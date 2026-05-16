@@ -69,7 +69,6 @@ flowchart LR
     T1[Token in] --> CMP[GPU compute units]
     CMP -->|"hop ~10 mm — 100 pJ/bit — read ~3.3 GB / layer"| HBM[(HBM3<br/>142 GB weights)]
     HBM -->|"return activations<br/>~10 mm, 100 pJ/bit"| CMP
-    CMP -.->|"× 43 layers / token<br/>= ~13 GB active read / token (MoE)<br/>≈ ~10 J transport energy / token"| CMP
     CMP --> T2[Token out]
     style HBM fill:#fbb
     style CMP fill:#bcf
@@ -84,7 +83,6 @@ flowchart LR
     T1[Token in] --> PE[Compute PE]
     PE -->|"&lt;1 mm on-wafer fabric<br/>~1-5 pJ/bit<br/>weights already resident"| SRAM[("On-wafer SRAM<br/>~18 GB")]
     SRAM -->|"local return"| PE
-    PE -.->|"× 43 layers / token<br/>0 off-chip hops<br/>but ~10 kW system power"| PE
     PE --> T2[Token out]
     style SRAM fill:#bcf
     style PE fill:#bcf
@@ -96,8 +94,7 @@ Weights live ON-WAFER in SRAM (~18 GB on a single 350 cm² wafer). No off-chip H
 
 ```mermaid
 flowchart LR
-    T1[Token in] --> ASIC["Model = silicon datapath<br/>(weights baked as literal wires)<br/>1 model per chip<br/>~$30M NRE / model"]
-    ASIC -.->|"in-cell &lt;10 nm<br/>~0.001 pJ/bit (wire only)<br/>0 memory reads<br/>~2-3 W"| ASIC
+    T1[Token in] --> ASIC["Model = silicon datapath<br/>(weights baked as literal wires)<br/>in-cell &lt;10 nm, ~0.001 pJ/bit<br/>0 memory reads, ~2-3 W<br/>1 model per chip, ~$30M NRE / model"]
     ASIC --> T2[Token out]
     style ASIC fill:#9c9
 ```
@@ -126,12 +123,10 @@ All-SRAM, on-chip weights, 0 DRAM access — but per-chip SRAM is small (~230 MB
 ```mermaid
 flowchart LR
     T1[Token in] --> KV["KV SRAM<br/>~6.7 GB on-die<br/>0.1 pJ/bit"]
-    KV --> L1["Chip layer 1<br/>ReRAM cells<br/>(weights resident)"]
-    L1 -.->|"in-situ MAC<br/>50 nm in-cell<br/>~5 pJ/bit<br/>0 weight reads"| L1
+    KV --> L1["Chip layer 1<br/>ReRAM cells (weights resident)<br/>in-situ MAC, 50 nm in-cell<br/>~5 pJ/bit, 0 weight reads"]
     L1 -->|"TSV vertical &lt;1 mm<br/>~0.1 pJ/bit"| L2["Chip layer 2"]
     L2 --> L3["..."]
     L3 --> L8["Chip layer 8"]
-    L8 -.->|"× 43 model layers / token<br/>= ~0 J transport + ~0.3 J compute / token"| L8
     L8 --> T2[Token out]
     style L1 fill:#9c9
     style L2 fill:#9c9

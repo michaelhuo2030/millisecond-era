@@ -68,6 +68,144 @@
 
 ---
 
+## token 在物理上是怎么算出来的 — 我们的 240-960× 来自哪里
+
+LLM 推理的 wall-clock 瓶颈**不在算力**, 在**权重每 token 物理移动多远**。现代 GPU 大部分时间在等 HBM 数据返回。架构层真正的杠杆不是 attention sweep 或 speculative decoding (这两个是 software 层的优化, 任何 chip 都能叠上去) — 是**权重住在哪里**。
+
+以下: 5 种架构, 并排, 一个 token 在物理上真实的旅程 — 走多远, 每 bit 多少 picojoule, 每 token 总能耗。然后一张 7 行对比表, 一个 2×2 定位矩阵, 4 条核心比例。
+
+### Traditional GPU + HBM (NVIDIA H100 / Apple M4 Max)
+
+```mermaid
+flowchart LR
+    T1[Token in] --> CMP[GPU compute units]
+    CMP -->|"hop ~10 mm — 100 pJ/bit — read ~3.3 GB / layer"| HBM[(HBM3<br/>142 GB weights)]
+    HBM -->|"return activations<br/>~10 mm, 100 pJ/bit"| CMP
+    CMP -.->|"× 43 layers / token<br/>= ~13 GB active read / token (MoE)<br/>≈ ~10 J transport energy / token"| CMP
+    CMP --> T2[Token out]
+    style HBM fill:#fbb
+    style CMP fill:#bcf
+```
+
+权重住在**片外 HBM**。每一 token 的每一层 = 一次 10 mm 的 GPU ↔ HBM 往返。V4-Flash 每 token 激活 13B 参数 (MoE), 每 token 通过 HBM3 搬运 ~13 GB, 以 ~100 pJ/bit 算 ≈ **每 token 约 10 J 纯权重传输能量**。计算本身很快; 等内存才是瓶颈。
+
+### Cerebras WSE-3 (晶圆级)
+
+```mermaid
+flowchart LR
+    T1[Token in] --> PE[Compute PE]
+    PE -->|"&lt;1 mm on-wafer fabric<br/>~1-5 pJ/bit<br/>weights already resident"| SRAM[("On-wafer SRAM<br/>~18 GB")]
+    SRAM -->|"local return"| PE
+    PE -.->|"× 43 layers / token<br/>0 off-chip hops<br/>but ~10 kW system power"| PE
+    PE --> T2[Token out]
+    style SRAM fill:#bcf
+    style PE fill:#bcf
+```
+
+权重住在**晶圆上的 SRAM** (单片 350 cm² 晶圆装 ~18 GB)。完全没有片外 HBM 跳, 每次访问距离 < 1 mm。但 SRAM 是易失的, 密度低, 整片晶圆系统功耗 ~10 kW。这是为训练级 FLOPs 优化, 不是边缘推理。
+
+### Taalas HC1 (多伦多 — "model-as-chip")
+
+```mermaid
+flowchart LR
+    T1[Token in] --> ASIC["Model = silicon datapath<br/>(weights baked as literal wires)<br/>1 model per chip<br/>~$30M NRE / model"]
+    ASIC -.->|"in-cell &lt;10 nm<br/>~0.001 pJ/bit (wire only)<br/>0 memory reads<br/>~2-3 W"| ASIC
+    ASIC --> T2[Token out]
+    style ASIC fill:#9c9
+```
+
+最极端的 model-as-chip。权重是**字面意义上的硅线** —— fab 阶段直接雕刻进去, 没有 flip-flop, 没有 memory cell, 没有读操作。每 bit 能量本质上只有金属线电容 (~0.001 pJ/bit)。代价: 一颗芯片一个模型, 每次流片 NRE 约 $30M, 模型升级 = 重新流片 = ~9-18 个月。
+
+### Groq LPU
+
+```mermaid
+flowchart LR
+    T1[Token in] --> C1["Chip 1<br/>~230 MB SRAM"]
+    C1 -->|"network hop<br/>~10-50 pJ/bit<br/>activation flow"| C2["Chip 2<br/>~230 MB SRAM"]
+    C2 -->|"network hop"| C3["..."]
+    C3 -->|"network hop"| Cn["Chip N<br/>~230 MB SRAM"]
+    Cn --> T2[Token out]
+    style C1 fill:#bcf
+    style C2 fill:#bcf
+    style C3 fill:#bcf
+    style Cn fill:#bcf
+```
+
+全 SRAM, 权重片上, 完全没有 DRAM 访问 —— 但单 chip SRAM 太小 (~230 MB)。一个 70B 模型需要很多 chip, 权重在网络上分片。每 token 的流量通过 deterministic interconnect 在 chip 间流转, ~10-50 pJ/bit。单 chip 快, 但系统层网络受限。
+
+### 我们 — 28nm ReRAM-CIM (毫秒纪) ★
+
+```mermaid
+flowchart LR
+    T1[Token in] --> KV["KV SRAM<br/>~6.7 GB on-die<br/>0.1 pJ/bit"]
+    KV --> L1["Chip layer 1<br/>ReRAM cells<br/>(weights resident)"]
+    L1 -.->|"in-situ MAC<br/>50 nm in-cell<br/>~5 pJ/bit<br/>0 weight reads"| L1
+    L1 -->|"TSV vertical &lt;1 mm<br/>~0.1 pJ/bit"| L2["Chip layer 2"]
+    L2 --> L3["..."]
+    L3 --> L8["Chip layer 8"]
+    L8 -.->|"× 43 model layers / token<br/>= ~0 J transport + ~0.3 J compute / token"| L8
+    L8 --> T2[Token out]
+    style L1 fill:#9c9
+    style L2 fill:#9c9
+    style L3 fill:#9c9
+    style L8 fill:#9c9
+    style KV fill:#bcf
+```
+
+权重**片上 + 非易失** 住在 ReRAM cell 里, **在计算位点 (in-situ MAC)** —— 乘加直接在 memory array 内部发生 (compute-in-memory)。每次权重读的物理路径 = ~50 nm (ReRAM cell 内部), 而不是 ~10 mm (HBM 边界)。KV cache 在片上 SRAM。8 层 3D 堆叠意味 V4-Flash 的 43 个模型层物理上分布在 8 个 chip layer 上 —— TSV 跨层跳 < 1 mm。**每 token 权重传输能量: ~0 J. In-situ MAC 计算: ~0.3 J / token**。而且因为 ReRAM 是**非易失 + 可重编程**, 这颗芯片可以重新刷新写入新模型 —— 不像 Taalas 模型是 fab 永久烧死的。
+
+### 7 个方案对比
+
+| 方案 | 权重住哪里 | 每 token 权重读 | 能量 / bit | 每跳距离 | 功耗 | 可重编程 | 形态 |
+|---|---|---|---|---|---|---|---|
+| Traditional GPU + HBM (H100, M4 Max) | 片外 HBM | ~13 GB 激活 (MoE) bandwidth-bound | ~100 pJ/bit (HBM3) | ~10 mm | 700 W (H100) / 80 W (M4 Max) | 是 (从盘加载) | 云机架 / 桌面 |
+| Cerebras WSE-3 | 晶圆 SRAM (~18 GB) | 0 (resident) | ~1-5 pJ/bit | <1 mm | ~10 kW 系统 | 是 | 晶圆级机柜 |
+| Etched Sohu | 硬连线 transformer datapath + 片外 HBM 存权重 | 是 (HBM 仍片外) | ~100 pJ/bit (HBM) + ~0 (datapath) | ~10 mm | ~5-20 W (估) | 受限 — Transformer-only 架构 | 推理机 |
+| Taalas HC1 (多伦多) | **字面硅线** (fab-baked) | 0 (没 memory, 模型就是芯片) | ~0.001 pJ/bit (线) | <10 nm in-cell | ~2-3 W (Llama 8B) | **否** ($30M NRE / 模型) | 边缘 ASIC |
+| Groq LPU | 片上 SRAM (~230 MB / chip) | 0 / chip; activation 跨 chip 流 | ~1-5 pJ/bit local; ~10-50 pJ/bit 网络 | <1 mm 片上; 5+ mm 网络 | 100-150 W / chip × N | 是 | 云机架 (多 chip) |
+| Tenstorrent Blackhole (多伦多) | 混合: 32 GB 片上 SRAM + 片外 DRAM | 大模型时是 | ~1-5 pJ/bit 片上; ~100 pJ/bit 片外 | <1 mm 片上; ~20-50 mm 片外 | 150-200 W | 是 | 云机架 / IP license |
+| **★ 我们 — 28nm ReRAM-CIM** | **非易失 ReRAM 在计算位点 (in-situ MAC)** | **0** (resident, 非易失) | **~5 pJ/bit in-cell** | **50 nm in-cell; <1 mm TSV** | **~70-150 W target ($850-$11,300 SKU)** | **是** (可重新写入) | **边缘 / 桌面 / Pro Cloud 卡** |
+
+target / TBD 备注: *Etched Sohu* 功耗未公开 — 估计值。 *我们 5 pJ/bit 和 ~70-150 W* 是 target spec (基于 HYDAR ISSCC 2026 hybrid CIM + 知存 / 苹芯 / 后摩 28nm CIM 数据) — 待 Phase β eval board + Phase δ MPW 实证。 *Cerebras 10 kW* 含冷却的系统级。
+
+### 关键的 2×2 — 每个架构在哪里
+
+```
+                                        是否可重编程?
+                          ┌──────────────────────────┬──────────────────────────┐
+                          │   可重编程               │   一次性 (fab-baked)     │
+                          ├──────────────────────────┼──────────────────────────┤
+   权重 片外                │ Traditional GPU + HBM    │                          │
+   (DRAM / HBM)            │ Etched Sohu (datapath)   │           —              │
+                          │ Tenstorrent Blackhole    │                          │
+                          ├──────────────────────────┼──────────────────────────┤
+   权重 片上 SRAM           │ Cerebras WSE-3           │                          │
+   (易失, 需持续供电)        │ Groq LPU                 │           —              │
+                          ├──────────────────────────┼──────────────────────────┤
+   权重 片上 非易失          │   ★ 我们                  │   Taalas HC1             │
+   (无需供电也保持)          │   (28nm ReRAM-CIM)       │   (model = silicon wires)│
+                          │   可重新刷写              │   1 模型 / 芯片          │
+                          └──────────────────────────┴──────────────────────────┘
+```
+
+最下面一行 (片上 + 非易失) 是**最节能的格子** — 权重不通电也保持, 运行时也没有 memory 读。Taalas 占右下角 (模型永久烧死, 超低功耗, 但一芯片只能一个模型)。**左下角 (片上非易失 + 可重编程) 是 ReRAM 物理独占的格子** — 像 flash 一样可重新写入, 但同时有 CIM 的 in-situ MAC 特性。这不是 marketing 定位, 是 28nm 量产工艺下可用的物理存储技术决定的 (SRAM 易失, flash 非易失但 MAC 慢, **ReRAM 非易失 + 快速 in-situ MAC**)。
+
+### 4 条核心比例
+
+**1. 每 bit 移动能量**: ReRAM-CIM in-cell MAC ~5 pJ/bit vs HBM3 片外读 ~100 pJ/bit → **每 bit 能效 ~20×**。
+
+**2. 每权重读的物理路径**: Traditional GPU 把权重在 HBM 之间搬 ~10 mm 一个 layer; ReRAM-CIM in-cell 读 ~50 nm → **物理路径 ~200,000× 更短**。这就是 bandwidth 瓶颈消失的真正原因 (库仑能量和 RC 延迟都跟距离 scaling)。
+
+**3. 每 token 传输能量 (V4-Flash 13B 激活)**: Traditional GPU + HBM 约 10 J / token (权重穿越 HBM 边界); 我们 ~0.3 J / token (in-situ MAC, 无传输) → **每 token 能量 ~30× 更低**。
+
+**4. 架构杠杆, 总结**: Attention sweep 优化 (FlashAttention / PagedAttention) 和 speculative decoding (draft + verify) 是 **software 层优化**。它们可以叠加在以上**任何**架构上, 并与 chip 端 gain 叠乘。它们不是物理杠杆的替代。物理杠杆是**权重相对计算单元的物理位置**, 以及移动它们的能量 / 距离代价。我们 240-960× 速度目标 (vs Mac M4 Max baseline) 来自**物理上消除 HBM bandwidth 瓶颈**, 不是算法巧思。Spec decode + attention 优化是叠加在上面的乘数。
+
+### 诚实的 gap
+
+我们尚未在自己的硅上测得 5 pJ/bit (Phase β eval board + Phase δ MPW); 尚未验证 28nm ReRAM 在量产 yield 下的 endurance / retention (Phase α 部分完成 — 见 `iteration-2026-05-14-kimi-audit/24-cell-physics-validation-2024-2026.md`); 尚未跟昕原 settle 量产 yield 下的 4-bit cell BER (deferred — 小批量评估可接受)。本节数字锚定在: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM 先例)、知存 WTM2101 datasheet、IBM Analog Foundation Models paper (Nature Comms 2025)、Cerebras S-1、Taalas 公开声明、Groq 公开数据、Tenstorrent IP licensing 数据。数据缺失或解释性处, 标 "(估)" 或 "target"。表格或矩阵任何 cell 摆错 — 欢迎提 issue 指正。
+
+---
+
 ## 我们已经验证了什么 — Stage 0+ 5 个 hard signals
 
 全部数据基于 2-bit V4-Flash (antirez Q2-K GGUF, 81 GB) on M4 Max 128 GB. 任何人都能在 GitHub 的 `data/` 和 `scripts/` 用 5 分钟复现。SRAM 端 finding 跟权重量化无关 (差异 < 5%), 所以对 4-bit 也成立。

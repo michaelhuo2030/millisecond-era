@@ -56,6 +56,145 @@ This is the empirical + black-tech-design output of one person, 1.5 months, ~$1,
 
 ---
 
+## How a token physically computes — and where our 240-960× lives
+
+The wall-clock bottleneck in LLM inference is **not** compute — it's **how far weights physically travel per token**. A modern GPU spends most of its time waiting for HBM. The architectural lever isn't attention sweep or speculative decoding (both are software optimizations that layer on top of any chip). The lever is **where the weights live**.
+
+Below: five architectures, side-by-side, with the actual physical journey of one token — distance traveled, picojoules per bit, and per-token energy cost. Then a comparison table covering seven approaches, a 2×2 positioning matrix, and four key ratios.
+
+### Traditional GPU + HBM (NVIDIA H100 / Apple M4 Max)
+
+```mermaid
+flowchart LR
+    T1[Token in] --> CMP[GPU compute units]
+    CMP -->|"hop ~10 mm — 100 pJ/bit — read ~3.3 GB / layer"| HBM[(HBM3<br/>142 GB weights)]
+    HBM -->|"return activations<br/>~10 mm, 100 pJ/bit"| CMP
+    CMP -.->|"× 43 layers / token<br/>= ~13 GB active read / token (MoE)<br/>≈ ~10 J transport energy / token"| CMP
+    CMP --> T2[Token out]
+    style HBM fill:#fbb
+    style CMP fill:#bcf
+```
+
+Weights live OFF-CHIP in HBM. Every layer of every token = a 10 mm round-trip across the GPU↔HBM boundary. With V4-Flash 13B active params per token (MoE), each token transports ~13 GB through HBM3 at ~100 pJ/bit ≈ **~10 J / token of pure weight transport**. The compute itself is fast; the wait for memory is the bottleneck.
+
+### Cerebras WSE-3 (Wafer-scale)
+
+```mermaid
+flowchart LR
+    T1[Token in] --> PE[Compute PE]
+    PE -->|"&lt;1 mm on-wafer fabric<br/>~1-5 pJ/bit<br/>weights already resident"| SRAM[("On-wafer SRAM<br/>~18 GB")]
+    SRAM -->|"local return"| PE
+    PE -.->|"× 43 layers / token<br/>0 off-chip hops<br/>but ~10 kW system power"| PE
+    PE --> T2[Token out]
+    style SRAM fill:#bcf
+    style PE fill:#bcf
+```
+
+Weights live ON-WAFER in SRAM (~18 GB on a single 350 cm² wafer). No off-chip HBM hops at all — distance per access is <1 mm. But SRAM is volatile, density is low, and the wafer burns ~10 kW system power. Optimized for training-grade FLOPs, not edge inference.
+
+### Taalas HC1 (Toronto — "model-as-chip")
+
+```mermaid
+flowchart LR
+    T1[Token in] --> ASIC["Model = silicon datapath<br/>(weights baked as literal wires)<br/>1 model per chip<br/>~$30M NRE / model"]
+    ASIC -.->|"in-cell &lt;10 nm<br/>~0.001 pJ/bit (wire only)<br/>0 memory reads<br/>~2-3 W"| ASIC
+    ASIC --> T2[Token out]
+    style ASIC fill:#9c9
+```
+
+Most extreme model-as-chip. Weights are **literal silicon wires** sculpted during fabrication — no flip-flops, no memory cells, no reads. Energy per bit is essentially wire capacitance only (~0.001 pJ/bit). Tradeoff: one model per chip, ~$30M NRE per tape-out, model upgrade = new tape-out = ~9-18 months.
+
+### Groq LPU
+
+```mermaid
+flowchart LR
+    T1[Token in] --> C1["Chip 1<br/>~230 MB SRAM"]
+    C1 -->|"network hop<br/>~10-50 pJ/bit<br/>activation flow"| C2["Chip 2<br/>~230 MB SRAM"]
+    C2 -->|"network hop"| C3["..."]
+    C3 -->|"network hop"| Cn["Chip N<br/>~230 MB SRAM"]
+    Cn --> T2[Token out]
+    style C1 fill:#bcf
+    style C2 fill:#bcf
+    style C3 fill:#bcf
+    style Cn fill:#bcf
+```
+
+All-SRAM, on-chip weights, 0 DRAM access — but per-chip SRAM is small (~230 MB). A 70B-parameter model needs many chips, so weights are sharded across the network. Per-token traffic moves between chips at ~10-50 pJ/bit through the deterministic interconnect. Fast per-chip but network-bound at the system level.
+
+### Ours — 28nm ReRAM-CIM (millisecond-era) ★
+
+```mermaid
+flowchart LR
+    T1[Token in] --> KV["KV SRAM<br/>~6.7 GB on-die<br/>0.1 pJ/bit"]
+    KV --> L1["Chip layer 1<br/>ReRAM cells<br/>(weights resident)"]
+    L1 -.->|"in-situ MAC<br/>50 nm in-cell<br/>~5 pJ/bit<br/>0 weight reads"| L1
+    L1 -->|"TSV vertical &lt;1 mm<br/>~0.1 pJ/bit"| L2["Chip layer 2"]
+    L2 --> L3["..."]
+    L3 --> L8["Chip layer 8"]
+    L8 -.->|"× 43 model layers / token<br/>= ~0 J transport + ~0.3 J compute / token"| L8
+    L8 --> T2[Token out]
+    style L1 fill:#9c9
+    style L2 fill:#9c9
+    style L3 fill:#9c9
+    style L8 fill:#9c9
+    style KV fill:#bcf
+```
+
+Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply-accumulate happens directly inside the memory array (compute-in-memory). Physical path per weight read = ~50 nm (within a ReRAM cell) instead of ~10 mm (across the HBM boundary). KV cache sits on-die in SRAM. 8-layer 3D stack means the 43 model layers are spread across 8 physical chip layers — TSV cross-layer hops are <1 mm. **Per-token weight transport energy: ~0 J. In-situ MAC compute: ~0.3 J / token.** And because ReRAM is **non-volatile + re-programmable**, the chip can be re-flashed for a new model — unlike Taalas where the model is fab-baked permanently.
+
+### Seven-approach comparison
+
+| Approach | Weights live | Per-token weight read | Energy/bit | Distance/hop | Power | Reconfigurable | Form factor |
+|---|---|---|---|---|---|---|---|
+| Traditional GPU + HBM (H100, M4 Max) | Off-chip HBM | ~13 GB active (MoE) bandwidth-bound | ~100 pJ/bit (HBM3) | ~10 mm | 700 W (H100) / 80 W (M4 Max) | Yes (load from disk) | Cloud rack / desktop |
+| Cerebras WSE-3 | On-wafer SRAM (~18 GB) | 0 (resident) | ~1-5 pJ/bit | <1 mm | ~10 kW system | Yes | Wafer-scale appliance |
+| Etched Sohu | Hardcoded transformer datapath + external HBM for weights | Yes (HBM still off-chip) | ~100 pJ/bit (HBM) + ~0 (datapath) | ~10 mm | ~5-20 W (est.) | Limited — Transformer-only arch | Inference appliance |
+| Taalas HC1 (Toronto) | **Literal silicon wires** (fab-baked) | 0 (no memory, IS the model) | ~0.001 pJ/bit (wire) | <10 nm in-cell | ~2-3 W (Llama 8B) | **NO** ($30M NRE / model) | Edge ASIC |
+| Groq LPU | On-chip SRAM (~230 MB / chip) | 0 per chip; activation flows across chips | ~1-5 pJ/bit local; ~10-50 pJ/bit network | <1 mm on-chip; 5+ mm network | 100-150 W / chip × N chips | Yes | Cloud rack (multi-chip) |
+| Tenstorrent Blackhole (Toronto) | Mixed: 32 GB on-die SRAM + off-chip DRAM | Yes for large models | ~1-5 pJ/bit on-die; ~100 pJ/bit off-chip | <1 mm on-chip; ~20-50 mm off-chip | 150-200 W | Yes | Cloud rack / IP-license |
+| **★ Ours — 28nm ReRAM-CIM** | **Non-volatile ReRAM AT compute (in-situ MAC)** | **0** (resident, non-volatile) | **~5 pJ/bit in-cell** | **50 nm in-cell; <1 mm TSV** | **~70-150 W target ($850-$11,300 SKUs)** | **YES** (re-flashable) | **Edge / desktop / Pro Cloud card** |
+
+Notes on target / TBD: *Etched Sohu* power not public — estimated. *Ours 5 pJ/bit and ~70-150 W* are target specs (HYDAR ISSCC 2026 hybrid CIM + 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) 28nm CIM precedent) — to be empirically validated via Phase β eval boards and Phase δ MPW. *Cerebras 10 kW* is system-level including cooling.
+
+### The 2×2 that matters — where each architecture sits
+
+```
+                                        RECONFIGURABLE?
+                          ┌──────────────────────────┬──────────────────────────┐
+                          │   re-programmable        │   one-time (fab-baked)   │
+                          ├──────────────────────────┼──────────────────────────┤
+   Weights OFF-CHIP        │   Traditional GPU + HBM  │                          │
+   (DRAM / HBM)            │   Etched Sohu (datapath) │           —              │
+                          │   Tenstorrent Blackhole  │                          │
+                          ├──────────────────────────┼──────────────────────────┤
+   Weights ON-CHIP         │   Cerebras WSE-3         │                          │
+   SRAM (volatile,         │   Groq LPU               │           —              │
+   needs constant power)   │                          │                          │
+                          ├──────────────────────────┼──────────────────────────┤
+   Weights ON-CHIP         │    ★ Ours                 │   Taalas HC1             │
+   NON-VOLATILE            │    (28nm ReRAM-CIM)      │   (model-as-silicon)     │
+   (no power to retain)    │    re-flashable          │   1 model / chip         │
+                          └──────────────────────────┴──────────────────────────┘
+```
+
+The bottom row (on-chip + non-volatile) is the **most power-efficient cell** — weights retain without electricity, no memory reads at runtime. Taalas occupies the right-bottom cell (model permanently baked, ultra-low-power, but one chip = one model). **The left-bottom cell (on-chip non-volatile + re-programmable) is where ReRAM physics uniquely sits** — re-flashable like flash memory, but with the in-situ MAC characteristic of CIM. This isn't a marketing positioning argument; it's a consequence of which physical memory technologies exist at 28nm production-ready (SRAM volatile, flash non-volatile but slow MAC, **ReRAM non-volatile + fast in-situ MAC**).
+
+### Four key ratios
+
+**1. Energy per bit moved**: ReRAM-CIM in-cell MAC at ~5 pJ/bit vs HBM3 off-chip read at ~100 pJ/bit → **~20× more efficient per bit moved**.
+
+**2. Physical path length per weight read**: Traditional GPU hops weights ~10 mm to HBM and back per layer; ReRAM-CIM reads in-cell at ~50 nm → **~200,000× shorter physical path**. This is the actual reason the bandwidth bottleneck disappears (Coulomb energy and RC delay both scale with distance).
+
+**3. Per-token transport energy (V4-Flash, 13B active)**: Traditional GPU + HBM ~10 J / token (weight transport across HBM boundary); Ours ~0.3 J / token (in-situ MAC, no transport) → **~30× lower energy per token**.
+
+**4. The architectural lever, summarized**: Attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are **software-level optimizations**. They layer on top of *any* of the architectures above and compound with chip-side gains. They are not substitutes for the physical lever. The lever is **where the weights physically sit relative to the compute units**, and the energy / distance cost of moving them. Our 240-960× speed target (vs Mac M4 Max baseline) comes from **eliminating the HBM bandwidth bottleneck physically**, not from algorithmic cleverness. Spec decode + attention optimization would be additive multipliers on top.
+
+### Honest gaps
+
+We have not yet measured 5 pJ/bit on our own silicon (Phase β eval boards + Phase δ MPW); not verified 28nm ReRAM endurance / retention at production yield (Phase α partial — see `iteration-2026-05-14-kimi-audit/24-cell-physics-validation-2024-2026.md`); not settled 4-bit cell BER at production yield with 昕原 (deferred — small-batch evaluation acceptable). Numbers in this section are anchored against: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM precedent), 知存 WTM2101 datasheet, IBM Analog Foundation Models paper (Nature Comms 2025), Cerebras S-1, Taalas public statements, Groq published specs, Tenstorrent IP licensing data. Where data is unavailable or interpretive, marked "(est.)" or "target". Feedback welcome if any cell in the table or matrix is misplaced — open an issue.
+
+---
+
 ## What we've already verified — Stage 0+/0++ hard signals (5)
 
 All data: 2-bit DeepSeek V4-Flash (antirez Q2-K GGUF, 81 GB) on M4 Max 128 GB. Reproducible in `data/` + `scripts/`. **SRAM-side findings are quantization-agnostic** — KV/Indexer/Activation memory needs are weight-quantization-independent (<5% difference between 2-bit and 4-bit).

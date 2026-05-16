@@ -347,13 +347,9 @@ The chip is the difference between *AI you talk to occasionally* and *AI as how 
 | Phase β | 昕原 (Xinyuan) / 知存 / 苹芯 / 后摩 BD outreach | Michael | email/X/intro | $0 | M3 trigger |
 | Phase δ | MPW small test tile (5×5 mm² 28nm) | (TBD) | O1 borrow vendor testchip / O2 university CMP / O3 partner-funded / O4 alumni | $0-42K | M9-M24 |
 
-### How the self-funding actually works (this is not magic, just 知行合一)
+### Funding (not the hard part)
 
-I run **Project-Based Learning (PBL) coaching** for Chinese high school students (Shanghai cohort) and overseas Chinese-origin high schoolers (US / Canada). Instead of teaching for tests, I guide them to build **real commercial products for real customers** — a stack of small-but-shippable ventures that generate actual revenue. Coaching fees + project revenue is what funds this chip work.
-
-This is literally 知行合一 (*zhī xíng hé yī*, "knowledge and action as one"): the way I learn, the way I teach, and the way I earn are all the same loop. The chip thesis itself becomes a teaching case — the students see a real builder going from hypothesis → measurement → first-principles design → public publication in real time. They build their own ventures using the same playbook.
-
-This gives a **stable, growing income stream that is independent of any investor or grant**. As the student cohort expands and AI-augmented growth-marketing experiments compound, Year-1 self-fund comfortably reaches **$4,200–7,000 (¥30K–50K)**. Stretching to **$14K–70K (¥100K–500K)** Year-1 is plausible with cohort expansion. The 2-year self-fund pool plus partner support plus university / alumni / sponsor contributions targets **~$140K (¥1M)** — enough for one small 5×5 mm² 28nm MPW test tile.
+I have a part-time coaching income that already comfortably exceeds the project budget. Working a bit harder on it, combined with partner support and university / alumni / sponsor contributions, easily reaches a 2-year self-fund pool of **~$140K (¥1M)** — enough for one small 5×5 mm² 28nm MPW test tile. Funding isn't the hard part of this project; chip physics is.
 
 **Important**: I do **not** chase investors. Reactive readiness only — if a fund proactively reaches us because they actually want this thing, we'll talk. We never write cold pitches. The line "100 真心 partner 围拢" (*100 wholehearted partners gather*) means: 100 people who genuinely want this chip to exist (developers, fab engineers, academics, students, retired silicon veterans) each contribute what they can — code, eval boards, PDK access, design review, financial sponsorship, or simply genuine interest. That is the funding model. Not VCs.
 
@@ -420,7 +416,7 @@ We're not positioning this as a national-champion-vs-someone-else story. We're *
 
 **Why China-fab capacity matters here**: 28nm ReRAM-CIM production capacity is *accessible* in Chinese fabs today (e.g., 昕原 confirmed at 2K wpm partner-fab, >93% yield, multi-billion-dollar investor stack). That accessibility means *this physical artifact can actually exist*, not as a five-year wait but as a near-term reality. **We use that accessibility to serve the open community** — not to compete *against* anyone, but to put the missing hardware layer where it belongs, in the open.
 
-The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (via PBL coaching revenue, 知行合一 / *zhī xíng hé yī*) + ~100 wholehearted partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
+The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (知行合一 / *zhī xíng hé yī* — knowledge and action as one) + ~100 wholehearted partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
 
 *"Chip lifetime ≠ silicon lifetime"* — 28nm ReRAM is reprogrammable (10⁶ write cycles). Same silicon runs V4-Flash text-only today, V4.1-VL multimodal six months from now (just reflash, +1 GB vision encoder weights), V4.5 / V5-Flash for the next several years. 5-7 year chip useful life across 3-5 model generations. Western Mask-ROM chips (Etched/Taalas) are one-shot. Chinese ReRAM-CIM is *evolving*.
 

@@ -140,7 +140,7 @@ flowchart LR
     style KV fill:#bcf
 ```
 
-Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply-accumulate happens directly inside the memory array (compute-in-memory). Physical path per weight read = ~50 nm (within a ReRAM cell) instead of ~10 mm (across the HBM boundary). KV cache sits on-die in SRAM. 8-layer 3D stack means the 43 model layers are spread across 8 physical chip layers — TSV cross-layer hops are <1 mm. **Per-token weight transport energy: ~0 J. In-situ MAC compute: ~0.3 J / token.** And because ReRAM is **non-volatile + re-programmable**, the chip can be re-flashed for a new model — unlike Taalas where the model is fab-baked permanently.
+Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply-accumulate happens directly inside the memory array (compute-in-memory). Physical path per weight read = ~50 nm (within a ReRAM cell) instead of ~10 mm (across the HBM boundary). KV cache sits on-die in SRAM. 8-layer 3D stack means the 43 model layers are spread across 8 physical chip layers — TSV cross-layer hops are <1 mm and ~1 ns latency per hop (signal propagation + driver), so 7-8 TSV hops per token total ~8 ns — negligible vs the ~50-70 ns ReRAM-read + ADC time per tile operation. **Compute (ReRAM cell read + ADC) is the latency floor, not the wires.** TSV bandwidth utilization is ~0.026% (vertical hops are not the bottleneck). **Per-token weight transport energy: ~0 J. In-situ MAC compute: ~0.3 J / token.** And because ReRAM is **non-volatile + re-programmable**, the chip can be re-flashed for a new model — unlike Taalas where the model is fab-baked permanently.
 
 ### Seven-approach comparison
 
@@ -154,7 +154,7 @@ Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply
 | Tenstorrent Blackhole (Toronto) | Mixed: 32 GB on-die SRAM + off-chip DRAM | Yes for large models | ~1-5 pJ/bit on-die; ~100 pJ/bit off-chip | <1 mm on-chip; ~20-50 mm off-chip | 150-200 W | Yes | Cloud rack / IP-license |
 | **★ Ours — 28nm ReRAM-CIM** | **Non-volatile ReRAM AT compute (in-situ MAC)** | **0** (resident, non-volatile) | **~5 pJ/bit in-cell** | **50 nm in-cell; <1 mm TSV** | **~70-150 W target ($850-$11,300 SKUs)** | **YES** (re-flashable) | **Edge / desktop / Pro Cloud card** |
 
-Notes on target / TBD: *Etched Sohu* power not public — estimated. *Ours 5 pJ/bit and ~70-150 W* are target specs (HYDAR ISSCC 2026 hybrid CIM + 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) 28nm CIM precedent) — to be empirically validated via Phase β eval boards and Phase δ MPW. *Cerebras 10 kW* is system-level including cooling.
+Notes on target / TBD: *Etched Sohu* power not public — estimated. *Ours 5 pJ/bit and ~70-150 W* are target specs (HYDAR ISSCC 2026 hybrid CIM + 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) 28nm CIM precedent) — to be empirically validated via vendor eval boards, then MPW silicon (see Roadmap below). *Cerebras 10 kW* is system-level including cooling.
 
 ### The 2×2 that matters — where each architecture sits
 
@@ -191,7 +191,7 @@ The bottom row (on-chip + non-volatile) is the **most power-efficient cell** —
 
 ### Honest gaps
 
-We have not yet measured 5 pJ/bit on our own silicon (Phase β eval boards + Phase δ MPW); not verified 28nm ReRAM endurance / retention at production yield (Phase α partial — see `iteration-2026-05-14-kimi-audit/24-cell-physics-validation-2024-2026.md`); not settled 4-bit cell BER at production yield with 昕原 (deferred — small-batch evaluation acceptable). Numbers in this section are anchored against: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM precedent), 知存 WTM2101 datasheet, IBM Analog Foundation Models paper (Nature Comms 2025), Cerebras S-1, Taalas public statements, Groq published specs, Tenstorrent IP licensing data. Where data is unavailable or interpretive, marked "(est.)" or "target". Feedback welcome if any cell in the table or matrix is misplaced — open an issue.
+We have not yet measured 5 pJ/bit on our own silicon — that arrives with vendor eval boards then MPW (see Roadmap below). 28nm ReRAM endurance / retention at production yield is currently validated only against published literature + vendor datasheets, not first-hand silicon measurements. 4-bit cell BER at production yield with 昕原 (Xinyuan) is deferred — small-batch evaluation is acceptable for now. Numbers in this section are anchored against: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM precedent), 知存 (Zhicun) WTM2101 datasheet, IBM Analog Foundation Models paper (Nature Comms 2025), Cerebras S-1, Taalas public statements, Groq published specs, Tenstorrent IP licensing data. Where data is unavailable or interpretive, marked "(est.)" or "target". Feedback welcome if any cell in the table or matrix is misplaced — open an issue.
 
 ---
 

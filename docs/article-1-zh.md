@@ -152,7 +152,7 @@ flowchart LR
     style KV fill:#bcf
 ```
 
-权重**片上 + 非易失** 住在 ReRAM cell 里, **在计算位点 (in-situ MAC)** —— 乘加直接在 memory array 内部发生 (compute-in-memory)。每次权重读的物理路径 = ~50 nm (ReRAM cell 内部), 而不是 ~10 mm (HBM 边界)。KV cache 在片上 SRAM。8 层 3D 堆叠意味 V4-Flash 的 43 个模型层物理上分布在 8 个 chip layer 上 —— TSV 跨层跳 < 1 mm。**每 token 权重传输能量: ~0 J. In-situ MAC 计算: ~0.3 J / token**。而且因为 ReRAM 是**非易失 + 可重编程**, 这颗芯片可以重新刷新写入新模型 —— 不像 Taalas 模型是 fab 永久烧死的。
+权重**片上 + 非易失** 住在 ReRAM cell 里, **在计算位点 (in-situ MAC)** —— 乘加直接在 memory array 内部发生 (compute-in-memory)。每次权重读的物理路径 = ~50 nm (ReRAM cell 内部), 而不是 ~10 mm (HBM 边界)。KV cache 在片上 SRAM。8 层 3D 堆叠意味 V4-Flash 的 43 个模型层物理上分布在 8 个 chip layer 上 —— TSV 跨层跳 < 1 mm, 每跳延迟 ~1 ns (信号传播 + 驱动), 每 token 总共 7-8 跳 ~8 ns —— 相比 ReRAM 读 + ADC 单次 tile 操作 ~50-70 ns, **完全可忽略**。**速度的 latency floor 是 compute (ReRAM cell 读 + ADC), 不是线**。TSV 带宽利用率仅 ~0.026% (纵向跳不是瓶颈)。**每 token 权重传输能量: ~0 J. In-situ MAC 计算: ~0.3 J / token**。而且因为 ReRAM 是**非易失 + 可重编程**, 这颗芯片可以重新刷新写入新模型 —— 不像 Taalas 模型是 fab 永久烧死的。
 
 ### 7 个方案对比
 
@@ -166,7 +166,7 @@ flowchart LR
 | Tenstorrent Blackhole (多伦多) | 混合: 32 GB 片上 SRAM + 片外 DRAM | 大模型时是 | ~1-5 pJ/bit 片上; ~100 pJ/bit 片外 | <1 mm 片上; ~20-50 mm 片外 | 150-200 W | 是 | 云机架 / IP license |
 | **★ 我们 — 28nm ReRAM-CIM** | **非易失 ReRAM 在计算位点 (in-situ MAC)** | **0** (resident, 非易失) | **~5 pJ/bit in-cell** | **50 nm in-cell; <1 mm TSV** | **~70-150 W target ($850-$11,300 SKU)** | **是** (可重新写入) | **边缘 / 桌面 / Pro Cloud 卡** |
 
-target / TBD 备注: *Etched Sohu* 功耗未公开 — 估计值。 *我们 5 pJ/bit 和 ~70-150 W* 是 target spec (基于 HYDAR ISSCC 2026 hybrid CIM + 知存 / 苹芯 / 后摩 28nm CIM 数据) — 待 Phase β eval board + Phase δ MPW 实证。 *Cerebras 10 kW* 含冷却的系统级。
+target / TBD 备注: *Etched Sohu* 功耗未公开 — 估计值。 *我们 5 pJ/bit 和 ~70-150 W* 是 target spec (基于 HYDAR ISSCC 2026 hybrid CIM + 知存 / 苹芯 / 后摩 28nm CIM 数据) — 待 vendor eval board, 然后 MPW silicon 实证 (见下面 Roadmap)。 *Cerebras 10 kW* 含冷却的系统级。
 
 ### 关键的 2×2 — 每个架构在哪里
 
@@ -202,7 +202,7 @@ target / TBD 备注: *Etched Sohu* 功耗未公开 — 估计值。 *我们 5 pJ
 
 ### 诚实的 gap
 
-我们尚未在自己的硅上测得 5 pJ/bit (Phase β eval board + Phase δ MPW); 尚未验证 28nm ReRAM 在量产 yield 下的 endurance / retention (Phase α 部分完成 — 见 `iteration-2026-05-14-kimi-audit/24-cell-physics-validation-2024-2026.md`); 尚未跟昕原 settle 量产 yield 下的 4-bit cell BER (deferred — 小批量评估可接受)。本节数字锚定在: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM 先例)、知存 WTM2101 datasheet、IBM Analog Foundation Models paper (Nature Comms 2025)、Cerebras S-1、Taalas 公开声明、Groq 公开数据、Tenstorrent IP licensing 数据。数据缺失或解释性处, 标 "(估)" 或 "target"。表格或矩阵任何 cell 摆错 — 欢迎提 issue 指正。
+我们尚未在自己的硅上测得 5 pJ/bit — 那是 vendor eval board, 然后 MPW silicon 阶段的事 (见下面 Roadmap)。28nm ReRAM 在量产 yield 下的 endurance / retention, 目前仅基于公开文献 + vendor datasheet 验证, 不是自己硅上一手实测。4-bit cell BER 在量产 yield 下 (跟昕原 / Xinyuan) 暂 defer — 小批量评估可接受。本节数字锚定在: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM 先例)、知存 (Zhicun) WTM2101 datasheet、IBM Analog Foundation Models paper (Nature Comms 2025)、Cerebras S-1、Taalas 公开声明、Groq 公开数据、Tenstorrent IP licensing 数据。数据缺失或解释性处, 标 "(估)" 或 "target"。表格或矩阵任何 cell 摆错 — 欢迎提 issue 指正。
 
 ---
 

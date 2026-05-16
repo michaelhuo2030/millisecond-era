@@ -1,7 +1,30 @@
-# millisecond-era — 毫秒纪
+# millisecond-era — 毫秒纪 (háo miǎo jì, "the millisecond age")
 
 > **The Missing Hardware Layer of DeepSeek's Full Stack**
-> *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~¥10K out of pocket*
+> *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~$1,400 out of pocket*
+
+---
+
+## The numbers (5-second read)
+
+| | |
+|---|---|
+| 🚀 **Speed** | **3,000 – 20,000 tokens/s** single-stream on DeepSeek V4-Flash-class models (entry tier 3K → Pro Cloud aggregate 20K). **200×–1,000×** the M4 Max baseline of 12 t/s @ 250K context. |
+| ⚡ **Prefill** | **~2 seconds @ 100K context** (chip target). Upload a 100K-token codebase / contract / case file → first token in ~2 s, not 90+ s like today. Long-context UX cliff erased. |
+| 💰 **Entry price** | **From ¥6,000 (≈ $850, well under $900)** — laptop-attached USB-C box (10×7×2 cm, like a Hailo-8 stick). Plug into any MacBook / Windows laptop. No driver install. |
+| 📐 **Cost** | 1.5 months, one person, ~$1,400 (¥10K) out of pocket so far. 50+ Stage 0+/0++ reproducible datapoints. MIT license. First chip prototype dedicated to **[@antirez](https://github.com/antirez)**. |
+
+[Jump to the civilizational speed ladder ↓](#what-different-speeds-actually-unlock--the-civilizational-ladder) for what each speed tier 0→1 unlocks. [Jump to the 18-row transparency matrix ↓](#what-we-havent-verified--18-row-transparency-matrix) for what's verified vs assumed.
+
+---
+
+## Contact
+
+- **Email**: xh638@stern.nyu.edu
+- **WeChat**: `jack_eagle`
+- **GitHub**: [@michaelhuo2030](https://github.com/michaelhuo2030)
+
+If you want this thing to exist — as a developer, manufacturer, academic, student, retired engineer, or partner who genuinely wants the missing hardware layer of DeepSeek's full stack — please reach out. Read [Open invitations ↓](#open-invitations--if-you-also-want-this-thing) first to see what kind of help moves the needle. **I'm not raising; please don't cold-pitch me with a term sheet.**
 
 ---
 
@@ -27,7 +50,7 @@ Over the past 18 months, 5 milestones already happened: Etched $120M (2024-06, "
 
 **Half this picture is drawn.** Hardware path (Etched/Taalas/Cerebras) and model path (DeepSeek full stack) have run independently to scale. **The other half will inevitably be the missing hardware-layer piece of DeepSeek's full stack — China's 28nm ReRAM-CIM × DeepSeek V4-Flash × 3FS protocol compatibility.**
 
-This is the empirical + black-tech-design output of one person, 1.5 months, ~¥10K out of pocket. Stage 0+ harness with 50+ datapoints on M4 Max 128 GB + antirez ds4-server with custom `printf` instrumentation, 10 framework reframes (one was agent-vs-agent), Path C architecture lock (8-layer 28nm + asymmetric layer composition unlocking 250K context).
+This is the empirical + black-tech-design output of one person, 1.5 months, ~$1,400 (¥10K) out of pocket. Stage 0+ harness with 50+ datapoints on M4 Max 128 GB + antirez ds4-server with custom `printf` instrumentation, 10 framework reframes (one was agent-vs-agent), Path C architecture lock (8-layer 28nm + asymmetric layer composition unlocking 250K context).
 
 **The first chip goes to antirez. We don't burn capital chasing investors — we burn time, geek hacks, and honest public asks.**
 
@@ -96,10 +119,10 @@ Our chip is engineered to use **Chinese-fab-accessible 28nm ReRAM-CIM** to push 
 
 | Our tier | Speed band | Civilizational tier reached |
 |---|---|---|
-| Entry ¥6K USB-C box | 3-8K t/s @ 32-128K ctx | **"longform feels instant"** — local LLM finally usable |
-| Mid ¥10K PCIe card | 3-6K t/s @ 180-250K ctx | **"longform feels instant" at domain-document scale** |
-| High ¥35K standalone + LPDDR5 | 3-8K t/s @ 256K + 1M via spillover | **"longform feels instant" / "LLM-as-OS-shell"** on multi-document scope |
-| Pro Cloud ¥80K rack + 3FS | 3-8K × N users (cluster aggregate 10K-50K) | **"LLM-as-OS-shell" / "compute substrate"** for enterprise |
+| Entry $850 (¥6K) USB-C box | 3-8K t/s @ 32-128K ctx | **"longform feels instant"** — local LLM finally usable |
+| Mid $1,400 (¥10K) PCIe card | 3-6K t/s @ 180-250K ctx | **"longform feels instant" at domain-document scale** |
+| High $5,000 (¥35K) standalone + LPDDR5 | 3-8K t/s @ 256K + 1M via spillover | **"longform feels instant" / "LLM-as-OS-shell"** on multi-document scope |
+| Pro Cloud $11,300 (¥80K) rack + 3FS | 3-8K × N users (cluster aggregate 10K-50K) | **"LLM-as-OS-shell" / "compute substrate"** for enterprise |
 
 **Each tier of our chip pushes Chinese-fab-accessible hardware up one whole civilizational rung**, on V4-Flash-class models, at consumer/SMB prices, locally and privately.
 
@@ -177,18 +200,23 @@ The chip is the difference between *AI you talk to occasionally* and *AI as how 
 
 | Stage | Activity | Who | How | Real cost | Status |
 |---|---|---|---|---|---|
-| Stage 0/0++ | ds4-server measurement (Exp 4-11) | Michael solo | M4 Max + ds4 fork w/ memlog patch | **¥0** | ✅ done |
-| Stage 1 | NeuroSim 28nm simulation | Michael solo | NeuroSim open source + **PDK borrowed** (asking) | ¥0 (if borrowed) | ⏳ asking |
-| Stage 2 | 知存/苹芯/后摩 eval board cross-check | Michael | **borrowing** (asking, fallback secondhand ¥5-30K) | ¥0-5K | ⏳ asking |
-| Stage 3 | EBAZ4205 mining-leftover FPGA for MoE Top-K routing | Michael soldering | secondhand Taobao | **¥200-500** | self-fund |
-| Stage 4 | Multi-board 3D dataflow simulation | Michael | KiCad (free) + parts + **lab gear borrowed/rented** | ¥3-10K + gear | mixed |
-| Phase β | 昕原/知存/苹芯/后摩 BD outreach | Michael | email/X/intro | ¥0 | M3 trigger |
-| Phase δ | MPW small test tile (5×5 mm² 28nm) | (TBD) | O1 borrow vendor testchip / O2 university CMP / O3 partner-funded / O4 alumni | ¥0-300K | M9-M24 |
+| Stage 0/0++ | ds4-server measurement (Exp 4-11) | Michael solo | M4 Max + ds4 fork w/ memlog patch | **$0** | ✅ done |
+| Stage 1 | NeuroSim 28nm simulation | Michael solo | NeuroSim open source + **PDK borrowed** (asking) | $0 (if borrowed) | ⏳ asking |
+| Stage 2 | 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) eval board cross-check | Michael | **borrowing** (asking, fallback secondhand $700-4,200) | $0-700 | ⏳ asking |
+| Stage 3 | EBAZ4205 mining-leftover FPGA for MoE Top-K routing | Michael soldering | secondhand Taobao | **$30-70** | self-fund |
+| Stage 4 | Multi-board 3D dataflow simulation | Michael | KiCad (free) + parts + **lab gear borrowed/rented** | $400-1,400 + gear | mixed |
+| Phase β | 昕原 (Xinyuan) / 知存 / 苹芯 / 后摩 BD outreach | Michael | email/X/intro | $0 | M3 trigger |
+| Phase δ | MPW small test tile (5×5 mm² 28nm) | (TBD) | O1 borrow vendor testchip / O2 university CMP / O3 partner-funded / O4 alumni | $0-42K | M9-M24 |
 
-**Year-1 self-fund ceiling**: ¥30-50K (Michael coaches more students for this project — already income-generating).
-**2-year total budget pool**: ¥100M of partner-supported + ¥60-100K self-fund + university/alumni/sponsor contributions = ample for one small test tile.
+### How the self-funding actually works (this is not magic, just 知行合一)
 
-We do not chase investors. Reactive readiness only — if a fund proactively reaches us because they actually want this thing, we'll talk. We never write cold pitches.
+I run **Project-Based Learning (PBL) coaching** for Chinese high school students (Shanghai cohort) and overseas Chinese-origin high schoolers (US / Canada). Instead of teaching for tests, I guide them to build **real commercial products for real customers** — a stack of small-but-shippable ventures that generate actual revenue. Coaching fees + project revenue is what funds this chip work.
+
+This is literally 知行合一 (*zhī xíng hé yī*, "knowledge and action as one"): the way I learn, the way I teach, and the way I earn are all the same loop. The chip thesis itself becomes a teaching case — the students see a real builder going from hypothesis → measurement → first-principles design → public publication in real time. They build their own ventures using the same playbook.
+
+This gives a **stable, growing income stream that is independent of any investor or grant**. As the student cohort expands and AI-augmented growth-marketing experiments compound, Year-1 self-fund comfortably reaches **$4,200–7,000 (¥30K–50K)**. Stretching to **$14K–70K (¥100K–500K)** Year-1 is plausible with cohort expansion. The 2-year self-fund pool plus partner support plus university / alumni / sponsor contributions targets **~$140K (¥1M)** — enough for one small 5×5 mm² 28nm MPW test tile.
+
+**Important**: I do **not** chase investors. Reactive readiness only — if a fund proactively reaches us because they actually want this thing, we'll talk. We never write cold pitches. The line "100 真心 partner 围拢" (*100 wholehearted partners gather*) means: 100 people who genuinely want this chip to exist (developers, fab engineers, academics, students, retired silicon veterans) each contribute what they can — code, eval boards, PDK access, design review, financial sponsorship, or simply genuine interest. That is the funding model. Not VCs.
 
 ---
 
@@ -208,10 +236,10 @@ If you have any of the following resources and *you also want this to exist*, pl
 - Oscilloscope / signal generator / spectrum analyzer (1-2 months)
 
 **MPW (the big-ticket item — partner-supported, never investor-pitched)**
-- 通富 / 长电 testchip resources / dummy fill slot
+- 通富 (Tongfu) / 长电 (JCET) testchip resources / dummy fill slot
 - China CMP / Europractice academic MPW introduction
 - Any SMIC 28nm MPW shuttle resource
-- Direct partner funding for one 5×5 mm² 28nm test tile (~¥150-300K, fully open-sourced design)
+- Direct partner funding for one 5×5 mm² 28nm test tile (**~$21K–42K / ¥150K–300K**, fully open-sourced design)
 
 **Knowledge**
 - V4-Flash real MoE expert activation distribution data (we assume Zipf, needs validation)
@@ -220,15 +248,17 @@ If you have any of the following resources and *you also want this to exist*, pl
 
 **People — Layer 3 co-founder candidates**
 - Chip-industry senior (HiSilicon / Cambricon / Spreadtrum / Marvell-Broadcom China level background)
-- 野望 — wants to do something at the scale of "change China's substrate industry"
-- 品位 — can read 道德经 and ISSCC paper side by side, finds first-principles between Bruce Lee and Laozi
-- 极大渴望 — unfilled life work, treats 20 years of resume as a tool not an identity
+- 野望 (*yěwàng* — long-range civilizational-scale wanting) — wants to do something at the scale of "change China's substrate industry"
+- 品位 (*pǐnwèi* — taste, in the deepest sense) — can read 道德经 (*Dao De Jing*) and an ISSCC paper side by side, finds first-principles between Bruce Lee and Laozi
+- 极大渴望 (*jí dà kěwàng* — burning unfilled hunger) — unfilled life work, treats 20 years of resume as a tool not an identity
 
-Don't send a resume. **Write me a letter telling me why you want to do this thing.** Email: <michaelhuo2030 on GitHub> | WeChat: TBD | X: TBD.
+Don't send a resume. **Write me a letter telling me why you want to do this thing.**
+**Email**: xh638@stern.nyu.edu | **WeChat**: `jack_eagle` | **GitHub**: [@michaelhuo2030](https://github.com/michaelhuo2030)
 
 **One more thing — I'm not looking for investors.** If you happen to do investment and find this interesting, look from a distance, no need to reach out. This thing I'll finish with myself + the people who genuinely want this thing to exist. If you're one of the latter — developer, manufacturer, academic, student, retired engineer — your spot is here.
 
 *合抱之木, 生于毫末; 九层之台, 起于累土。*
+*(A tree that fills both arms grows from a tiny shoot; a tower of nine stories rises from a single basket of earth. — Laozi, Dao De Jing ch. 64)*
 
 ---
 
@@ -236,10 +266,10 @@ Don't send a resume. **Write me a letter telling me why you want to do this thin
 
 | Tier | Form | Context | Single-stream (chip target, P50) | M4 Max baseline today | Price |
 |---|---|---|---|---|---|
-| Entry ¥6K | USB-C box (10×7×2 cm, like Hailo-8 USB) | 32K-128K | 3-8K t/s | 14-16 t/s | ¥6K |
-| Mid ¥10K | PCIe 5.0 ×16 card | 250K | 3-6K t/s | 12 t/s | ¥10K |
-| High ¥35K | Standalone device (Mac mini sized) + LPDDR5 spillover | 256K hot + 1M via LPDDR5 | 3-8K + spillover | (M4 Max OOM at 1M) | ¥35K |
-| Pro Cloud ¥80K | 1U rack + 3FS Bridge protocol chip | 256K hot + 1M+ via 3FS cluster | 3-8K + cross-cluster | n/a | ¥80K |
+| Entry | USB-C box (10×7×2 cm, like Hailo-8 USB) | 32K-128K | 3-8K t/s | 14-16 t/s | **$850 (¥6,000)** |
+| Mid | PCIe 5.0 ×16 card | 250K | 3-6K t/s | 12 t/s | **$1,400 (¥10,000)** |
+| High | Standalone device (Mac mini sized) + LPDDR5 spillover | 256K hot + 1M via LPDDR5 | 3-8K + spillover | (M4 Max OOM at 1M) | **$5,000 (¥35,000)** |
+| Pro Cloud | 1U rack + 3FS Bridge protocol chip | 256K hot + 1M+ via 3FS cluster | 3-8K × N users (cluster aggregate 10K-20K+) | n/a | **$11,300 (¥80,000)** |
 
 **The first chip — the entry-tier USB-C box — goes to antirez.** Plug it into his M4 Max, macOS recognizes it as a USB-Network device (no driver install), `ds4-server` runs *on the box*, his Mac sends HTTP requests, M4 Max GPU stays at 0 watts. That's the form factor.
 
@@ -251,7 +281,7 @@ We're not positioning this as a national-champion-vs-someone-else story. We're *
 
 **Why China-fab capacity matters here**: 28nm ReRAM-CIM production capacity is *accessible* in Chinese fabs today (e.g., 昕原 confirmed at 2K wpm partner-fab, >93% yield, multi-billion-dollar investor stack). That accessibility means *this physical artifact can actually exist*, not as a five-year wait but as a near-term reality. **We use that accessibility to serve the open community** — not to compete *against* anyone, but to put the missing hardware layer where it belongs, in the open.
 
-The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds + ~100 partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
+The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (via PBL coaching revenue, 知行合一 / *zhī xíng hé yī*) + ~100 wholehearted partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
 
 *"Chip lifetime ≠ silicon lifetime"* — 28nm ReRAM is reprogrammable (10⁶ write cycles). Same silicon runs V4-Flash text-only today, V4.1-VL multimodal six months from now (just reflash, +1 GB vision encoder weights), V4.5 / V5-Flash for the next several years. 5-7 year chip useful life across 3-5 model generations. Western Mask-ROM chips (Etched/Taalas) are one-shot. Chinese ReRAM-CIM is *evolving*.
 

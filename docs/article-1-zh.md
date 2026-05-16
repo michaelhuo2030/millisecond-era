@@ -82,8 +82,10 @@ flowchart LR
     CMP -->|"hop ~10 mm — 100 pJ/bit — read ~3.3 GB / layer"| HBM[(HBM3<br/>142 GB weights)]
     HBM -->|"return activations<br/>~10 mm, 100 pJ/bit"| CMP
     CMP --> T2[Token out]
+    CMP -.- TOTAL["per token total:<br/>× 43 layers<br/>~13 GB active (MoE) HBM read<br/>≈ ~10 J transport energy"]
     style HBM fill:#fbb
     style CMP fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 权重住在**片外 HBM**。每一 token 的每一层 = 一次 10 mm 的 GPU ↔ HBM 往返。V4-Flash 每 token 激活 13B 参数 (MoE), 每 token 通过 HBM3 搬运 ~13 GB, 以 ~100 pJ/bit 算 ≈ **每 token 约 10 J 纯权重传输能量**。计算本身很快; 等内存才是瓶颈。
@@ -96,8 +98,10 @@ flowchart LR
     PE -->|"&lt;1 mm on-wafer fabric<br/>~1-5 pJ/bit<br/>weights already resident"| SRAM[("On-wafer SRAM<br/>~18 GB")]
     SRAM -->|"local return"| PE
     PE --> T2[Token out]
+    PE -.- TOTAL["per token total:<br/>× 43 layers<br/>0 off-chip hops<br/>but ~10 kW system power"]
     style SRAM fill:#bcf
     style PE fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 权重住在**晶圆上的 SRAM** (单片 350 cm² 晶圆装 ~18 GB)。完全没有片外 HBM 跳, 每次访问距离 < 1 mm。但 SRAM 是易失的, 密度低, 整片晶圆系统功耗 ~10 kW。这是为训练级 FLOPs 优化, 不是边缘推理。
@@ -140,11 +144,13 @@ flowchart LR
     L2 --> L3["..."]
     L3 --> L8["Chip layer 8"]
     L8 --> T2[Token out]
+    L8 -.- TOTAL["per token total:<br/>× 43 model layers across 8 chip layers<br/>~0 J weight transport<br/>+ ~0.3 J compute"]
     style L1 fill:#9c9
     style L2 fill:#9c9
     style L3 fill:#9c9
     style L8 fill:#9c9
     style KV fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 权重**片上 + 非易失** 住在 ReRAM cell 里, **在计算位点 (in-situ MAC)** —— 乘加直接在 memory array 内部发生 (compute-in-memory)。每次权重读的物理路径 = ~50 nm (ReRAM cell 内部), 而不是 ~10 mm (HBM 边界)。KV cache 在片上 SRAM。8 层 3D 堆叠意味 V4-Flash 的 43 个模型层物理上分布在 8 个 chip layer 上 —— TSV 跨层跳 < 1 mm, 每跳延迟 ~1 ns (信号传播 + 驱动), 每 token 总共 7-8 跳 ~8 ns —— 相比 ReRAM 读 + ADC 单次 tile 操作 ~50-70 ns, **完全可忽略**。**速度的 latency floor 是 compute (ReRAM cell 读 + ADC), 不是线**。TSV 带宽利用率仅 ~0.026% (纵向跳不是瓶颈)。**每 token 权重传输能量: ~0 J. In-situ MAC 计算: ~0.3 J / token**。而且因为 ReRAM 是**非易失 + 可重编程**, 这颗芯片可以重新刷新写入新模型 —— 不像 Taalas 模型是 fab 永久烧死的。

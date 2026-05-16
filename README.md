@@ -70,8 +70,10 @@ flowchart LR
     CMP -->|"hop ~10 mm — 100 pJ/bit — read ~3.3 GB / layer"| HBM[(HBM3<br/>142 GB weights)]
     HBM -->|"return activations<br/>~10 mm, 100 pJ/bit"| CMP
     CMP --> T2[Token out]
+    CMP -.- TOTAL["per token total:<br/>× 43 layers<br/>~13 GB active (MoE) HBM read<br/>≈ ~10 J transport energy"]
     style HBM fill:#fbb
     style CMP fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 Weights live OFF-CHIP in HBM. Every layer of every token = a 10 mm round-trip across the GPU↔HBM boundary. With V4-Flash 13B active params per token (MoE), each token transports ~13 GB through HBM3 at ~100 pJ/bit ≈ **~10 J / token of pure weight transport**. The compute itself is fast; the wait for memory is the bottleneck.
@@ -84,8 +86,10 @@ flowchart LR
     PE -->|"&lt;1 mm on-wafer fabric<br/>~1-5 pJ/bit<br/>weights already resident"| SRAM[("On-wafer SRAM<br/>~18 GB")]
     SRAM -->|"local return"| PE
     PE --> T2[Token out]
+    PE -.- TOTAL["per token total:<br/>× 43 layers<br/>0 off-chip hops<br/>but ~10 kW system power"]
     style SRAM fill:#bcf
     style PE fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 Weights live ON-WAFER in SRAM (~18 GB on a single 350 cm² wafer). No off-chip HBM hops at all — distance per access is <1 mm. But SRAM is volatile, density is low, and the wafer burns ~10 kW system power. Optimized for training-grade FLOPs, not edge inference.
@@ -128,11 +132,13 @@ flowchart LR
     L2 --> L3["..."]
     L3 --> L8["Chip layer 8"]
     L8 --> T2[Token out]
+    L8 -.- TOTAL["per token total:<br/>× 43 model layers across 8 chip layers<br/>~0 J weight transport<br/>+ ~0.3 J compute"]
     style L1 fill:#9c9
     style L2 fill:#9c9
     style L3 fill:#9c9
     style L8 fill:#9c9
     style KV fill:#bcf
+    style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
 Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply-accumulate happens directly inside the memory array (compute-in-memory). Physical path per weight read = ~50 nm (within a ReRAM cell) instead of ~10 mm (across the HBM boundary). KV cache sits on-die in SRAM. 8-layer 3D stack means the 43 model layers are spread across 8 physical chip layers — TSV cross-layer hops are <1 mm and ~1 ns latency per hop (signal propagation + driver), so 7-8 TSV hops per token total ~8 ns — negligible vs the ~50-70 ns ReRAM-read + ADC time per tile operation. **Compute (ReRAM cell read + ADC) is the latency floor, not the wires.** TSV bandwidth utilization is ~0.026% (vertical hops are not the bottleneck). **Per-token weight transport energy: ~0 J. In-situ MAC compute: ~0.3 J / token.** And because ReRAM is **non-volatile + re-programmable**, the chip can be re-flashed for a new model — unlike Taalas where the model is fab-baked permanently.

@@ -426,7 +426,10 @@ The path forward — open thesis, public 18-row transparency, public invitations
 ## Documents in this repo
 
 - **README.md** (this file) — English thesis + transparency
-- **docs/article-1-zh.md** — Chinese version (公众号 / 知乎 / Substack-zh)
+- **article-2.md** — Stage 1 validation report (15 hypotheses checked, one architecture locked) ★ **NEW 2026-05-18**
+- **docs/article-1-zh.md** — Article 1 Chinese version (公众号 / 知乎 / Substack-zh)
+- **docs/article-2-zh.md** — Article 2 Chinese version ★ **NEW 2026-05-18**
+- **docs/stage-1-validation/** — Stage 1 empirical evidence (JSON summaries from 6 experiments) ★ **NEW 2026-05-18**
 - **docs/exp-10-analysis.md** — Stage 0++ memory breakdown analysis (8 datapoints, fully deterministic, 27.5 KB/token total)
 - **docs/exp-11-quality-survey.md** — 2-bit V4-Flash quality on 5 real-world tasks
 - **docs/architecture-v9.md** — chip architecture redesign (10 black-tech design ideas, Path A/B/C trade-off, Path C lock)

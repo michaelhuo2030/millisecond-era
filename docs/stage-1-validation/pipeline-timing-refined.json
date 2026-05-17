@@ -1,0 +1,101 @@
+{
+  "model_refinements": [
+    "MLA latent compression (Exp 10: ~400 B/token/layer compressed)",
+    "CSA Lightning Indexer Top-K = 128 (sparse attention, NOT full ctx scan)",
+    "Tile-parallel: 512 tiles \u00d7 128 parallel dot products/op = 6.55e+11 dot products/sec/layer",
+    "Async overlap: max(attn, moe) per layer instead of sum",
+    "Indexer bytes/t/layer: optimistic 8 (Michael anchor) vs conservative 60 (Exp 10 allocator slope)"
+  ],
+  "ctx_grid": [
+    32000,
+    90000,
+    128000,
+    250000
+  ],
+  "clock_grid": [
+    800000000.0,
+    1000000000.0,
+    1200000000.0
+  ],
+  "base_results": {
+    "800MHz_32K": 30915.0069172328,
+    "800MHz_90K": 24550.872476630637,
+    "800MHz_128K": 24550.872476630637,
+    "800MHz_250K": 18315.26989839604,
+    "1000MHz_32K": 38643.758646541,
+    "1000MHz_90K": 30688.5905957883,
+    "1000MHz_128K": 30688.5905957883,
+    "1000MHz_250K": 22894.08737299505,
+    "1200MHz_32K": 46372.5103758492,
+    "1200MHz_90K": 36826.30871494596,
+    "1200MHz_128K": 36826.30871494596,
+    "1200MHz_250K": 27472.90484759406
+  },
+  "conservative_results": {
+    "800MHz_32K": 18547.15498234543,
+    "800MHz_90K": 15698.802770053751,
+    "800MHz_128K": 15698.802770053751,
+    "800MHz_250K": 12519.111205699952,
+    "1000MHz_32K": 23183.943727931786,
+    "1000MHz_90K": 19623.503462567187,
+    "1000MHz_128K": 19623.503462567187,
+    "1000MHz_250K": 15648.88900712494,
+    "1200MHz_32K": 27820.732473518143,
+    "1200MHz_90K": 23548.204155080624,
+    "1200MHz_128K": 23548.204155080624,
+    "1200MHz_250K": 18778.66680854993
+  },
+  "bottleneck_at_250K_1GHz_base": {
+    "indexer_scan_ns": 685.0,
+    "topk_attn_compute_ns": 145.0,
+    "attn_ctrl_ns": 14.5,
+    "attn_total_ns": 844.5,
+    "moe_ns": 215.0,
+    "resid_ns": 2.0,
+    "per_layer_async_ns": 846.5,
+    "per_layer_sync_ns": 1061.5
+  },
+  "sensitivity_indexer_bytes": {
+    "4": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "8": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "16": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "30": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "60": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "120": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    },
+    "250": {
+      "async": 22894.08737299505,
+      "sync": 18257.037174979094
+    }
+  },
+  "sensitivity_topk": {
+    "32": 22894.08737299505,
+    "64": 22894.08737299505,
+    "128": 22894.08737299505,
+    "256": 22894.08737299505,
+    "512": 22894.08737299505,
+    "1024": 20475.272013988706
+  },
+  "g8_verdict_base": "\u2705 ALL targets met",
+  "g8_verdict_cons": "\u2705 ALL targets met",
+  "base_250K_1GHz_tps": 22894.08737299505,
+  "cons_250K_1GHz_tps": 15648.88900712494,
+  "narrative": "With MLA + CSA Indexer + tile-parallel + async overlap (BASE case), 250K ctx @ 1GHz yields ~22894 tps \u2014 comfortably above 8K typical target. Even in the CONSERVATIVE case (Exp 10 allocator slope, no async, +40% overhead), ~15649 tps \u2014 still above 3K floor. G8 hypothesis: 0/5 \u2192 4/5 LOCK under BASE assumptions, 3/5 under CONSERVATIVE. Bottleneck at 250K is indexer scan (linear in ctx), which scales as O(ctx \u00d7 indexer_bytes / aggregate_tile_throughput)."
+}

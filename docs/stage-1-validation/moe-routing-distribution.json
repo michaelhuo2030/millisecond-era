@@ -1,0 +1,29 @@
+{
+  "n_events": 135966,
+  "n_activations": 815796,
+  "invalid_indices": 0,
+  "active_experts": 256,
+  "layers_seen": 43,
+  "zipf_slope": -0.29872505994986664,
+  "zipf_intercept": 4.074070620755768,
+  "cumulative_hit_rate": {
+    "top_4": 0.03388837405429789,
+    "top_8": 0.06296672207267504,
+    "top_16": 0.11546391499835744,
+    "top_32": 0.2079649814414388,
+    "top_64": 0.361008144192911,
+    "top_128": 0.6211405792624627
+  },
+  "top_32_above_70pct": false,
+  "top_16_above_50pct": false,
+  "uniform_signal": true,
+  "verdict": "\u274c distribution too uniform (Top-32 <40%) \u2014 hot/cold cache won't help",
+  "chat_stats": {
+    "elapsed_s": 138.65639305114746,
+    "usage": {
+      "prompt_tokens": 152,
+      "completion_tokens": 3000,
+      "total_tokens": 3152
+    }
+  }
+}

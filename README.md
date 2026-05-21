@@ -91,6 +91,8 @@ Three killer applications:
 See [`docs/hdc-gesture-applications.md`](docs/hdc-gesture-applications.md) for full analysis and numbers.  
 Demo (runnable on any Mac): [`scripts/signlang_demo.py`](scripts/signlang_demo.py) — `python3 scripts/signlang_demo.py`
 
+Deep dive — 8 benchmark tests + architecture innovations + tokamak plasma control: [`docs/article-hdc-silicon-hippocampus.md`](docs/article-hdc-silicon-hippocampus.md)
+
 ---
 
 ## Contact

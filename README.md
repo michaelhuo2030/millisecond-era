@@ -67,6 +67,32 @@ The Mini SKU includes a dedicated **Hyperdimensional Computing (HDC)** module al
 
 ---
 
+## HDC Applications: Sign Language, Sports Coaching, and Games
+
+**HDC enables near-real-time gesture recognition on any Mac or GPU today — no chip required for prototypes.** The Mini SKU later provides ~50,000× latency speedup for embedded deployment.
+
+Measured on M4 Max (D=10K, 10 CSL signs, 1-shot):
+
+| Metric | Result |
+|---|---|
+| Accuracy | **100%** (1-shot per sign, noise σ=0.05) |
+| Latency | **6.84 ms/query** (146 QPS) |
+| Memory | **1.2 MB** for 1,000-sign vocabulary |
+| Real-time | ✓ at 30fps and 60fps |
+
+Three killer applications:
+
+- **Sign language (deaf recognition)**: 1 example per sign + 1 example per signer = done. ~28M deaf people in China. Works on Mac today. Mini SKU later: 1.27 μs/query embedded in glasses or phone.
+- **Sports coaching**: Coach demonstrates correct form once → athlete gets real-time similarity score forever. No labeled dataset, no retraining, no ML engineer.
+- **Game gesture library**: HDC superposition bundles 100M gesture variants into ~10K prototype vectors. AI-generated gesture vocabulary is semantic by construction.
+
+**In-between gestures return proportional similarity scores, not hard labels.** An ambiguous gesture between "hello" and "thank you" returns `sim(hello)=0.42, sim(thank you)=0.40` — the system tells you *how much* it matches each class, not just a forced winner.
+
+See [`docs/hdc-gesture-applications.md`](docs/hdc-gesture-applications.md) for full analysis and numbers.  
+Demo (runnable on any Mac): [`scripts/signlang_demo.py`](scripts/signlang_demo.py) — `python3 scripts/signlang_demo.py`
+
+---
+
 ## Contact
 
 - **Email**: xh638@stern.nyu.edu

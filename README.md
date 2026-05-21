@@ -5,7 +5,25 @@
 
 ---
 
-## The numbers (5-second read)
+> **⚠️ 2026-05-18 Corrections — please read before the numbers below**
+>
+> The numbers table below was published 2026-05-16. Two days later, a bottom-up physical audit found a fundamental error: **"25 GB/die pure CIM @ 28nm" is physically infeasible** — it requires ~1,500× the cell density of 2026 industry SOTA. The architecture has been recalibrated.
+>
+> | Metric | Originally claimed | Corrected (2026-05-18) |
+> |---|---|---|
+> | Architecture | Pure CIM (weights never move) | **Hybrid**: 95% storage-mode + 5% CIM scratchpad |
+> | Energy efficiency | 25–40× vs GPU | **3–7× vs GPU** |
+> | Primary model | DeepSeek V4-Flash 81 GB Q2_K | **Qwen3.5-9B Q4_K_M ~5.5 GB (Mini SKU primary)** |
+> | Throughput | 5,000–15,000 tok/s | **1K floor / 1.5–5K sustained / 4–12K peak** (Mini SKU) |
+> | Quantization quality | Q2_K (claimed usable) | Q2_K has +96% perplexity — unusable. **Q4_K_M primary** |
+>
+> The original numbers are preserved below as written. The full iteration history — what we got wrong, how we found out, and how we corrected — is in **[iteration-log-2026-05.md](iteration-log-2026-05.md)**.
+>
+> This is what Bayesian research actually looks like.
+
+---
+
+## The numbers (5-second read, original 2026-05-16 — see correction above)
 
 | | |
 |---|---|

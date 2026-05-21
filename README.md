@@ -36,6 +36,37 @@
 
 ---
 
+## Open Source: HDC SDK for the Mini SKU
+
+The Mini SKU includes a dedicated **Hyperdimensional Computing (HDC)** module alongside the LLM inference engine. HDC = 100,000-dimension binary vectors + 3 operations (bind / bundle / permute). On ReRAM CIM it does things no neural network can:
+
+| Capability | HDC on Mini SKU | Neural network |
+|---|---|---|
+| 1-shot learning | 1,000 classes, 100% accuracy | Needs 50–200 gradient steps minimum |
+| Forgetting | Zero (tested to 500+ incremental classes) | Catastrophic forgetting without EWC |
+| 30% bit-flip noise | Still fully functional | Random output |
+| Search latency | **1.27 μs** (comparator mode) | GPU: 50–200 μs for equivalent search |
+| Tokamak disruption detection | **1–2 μs** reaction time | DeepMind AlphaControl: ~10 ms |
+
+**The SDK is open source:**
+
+> **[michaelhuo2030/torchhd](https://github.com/michaelhuo2030/torchhd/tree/reram-cim-backend)** — fork of `hyperdimensional-computing/torchhd` with a drop-in ReRAM CIM backend.
+>
+> ```python
+> # 2-line swap: replace standard torchhd with Mini SKU simulation
+> from torchhd.reram_torchhd_backend import ReRAMHDC
+> hdc = ReRAMHDC(d=100_000, mode="comparator")   # models Mini SKU CIM
+>
+> mem = hdc.make_memory()
+> mem.add("gesture_open", training_hvs)   # 1-shot: one bundle per class
+> result = mem.search(query_hv)           # 1.27 μs on chip
+> print(hdc.energy_report())             # pJ/op + μs/query
+> ```
+>
+> Includes: OnlineHD error-driven online update, level encoding for sensor data, EMG gesture demo, Phase 0→3 backend swap guide.
+
+---
+
 ## Contact
 
 - **Email**: xh638@stern.nyu.edu

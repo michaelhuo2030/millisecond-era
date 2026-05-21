@@ -1,0 +1,8 @@
+MSL-150 2-Class Real HDC  D=10000  n_levels=100
+Accuracy: 100.0%  (54 test samples, 1-shot per class)
+Latency: 12.60 ms/query
+
+hospital→hospital: 0.586±0.075
+hospital→si:       0.474±0.063
+si→si:             0.745±0.017
+si→hospital:       0.466±0.006

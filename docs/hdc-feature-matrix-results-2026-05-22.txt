@@ -1,0 +1,9 @@
+HDC Feature Matrix  MSL-150  D=10000  2026-05-22
+Method: Path3-Retrain  1-shot  20 iters
+
+Feature                dims  N=  8  N= 20  N= 40  N= 80  N=139    gain@139
+Right only               63  75.7%  72.3%  57.9%  51.3%  48.8%  +0.0pp
++Left hand              126  76.2%  77.1%  70.5%  64.4%  60.2%  +11.5pp
++Velocity               126  70.7%  67.4%  51.3%  44.8%  40.7%  -8.1pp
++Left+Velocity          189  75.3%  76.6%  69.3%  62.1%  56.1%  +7.4pp
++Left+Vel+Face          198  74.9%  75.8%  70.5%  61.7%  56.5%  +7.7pp

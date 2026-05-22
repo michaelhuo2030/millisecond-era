@@ -1,0 +1,8 @@
+HDC Multi-Shot  MSL-150  N=139  D=10000  2026-05-22
+
+Feature             1-shot  2-shot  3-shot  50-shot  proj@30  proj@100
+F1 right only       48.8%  69.9%  70.4%  64.7%  67.3%*  69.6%*
+F2 bilateral        60.2%  71.7%  81.8%  80.6%  81.4%*  86.2%*
+F2+velocity         56.1%  70.0%  81.4%  74.8%  76.8%*  80.6%*
+
+* log fit projection

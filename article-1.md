@@ -27,7 +27,7 @@ That fact, plus ten framework-level reframes in 48 hours of multi-AI cross-valid
 
 This is the part most "chip theses" hide. I'm putting it up front. Since the first internal draft, four claims were corrected — three of them *downward*:
 
-- **Speed (down ~5–50×).** An earlier draft said "5–15K / 10K+ tok/s." That was a hopeful extrapolation, not a measured envelope. The realistic envelope: **Mini ~500–2,000 · Mid ~1,000–2,500 · Pro ~30–300 tok/s** (Pro reaches ~1,575 only with aggressive MoE-locality + mitigations). The Pro tier is memory-bandwidth-bound, and I now say so plainly. **These are pre-silicon estimates — envelopes, not measured silicon.** Exact figures wait for Stage-1.
+- **Speed (down ~5–50× from the original overclaim).** An earlier draft said "5–15K / 10K+ tok/s" — a hopeful extrapolation, not a measured envelope. The realistic envelope: **Mini ~500–2,000 · Mid ~1,000–2,500 · Pro ~220–2,000 tok/s.** Pro's number hinges on **ternary {−1, 0, +1} weights**, which shrink a 27–70B model to ~6–14 GB — small enough to mostly fit *on-compute*, so it's compute-bound (~500–2,000, Mini-tier) rather than weight-streaming-bound (~220–1,000); speculative decoding (a Mini puck drafting for the Pro) reaches several-thousand. **These are pre-silicon estimates — envelopes, not measured silicon.** Exact figures wait for Stage-1.
 - **"Runs DeepSeek V4-Flash natively" — retracted for first silicon.** DeepSeek-class (81 GB, *already* INT2–8-compressed from ~170 GB FP16) is not physics-possible to hold natively on one 28nm die — fitting it would need ~270× compression, near the Shannon floor. So **first silicon targets a 27–70B-class model that comfortably fits**; frontier-class is a *later* SKU, once the process is de-risked. 合抱之木，生于毫末.
 - **On-die capacity is an extrapolation, not a demo.** Every *published* 28nm ReRAM-CIM macro is small (≤4 Mb). There is no GB-scale demonstration yet, so the capacity figures need fab-partner validation. The honest Pro ceiling is **~48 GB @ 28nm 8-layer** (yield cliff), not 80.
 - **Cells are ternary, not 4-bit MLC.** Published 4-bit-MLC RRAM has only ~2-hour retention at 125 °C plus conductance drift that corrupts analog inference. I lean **ternary {−1, 0, +1}**, which tolerates ~10–20× more analog noise — the single largest device-risk reduction available, and externally validated by OpenBMB's near-lossless ternary BitCPM LLM.
@@ -41,7 +41,7 @@ DeepSeek shipped a full stack — the V4-Flash model, `ds4-server` inference, tr
 The bet: a 28nm hybrid ReRAM-CIM chip co-designed with V4-Flash's compressed-sparse-attention + hierarchical-compressed-activation, delivering:
 
 - long-context inference on a single die (exact KV-SRAM sizing still being verified);
-- **~500–2,000 tok/s (Mini) · ~1,000–2,500 (Mid) · ~30–300 (Pro)** — pre-silicon envelopes (see Corrigenda);
+- **~500–2,000 tok/s (Mini) · ~1,000–2,500 (Mid) · ~220–2,000 (Pro)** — pre-silicon envelopes (see Corrigenda);
 - **sub-5W for the Mini tier** vs 200W+ for an H100 — energy, not peak throughput, is the differentiator;
 - **ternary {−1, 0, +1} cells**;
 - $850 (Mini) / $1.4K (Mid) / $5K (Pro) product tiers.

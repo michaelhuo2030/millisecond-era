@@ -1,6 +1,6 @@
 # The Millisecond Era: One Person's Falsifiable Bet on the Next AI-Chip Substrate
 
-*One person. 1.5 months. ¥10K out of pocket. 50+ reproducible datapoints. A thesis about why 28nm ReRAM compute-in-memory could be the substrate flip China can lead — and a set of my own corrections, published in the body, because a thesis that can't survive its own audit isn't worth shipping.*
+*One person. 1.5 months. $1.4K out of pocket. 50+ reproducible datapoints. A thesis about why 28nm ReRAM compute-in-memory could be the substrate flip China can lead — and a set of my own corrections, published in the body, because a thesis that can't survive its own audit isn't worth shipping.*
 
 ---
 
@@ -19,7 +19,7 @@ This article documents one bet on what the next flip looks like — empirically 
 
 I ran DeepSeek V4-Flash on a 128 GB MacBook (thanks to [@antirez](https://github.com/antirez)'s `ds4-server`), measured the indexer's memory growth empirically (25 datapoints, 10K → 250K context), and found it grows **~66× slower** than a linear reading of the README suggests — because the indexer pre-allocates a pool and reuses it.
 
-That fact, plus ten framework-level reframes in 48 hours of multi-AI cross-validation (Kimi + Claude + DeepSeek + MiniMax + me), lets me argue — falsifiably — that a single 28nm hybrid ReRAM-CIM die can serve long-context, on-device LLM inference at **sub-5W (Mini tier)**, at **¥6K–35K** product prices.
+That fact, plus ten framework-level reframes in 48 hours of multi-AI cross-validation (Kimi + Claude + DeepSeek + MiniMax + me), lets me argue — falsifiably — that a single 28nm hybrid ReRAM-CIM die can serve long-context, on-device LLM inference at **sub-5W (Mini tier)**, at **$850–$5K** product prices.
 
 **What this article actually is:** not a chip pitch. A documentation of the *research methodology* that produces this chip. The chip is the artifact. The methodology is the moat.
 
@@ -44,7 +44,7 @@ The bet: a 28nm hybrid ReRAM-CIM chip co-designed with V4-Flash's compressed-spa
 - **~500–2,000 tok/s (Mini) · ~1,000–2,500 (Mid) · ~30–300 (Pro)** — pre-silicon envelopes (see Corrigenda);
 - **sub-5W for the Mini tier** vs 200W+ for an H100 — energy, not peak throughput, is the differentiator;
 - **ternary {−1, 0, +1} cells**;
-- ¥6K (Mini) / ¥10K (Mid) / ¥35K (Pro) product tiers.
+- $850 (Mini) / $1.4K (Mid) / $5K (Pro) product tiers.
 
 **We're not the first — hybrid already shipped.** The skeptic asks: "Pure analog ReRAM-CIM died with Mythic. Why does hybrid work?" Because HYDAR (ISSCC 2026) is a hybrid analog/digital RRAM CIM that *just shipped silicon*. The market already decided: not pure analog, not pure digital — **hybrid**. (My own first draft mislabeled HYDAR "pure digital" from a secondhand summary; the official program corrected me to "hybrid." The correction *strengthens* the bet.) Pure analog is dead; pure digital is NVIDIA's expensive domain; hybrid is the 2026 reality, and that's where this chip lives.
 
@@ -79,19 +79,19 @@ Each reframe came from a specific source — a README sentence, a calculation, a
 
 **Engineer (China) — when can I plug this in?** Stage 0+ (FPGA PoC) is running this month; production targets 2028–2030. USB-C, no driver hassle. Mini runs Qwen3.5-9B Q4 (a tight fit); Pro targets a 27–70B-class model. (Frontier DeepSeek-V4-class is a later SKU — see Corrigenda.)
 
-**Investor — TAM and exit?** Substrate flips every ~10 years; this one is 2027–2030. Winners of a substrate flip historically see $100B+ TAM. *However: I'm not raising.* Year-1 budget is ¥30–50K out of pocket; the goal is a 100-partner network, not a Seed round. If you want in, terms are equal — not a pitch, not a plea.
+**Investor — TAM and exit?** Substrate flips every ~10 years; this one is 2027–2030. Winners of a substrate flip historically see $100B+ TAM. *However: I'm not raising.* Year-1 budget is $4K–$7K out of pocket; the goal is a 100-partner network, not a Seed round. If you want in, terms are equal — not a pitch, not a plea.
 
 **Academic — reproducibility?** 50+ datapoints, a ~280-line Python harness, public on GitHub; an M4 Max 128 GB is the only requirement; raw JSONL attached for every measurement. Replicate before you cite.
 
-**Policy / state capital — fit with China's chip strategy?** 28nm is the highest node China makes at scale (SMIC); the 7nm dependence is the bottleneck. For LLM edge inference, 28nm hybrid ReRAM-CIM can beat 14nm pure-digital by killing the data-movement penalty. It leverages existing 28nm capacity + domestic ReRAM IP, with no 7nm dependence. First MPW 2027–2028; capital intensity for the substrate-layer thesis is ¥80–150万 for first silicon — orders of magnitude below a mainstream chip Series A.
+**Policy / state capital — fit with China's chip strategy?** 28nm is the highest node China makes at scale (SMIC); the 7nm dependence is the bottleneck. For LLM edge inference, 28nm hybrid ReRAM-CIM can beat 14nm pure-digital by killing the data-movement penalty. It leverages existing 28nm capacity + domestic ReRAM IP, with no 7nm dependence. First MPW 2027–2028; capital intensity for the substrate-layer thesis is $110K–$210K for first silicon — orders of magnitude below a mainstream chip Series A.
 
-**Developer / end user — cost and timing?** ¥6K / ¥10K / ¥35K tiers, USB-C plug-and-play, long-context. Mini runs Qwen3.5-9B Q4; Pro a 27–70B-class model. Production 2028–2030; the GitHub repo updates weekly as Stage 0+ data ships.
+**Developer / end user — cost and timing?** $850 / $1.4K / $5K tiers, USB-C plug-and-play, long-context. Mini runs Qwen3.5-9B Q4; Pro a 27–70B-class model. Production 2028–2030; the GitHub repo updates weekly as Stage 0+ data ships.
 
 **Technical reader — is the data trustworthy?** 25 datapoints, M4 Max 128 GB, RSS via PID-anchored psutil, independently reproduced on a second M4 (±3%), methodology cross-audited by two other models. The harness is ~280 lines, on GitHub. (The reason RSS at 250K is *lower* than at 200K is pool reclaim, not measurement error; I hold three hypotheses and don't claim certainty on which.)
 
 ## An invitation — not a raise
 
-I'm not raising. I'm inviting. If you have RTL / FPGA-bring-up experience, 28nm floorplanning / DFM background, ReRAM characterization access, DeepSeek-deployment war stories, or capital instincts *without* needing control (¥80–150万 for first MPW, equity-light, 10-year horizon) — reach me through the public channel first:
+I'm not raising. I'm inviting. If you have RTL / FPGA-bring-up experience, 28nm floorplanning / DFM background, ReRAM characterization access, DeepSeek-deployment war stories, or capital instincts *without* needing control ($110K–$210K for first MPW, equity-light, 10-year horizon) — reach me through the public channel first:
 
 - **GitHub:** `michaelhuo2030/millisecond-era` (a public issue or PR is the first filter).
 

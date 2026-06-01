@@ -34,6 +34,8 @@
 
 [Jump to the civilizational speed ladder ↓](#what-different-speeds-actually-unlock--the-civilizational-ladder) for what each speed tier 0→1 unlocks. [Jump to the 18-row transparency matrix ↓](#what-we-havent-verified--18-row-transparency-matrix) for what's verified vs assumed.
 
+> 📚 **New — learn the substrate from the ground up:** [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — an interactive, for-dummies explainer of ReRAM-CIM from "what is a bit" → device physics → materials + papers → SRAM-CIM vs ReRAM-CIM → "how big a ternary model can it actually hold." Companion: a live [capacity calculator](learn/reram-cim-calculator.html) and the [expert-consultation question list](learn/reram-cim-expert-consult.md). This is the honest record of one outsider learning the bottom layer with AI as a co-pilot.
+
 ---
 
 ## Open Source: HDC SDK for the Mini SKU

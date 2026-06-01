@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReRAM-CIM 从底层说起 · 超级科普 (for dummies)</title>
+<style>
+:root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff;--vio:#caa9ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,#16182a,#06070d);color:var(--ink);font:16px/1.7 -apple-system,Segoe UI,"PingFang SC",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:24px 18px 120px}
+h1{font-size:30px;margin:0 0 4px;line-height:1.2}.tagline{color:var(--dim);font-size:15px;margin-bottom:8px}
+h2{font-size:23px;margin:48px 0 6px;border-left:4px solid var(--hot);padding-left:12px}
+h3{font-size:18px;margin:26px 0 6px;color:var(--hot)}
+p{margin:10px 0}.dim{color:var(--dim)}
+.lead{color:#cdd;font-size:17px}
+.nav{position:sticky;top:0;background:#06070dde;backdrop-filter:blur(8px);z-index:20;padding:10px 0;margin:0 -18px 10px;border-bottom:1px solid #20212c}
+.nav a{color:var(--hot);text-decoration:none;font-size:12.5px;margin:0 10px;white-space:nowrap}
+.nav .inner{max-width:860px;margin:0 auto;padding:0 18px;overflow-x:auto;white-space:nowrap}
+.topnav a{color:var(--blue);text-decoration:none;font-size:13px;margin-right:14px}
+.card{background:var(--panel);border-radius:14px;padding:18px 20px;box-shadow:0 0 0 1px #23242f;margin:18px 0}
+.g{color:var(--blue);border-bottom:1px dashed #3a5180;cursor:pointer;font-weight:600}
+.g:hover{color:var(--hot);border-color:var(--hot)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th,td{text-align:left;padding:8px 9px;border-bottom:1px solid #20212c;vertical-align:top}
+th{color:var(--hot);font-weight:700;font-size:13px}
+td b{color:var(--ink)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--hot)}
+.cell-demo{display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:center;margin:14px 0}
+.atom{position:relative;width:150px;height:170px;background:linear-gradient(#1c2030,#11141f);border-radius:12px;border:1px solid #2a2d40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+.electrode{width:120px;height:16px;background:#7aa9ff;border-radius:3px}
+.electrode.bot{background:#ffd36b}
+.oxide{width:120px;height:70px;background:#23283a;position:relative;overflow:hidden}
+.filament{position:absolute;left:50%;top:0;transform:translateX(-50%);width:8px;background:linear-gradient(#8ee59a,#ffd36b);transition:height .5s;height:0}
+.atom.on .filament{height:70px}
+.lbl{font-size:12px;color:var(--dim);margin-top:8px}.state{font-weight:700;font-size:14px;margin-top:3px}
+.btn{background:#244d24;color:#fff;border:1px solid #356a35;border-radius:9px;padding:9px 15px;font-size:14px;cursor:pointer}
+input[type=range]{width:100%}
+input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;border-radius:8px;padding:8px;font-size:15px;width:140px}
+.conv{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.barwrap{margin:10px 0}.bar{height:14px;background:#1c1d2a;border-radius:7px;overflow:hidden}.bar>i{display:block;height:100%;transition:.3s}
+.kpi{font-size:30px;font-weight:800;color:var(--hot);font-variant-numeric:tabular-nums}
+.note{color:var(--dim);font-size:13px}
+.stack{counter-reset:s}
+.stack .row{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #20212c}
+.stack .n{flex:none;width:30px;height:30px;border-radius:50%;background:#241f12;color:var(--hot);display:flex;align-items:center;justify-content:center;font-weight:800}
+.pop{position:fixed;left:0;right:0;bottom:0;background:#11131e;border-top:2px solid var(--blue);padding:18px 20px;box-shadow:0 -8px 30px #000a;transform:translateY(110%);transition:.22s;z-index:40;max-height:60vh;overflow:auto}
+.pop.show{transform:translateY(0)}.pop h3{margin:0 0 6px;color:var(--blue)}.pop .x{position:absolute;top:12px;right:18px;cursor:pointer;color:var(--dim);font-size:24px}
+.pop .body{max-width:820px;font-size:15px;line-height:1.75}
+.paper{font-size:13.5px;color:var(--dim);margin:4px 0}.paper b{color:var(--ink)}.paper .y{color:var(--vio)}
+.flip{display:flex;gap:12px;margin:12px 0}.flip>div{flex:1;background:var(--panel2);border-radius:12px;padding:14px;border:1px solid #23242f}
+.flip h4{margin:0 0 8px;font-size:15px}
+.callout{background:#15110a;border:1px solid #3a2f12;border-radius:12px;padding:14px 16px;margin:16px 0}
+.callout b{color:var(--hot)}
+.defsrc{display:none}
+.foot{color:var(--dim);font-size:13px;margin-top:50px;border-top:1px solid #20212c;padding-top:18px}
+</style></head><body>
+<div class="nav"><div class="inner">
+<a href="#count">①数数(bit/Mb)</a><a href="#cell">②一个cell</a><a href="#reram">③ReRAM物理</a><a href="#mat">④材料+论文</a><a href="#mlc">⑤多电平</a><a href="#cim">⑥存算一体</a><a href="#vs">⑦SRAM vs ReRAM</a><a href="#density">⑧能放多少</a><a href="#next">⑨接下来</a>
+</div></div>
+<div class="wrap">
+<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a><a href="reram-cim-expert-consult.md">📋 专家咨询清单</a></div>
+<h1>ReRAM-CIM,从最底层说起 🧱</h1>
+<div class="tagline">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</div>
+<p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、正在请教专家的那个问题。</p>
+
+<h2 id="count">① 先学会数数:bit、byte、Mb、MB</h2>
+<p>所有"容量"都是在数同一个东西:能存多少个 <span class="g" data-k="bit">bit</span>。</p>
+<table>
+<tr><th>单位</th><th>等于</th><th>大白话</th></tr>
+<tr><td><b>bit(比特)</b></td><td>1 个 0 或 1</td><td>最小的信息,一个开关</td></tr>
+<tr><td><b>byte(字节)</b></td><td>8 bit</td><td>1 个英文字母</td></tr>
+<tr><td><b>Kb / KB</b></td><td>1024 bit / 1024 byte</td><td>一句话</td></tr>
+<tr><td><b>Mb / MB</b></td><td>100万 bit / 100万 byte</td><td>一张图 / 一本书</td></tr>
+<tr><td><b>Gb / GB</b></td><td>10亿 bit / 10亿 byte</td><td>一部电影</td></tr>
+</table>
+<div class="callout">
+<b>⚠️ 全场最大的坑:小写 b = bit,大写 B = byte,差 8 倍。</b><br>
+专家说"可以实现 <b>16.32 Mb</b>"(megabit)= 只有 <b>2.04 MB</b>(megabyte)。如果我们误当成 32 MB,就高估了 16 倍。<span class="g" data-k="trap">为什么这要命?</span>
+</div>
+<div class="card">
+<h3>🔢 自己换算一下</h3>
+<div class="conv">
+<input type="number" id="cv" value="16.32" step="0.01" oninput="conv()">
+<select id="cu" onchange="conv()" style="background:#1c1d2a;color:#eef;border:1px solid #33354a;border-radius:8px;padding:8px"><option value="mb">Mb (megabit)</option><option value="MB">MB (megabyte)</option><option value="gb">Gb</option><option value="GB">GB</option></select>
+<button class="btn" onclick="conv()">换算</button>
+</div>
+<div id="cvout" style="margin-top:12px"></div>
+<div class="note">三元模型每个权重约占 <span class="g" data-k="bpw">2 bit</span>(实做),理论极限 1.58 bit。这里按 2 bit 估能装多少参数。</div>
+</div>
+
+<h2 id="cell">② 什么是一个"存储单元"(cell)?</h2>
+<p>芯片里存 1 个 bit 的最小零件叫 <span class="g" data-k="cell">cell</span>。怎么造它,是 SRAM 和 ReRAM 最根本的区别:</p>
+<div class="flip">
+<div><h4 class="blue" style="color:var(--blue)">SRAM cell</h4><p class="note">用 <b>6 个晶体管</b>搭一个"跷跷板",靠通电保持 0/1。<br>• 快、成熟<br>• 但占地大(6 个管子存 1 bit)<br>• <b>断电就忘</b>(易失)<br>• 权重每次要重新搬进来</p></div>
+<div><h4 style="color:var(--hot)">ReRAM cell</h4><p class="note">用 <b>1 个晶体管 + 1 个电阻开关</b>(叫 <span class="g" data-k="1t1r">1T1R</span>)。<br>• 小得多(密度高)<br>• <b>断电不忘</b>(非易失)<br>• 权重刻进去就一直在<br>• 但写得慢、会"老化"、多电平不稳</p></div>
+</div>
+<p class="dim">注意专家的话:"reram 只是换了工艺和存储单元,整体架构一样"——意思是上层电路设计(尤其外围)两者高度相通,所以做 SRAM-CIM 的人能很快看懂 ReRAM-CIM。</p>
+
+<h2 id="reram">③ ReRAM 到底是什么物理?(点一下亲手"造"一个)</h2>
+<p>ReRAM = <b>Re</b>sistive <b>RAM</b>,电阻式存储器。结构简单到不可思议:<b>金属 — 氧化物 — 金属</b>,像个三明治。给它加电压,中间的氧化物里会<span class="g" data-k="filament">长出或断开一根导电细丝</span>:</p>
+<div class="cell-demo">
+<div class="atom" id="atom" onclick="toggleAtom()">
+<div class="electrode">上电极</div>
+<div class="oxide"><div class="filament"></div></div>
+<div class="electrode bot">下电极</div>
+<div class="state" id="atomState">高阻 (HRS) = 0</div>
+</div>
+<div style="max-width:330px">
+<p class="note">👆 点这个 cell:</p>
+<p class="note"><b class="ok">长出细丝</b> → 电阻变低(<span class="g" data-k="lrs">LRS</span>)→ 电流好通过 → 记作 <b>1</b>(SET)<br><b class="bad">断开细丝</b> → 电阻变高(HRS)→ 电流难通过 → 记作 <b>0</b>(RESET)</p>
+<p class="note">就这么个开关,反复刻录就能存模型权重。整块芯片是几百万个这样的 cell 排成网格(<span class="g" data-k="crossbar">crossbar 阵列</span>)。</p>
+</div>
+</div>
+
+<h2 id="mat">④ 用什么材料?(选型 + 对应论文)</h2>
+<p>"中间那层氧化物"用什么,决定了它好不好用。主流几条路线:</p>
+<table>
+<tr><th>材料路线</th><th>代表</th><th>特点</th><th>谁在用</th></tr>
+<tr><td><b>HfO₂ 氧化铪</b><br><span class="note">OxRAM 主流</span></td><td>HfOₓ</td><td>和 CMOS 工艺最兼容、最容易量产 ✅</td><td>TSMC 22/28nm 嵌入式、清华 CIM 芯片</td></tr>
+<tr><td><b>TaOₓ 氧化钽</b></td><td>Ta₂O₅</td><td>耐久最好(能反复刻很多次)</td><td>Panasonic 已商用</td></tr>
+<tr><td><b>TiO₂ 氧化钛</b></td><td>—</td><td>最早的"忆阻器",历史意义大</td><td>HP 实验室(2008)</td></tr>
+<tr><td><b>CBRAM 导电桥</b></td><td>Ag/Cu 离子</td><td>另一种机理(金属离子搭桥),更省电但更飘</td><td>Weebit Nano (SiOₓ) 等</td></tr>
+</table>
+<h3>👉 想读原始论文(从入门到 CIM 整机)</h3>
+<div class="paper"><b>Strukov 等,"The missing memristor found"</b> <span class="y">Nature 2008</span> — HP 用 TiO₂ 第一次坐实"忆阻器",ReRAM 的起点。</div>
+<div class="paper"><b>Wong 等,"Metal–Oxide RRAM"</b> <span class="y">Proc. IEEE 2012</span> — RRAM 的经典综述,想搞懂器件就读它。</div>
+<div class="paper"><b>Ielmini & Wong,"In-memory computing with resistive switching devices"</b> <span class="y">Nature Electronics 2018</span> — 存内计算(CIM)的奠基综述。</div>
+<div class="paper"><b>Yao 等,"Fully hardware-implemented memristor CNN"</b> <span class="y">Nature 2020</span> — 清华(吴华强/钱鹤组)做出<b>完整的 RRAM CIM 芯片</b>跑 CNN,里程碑。</div>
+<div class="paper"><b>Wan 等,"A compute-in-memory chip based on RRAM (NeuRRAM)"</b> <span class="y">Nature 2022</span> — Stanford/UCSD,48 核 RRAM-CIM,能效与精度兼顾的标杆。</div>
+<p class="note">这几篇就是你跟专家对话时的共同语言。专家说"reram cim 除了论文没有公开资料"——上面就是那些论文。</p>
+
+<h2 id="mlc">⑤ 多电平(MLC):一个 cell 能不能存更多?</h2>
+<p>如果导电细丝能调出<b>好几种粗细</b>(几档电阻),一个 cell 就能存不止 1 bit。这叫 <span class="g" data-k="mlc">MLC</span>。听起来很美——但这正是我最担心、也是 ReRAM 最大的软肋:</p>
+<div class="card">
+<h3>🎚 拖一下:一个 cell 想存几档?</h3>
+<input type="range" id="lvl" min="2" max="16" value="2" oninput="lvlCalc()">
+<div style="display:flex;justify-content:space-between;margin-top:8px">
+<span>能存 <b id="lvlN" class="kpi" style="font-size:20px">2</b> 档 = <b id="lvlBit">1.0</b> bit/cell</span>
+<span id="lvlRel" class="ok">可靠度:高 ✅</span>
+</div>
+<div class="barwrap"><div class="bar"><i id="lvlBar" style="width:100%;background:var(--ok)"></i></div></div>
+<p class="note" id="lvlMsg"></p>
+</div>
+<div class="callout">
+<b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只需要 3 档 {−1,0,+1},HDC 二元只需要 2 档</b>。<span class="g" data-k="ternfit">我们故意用低精度算法,去吃 ReRAM 器件不精确的亏</span>——这是整个技术路线的赌注。
+</div>
+
+<h2 id="cim">⑥ "存算一体"(CIM)是什么黑魔法?</h2>
+<p>普通电脑:数据存在内存,要算的时候搬到 CPU,算完搬回去——<b>搬运</b>本身又慢又费电(这叫<span class="g" data-k="memwall">内存墙</span>)。</p>
+<p><b>CIM(Compute-in-Memory,存内计算)</b>:干脆<b>在存权重的地方直接做计算,权重一步都不挪</b>。怎么做到?靠两条中学物理:</p>
+<table>
+<tr><td><b>欧姆定律</b></td><td>电流 = 电压 × 电导(=1/电阻)。把输入做成电压、权重做成 cell 电阻 → 电流自动 = 输入×权重。<b>一次乘法,零指令。</b></td></tr>
+<tr><td><b>基尔霍夫定律</b></td><td>一整列 cell 的电流在导线上自动相加 → 一列就是一次"乘加求和"(<span class="g" data-k="mac">MAC</span>)。整个矩阵乘法在一瞬间、用物理完成。</td></tr>
+</table>
+<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种模拟乘加。代价是:要把模拟电流读成数字,需要大量 <span class="g" data-k="adc">ADC</span>——这玩意又大又费电,正是专家说"电路设计很大"的地方。</p>
+
+<h2 id="vs">⑦ 专家做的 SRAM-CIM,和我们的 ReRAM-CIM 差在哪?</h2>
+<p>你问的好问题。两者<b>架构、外围、ADC 那套几乎一样</b>(所以专家的经验能迁移),区别只在"用什么 cell 存权重":</p>
+<table>
+<tr><th>维度</th><th>SRAM-CIM(专家方向)</th><th>ReRAM-CIM(我们方向)</th></tr>
+<tr><td>存储单元</td><td>6+ 晶体管搭的 SRAM</td><td>1 晶体管 + 1 电阻开关</td></tr>
+<tr><td>断电</td><td class="bad">就忘(<span class="g" data-k="volatile">易失</span>)→ 权重每次重搬</td><td class="ok">不忘(非易失)→ 权重刻进去常驻 ⭐</td></tr>
+<tr><td>密度(同面积存多少)</td><td class="bad">低(管子多)</td><td class="ok">高 3–10×</td></tr>
+<tr><td>读/算速度</td><td class="ok">极快、稳</td><td>快,但模拟读出要 ADC</td></tr>
+<tr><td>写入</td><td class="ok">快、随便写</td><td class="bad">慢、会老化(耐久有限)</td></tr>
+<tr><td>模拟精度</td><td class="ok">好(数字单元)</td><td class="bad">差(细丝会飘)← 我们用三元绕开</td></tr>
+<tr><td>成熟度</td><td class="ok">标准 CMOS,谁都能做</td><td class="bad">要特殊工艺,资料只在论文里</td></tr>
+</table>
+<div class="callout">
+<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进只读卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的不精确,正好被三元算法吃下。专家做 SRAM-CIM,但因为架构相通 + 他在存算企业实习,完全能帮我们看 ReRAM 论文、判断密度真伪。
+</div>
+
+<h2 id="density">⑧ 那……到底能放下多大的模型?(我心里没底的那个数)</h2>
+<p>"能放多少"不是一个数,是 <b>6 个因子相乘</b>。把它拆开,就知道该问专家什么:</p>
+<div class="card stack">
+<div class="row"><div class="n">A</div><div><b>每个 cell 存几 bit</b> — 多电平可靠吗?<span class="dim">(第⑤节,我们的三元命门)</span></div></div>
+<div class="row"><div class="n">B</div><div><b>每 mm² 多少 cell</b> — 28nm 下单元多大</div></div>
+<div class="row"><div class="n">C</div><div><b>阵列有效率</b> — macro 里真正是 cell 的面积占比(ADC/驱动吃掉 50–80%)<span class="dim">← 理论 vs 实操最大落差</span></div></div>
+<div class="row"><div class="n">D</div><div><b>可用面积</b> — 良率/reticle 限制下实际能用多大</div></div>
+<div class="row"><div class="n">E</div><div><b>层数</b> — 能不能 3D 堆叠(专家:400mm² ReRAM CIM 没人做过)</div></div>
+</div>
+<p>峰值密度(Mb/mm²)= A×B×C。<b>只要从专家那拿到 A、C 和"峰值密度"这三个数,前面那个计算器就能填准,我就有底了。</b></p>
+<div class="callout"><b>当前已知锚点:</b> 专家说 28nm 可实现 <b>16.32 Mb</b>(八成是单个 macro)。要拼到能跑 BERT-base(~110M 参数 ≈ 256 Mb)需要拼 ~16 个这样的 macro——能不能拼、拼到 400mm² 行不行,就是没人验证过的无人区。</div>
+
+<h2 id="next">⑨ 接下来:把空格填上</h2>
+<p>这页讲清了<b>是什么</b>。剩下的是<b>拿数字</b>——已经约了一位做 SRAM-CIM、在存算企业实习的博士。配套两份:</p>
+<p>📋 <a href="reram-cim-expert-consult.md" style="color:var(--hot)">给专家的问题清单</a>(问什么、为什么、好答案长啥样)<br>
+⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)">容量计算器</a>(专家一报数,当场算能跑多大模型)</p>
+<p class="dim">这是一个半年前还不写代码的人,用 AI 当帮手,一砖一瓦学底层的记录。错了就改(见 README 的 Bayesian 修正史)。</p>
+
+<div class="foot">millisecond-era · 毫秒纪 · ReRAM-CIM 101 · 2026-06-01<br>声明:科普向,数字以论文与专家确认为准;材料/论文条目均为公开文献,如有出入以原文为准。</div>
+</div>
+
+<!-- glossary sources (kept in DOM to avoid JS-string escaping issues) -->
+<div class="defsrc" id="def-bit"><b>bit(比特)</b>：信息的最小单位，只有 0 或 1，就像一个开关。8 个 bit = 1 个 byte（字节）= 1 个英文字母的存储量。芯片"容量"本质就是在数能存多少个 bit。</div>
+<div class="defsrc" id="def-trap">小写 b 是 bit，大写 B 是 byte，1 byte = 8 bit。"16.32 Mb" = 16.32 兆比特 = 2.04 兆字节(MB)。如果误读成 32 MB，就把容量高估了约 16 倍——能跑的模型从"几百万参数的小玩具"被错当成"上亿参数的 BERT"。所以跟专家、跟朋友核对时，第一句先问：你说的是 Mb 还是 MB？</div>
+<div class="defsrc" id="def-bpw">三元权重只有 {−1,0,+1} 三个值，理论上用 log₂3 ≈ 1.58 bit 就能表示。但物理上一个 cell 往往要占 2 bit（比如用两个单元做差分、或一个四电平单元只用其中三档）。所以估算容量时按 2 bit/权重比较稳妥，1.58 是最乐观的理论地板。</div>
+<div class="defsrc" id="def-cell">cell（存储单元）：芯片里存 1 个 bit 的最小零件。SRAM 用 6 个晶体管搭一个，ReRAM 用 1 个晶体管 + 1 个电阻开关。cell 越小，同样面积能存越多，密度越高。</div>
+<div class="defsrc" id="def-1t1r">1T1R = 1 Transistor + 1 Resistor，一个晶体管串一个电阻开关。晶体管负责"选中这个单元"，电阻开关负责"存 0 还是 1"。这是 ReRAM 阵列最常见的单元结构，比 SRAM 的 6 管小很多。</div>
+<div class="defsrc" id="def-filament">导电细丝（conductive filament）：在金属-氧化物-金属三明治里，加电压会让氧化物中的氧原子移动，留下一串"氧空位"连成一根纳米细丝，像在绝缘层里搭了一座桥。桥通（LRS，低阻）= 1，桥断（HRS，高阻）= 0。反复加正/负电压就能反复搭桥/拆桥，于是能反复写入模型权重。它"会飘"——每次搭出来的桥粗细略有不同，这就是 ReRAM 模拟精度差的根源。</div>
+<div class="defsrc" id="def-lrs">LRS = Low Resistance State（低阻态），细丝接通、电流好走，记作 1。反义是 HRS = High Resistance State（高阻态），细丝断开，记作 0。读出时给个小电压看电流大小，就知道存的是 0 还是 1。</div>
+<div class="defsrc" id="def-crossbar">crossbar（交叉阵列）：把横线（行）和竖线（列）交叉排成网格，每个交叉点放一个 cell。这种结构让"一整列同时做乘加求和"成为可能——正是存内计算 CIM 的物理基础。几百万个 cell 就这样排成一大片。</div>
+<div class="defsrc" id="def-mlc">MLC = Multi-Level Cell（多电平单元）：让一个 cell 能区分好几档电阻（不只是高/低两档），从而一个单元存不止 1 bit。能省地方，但 ReRAM 的细丝会随时间漂移、不同单元也不一致，档分得越多越容易读错——良率和可靠性是它的死穴。这恰恰是为什么三元/HDC（只需要 2–3 档）特别适配 ReRAM。</div>
+<div class="defsrc" id="def-ternfit">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元权重只有 3 个值、HDC 是二元只有 2 个值——只需要 cell 分出 2–3 档，这是 ReRAM 最容易、最可靠做到的。于是"算法故意低精度"和"器件天生不精确"刚好对上。这是 millisecond-era 整个技术押注的核心假设，需要在真硅上验证（见 README）。</div>
+<div class="defsrc" id="def-memwall">内存墙（memory wall）：现代芯片算得很快，但数据要从内存搬到计算单元，这段"搬运"又慢又费电，成了真正的瓶颈。大模型推理时反复搬几个 GB 的权重，大量时间和电力耗在搬运上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
+<div class="defsrc" id="def-mac">MAC = Multiply-Accumulate（乘加）：神经网络最基本的运算——把输入乘以权重再累加。一个 1000×1000 的矩阵乘法就是上百万次 MAC。CIM 用一列 cell 的电流自动相加，一瞬间完成一整列的 MAC，这就是它快的来源。</div>
+<div class="defsrc" id="def-adc">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这就是专家说"电路设计很大"的具体所指，也是"理论密度"远高于"实际能放"的主因。</div>
+<div class="defsrc" id="def-volatile">易失 vs 非易失：易失（volatile）= 一断电就忘，SRAM/DRAM 都是，所以每次开机要重新把权重搬进去。非易失（non-volatile）= 断电也记得，ReRAM/闪存是，权重一次刻进去就常驻芯片。对"权重大又想常驻又想省电"的 LLM，非易失是 ReRAM 的关键卖点。</div>
+
+<div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>
+
+<script>
+// glossary popups — read text from hidden DOM nodes (no JS string escaping pitfalls)
+document.querySelectorAll('.g').forEach(function(el){
+  el.addEventListener('click',function(){
+    var k=el.getAttribute('data-k'); if(!k)return;
+    var src=document.getElementById('def-'+k); if(!src)return;
+    document.getElementById('popT').textContent=el.textContent;
+    document.getElementById('popB').innerHTML=src.innerHTML;
+    document.getElementById('pop').classList.add('show');
+  });
+});
+// ① converter
+function fmtP(p){if(p>=1e9)return (p/1e9).toFixed(2)+' B';if(p>=1e6)return (p/1e6).toFixed(1)+' M';return Math.round(p/1e3)+' K';}
+function conv(){
+  var v=parseFloat(document.getElementById('cv').value)||0, u=document.getElementById('cu').value;
+  var bits;
+  if(u==='mb')bits=v*1e6; else if(u==='MB')bits=v*8e6; else if(u==='gb')bits=v*1e9; else bits=v*8e9;
+  var MB=bits/8/1e6, params=bits/2; // 2 bit/weight
+  document.getElementById('cvout').innerHTML=
+    '= <b class="warn">'+bits.toLocaleString()+'</b> bit = <b class="ok">'+MB.toFixed(2)+' MB</b><br>'+
+    '三元模型(2bit/权重)约能装 <span class="kpi">'+fmtP(params)+'</span> 参数 '+
+    '<span class="note">('+(params>=80e6?'≈ BERT/GPT-2-small 级':params>=10e6?'≈ 小模型/TinyStories 级':'≈ 玩具模型')+')</span>';
+}
+// ③ atom
+function toggleAtom(){var a=document.getElementById('atom');a.classList.toggle('on');
+  document.getElementById('atomState').innerHTML=a.classList.contains('on')?'<span class="ok">低阻 (LRS) = 1</span>':'<span class="bad">高阻 (HRS) = 0</span>';}
+// ⑤ MLC reliability
+function lvlCalc(){
+  var n=+document.getElementById('lvl').value;
+  var bit=Math.log2(n);
+  document.getElementById('lvlN').textContent=n;
+  document.getElementById('lvlBit').textContent=bit.toFixed(1);
+  // illustrative reliability: drops fast past ~4 levels
+  var rel=Math.max(2,100*Math.pow(0.78,n-2));
+  var bar=document.getElementById('lvlBar'), relEl=document.getElementById('lvlRel'), msg=document.getElementById('lvlMsg');
+  bar.style.width=rel.toFixed(0)+'%';
+  var col,txt,m;
+  if(n<=2){col='var(--ok)';txt='可靠度:高 ✅';m='2 档 = 标准 0/1。最稳。HDC 二元只要这个。';}
+  else if(n<=3){col='var(--ok)';txt='可靠度:好 ✅';m='3 档 = 刚好对上三元 {−1,0,+1}。ReRAM 还扛得住——这正是我们要的。';}
+  else if(n<=4){col='var(--hot)';txt='可靠度:中 ⚠️';m='4 档(2 bit)开始吃力,论文里有但良率打折。';}
+  else if(n<=8){col='var(--hot)';txt='可靠度:差 ⚠️';m='8 档:细丝漂移让相邻档容易读错,实验室能演示、量产很难。';}
+  else{col='var(--bad)';txt='可靠度:很差 ❌';m='16+ 档(8-bit DNN 想要的精度):ReRAM 基本扛不住——这就是为什么普通 DNN 难、而三元正合适。';}
+  bar.style.background=col;relEl.style.color=col;relEl.textContent=txt;msg.textContent=m;
+}
+conv();lvlCalc();
+</script></body></html>

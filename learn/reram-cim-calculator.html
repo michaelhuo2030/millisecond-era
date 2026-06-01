@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReRAM-CIM 三元模型容量计算器</title>
+<style>
+:root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#16182a,#06070d);color:var(--ink);font:15px/1.6 -apple-system,Segoe UI,"PingFang SC",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:26px;margin:0 0 4px}.sub{color:var(--dim);font-size:14px;margin-bottom:20px;max-width:760px}
+.nav a{color:var(--hot);text-decoration:none;font-size:13px;margin-right:14px}.nav{margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border-radius:14px;padding:18px;box-shadow:0 0 0 1px #23242f}
+.card h2{font-size:15px;margin:0 0 14px;color:var(--hot);font-weight:700;letter-spacing:.3px}
+label{display:block;font-size:13px;color:var(--dim);margin:14px 0 5px}
+label .q{color:var(--blue);cursor:pointer;font-weight:700;border:1px solid #2a3550;border-radius:50%;display:inline-block;width:16px;height:16px;line-height:14px;text-align:center;font-size:11px;margin-left:6px}
+label .q:hover{background:#2a3550}
+input[type=range]{width:100%}
+input[type=number],select{width:100%;background:#1c1d2a;color:var(--ink);border:1px solid #33354a;border-radius:8px;padding:9px;font-size:14px}
+.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+.valbig{font-variant-numeric:tabular-nums;color:var(--ok);font-weight:700}
+.out{font-size:14px}
+.bignum{font-size:34px;font-weight:800;color:var(--hot);font-variant-numeric:tabular-nums;line-height:1.1;margin:2px 0}
+.outrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #20212c;font-size:14px}
+.outrow span:first-child{color:var(--dim)}.outrow b{font-variant-numeric:tabular-nums}
+.tier{display:inline-block;font-size:12px;background:#241f12;color:var(--hot);padding:2px 9px;border-radius:6px;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+th,td{text-align:right;padding:5px 6px;border-bottom:1px solid #1d1e29}th{color:var(--dim);font-weight:600}
+td:first-child,th:first-child{text-align:left}
+.fit{color:var(--ok);font-weight:700}.nofit{color:var(--bad)}
+.hl{background:#15241a}
+#explain{position:fixed;left:0;right:0;bottom:0;background:#11131e;border-top:2px solid var(--hot);padding:18px 20px;box-shadow:0 -8px 30px #000a;transform:translateY(110%);transition:.22s;z-index:30;max-height:55vh;overflow:auto}
+#explain.show{transform:translateY(0)}
+#explain h3{margin:0 0 6px;color:var(--hot);font-size:17px}
+#explain .body{color:#dde;font-size:14.5px;line-height:1.7;max-width:820px}
+#explain .x{position:absolute;top:12px;right:18px;cursor:pointer;color:var(--dim);font-size:22px}
+.note{color:var(--dim);font-size:12px;margin-top:10px}
+.pill{display:inline-block;background:#1c1d2a;border:1px solid #2a2c3d;border-radius:20px;padding:3px 11px;font-size:12px;margin:3px 4px 0 0;cursor:pointer}
+.pill:hover{border-color:var(--hot)}
+.formula{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:#0c0d15;border:1px solid #22232f;border-radius:8px;padding:10px;color:#bcd;margin-top:10px;overflow-x:auto}
+.bar{height:8px;background:#1c1d2a;border-radius:5px;overflow:hidden;margin-top:4px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#8ee59a,#ffd36b)}
+</style></head><body><div class="wrap">
+<div class="nav"><a href="reram-cim-101.html">← 回科普</a><a href="#" onclick="explainTopic('overview');return false;">❓ 这工具在算什么</a></div>
+<h1>ReRAM-CIM 三元模型容量计算器 ⚙️</h1>
+<div class="sub">给定一块 ReRAM-CIM 芯片的容量,算它能塞下多大的 <b>ternary(三元 {−1,0,+1})</b> 模型。所有要考虑的物理因素——cell 类型、电平数、差分、ECC 冗余、激活预留——都做成旋钮。<b>每个带 <span style="color:var(--blue)">?</span> 的词点一下有大白话解释。</b></div>
+
+<div class="grid">
+  <!-- INPUTS -->
+  <div class="card">
+    <h2>① 旋钮 — 调这里</h2>
+
+    <label>芯片容量 <span class="q" onclick="explainTopic('capacity')">?</span> <span class="valbig" id="capLbl"></span></label>
+    <input type="range" id="cap" min="0" max="1000" value="0" oninput="calc()">
+    <div class="row" style="margin-top:8px">
+      <input type="number" id="capNum" step="1" oninput="capFromNum()">
+      <select id="capUnit" onchange="capFromNum()"><option value="1048576">MB</option><option value="1073741824">GB</option></select>
+    </div>
+    <div class="note">范围 32 MB → 30 GB。直接拖滑块,或在框里输精确数字。</div>
+
+    <label>这容量指的是 <span class="q" onclick="explainTopic('whatcap')">?</span></label>
+    <select id="capKind" onchange="calc()">
+      <option value="weights">纯权重阵列(只存模型权重)</option>
+      <option value="total">芯片总存储(含激活/KV 缓冲)</option>
+    </select>
+
+    <label>Cell 类型 / 每个权重占几个 cell <span class="q" onclick="explainTopic('cell')">?</span></label>
+    <select id="cell" onchange="calc()">
+      <option value="2|SLC 差分对(2×1bit cell,最稳)">SLC 差分对 — 2 cell/权重 (2.0 bit)</option>
+      <option value="2|MLC-4 单 cell(4 电平,浪费1档)">MLC 4 电平 单 cell — 2.0 bit/权重</option>
+      <option value="1.58|MLC-3 原生三元(3 电平/cell)">MLC 3 电平 原生三元 — 1.58 bit/权重 ⭐</option>
+      <option value="1.58|理论极限(完美打包)">理论极限 packed — 1.58 bit/权重</option>
+      <option value="3|保守(含纠错冗余)">保守(单 cell + 1bit ECC) — 3.0 bit/权重</option>
+    </select>
+
+    <label>额外开销:ECC + 冗余 + 外围 <span class="q" onclick="explainTopic('overhead')">?</span> <span class="valbig" id="ovLbl"></span></label>
+    <input type="range" id="ov" min="0" max="40" value="12" oninput="calc()">
+
+    <label>给激活 / KV cache 预留 <span class="q" onclick="explainTopic('activation')">?</span> <span class="valbig" id="actLbl"></span></label>
+    <input type="range" id="act" min="0" max="50" value="0" oninput="calc()">
+    <div class="note">仅当上面选「芯片总存储」时生效。权重模式下激活通常放单独 SRAM。</div>
+
+    <label>算力(估 tok/s 用)<span class="q" onclick="explainTopic('tops')">?</span> <span class="valbig" id="topsLbl"></span></label>
+    <input type="range" id="tops" min="0" max="200" value="20" oninput="calc()">
+    <div class="note">CIM 的速度由阵列每秒 MAC 次数(TOPS)决定,不是带宽。这只是粗估,看落在速度阶梯哪一档。</div>
+  </div>
+
+  <!-- OUTPUTS -->
+  <div class="card">
+    <h2>② 结果 — 能塞多大模型</h2>
+    <div class="out">
+      <div style="color:var(--dim);font-size:13px">最大三元参数量</div>
+      <div class="bignum" id="params">—</div>
+      <div id="tierLine" style="margin:4px 0 12px"></div>
+
+      <div class="outrow"><span>有效 bit/权重 <span class="q" onclick="explainTopic('bpw')">?</span></span><b id="bpw">—</b></div>
+      <div class="outrow"><span>可用容量(扣开销/激活后)</span><b id="usable">—</b></div>
+      <div class="outrow"><span>同尺寸 fp16 模型要多大 <span class="q" onclick="explainTopic('compress')">?</span></span><b id="fp16">—</b></div>
+      <div class="outrow"><span>三元压缩比</span><b id="ratio">—</b></div>
+      <div class="outrow"><span>粗估速度(权重全在片上)<span class="q" onclick="explainTopic('speed')">?</span></span><b id="toks">—</b></div>
+    </div>
+    <div class="formula" id="formula"></div>
+  </div>
+</div>
+
+<!-- MODEL FIT TABLE -->
+<div class="card" style="margin-top:16px">
+  <h2>③ 常见模型 — 这块芯片装得下哪些?(按当前旋钮)</h2>
+  <table id="modeltbl"><thead><tr><th>模型</th><th>参数量</th><th>三元需容量</th><th>装得下?</th><th>剩余</th></tr></thead><tbody></tbody></table>
+  <div class="note">绿=整模型塞进当前芯片;红=塞不下(需蒸馏更小 / 多片拼 / 更大容量)。高亮行=当前容量下最大能装的那档。</div>
+</div>
+
+<!-- QUICK SCENARIOS -->
+<div class="card" style="margin-top:16px">
+  <h2>④ 一键场景</h2>
+  <span class="pill" onclick="preset(32,'1048576')">朋友的 32 MB</span>
+  <span class="pill" onclick="preset(150,'1048576')">150 MB</span>
+  <span class="pill" onclick="preset(512,'1048576')">512 MB</span>
+  <span class="pill" onclick="preset(2,'1073741824')">2 GB</span>
+  <span class="pill" onclick="preset(8,'1073741824')">8 GB</span>
+  <span class="pill" onclick="preset(30,'1073741824')">30 GB(满配)</span>
+  <div class="note" style="margin-top:12px">名词不懂就点旁边的 <span style="color:var(--blue)">?</span>。所有数都按"权重住在片上 → memory wall 消失 → 高速档"这个前提。</div>
+</div>
+
+</div>
+
+<div id="explain"><span class="x" onclick="document.getElementById('explain').classList.remove('show')">×</span>
+<h3 id="exTitle"></h3><div class="body" id="exBody"></div></div>
+
+<script>
+// ---- model zoo (params in millions) ----
+const MODELS=[
+ ["TinyStories-30M",30],["BERT-base",110],["GPT-2 small",124],["GPT-2 medium",355],
+ ["Qwen 0.5B",500],["GPT-2 large",774],["Qwen 1.5B",1500],["Llama-3.2 1B",1230],
+ ["Phi-2",2700],["Qwen 3B",3000],["Llama-3 8B",8000],["Qwen 14B",14000],
+ ["Qwen 32B",32000],["Llama 70B",70000]];
+
+// ---- plain-Chinese explainers ----
+const EXP={
+ overview:["这工具在算什么",
+  "一句话:<b>容量 ÷ 每个权重占的 bit = 能装多少个权重(参数)</b>。<br><br>ReRAM-CIM 芯片把模型权重直接存在存储单元(cell)里,还能就地做乘加(CIM=存内计算)。三元模型每个权重只是 {−1,0,+1},理论上只要 1.58 bit,但实际占多少取决于 cell 怎么存。把这些物理因素都调一调,就知道你朋友那块芯片到底能跑多大的模型。"],
+ capacity:["芯片容量",
+  "ReRAM 阵列的总存储量,单位 MB/GB。<b>注意:这是存权重的物理容量,不是 fp16 模型的大小。</b><br><br>同样 1.3 亿参数的模型:fp16 要 260MB,三元只要 ~32MB——这 8 倍差距正是三元存在的意义。所以别拿“0.5B/8B”的 fp16 直觉直接套芯片容量。"],
+ whatcap:["这容量指什么",
+  "<b>纯权重阵列</b>:32MB 全部用来存模型权重(最乐观,激活另放 SRAM)。<br><b>芯片总存储</b>:32MB 要同时装权重 + 推理时的中间激活 + KV cache,那权重能用的就更少——用下面的“激活预留”滑块切出一块。<br><br>问你朋友:他说的 32MB 是哪种?差很多。"],
+ cell:["Cell 类型 / 电平 / 差分",
+  "ReRAM 的一个存储单元叫 <b>cell</b>。它能区分几个电阻档位(电平)决定能存几 bit:<br><br>• <b>SLC</b>(单层):只分高/低 2 档 = 1 bit。三元有 3 个值,1 bit 不够,所以常用 <b>2 个 cell 做差分对</b>(G⁺−G⁻)来稳稳表示带符号的 ±,= 2 bit/权重,最稳。<br>• <b>MLC-4</b>(4 电平):1 个 cell 存 2 bit。三元只用其中 3 档,浪费 1 档,= 2 bit/权重。<br>• <b>MLC-3 原生三元</b>:cell 精确分 3 档,刚好对上 {−1,0,+1},1 cell 装 1 个三元值 = 理论 1.58 bit,密度最高 ⭐。<br>• <b>保守</b>:单 cell 再加纠错位,~3 bit/权重。<br><br>电平越多越省地方,但越难分清(模拟精度),这正是要在真硅上测的点——三元只需分少数几档,容差比 8-bit DNN 宽得多。"],
+ overhead:["ECC / 冗余 / 外围开销",
+  "真芯片不可能 100% 都拿来存权重:<br>• <b>ECC</b>(纠错码):ReRAM 会有坏点/漂移,要加校验位。<br>• <b>冗余</b>:备用行列替换坏的。<br>• <b>外围</b>:ADC、读出、行列译码也占面积(不占容量但占预算)。<br><br>典型扣掉 10–20%。保守就拉高。"],
+ activation:["激活 / KV cache 预留",
+  "模型跑的时候除了权重,还有<b>激活值</b>(每层的中间结果)和 <b>KV cache</b>(注意力的历史,随上下文长度涨)。<br><br>如果芯片是“权重+激活共用同一块存储”,就得切一块给它们。纯权重阵列模式(激活另有 SRAM)可设 0。小模型 + 短上下文时这块很小。"],
+ tops:["算力 TOPS",
+  "<b>TOPS = 每秒万亿次操作</b>。CIM 芯片的速度由存内阵列每秒能做多少次乘加决定,<b>不是</b>由内存带宽决定(权重不用搬来搬去,这正是 CIM 的杀手锏)。<br><br>每生成 1 个 token ≈ 要把整个模型过一遍 ≈ 2×参数 次操作。所以 tok/s ≈ TOPS ÷ (2×参数)。这里给个粗估,看落在咱速度阶梯哪一档。"],
+ bpw:["有效 bit/权重",
+  "把 cell 类型 + 电平算下来,平均每个三元权重实际占多少 bit。1.58 是理论地板,2.0 是常见实做,3.0 是带纠错的保守值。<b>越小 = 同容量装越多参数。</b>"],
+ compress:["同尺寸 fp16 要多大",
+  "同样参数量,如果用普通 fp16 存要占多大。用来对比:你这块小小的 ReRAM 芯片,等效装下了一个多大的“常规”模型。三元压缩比 = fp16 大小 ÷ 芯片容量,通常 ~8–10×。"],
+ speed:["粗估速度 tok/s",
+  "前提:<b>整个模型权重都在片上</b> → 不用反复从 DRAM 搬权重 → memory wall 消失 → 这就是速度阶梯里“几万 t/s”那一档的物理基础。<br><br>数值 = TOPS ÷ (2×参数),很粗,只为定性看档位。真实还受激活搬运、流水线、外围 ADC 限制。"],
+};
+function explainTopic(k){const e=EXP[k];if(!e)return;document.getElementById('exTitle').innerHTML=e[0];document.getElementById('exBody').innerHTML=e[1];document.getElementById('explain').classList.add('show');}
+
+// ---- capacity slider: log scale 32MB .. 30GB ----
+const MINB=32*1048576, MAXB=30*1073741824;
+function sliderToBytes(s){const lo=Math.log(MINB),hi=Math.log(MAXB);return Math.exp(lo+(hi-lo)*s/1000);}
+function bytesToSlider(b){const lo=Math.log(MINB),hi=Math.log(MAXB);return Math.round((Math.log(b)-lo)/(hi-lo)*1000);}
+function fmtBytes(b){if(b>=1073741824)return (b/1073741824).toFixed(b<10*1073741824?2:1)+' GB';return (b/1048576).toFixed(b<100*1048576?1:0)+' MB';}
+function fmtParams(p){if(p>=1e9)return (p/1e9).toFixed(2)+' B';if(p>=1e6)return (p/1e6).toFixed(1)+' M';return (p/1e3).toFixed(0)+' K';}
+
+let curBytes=MINB;
+function capFromNum(){const n=parseFloat(document.getElementById('capNum').value)||32;const u=parseFloat(document.getElementById('capUnit').value);curBytes=Math.min(MAXB,Math.max(MINB,n*u));document.getElementById('cap').value=bytesToSlider(curBytes);calc();}
+function preset(n,u){document.getElementById('capNum').value=n;document.getElementById('capUnit').value=u;capFromNum();}
+
+function calc(){
+ // capacity from slider unless num drove it
+ const s=+document.getElementById('cap').value;
+ curBytes=sliderToBytes(s);
+ // sync num box to slider value
+ const gb=curBytes>=1073741824;
+ document.getElementById('capUnit').value=gb?'1073741824':'1048576';
+ document.getElementById('capNum').value=(curBytes/(gb?1073741824:1048576)).toFixed(gb?2:0);
+ document.getElementById('capLbl').textContent=fmtBytes(curBytes);
+
+ const ov=+document.getElementById('ov').value, act=+document.getElementById('act').value, tops=+document.getElementById('tops').value;
+ document.getElementById('ovLbl').textContent=ov+'%';
+ document.getElementById('actLbl').textContent=act+'%';
+ document.getElementById('topsLbl').textContent=tops+' TOPS';
+
+ const [bpwStr,cellName]=document.getElementById('cell').value.split('|');
+ const bpw=parseFloat(bpwStr);
+ const capKind=document.getElementById('capKind').value;
+ const actFrac=(capKind==='total')?act/100:0;
+
+ const totalBits=curBytes*8;
+ const usableBits=totalBits*(1-ov/100)*(1-actFrac);
+ const params=usableBits/bpw;
+
+ const fp16Bytes=params*2;
+ const ratio=fp16Bytes/curBytes;
+ const toks=tops*1e12/(2*params);
+
+ document.getElementById('params').textContent=fmtParams(params);
+ document.getElementById('bpw').textContent=bpw.toFixed(2)+' bit';
+ document.getElementById('usable').textContent=fmtBytes(usableBits/8);
+ document.getElementById('fp16').textContent=fmtBytes(fp16Bytes);
+ document.getElementById('ratio').textContent=ratio.toFixed(1)+'×';
+ document.getElementById('toks').textContent=toks>=1000?Math.round(toks).toLocaleString()+' tok/s':toks.toFixed(0)+' tok/s';
+
+ // tier label
+ let tier,desc;
+ if(toks>=50000){tier='Tier 8';desc='社会级实时演化';}
+ else if(toks>=10000){tier='Tier 6–7';desc='千未来 / 反射';}
+ else if(toks>=1000){tier='Tier 4–5';desc='超人速思考';}
+ else if(toks>=100){tier='Tier 2–3';desc='比人快';}
+ else {tier='Tier 1';desc='约人类阅读速';}
+ document.getElementById('tierLine').innerHTML='<span class="tier">'+tier+'</span> &nbsp;<span style="color:var(--dim);font-size:13px">'+desc+' · cell:'+cellName+'</span>';
+
+ document.getElementById('formula').textContent=
+   '参数 = 容量×8 ×(1−开销'+ov+'%)'+(actFrac?' ×(1−激活'+act+'%)':'')+' ÷ '+bpw.toFixed(2)+'bit/权重\n'+
+   '     = '+(curBytes*8).toExponential(2)+' bit × '+((1-ov/100)*(1-actFrac)).toFixed(2)+' ÷ '+bpw.toFixed(2)+' = '+fmtParams(params)+' 参数\n'+
+   'tok/s ≈ '+tops+' TOPS ÷ (2 × '+fmtParams(params)+') = '+(toks>=1000?Math.round(toks).toLocaleString():toks.toFixed(0))+' tok/s';
+
+ // model table
+ const tb=document.querySelector('#modeltbl tbody');tb.innerHTML='';
+ let bestRow=null;
+ MODELS.forEach(([nm,mp])=>{
+   const need=mp*1e6*bpw/8; // bytes
+   const fits=need<=usableBits/8;
+   const rem=usableBits/8-need;
+   const tr=document.createElement('tr');
+   if(fits&&(!bestRow||mp>bestRow._mp))bestRow=tr,tr._mp=mp;
+   tr.innerHTML='<td>'+nm+'</td><td>'+(mp>=1000?(mp/1000)+' B':mp+' M')+'</td><td>'+fmtBytes(need)+'</td>'+
+     '<td class="'+(fits?'fit':'nofit')+'">'+(fits?'✓ 装得下':'✗ 超容量')+'</td>'+
+     '<td>'+(fits?fmtBytes(rem):'缺 '+fmtBytes(-rem))+'</td>';
+   tr._mp=mp;tb.appendChild(tr);
+ });
+ if(bestRow)bestRow.classList.add('hl');
+}
+document.getElementById('cap').value=0;preset(32,'1048576');
+</script></body></html>

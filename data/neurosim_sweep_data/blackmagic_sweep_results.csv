@@ -1,0 +1,9 @@
+config,pathway,pipeline,speedUpDegree,globalBufferType,bufferCoreSize,chipArea_mm2,arrayArea_mm2,memUtil_pct,macroDensity_Mb_per_mm2,note
+BM1_baseline_no_pipeline_speedup1,2.5_pipeline,false,1,false,128,112.078,8.38002,98.2558,12.6483,Baseline: no pipeline, speedUp=1
+BM2_speedup_only_no_pipeline,2.5_pipeline,false,8,false,128,112.078,8.38002,98.2558,12.6483,speedUp=8 only
+BM3_pipeline_only_speedup1,2.5_pipeline,true,1,false,128,110.784,8.38002,98.2558,12.7960,pipeline=true only
+BM4_pipeline_speedup8,2.5_pipeline,true,8,false,128,110.784,8.38002,98.2558,12.7960,BOTH pipeline + speedUp=8
+BM5_register_file_buf128,2.3_sram_cache,false,1,false,128,112.078,8.38002,98.2558,12.6483,Register file baseline
+BM6_SRAM_buf128,2.3_sram_cache,false,1,true,128,111.971,8.38002,98.2558,12.6604,SRAM 128x128 buf
+BM7_SRAM_buf256,2.3_sram_cache,false,1,true,256,111.975,8.38002,98.2558,12.6599,SRAM 256x256 buf
+BM8_SRAM_buf512,2.3_sram_cache,false,1,true,512,111.993,8.38002,98.2558,12.6579,SRAM 512x512 buf (Tier 0 cache proxy)

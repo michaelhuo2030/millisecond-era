@@ -42,6 +42,14 @@
 >
 > The honest record of one outsider learning the bottom layer with AI as a co-pilot.
 
+> 🔬 **Research notes · data · tools (published from the lab, verdicts kept honest):**
+> - [`docs/NORTH-STAR.md`](docs/NORTH-STAR.md) — the trillion-fold-future vision (physics-grounded).
+> - [`docs/MAC-SPEED-CEILING-MEASURED.md`](docs/MAC-SPEED-CEILING-MEASURED.md) — measured Mac LLM speed ceiling + ternary-accel curve + the on-chip-vs-DRAM bandwidth law (CONFIRM).
+> - [`data/neurosim_sweep_data/`](data/neurosim_sweep_data/) — NeuroSim V1.3 ARM64 sweeps (45+ points) + replication patches (numbers are the corrected envelopes).
+> - [`scripts/hdc_experiment_kit.py`](scripts/hdc_experiment_kit.py) — the executable rigor kit (laws → runtime gates: held-out split, lift+bootstrap CI, auto-VOID).
+> - [`docs/HDC-theory-foundations-thomas-dasgupta-rosing-2021.md`](docs/HDC-theory-foundations-thomas-dasgupta-rosing-2021.md) — HDC theory reading notes.
+> - Foundational HDC library lives in its own repo: **[hdc-ops](https://github.com/michaelhuo2030/hdc-ops)**.
+
 ---
 
 ## Open Source: HDC SDK for the Mini SKU

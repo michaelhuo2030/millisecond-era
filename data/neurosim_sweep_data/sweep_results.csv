@@ -1,0 +1,8 @@
+config,network,technode,cellBit,subArray,numColMuxed,levelOutput,operationmode,chipArea_mm2,arrayArea_mm2,adcArea_um2,otherArea_um2,memUtilization_pct,arrayFraction_pct,adcFraction_pct
+A_baseline_22nm_2bit_128sub_8mux_32lvl,ResNet18,22,2,128,8,32,2,79.4819,1.9732,3.14169e+07,buffers,,91.4158,2.4800,0
+B_22nm_4bit_128sub_8mux_32lvl,ResNet18,22,4,128,8,32,2,50.7407,1.24239,1.9781e+07,buffers,,86.6436,2.4400,0
+C_22nm_4bit_256sub_8mux_32lvl,ResNet18,22,4,256,8,32,2,86.7968,3.99512,3.18048e+07,buffers,,60.7794,4.6000,0
+D_22nm_4bit_256sub_16mux_32lvl,ResNet18,22,4,256,16,32,2,69.9068,3.99512,1.75957e+07,buffers,,60.7794,5.7100,0
+E_22nm_4bit_256sub_16mux_16lvl,ResNet18,22,4,256,16,16,2,58.7228,3.99512,8.51402e+06,buffers,,60.7794,6.8000,0
+F_22nm_4bit_512sub_32mux_16lvl,ResNet18,22,4,512,32,16,2,45.0056,3.99512,2.53816e+06,buffers,,36.5397,8.8700,0
+G_32nm_4bit_256sub_8mux_32lvl,ResNet18,32,4,256,8,32,2,187.554,8.4525,6.72895e+07,buffers,,60.7794,4.5000,0

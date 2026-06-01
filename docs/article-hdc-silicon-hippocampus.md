@@ -191,11 +191,11 @@ prefetch_target = HDMemory.search(attention_summary_hv)
 
 ---
 
-## §5 Tokamak 等离子体控制 — AI for Science 第三锚点
+## §5 Tokamak 等离子体控制 — AI for Science 第三应用方向
 
 Phase 47.14 最意外的发现: **HDC 对核聚变等离子体控制有数量级优势**.
 
-ASIPP (中科院等离子物理研究所) 的 EAST Tokamak 每秒产生 ~10K 传感器信号. 等离子体破裂 (disruption) 是最危险事件, 发生在毫秒时间尺度. 任何反应都必须在 **≤1 ms** 完成.
+某聚变研究机构 (国家级研究机构等离子物理研究所) 的 托卡马克 每秒产生 ~10K 传感器信号. 等离子体破裂 (disruption) 是最危险事件, 发生在毫秒时间尺度. 任何反应都必须在 **≤1 ms** 完成.
 
 当前 AI 方案 (DeepMind AlphaControl 类系统): GPU 推理 ~10 ms. 太慢.
 
@@ -209,12 +209,12 @@ ASIPP (中科院等离子物理研究所) 的 EAST Tokamak 每秒产生 ~10K 传
 - 比 DeepMind ~10 ms: **约 10,000× 更快**
 - 比 "安全反应时间" 1 ms: **还有 787× 余量**
 
-**战略意义**: 这是我们的第三个 AI for Science 锚点:
-- 锚点 1: 深势科技 DP-GEN 材料筛选 (Article 2 引用, Phase 47.9)
-- 锚点 2: 中科院 AI 辅助新材料设计 (DeePMD-kit)
-- **锚点 3: ASIPP EAST Tokamak 等离子体控制** (1.27 μs HDC 反应)
+**战略意义**: 这是我们的第三个 AI for Science 应用方向:
+- 应用方向 1: DP-GEN 类分子动力学材料筛选 (Article 2 引用, Phase 47.9)
+- 应用方向 2: AI 辅助新材料设计 (DeePMD-kit)
+- **应用方向 3: 托卡马克 等离子体控制** (1.27 μs HDC 反应)
 
-ASIPP + 中科院战略关系 + 核聚变是国家战略 = 最高级别 anchor customer.
+某聚变研究机构 + 国家级研究机构战略关系 + 核聚变是国家战略 = 反应时间要求最严苛的应用.
 
 ---
 
@@ -314,7 +314,7 @@ HDC 不是万能的. 要说清楚它做不到什么:
 - Nunes, I. et al. (2023). Torchhd: Python Library for HDC. *JMLR* v24.
 - HYDAR ISSCC 2026: 28nm ReRAM CIM, 2.82 TOPS/mm².
 - DeepMind (2022). Magnetic control of tokamak plasmas. *Nature*.
-- ASIPP EAST Tokamak: 中科院合肥物质科学研究院.
+- 托卡马克: 国家级研究机构合肥物质科学研究院.
 
 ---
 

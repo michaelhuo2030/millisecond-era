@@ -1,5 +1,5 @@
 {
-  "input_jsonl": "/Users/a1-6/stage1-harness/exp13/exp13_moelog.jsonl",
+  "input_jsonl": "exp13_moelog.jsonl",
   "n_events": 135966,
   "n_accesses": 815796,
   "cache_sizes": [

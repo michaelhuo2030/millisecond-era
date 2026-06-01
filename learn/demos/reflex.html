@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>反射 · 一群比你眨眼还快的 AI</title>
+<style>
+:root{--bg:#06070d;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:14px}h1{font-size:19px;margin:2px 0}.sub{color:var(--dim);font-size:13px;margin-bottom:10px}
+.main{display:flex;gap:14px;flex-wrap:wrap}.stage{background:#000;border-radius:12px;box-shadow:0 0 0 1px #222}
+canvas{display:block;border-radius:12px;cursor:none}.side{flex:1;min-width:240px}
+.panel{background:#13141f;border-radius:10px;padding:13px;box-shadow:0 0 0 1px #222;margin-bottom:10px}
+.big{font-size:28px;color:var(--hot);font-weight:700;font-variant-numeric:tabular-nums}
+.stat{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;padding:1px 0}.stat b{color:var(--ink)}
+.row{margin:8px 0}.row label{display:flex;justify-content:space-between;color:var(--dim);font-size:12px}input[type=range]{width:100%;accent-color:#ffd36b}
+.tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#241f12;color:var(--hot);font-size:11px}
+</style></head><body><div class="wrap">
+<h1>反射 · 一群比你眨眼还快的 AI <span class="tag">Tier 6</span></h1>
+<div class="sub"><b>把鼠标移到画面上</b>——每个光点都是一个 AI，它在亚毫秒内"看到→决定→躲开"。你怎么甩都甩不掉，因为它每秒重新决策几万次，比世界变化快几千倍。</div>
+<div class="main">
+  <div class="stage"><canvas id="cv" width="640" height="500"></canvas></div>
+  <div class="side">
+    <div class="panel"><div class="big" id="dps">0</div><div style="color:var(--dim);font-size:12px">次决策/秒（全体）</div>
+      <div class="stat" style="margin-top:6px"><span>单次决策延迟</span><b id="lat">~微秒级</b></div>
+      <div class="stat"><span>对比 慢速AI</span><b>50ms → 慢 1万倍</b></div>
+      <div class="stat"><span>一帧(16ms)内决策</span><b id="perframe">0</b></div></div>
+    <div class="panel">
+      <div class="row"><label>智能体数 <span id="vn">400</span></label><input id="n" type="range" min="50" max="1500" value="400"></div>
+      <div class="row"><label>警觉范围 <span id="vr">90</span></label><input id="r" type="range" min="30" max="180" value="90"></div>
+      <div style="color:var(--dim);font-size:12px">慢速 AI（思考要 50ms）每步落后整整一拍，追不上世界。能"反应"靠的就是速度——实时控制、游戏 NPC、机器人反射都要它。</div>
+    </div>
+  </div>
+</div></div><script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');const W=640,H=500;
+let N,x,y,vx,vy,mx=-999,my=-999,decisions=0,P={n:400,r:90};
+function init(){N=P.n;x=new Float32Array(N);y=new Float32Array(N);vx=new Float32Array(N);vy=new Float32Array(N);
+  for(let i=0;i<N;i++){x[i]=Math.random()*W;y[i]=Math.random()*H;}}
+function step(){const R=P.r,R2=R*R;
+  for(let i=0;i<N;i++){decisions++;
+    let ax=0,ay=0;const dx=x[i]-mx,dy=y[i]-my,d2=dx*dx+dy*dy;
+    if(d2<R2){const d=Math.sqrt(d2)||1;const f=(R-d)/R*2.2;ax+=dx/d*f;ay+=dy/d*f;} // flee cursor (the reflex)
+    // gentle return to center + drift so they regroup
+    ax+=(W/2-x[i])*0.0006;ay+=(H/2-y[i])*0.0006;
+    vx[i]=(vx[i]+ax)*0.90;vy[i]=(vy[i]+ay)*0.90;
+    x[i]+=vx[i];y[i]+=vy[i];
+    if(x[i]<0){x[i]=0;vx[i]*=-.5;}if(x[i]>W){x[i]=W;vx[i]*=-.5;}
+    if(y[i]<0){y[i]=0;vy[i]*=-.5;}if(y[i]>H){y[i]=H;vy[i]*=-.5;}
+  }
+}
+function render(){ctx.fillStyle='rgba(6,7,13,0.4)';ctx.fillRect(0,0,W,H);
+  for(let i=0;i<N;i++){const sp=Math.min(1,(Math.abs(vx[i])+Math.abs(vy[i]))/6);
+    ctx.fillStyle=`hsl(${200-sp*200|0},80%,${55+sp*25|0}%)`;ctx.beginPath();ctx.arc(x[i],y[i],2.4,0,6.28);ctx.fill();}
+  if(mx>0){ctx.strokeStyle='rgba(255,211,107,0.5)';ctx.beginPath();ctx.arc(mx,my,P.r,0,6.28);ctx.stroke();}
+}
+let lastT=performance.now(),dl=0;
+function loop(){step();render();const now=performance.now();
+  if(now-lastT>250){const r=(decisions-dl)/((now-lastT)/1000);dl=decisions;lastT=now;
+    document.getElementById('dps').textContent=Math.round(r).toLocaleString();
+    document.getElementById('perframe').textContent=Math.round(r*0.016).toLocaleString();}
+  requestAnimationFrame(loop);}
+cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+cv.addEventListener('mouseleave',()=>{mx=-999;my=-999;});
+document.getElementById('n').addEventListener('input',e=>{P.n=+e.target.value;document.getElementById('vn').textContent=e.target.value;init();});
+document.getElementById('r').addEventListener('input',e=>{P.r=+e.target.value;document.getElementById('vr').textContent=e.target.value;});
+init();requestAnimationFrame(loop);
+</script></body></html>

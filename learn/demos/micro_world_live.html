@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MICRO-WORLD · HDC 智能体文明涌现（实时）</title>
+<style>
+  :root{ --bg:#0b0b12; --panel:#15161f; --ink:#e8e8ef; --dim:#8b8ca0; --accent:#7ad17a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,Segoe UI,Roboto,"PingFang SC",sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px}
+  h1{font-size:19px;margin:4px 0 2px}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:12px}
+  .main{display:flex;gap:16px;flex-wrap:wrap}
+  .stage{background:#000;border-radius:10px;padding:8px;box-shadow:0 0 0 1px #23242f}
+  canvas{display:block;border-radius:6px;image-rendering:pixelated}
+  .side{flex:1;min-width:280px;display:flex;flex-direction:column;gap:12px}
+  .panel{background:var(--panel);border-radius:10px;padding:14px;box-shadow:0 0 0 1px #23242f}
+  .stat{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #20212c}
+  .stat b{font-variant-numeric:tabular-nums}
+  .big{font-size:26px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .row{margin:10px 0}
+  .row label{display:flex;justify-content:space-between;color:var(--dim);font-size:12px}
+  input[type=range]{width:100%;accent-color:#7ad17a}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:#272838;color:var(--ink);border:1px solid #33344a;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px}
+  button:hover{background:#32334a}
+  button.go{background:#244d24;border-color:#356a35}
+  .note{color:var(--dim);font-size:12px}
+  .tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#222536;color:#9fd;font-size:11px;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MICRO-WORLD · 一个用 HDC 智能体跑的活世界（实时·可调参数）</h1>
+  <div class="sub">每个点 = 一个 AI 智能体，颜色 = 它的<b>文化</b>（一个超维向量）。没人下令分组——它们只是找食物、移动、跟旁边的人聊天、生后代（继承文化）、变老死去。看<b>文化和地理一起涌现</b>：从一锅随机颜色 → 食物斑块上长出一个个有颜色的"部落"。</div>
+
+  <div class="main">
+    <div class="stage">
+      <canvas id="cv" width="560" height="560"></canvas>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <div class="stat"><span>步数 step</span><b id="s_step">0</b></div>
+        <div class="stat"><span>人口 population</span><b id="s_pop">0</b></div>
+        <div class="stat"><span>同地文化相似 <span class="note">(邻居)</span></span><b id="s_ns">0%</b></div>
+        <div class="stat"><span>随机两人相似</span><b id="s_rs">0%</b></div>
+        <div class="stat" style="border:none;margin-top:6px"><span>文化地理信号 <span class="note">(邻居−随机)</span></span></div>
+        <div class="big" id="s_geo">+0pp</div>
+        <div class="note" id="s_msg">随机起点：人人不同文化。</div>
+        <div class="stat" style="border:none;margin-top:6px"><span>速度</span><b id="s_fps">— 步/秒</b></div>
+      </div>
+
+      <div class="panel">
+        <div class="btns">
+          <button class="go" id="btnPlay">⏸ 暂停</button>
+          <button id="btnReset">↺ 重置</button>
+          <button id="btnDiverse">🌍 多元世界</button>
+          <button id="btnMelt">🫧 大熔炉</button>
+        </div>
+        <div class="row"><label>模拟速度 <span id="v_speed">4</span> 步/帧</label>
+          <input type="range" id="speed" min="1" max="16" value="4"></div>
+        <div class="row"><label>起始智能体数 <span id="v_pop">220</span> <span class="note">(重置生效)</span></label>
+          <input type="range" id="pop0" min="40" max="900" value="220"></div>
+        <div class="row"><label>食物斑块数 <span id="v_patch">4</span> <span class="note">(重置生效)</span></label>
+          <input type="range" id="patches" min="1" max="8" value="4"></div>
+        <div class="row"><label>文化传播强度 <span id="v_spread">50</span>%</label>
+          <input type="range" id="spread" min="0" max="100" value="50"></div>
+        <div class="row"><label>变异率 <span id="v_mut">0.2</span>% <span class="note">(文化创新)</span></label>
+          <input type="range" id="mut" min="0" max="40" value="20"></div>
+        <div class="row"><label>寿命 <span id="v_life">130</span> 步</label>
+          <input type="range" id="life" min="40" max="320" value="130"></div>
+        <div class="row"><label>流动性/扩散 <span id="v_wander">4</span>% <span class="note">(越低=越定居)</span></label>
+          <input type="range" id="wander" min="0" max="40" value="4"></div>
+        <div class="note">想看<b>部落</b>：流动性低 + 变异低 + 传播高。想看<b>大同</b>（全融成一个）：流动性高、斑块=1。想看<b>持续多元</b>：变异调高。</div>
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:14px"><span class="tag">这是什么</span>纯浏览器里跑的 HDC 智能体微世界——速度的力量让你几秒看完一部"文明聚合史"。芯片的活：把 N、网格、文化维度各放大数量级，在电池功耗下跑真世界尺度。 — 给学生的可玩 demo。</p>
+</div>
+
+<script>
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const D=160;                  // 文化超维向量维度
+let S, CAP, fert, food, ax, ay, en, age, life, alive, cult, freeStack, step, running=true;
+let projR,projG,projB;
+const P={speed:4,pop0:220,patches:4,spread:0.5,mut:0.002,life:130,wander:0.04};
+
+function ri(n){return (Math.random()*n)|0;}
+function gauss(){let u=Math.random()||1e-9,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2831853*v);}
+function initProj(){projR=new Float32Array(D);projG=new Float32Array(D);projB=new Float32Array(D);
+  for(let i=0;i<D;i++){projR[i]=gauss();projG[i]=gauss();projB[i]=gauss();}}
+
+function init(){
+  S=56; CAP=Math.max(P.pop0*6,1800);
+  fert=new Float32Array(S*S); food=new Float32Array(S*S);
+  const cen=[]; for(let p=0;p<P.patches;p++) cen.push([ri(S),ri(S)]);
+  const sig=(S*0.07)*(S*0.07); let mx=1e-9;
+  for(let i=0;i<S;i++)for(let j=0;j<S;j++){let f=0;
+    for(const[cx,cy]of cen){let dx=i-cx,dy=j-cy;f+=Math.exp(-((dx*dx+dy*dy)/(2*sig)));}
+    fert[i*S+j]=f; if(f>mx)mx=f;}
+  for(let k=0;k<S*S;k++){fert[k]/=mx; food[k]=fert[k]*Math.random();}
+  ax=new Int16Array(CAP);ay=new Int16Array(CAP);en=new Float32Array(CAP);
+  age=new Int16Array(CAP);life=new Int16Array(CAP);alive=new Uint8Array(CAP);
+  cult=new Uint8Array(CAP*D); freeStack=[];
+  for(let s=CAP-1;s>=P.pop0;s--) freeStack.push(s);
+  for(let a=0;a<P.pop0;a++){alive[a]=1;ax[a]=ri(S);ay[a]=ri(S);en[a]=1.5;age[a]=0;
+    life[a]=80+ri(100); const o=a*D; for(let d=0;d<D;d++)cult[o+d]=ri(2);}
+  step=0;
+}
+
+function simStep(){
+  for(let k=0;k<S*S;k++){let f=food[k]+0.03*fert[k]; food[k]=f>fert[k]?fert[k]:f;}
+  const idx=[]; for(let a=0;a<CAP;a++) if(alive[a]) idx.push(a);
+  // move + eat
+  for(let t=0;t<idx.length;t++){const a=idx[t]; age[a]++;
+    let cx=ax[a],cy=ay[a]; let best=food[cx*S+cy],bdx=0,bdy=0;
+    const N=[[1,0],[-1,0],[0,1],[0,-1]];
+    for(const[dx,dy]of N){let nx=(cx+dx+S)%S,ny=(cy+dy+S)%S;let f=food[nx*S+ny];if(f>best+0.05){best=f;bdx=dx;bdy=dy;}}
+    if(Math.random()<P.wander){bdx=ri(3)-1;bdy=ri(3)-1;}
+    cx=(cx+bdx+S)%S;cy=(cy+bdy+S)%S;ax[a]=cx;ay[a]=cy;
+    const ci=cx*S+cy; const g=food[ci]*0.6; food[ci]*=0.4;
+    let e=en[a]+g-0.06; en[a]=e>4?4:e;}
+  // local culture spread (random pairing, same cell)
+  const perm=idx.slice(); for(let i=perm.length-1;i>0;i--){const j=ri(i+1);const tmp=perm[i];perm[i]=perm[j];perm[j]=tmp;}
+  for(let t=0;t<idx.length;t++){const a=idx[t],b=perm[t]; if(a===b)continue;
+    if(Math.abs(ax[a]-ax[b])<=1&&Math.abs(ay[a]-ay[b])<=1){const ao=a*D,bo=b*D;
+      for(let d=0;d<D;d++) if(cult[ao+d]!==cult[bo+d]&&Math.random()<P.spread) cult[ao+d]=cult[bo+d];}}
+  // reproduce
+  for(let t=0;t<idx.length;t++){const a=idx[t];
+    if(en[a]>3&&Math.random()<0.4&&freeStack.length){const c=freeStack.pop();
+      alive[c]=1; en[a]*=0.5; en[c]=en[a]; ax[c]=ax[a];ay[c]=ay[a];age[c]=0;
+      life[c]=(P.life*0.6|0)+ri(P.life*0.8|0||1);
+      const ao=a*D,co=c*D; for(let d=0;d<D;d++){let bit=cult[ao+d]; if(Math.random()<P.mut)bit=1-bit; cult[co+d]=bit;}}}
+  // death
+  for(let t=0;t<idx.length;t++){const a=idx[t]; if(en[a]<=0||age[a]>life[a]){alive[a]=0;freeStack.push(a);}}
+  step++;
+}
+
+function cultSim(a,b){const ao=a*D,bo=b*D;let m=0;for(let d=0;d<D;d++)if(cult[ao+d]===cult[bo+d])m++;return m/D;}
+function metrics(){const idx=[];for(let a=0;a<CAP;a++)if(alive[a])idx.push(a);
+  if(idx.length<30)return{pop:idx.length,ns:0,rs:0};
+  let ns=0,nc=0,rs=0,rc=0;
+  for(let t=0;t<700;t++){const a=idx[ri(idx.length)],b=idx[ri(idx.length)];if(a===b)continue;
+    const s=cultSim(a,b); rs+=s;rc++;
+    if(Math.abs(ax[a]-ax[b])<=2&&Math.abs(ay[a]-ay[b])<=2){ns+=s;nc++;}}
+  return{pop:idx.length,ns:nc?ns/nc:0,rs:rc?rs/rc:0};
+}
+
+function render(){
+  const cell=cv.width/S;
+  ctx.fillStyle='#05060a'; ctx.fillRect(0,0,cv.width,cv.height);
+  for(let i=0;i<S;i++)for(let j=0;j<S;j++){const f=food[i*S+j];
+    if(f>0.03){ctx.fillStyle='rgb(0,'+((f*42)|0)+',0)';ctx.fillRect(i*cell,j*cell,cell,cell);}}
+  const s3=Math.sqrt(D)*0.45;
+  for(let a=0;a<CAP;a++){ if(!alive[a])continue; const o=a*D; let r=0,g=0,b=0;
+    for(let d=0;d<D;d++){const pm=cult[o+d]?1:-1; r+=pm*projR[d];g+=pm*projG[d];b+=pm*projB[d];}
+    const R=((Math.tanh(r/s3)+1)*127.5)|0,G=((Math.tanh(g/s3)+1)*127.5)|0,B=((Math.tanh(b/s3)+1)*127.5)|0;
+    ctx.fillStyle='rgb('+R+','+G+','+B+')';
+    ctx.fillRect(ax[a]*cell,ay[a]*cell,cell+0.6,cell+0.6);}
+}
+
+let lastT=performance.now(), stepsSince=0, fcount=0;
+function loop(){
+  if(running){for(let s=0;s<P.speed;s++)simStep(); stepsSince+=P.speed;}
+  render();
+  fcount++;
+  if(fcount%8!==0 && running){requestAnimationFrame(loop);return;}  // stats (heavy) only every 8 frames
+  const m=metrics(); const geo=(m.ns-m.rs);
+  document.getElementById('s_step').textContent=step;
+  document.getElementById('s_pop').textContent=m.pop;
+  document.getElementById('s_ns').textContent=(m.ns*100|0)+'%';
+  document.getElementById('s_rs').textContent=(m.rs*100|0)+'%';
+  document.getElementById('s_geo').textContent='+'+(geo*100|0)+'pp';
+  const msg=document.getElementById('s_msg');
+  if(m.pop===0) msg.textContent='灭绝了 — 食物太少或寿命太短，试试重置/调参。';
+  else if(geo>0.12) msg.textContent='✓ 文化区域涌现了！同斑块文化聚合、跨斑块漂开 = 文化地理。';
+  else if(geo>0.05) msg.textContent='文化区域正在形成…';
+  else msg.textContent='还在混匀（降低流动性、提高传播试试）。';
+  const now=performance.now();
+  if(now-lastT>500){document.getElementById('s_fps').textContent=(stepsSince/((now-lastT)/1000)|0)+' 步/秒';lastT=now;stepsSince=0;}
+  requestAnimationFrame(loop);
+}
+
+// ---- controls ----
+function bind(id,key,fn){const el=document.getElementById(id);const lbl=document.getElementById('v_'+id);
+  el.addEventListener('input',()=>{P[key]=fn(+el.value); if(lbl)lbl.textContent=el.value;});}
+bind('speed','speed',v=>v);
+bind('spread','spread',v=>v/100);
+bind('mut','mut',v=>{document.getElementById('v_mut').textContent=(v/100).toFixed(1);return v/10000;});
+bind('life','life',v=>v);
+bind('wander','wander',v=>v/100);
+document.getElementById('pop0').addEventListener('input',e=>{P.pop0=+e.target.value;document.getElementById('v_pop').textContent=e.target.value;reset();});
+document.getElementById('patches').addEventListener('input',e=>{P.patches=+e.target.value;document.getElementById('v_patch').textContent=e.target.value;reset();});
+document.getElementById('btnPlay').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸ 暂停':'▶ 播放';});
+function reset(){init();}
+document.getElementById('btnReset').addEventListener('click',reset);
+document.getElementById('btnDiverse').addEventListener('click',()=>{ // persistent multiculture
+  P.mut=0.004;P.wander=0.03;P.spread=0.5;
+  setSlider('mut',40);setSlider('wander',3);setSlider('spread',50); reset();});
+document.getElementById('btnMelt').addEventListener('click',()=>{ // one global culture
+  P.patches=1;P.wander=0.20;P.mut=0.0;
+  document.getElementById('patches').value=1;document.getElementById('v_patch').textContent=1;
+  setSlider('wander',20);setSlider('mut',0); reset();});
+function setSlider(id,val){const el=document.getElementById(id);el.value=val;el.dispatchEvent(new Event('input'));}
+
+initProj(); init(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

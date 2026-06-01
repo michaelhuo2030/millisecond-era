@@ -44,7 +44,8 @@ button{background:#2d2440;border-color:#4a3a6a;color:#fff;cursor:pointer}button:
 
 <div class="card">
 <label>给它一句话(prompt)</label>
-<textarea id="prompt">用一句话解释:为什么速度快的 AI 能解锁全新的事,而不只是"答得更快"?</textarea>
+<textarea id="prompt">Write a short, vivid story (about 6 sentences) of a small robot that hears music for the very first time.</textarea>
+<div class="note">这些极小模型说<b>英文</b>最流畅(中文容易乱/慢)——主要是看它<b>吐字的速度</b>。想换提示词随便改。</div>
 <div class="btnrow">
 <button id="gen" disabled>▶ 生成(真跑)</button>
 <div style="margin-left:auto"><span class="kpi" id="tps">— <small>tok/s</small></span></div>
@@ -65,16 +66,19 @@ if (!navigator.gpu) { $("nogpu").style.display = "block"; }
 // populate small models from the prebuilt list (always-valid ids)
 try {
   const list = webllm.prebuiltAppConfig.model_list || [];
+  // broad family regexes (NOT pinned to q4f16 — the tiny 135M/360M are often q0f16)
   const want = [
-    {re:/SmolLM2-135M-Instruct-q4f16/, tag:"SmolLM2-135M · 极小 ~100MB · 最快下"},
-    {re:/SmolLM2-360M-Instruct-q4f16/, tag:"SmolLM2-360M · 很小 ~250MB"},
-    {re:/Qwen2\.5-0\.5B-Instruct-q4f16/, tag:"Qwen2.5-0.5B · 小 ~400MB · 更聪明"},
-    {re:/TinyLlama-1\.1B-Chat.*q4f16/, tag:"TinyLlama-1.1B · ~700MB"},
-    {re:/Llama-3\.2-1B-Instruct-q4f16/, tag:"Llama-3.2-1B · ~900MB · 最强"},
+    {re:/SmolLM2-135M/i, tag:"SmolLM2-135M · 极小 ~100–150MB · 最快(默认)"},
+    {re:/SmolLM2-360M/i, tag:"SmolLM2-360M · 很小 ~250MB"},
+    {re:/Qwen2(\.5)?-0\.5B/i, tag:"Qwen2.5-0.5B · 小 ~400MB · 更聪明"},
+    {re:/TinyLlama-1\.1B/i, tag:"TinyLlama-1.1B · ~700MB"},
+    {re:/Llama-3\.2-1B/i, tag:"Llama-3.2-1B · ~900MB · 最强(慢)"},
   ];
   const sel = $("model");
   for (const w of want) {
-    const m = list.find(x => w.re.test(x.model_id));
+    const cands = list.filter(x => w.re.test(x.model_id));
+    // prefer q4f16 (smaller download) when available, else the smallest-named candidate
+    const m = cands.find(x => /q4f16/.test(x.model_id)) || cands[0];
     if (m) { const o = document.createElement("option"); o.value = m.model_id; o.textContent = w.tag; sel.appendChild(o); }
   }
   if (!sel.children.length) {

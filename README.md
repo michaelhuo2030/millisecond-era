@@ -34,7 +34,13 @@
 
 [Jump to the civilizational speed ladder ↓](#what-different-speeds-actually-unlock--the-civilizational-ladder) for what each speed tier 0→1 unlocks. [Jump to the 18-row transparency matrix ↓](#what-we-havent-verified--18-row-transparency-matrix) for what's verified vs assumed.
 
-> 📚 **New — learn the substrate from the ground up:** [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — an interactive, for-dummies explainer of ReRAM-CIM from "what is a bit" → device physics → materials + papers → SRAM-CIM vs ReRAM-CIM → "how big a ternary model can it actually hold." Companion: a live [capacity calculator](learn/reram-cim-calculator.html). This is the honest record of one outsider learning the bottom layer with AI as a co-pilot.
+> 📚 **New — learn the substrate from the ground up (interactive, for-dummies):**
+> - 🧱 [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — ReRAM-CIM from "what is a bit" → device physics → materials + papers → storage family → "how big a ternary model can it hold."
+> - 👀 [`learn/reram-cim-visual.html`](learn/reram-cim-visual.html) — **see it move**: ternary cell, multi-level (MLC) physics, crossbar array, a live MAC computation (current summing down the columns), macro floorplan/efficiency, 2D/2.5D/3D packaging, yield, and how an LLM's layers map onto macros.
+> - 🧠 [`learn/hdc-101.html`](learn/hdc-101.html) — Hyperdimensional Computing from zero (bind/bundle/permute you can click), why it fits ReRAM, and the hub linking all HDC repos ([hdc-neon](https://github.com/michaelhuo2030/hdc-neon), [torchhd](https://github.com/michaelhuo2030/torchhd)).
+> - ⚙️ [`learn/reram-cim-calculator.html`](learn/reram-cim-calculator.html) — capacity → max ternary model + speed tier.
+>
+> The honest record of one outsider learning the bottom layer with AI as a co-pilot.
 
 ---
 

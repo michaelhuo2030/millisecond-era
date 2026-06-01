@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HDC 从零开始 · 超级科普 + 资源中心</title>
+<style>
+:root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff;--vio:#caa9ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,#16182a,#06070d);color:var(--ink);font:16px/1.7 -apple-system,Segoe UI,"PingFang SC",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 120px}
+h1{font-size:29px;margin:0 0 4px}.tagline{color:var(--dim);font-size:15px;margin-bottom:8px}
+h2{font-size:22px;margin:44px 0 4px;border-left:4px solid var(--vio);padding-left:12px}
+h3{font-size:18px;margin:22px 0 4px;color:var(--vio)}
+p{margin:8px 0}.dim{color:var(--dim)}.note{color:var(--dim);font-size:13px}
+.topnav a{color:var(--blue);text-decoration:none;font-size:13px;margin-right:14px}.topnav{margin-bottom:10px}
+.card{background:var(--panel);border-radius:14px;padding:16px 18px;box-shadow:0 0 0 1px #23242f;margin:14px 0}
+.g{color:var(--blue);border-bottom:1px dashed #3a5180;cursor:pointer;font-weight:600}.g:hover{color:var(--hot);border-color:var(--hot)}
+button{background:#2d2440;color:#fff;border:1px solid #4a3a6a;border-radius:9px;padding:8px 14px;font-size:14px;cursor:pointer}button.sec{background:#262838;border-color:#33354a}
+.hv{display:flex;flex-wrap:wrap;gap:2px;margin:6px 0}
+.hv b{width:13px;height:13px;border-radius:2px;display:inline-block}
+.lbl{font-size:13px;color:var(--dim);min-width:120px;display:inline-block}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.bar{height:13px;background:#1c1d2a;border-radius:7px;overflow:hidden;flex:1;min-width:120px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#ff8aa0,#ffd36b,#8ee59a);transition:.3s}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid #20212c;vertical-align:top}th{color:var(--vio);font-size:13px}
+.repo{display:block;background:var(--panel2);border:1px solid #2a2c3d;border-radius:12px;padding:14px 16px;margin:10px 0;text-decoration:none;color:var(--ink)}
+.repo:hover{border-color:var(--vio)}.repo .n{font-size:16px;font-weight:700;color:var(--hot)}.repo .d{color:var(--dim);font-size:13.5px;margin-top:3px}
+.callout{background:#15110a;border:1px solid #3a2f12;border-radius:12px;padding:14px 16px;margin:16px 0}.callout b{color:var(--hot)}
+.pop{position:fixed;left:0;right:0;bottom:0;background:#11131e;border-top:2px solid var(--blue);padding:18px 20px;box-shadow:0 -8px 30px #000a;transform:translateY(110%);transition:.22s;z-index:40;max-height:60vh;overflow:auto}
+.pop.show{transform:translateY(0)}.pop h3{margin:0 0 6px;color:var(--blue)}.pop .x{position:absolute;top:12px;right:18px;cursor:pointer;color:var(--dim);font-size:24px}.pop .body{max-width:820px;font-size:15px}.defsrc{display:none}
+.foot{color:var(--dim);font-size:13px;margin-top:50px;border-top:1px solid #20212c;padding-top:18px}
+</style></head><body><div class="wrap">
+<div class="topnav"><a href="reram-cim-101.html">← ReRAM 科普</a><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-cim-calculator.html">⚙️ 计算器</a></div>
+<h1>HDC 从零开始 🧠</h1>
+<div class="tagline">超维计算(Hyperdimensional Computing)。给纯小白:每个 <span class="g">蓝词</span> 点一下看人话。下面的向量能点能算。</div>
+<p class="lead">HDC 是我们这块芯片上跑的<b>另一种"大脑算法"</b>——不靠神经网络,靠<b>几万维的随机向量</b>做"绑定/打包/比对"。它天生 1-bit、抗噪、一次就学会、永不遗忘——<b>正好长在 ReRAM 这种又省电又不太精确的硬件上</b>。这页讲清它是什么,并把我们所有 HDC 的代码仓库挂在一起。</p>
+
+<h2>① 一个想法 = 一串一万维的随机数</h2>
+<p>HDC 把每个概念(比如"猫""红色""国王")都表示成一条<b>很长很长(1万~10万维)的向量</b>,每一维只是 <b>+1 或 −1</b>。一开始就是<span class="g" data-k="random">随机</span>给的。</p>
+<div class="card">
+<div class="row"><span class="lbl">概念 A(猫)</span><div class="hv" id="hvA"></div></div>
+<div class="row"><span class="lbl">概念 B(狗)</span><div class="hv" id="hvB"></div></div>
+<div class="row"><span class="lbl">相似度 A·B</span><div class="bar"><i id="simAB"></i></div><span id="simABn" style="min-width:54px;text-align:right"></span></div>
+<button class="sec" onclick="reroll()">🎲 换两个随机概念</button>
+<p class="note">⭐ 神奇之处:<b>任意两个随机长向量,相似度都接近 0(几乎垂直)</b>。维度越高越是如此。这意味着空间大到几乎装得下无穷多个互不干扰的概念——这是 HDC 一切的根。<span class="g" data-k="ortho">为什么?</span></p>
+</div>
+
+<h2>② 三个动作,就能搭出"思考"</h2>
+<p>HDC 只有 <span class="g" data-k="ops">三种运算</span>,但够用:</p>
+
+<h3>🔗 BIND 绑定(把两个东西"扣"成一对)</h3>
+<p>把 A 和 B 逐位相乘 → 得到一个<b>和谁都不像的新向量</b> C。用来表示"A 配 B"这种<b>键值对</b>(比如"颜色=红")。而且<b>可逆</b>:拿 C 再和 B 绑一次,就把 A 原样还原出来。</p>
+<div class="card">
+<button onclick="doBind()">🔗 C = 绑定(A, B)</button>
+<button class="sec" onclick="doUnbind()">↩ 用 B 解绑 C → 还原 A</button>
+<div class="row" style="margin-top:8px"><span class="lbl">结果 C</span><div class="hv" id="hvC"></div></div>
+<div class="row"><span class="lbl">C 和 A 像吗</span><div class="bar"><i id="simCA"></i></div><span id="simCAn" style="min-width:54px;text-align:right"></span></div>
+<p class="note" id="bindNote">点"绑定"看看:C 和 A、和 B 都不像(相似度≈0)——它是个全新的东西。但信息没丢,解绑能完整拿回来。</p>
+</div>
+
+<h3>📦 BUNDLE 打包(把一堆东西塞进"一个记忆")</h3>
+<p>把几个向量加起来取符号 → 得到一个<b>和每个成员都有点像</b>的向量 M。用来表示<b>集合 / 一段记忆</b>("我见过 X、Y、Z")。之后拿任意东西去比,就知道它<b>在不在这个记忆里</b>。</p>
+<div class="card">
+<button onclick="doBundle()">📦 M = 打包(X, Y, Z)</button>
+<div class="row" style="margin-top:8px"><span class="lbl">记忆 M</span><div class="hv" id="hvM"></div></div>
+<div class="row"><span class="lbl">成员 X 在里面?</span><div class="bar"><i id="simMX"></i></div><span id="simMXn" style="min-width:54px;text-align:right"></span></div>
+<div class="row"><span class="lbl">陌生 R 在里面?</span><div class="bar"><i id="simMR"></i></div><span id="simMRn" style="min-width:54px;text-align:right"></span></div>
+<p class="note" id="bundleNote">点"打包":成员 X 和 M 明显相似(在记忆里),陌生向量 R 和 M ≈0(不在)。这就是 HDC 的"记得"。</p>
+</div>
+
+<h3>↪ PERMUTE 移位(记住"顺序")</h3>
+<p>把向量整体平移几位 → 用来编码<b>先后/位置</b>("先 A 后 B" ≠ "先 B 后 A")。这样连句子、时间序列都能装进一条向量。</p>
+
+<h2>③ 为什么 HDC 和我们的 ReRAM 芯片是绝配?</h2>
+<table>
+<tr><th>HDC 的天性</th><th>普通神经网络</th><th>为什么配 ReRAM</th></tr>
+<tr><td><b>1-bit(只要 +1/−1)</b></td><td>要 8~16 bit 浮点</td><td>ReRAM cell 本就难存高精度,HDC 只要 1 bit,正好</td></tr>
+<tr><td><b>抗噪(30% 翻转还能用)</b></td><td>少量噪声就崩</td><td>ReRAM 电阻会飘,HDC 不在乎</td></tr>
+<tr><td><b>一次就学会、永不遗忘</b></td><td>要几百步梯度、会灾难性遗忘</td><td>写一次就记住,契合非易失存储</td></tr>
+<tr><td><b>追加是 O(1)(随手加)</b></td><td>重训或建索引</td><td>存内直接 bundle 进去,不用搬</td></tr>
+</table>
+<div class="callout"><b>一句话:</b>神经网络要"精确"——而 ReRAM 给不起精确;HDC 要的恰恰是"高维 + 1-bit + 抗噪",这正是 ReRAM 便宜又省电能给的。算法的脾气和硬件的脾气对上了。详见 <a href="reram-cim-101.html#mlc" style="color:var(--hot)">ReRAM 101 §⑤ 多电平</a>。</div>
+
+<h2>④ HDC 资源中心(我们所有 HDC 代码挂这)</h2>
+<p>这一节是个<b>会长大的中心</b>——现在挂着这些,以后的 HDC 项目都往这加:</p>
+<a class="repo" href="https://github.com/michaelhuo2030/hdc-neon" target="_blank"><div class="n">⚡ hdc-neon</div><div class="d">用 NEON SIMD 加速 HDC 检索,比 numpy 快 ~89×。证明 HDC 在普通 CPU 上就已经飞快,搬到 ReRAM-CIM 会更夸张。Apache-2.0。</div></a>
+<a class="repo" href="https://github.com/michaelhuo2030/torchhd" target="_blank"><div class="n">🔧 torchhd(fork · reram-cim-backend)</div><div class="d">在主流 HDC 库 torchhd 上加了一个可直接替换的 ReRAM-CIM 后端 —— 2 行代码,把标准 HDC 切到我们的芯片仿真上跑。</div></a>
+<div class="card" style="border:1px dashed #4a3a6a;text-align:center;color:var(--dim)">➕ 未来的 HDC 项目(知识生命体、连续写入 KB、镜子诊断…)陆续挂这里</div>
+
+<h2>⑤ 接着读</h2>
+<p>🧱 <a href="reram-cim-101.html" style="color:var(--hot)">ReRAM-CIM 从底层说起</a> — HDC 跑在什么硬件上<br>
+👀 <a href="reram-cim-visual.html" style="color:var(--hot)">看得见的 ReRAM-CIM</a> — 阵列、计算、封装,全是交互图<br>
+⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)">容量计算器</a></p>
+
+<div class="foot">HDC 101 · millisecond-era · 毫秒纪 · 2026-06-01 · 科普向,帮助理解直觉;严谨结果以代码与论文为准。</div>
+
+<div class="defsrc" id="d-random">这里的“随机”就是抛硬币:每一维独立地 50% 给 +1、50% 给 −1。一万维就抛一万次。正因为是独立随机,两个这样生成的向量几乎不可能碰巧很像。</div>
+<div class="defsrc" id="d-ortho">在很高的维度里,两个随机 ±1 向量“同号的位”和“异号的位”几乎各占一半,点积≈0,所以相似度≈0(近乎垂直/正交)。维度越高,这个“≈0”越稳。好处:你可以塞进海量互不干扰的概念,还能用“相似度”可靠地区分它们——这就是“超维”的超能力。</div>
+<div class="defsrc" id="d-ops">HDC 只有三种运算:<b>BIND 绑定</b>(逐位相乘,把两个扣成一对、且可逆)、<b>BUNDLE 打包</b>(相加取符号,把多个并成一个“集合/记忆”、和每个成员都像)、<b>PERMUTE 移位</b>(整体平移,编码顺序/位置)。就这三招,能搭出键值对、集合、序列——足够表达结构化的“想法”。</div>
+
+<div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>
+<script>
+const N=48;
+function rnd(){const v=[];for(let i=0;i<N;i++)v.push(Math.random()<0.5?-1:1);return v;}
+function sim(a,b){let d=0;for(let i=0;i<N;i++)d+=a[i]*b[i];return d/N;}
+function bind(a,b){return a.map((x,i)=>x*b[i]);}
+function bundle(...vs){const o=[];for(let i=0;i<N;i++){let s=0;for(const v of vs)s+=v[i];o.push(s>0?1:s<0?-1:(Math.random()<0.5?1:-1));}return o;}
+function draw(id,v){const c=document.getElementById(id);c.innerHTML='';for(const x of v){const b=document.createElement('b');b.style.background=x>0?'#8ee59a':'#ff8aa0';c.appendChild(b);}}
+function setbar(id,nid,s){const pct=Math.max(0,Math.min(100,(s+1)/2*100));document.getElementById(id).style.width=pct+'%';document.getElementById(nid).textContent=s.toFixed(2);}
+let A=rnd(),B=rnd(),C=null,X=rnd(),Y=rnd(),Z=rnd(),M=null,R=rnd();
+function reroll(){A=rnd();B=rnd();draw('hvA',A);draw('hvB',B);setbar('simAB','simABn',sim(A,B));C=null;document.getElementById('hvC').innerHTML='';}
+function doBind(){C=bind(A,B);draw('hvC',C);setbar('simCA','simCAn',sim(C,A));document.getElementById('bindNote').textContent='C 和 A 相似度≈0——全新的东西,不像 A 也不像 B。但信息都在里面。';}
+function doUnbind(){if(!C){doBind();}const rec=bind(C,B);draw('hvC',rec);setbar('simCA','simCAn',sim(rec,A));document.getElementById('bindNote').textContent='用 B 解绑 → 完整还原成 A(相似度=1.00)。绑定是可逆的,所以能存“键=值”再精确取回。';}
+function doBundle(){M=bundle(X,Y,Z);draw('hvM',M);setbar('simMX','simMXn',sim(M,X));setbar('simMR','simMRn',sim(M,R));document.getElementById('bundleNote').textContent='成员 X 与 M 明显相似(在记忆里);陌生 R 与 M≈0(不在)。一条向量就装下了一个集合。';}
+document.querySelectorAll('.g').forEach(function(el){el.addEventListener('click',function(){var s=document.getElementById('d-'+el.getAttribute('data-k'));if(!s)return;document.getElementById('popT').textContent=el.textContent;document.getElementById('popB').innerHTML=s.innerHTML;document.getElementById('pop').classList.add('show');});});
+reroll();draw('hvA',A);draw('hvB',B);
+</script></body></html>

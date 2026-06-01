@@ -55,7 +55,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <a href="#count">①数数(bit/Mb)</a><a href="#cell">②一个cell</a><a href="#reram">③ReRAM物理</a><a href="#mat">④材料+论文</a><a href="#mlc">⑤多电平</a><a href="#cim">⑥存算一体</a><a href="#vs">⑦SRAM vs ReRAM</a><a href="#density">⑧能放多少</a><a href="#next">⑨接下来</a>
 </div></div>
 <div class="wrap">
-<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
+<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="hdc-101.html">🧠 HDC 科普</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
 <h1>ReRAM-CIM,从最底层说起 🧱</h1>
 <div class="tagline">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</div>
 <p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、最想弄清的那个问题。</p>
@@ -152,6 +152,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <div class="callout">
 <b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只需要 3 档 {−1,0,+1},HDC 二元只需要 2 档</b>。<span class="g" data-k="ternfit">我们故意用低精度算法,去吃 ReRAM 器件不精确的亏</span>——这是整个技术路线的赌注。
 </div>
+<p class="note">🔎 <b>"MLC=3 是不是就是三元组?"</b> 几乎是,但要分清两层:<b>三元 {−1,0,+1} 说的是"值有 3 个"(算法)</b>;<b>MLC-3 说的是"一个 cell 物理上分 3 挡"(硬件)</b>。把一个三元权重存进一个 3 挡 cell,二者刚好对上——所以"原生三元 cell"=MLC-3。但三元也可以用 2 个普通 1-bit(SLC)cell 差分来存,不一定非走 MLC。关键是:三元只需要 2–3 挡,正好避开高挡位 MLC 那个最难的区。<b><a href="reram-cim-visual.html#mlc" style="color:var(--hot)">→ 点这里玩"多电平物理上怎么实现"的交互图</a></b>,拖到 6–8 挡就能看到挡位挤到一起、开始读错。</p>
 
 <h2 id="cim">⑥ "存算一体"(CIM)是什么黑魔法?</h2>
 <p>普通电脑:数据存在内存,要算的时候搬到 CPU,算完搬回去——<b>搬运</b>本身又慢又费电(这叫<span class="g" data-k="memwall">内存墙</span>)。</p>

@@ -25,7 +25,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}th,td{pa
 b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--blue)}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#cell">①单元 1T1R/2T2R</a><a href="#xbar">②crossbar 子阵列</a><a href="#adc">③ADC 三种方案</a><a href="#counter">③·计数器</a><a href="#macro">④macro 拼 tile</a><a href="#tile">⑤核拼接·时钟墙</a><a href="#d3">⑥3D 堆叠</a>
+<a href="#cell">①单元 1T1R/2T2R</a><a href="#xbar">②crossbar 子阵列</a><a href="#adc">③ADC 三种方案</a><a href="#counter">③·计数器</a><a href="#rsadc">③··RS-ADC</a><a href="#macro">④macro 拼 tile</a><a href="#tile">⑤核拼接·时钟墙</a><a href="#d3">⑥3D 堆叠</a>
 </div></div>
 <div class="wrap">
 <div class="topnav"><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-cim-101.html">🧱 ReRAM 101</a><a href="reram-cim-calculator.html">⚙️ 计算器</a></div>
@@ -87,6 +87,17 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 </table>
 </div>
 
+<!-- ③·· RS-ADC -->
+<h2 id="rsadc">③·· RS-ADC:多列怎么共享一个 ADC(ISSCC'24 34.8,真芯片)</h2>
+<p>真芯片确认 ADC 是<b>多列共享</b>的(不是每列一个)。<b>残差共享 ADC(RS-ADC)</b>:每列做便宜的<b>粗量化</b>(比较器),把粗量化后的<b>残差</b>经 MUX 送进<b>一个共享的精 ADC</b>顺序量化。<b>拖共享比看 ADC 数怎么降:</b></p>
+<div class="card" style="text-align:center">
+<div class="ctl" style="justify-content:center">共享比(1 精ADC : <span class="kpi" id="rsN">2</span> 列)<input type="range" id="rs" min="1" max="8" value="2" oninput="drawRS()"></div>
+<svg id="rsSvg" viewBox="0 0 440 240" width="440"></svg>
+<div class="row" id="rsStats" style="justify-content:center"></div>
+<div class="note" id="rsNote"></div>
+</div>
+<div class="real" style="text-align:left">📌 <b>诚实标注</b>:RS-ADC 的精确电路 <b>JSSC'24 正文付费墙未公开</b>(摘要只说"每个 ADC 可被多列共享")。上图是<b>推断拓扑</b>(粗量化/列 + 残差送共享精 ADC),要画准得拉 IEEE 原文。<br>同期 <b>ISSCC'24 34.3 的 ASQC</b>(电荷域累加+计数器+末端 1 个 6-bit SAR-ADC)= ③· 那个计数器动画的真原型(但用 SRAM)。<b>ADC 共享是全行业标配</b>:RS-ADC / ADC 虚拟化 / TIA 级联免 ADC。</div>
+
 <!-- ④ macro -->
 <h2 id="macro">④ macro:多个子阵列 + 加法树合并</h2>
 <p>一个 <b>macro</b> = 几个子阵列 + 读出 + <b>加法树/XOR 树</b>把各子阵列的部分和合并。真芯片(二元那款):<b>4 个 512×12 子阵列 → XOR 树合并</b>。一个 macro 大概 ~16–32 Mbit。</p>
@@ -123,8 +134,10 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 <a href="https://www.jos.ac.cn/en/article/doi/10.1088/1674-4926/24100017" target="_blank">JoS 28nm 576K RRAM-CIM macro (2T2R, 2.82 TOPS/mm²)</a> ·
 <a href="https://dl.acm.org/doi/10.1145/3701034" target="_blank">Cascaded ReRAM Crossbar for Transformer (ACM TODAES)</a> ·
 <a href="https://github.com/witmemtech/CIM-Technical-Papers-Collection/blob/main/readme.EN" target="_blank">知存 witmem · CIM 论文合集</a> ·
-<a href="https://www.digitimes.com/news/a20260302PD215/huawei-bytedance-rram-isscc-2026.html" target="_blank">Huawei-ByteDance RRAM ISSCC 2026</a> ·
-ISSCC'24 22nm 16Mb FP-ReRAM-CIM(National Tsing Hua) · HYDAR(清华,500+Mb 板级)。图为示意。
+<a href="https://www.researchgate.net/publication/385161425" target="_blank">ISSCC'24 34.8 · NTHU 22nm 16Mb FP-ReRAM(RS-ADC)</a> ·
+ISSCC'21 16.1 · NTHU 22nm 4Mb 8b ReRAM · REMNA(MLC FeFET, NAND式读) · ReCAT(级联ReRAM Transformer)。
+<br>★ <b>华为-字节 ISSCC'26 = "HYDAR"</b>(清华+华为+字节,28nm ~36Mb,<b>16 PE × 288×4096 阵列</b>,DL-ADC)—— 真身是<b>推荐系统向量搜索加速器,不是 LLM</b>;系统级 vs CPU 66×(按 QPS)。专家逐字稿里的 36Mbit/1.63Mb-mm² 就是它。
+<br>⚠️ 部分图为<b>推断拓扑</b>(IEEE/ACM 正文付费墙);精确电路需机构访问拉原文。完整文献 digest(7 篇,事实/推断/墙分级)在私有研究档。图为示意。
 </div>
 
 <script>
@@ -229,6 +242,26 @@ async function runCnt(){if(cntRunning)return;cntRunning=true;document.getElement
 document.getElementById('cntRun').onclick=runCnt;
 document.getElementById('cntRand').onclick=randCnt;
 drawCnt(0);
+
+// ③·· RS-ADC sharing
+function drawRS(){const N=+document.getElementById('rs').value;document.getElementById('rsN').textContent=N;
+ const s=document.getElementById('rsSvg');clr(s);const cols=8,pad=34,gw=46,top=18;
+ for(let j=0;j<cols;j++){const x=pad+j*gw;
+   s.appendChild(el('line',{x1:x,y1:top,x2:x,y2:top+48,stroke:'#2a2d40','stroke-width':1.5}));
+   for(let i=0;i<3;i++)s.appendChild(el('circle',{cx:x,cy:top+8+i*13,r:3,fill:'#2f7a45'}));
+   s.appendChild(el('rect',{x:x-11,y:top+54,width:22,height:16,rx:3,fill:'#23303a',stroke:'#33454f'}));txt(s,x,top+66,'粗','#7aa9ff',9);}
+ txt(s,16,top+64,'粗量化/列','#8a8ca6',9,'start');
+ const groups=Math.ceil(cols/N);
+ for(let g=0;g<groups;g++){const c0=g*N,c1=Math.min(cols,c0+N);const xc=pad+((c0+c1-1)/2)*gw;
+   for(let j=c0;j<c1;j++)s.appendChild(el('line',{x1:pad+j*gw,y1:top+70,x2:xc,y2:top+92,stroke:'#556','stroke-width':1}));
+   const mw=Math.max(26,(c1-c0)*gw-22);
+   s.appendChild(el('rect',{x:xc-mw/2,y:top+92,width:mw,height:15,rx:3,fill:'#2a2438',stroke:'#443a5a'}));txt(s,xc,top+103,'MUX','#caa9ff',9);
+   s.appendChild(el('rect',{x:xc-17,y:top+122,width:34,height:30,rx:5,fill:'#3a2030',stroke:'#7a3040'}));txt(s,xc,top+141,'精ADC','#ff8aa0',9);
+   s.appendChild(el('line',{x1:xc,y1:top+107,x2:xc,y2:top+122,stroke:'#7a3040','stroke-width':1.5}));}
+ document.getElementById('rsStats').innerHTML='<div>粗量化器 <b class="b">'+cols+'</b>(每列,便宜)</div><div>共享精 ADC <b class="g">'+groups+'</b></div><div>vs 每列一个 <b class="r">'+cols+'</b></div><div>精 ADC 省 <b class="y">'+(cols/groups).toFixed(1)+'×</b></div>';
+ document.getElementById('rsNote').textContent='共享比 '+N+' → 8 列只用 '+groups+' 个精 ADC。N 越大省越多,但分时共享 → 慢一点(密度↔速度老权衡)。';
+}
+drawRS();
 
 // ④ macro
 function drawMacro(){const s=document.getElementById('macroSvg');clr(s);

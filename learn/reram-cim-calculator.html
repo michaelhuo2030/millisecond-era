@@ -111,7 +111,7 @@ td:first-child,th:first-child{text-align:left}
 <!-- QUICK SCENARIOS -->
 <div class="card" style="margin-top:16px">
   <h2>④ 一键场景</h2>
-  <span class="pill" onclick="preset(32,'1048576')">朋友的 32 MB</span>
+  <span class="pill" onclick="preset(32,'1048576')">示例 32 MB</span>
   <span class="pill" onclick="preset(150,'1048576')">150 MB</span>
   <span class="pill" onclick="preset(512,'1048576')">512 MB</span>
   <span class="pill" onclick="preset(2,'1073741824')">2 GB</span>
@@ -136,11 +136,11 @@ const MODELS=[
 // ---- plain-Chinese explainers ----
 const EXP={
  overview:["这工具在算什么",
-  "一句话:<b>容量 ÷ 每个权重占的 bit = 能装多少个权重(参数)</b>。<br><br>ReRAM-CIM 芯片把模型权重直接存在存储单元(cell)里,还能就地做乘加(CIM=存内计算)。三元模型每个权重只是 {−1,0,+1},理论上只要 1.58 bit,但实际占多少取决于 cell 怎么存。把这些物理因素都调一调,就知道你朋友那块芯片到底能跑多大的模型。"],
+  "一句话:<b>容量 ÷ 每个权重占的 bit = 能装多少个权重(参数)</b>。<br><br>ReRAM-CIM 芯片把模型权重直接存在存储单元(cell)里,还能就地做乘加(CIM=存内计算)。三元模型每个权重只是 {−1,0,+1},理论上只要 1.58 bit,但实际占多少取决于 cell 怎么存。把这些物理因素都调一调,就知道目标芯片到底能跑多大的模型。"],
  capacity:["芯片容量",
   "ReRAM 阵列的总存储量,单位 MB/GB。<b>注意:这是存权重的物理容量,不是 fp16 模型的大小。</b><br><br>同样 1.3 亿参数的模型:fp16 要 260MB,三元只要 ~32MB——这 8 倍差距正是三元存在的意义。所以别拿“0.5B/8B”的 fp16 直觉直接套芯片容量。"],
  whatcap:["这容量指什么",
-  "<b>纯权重阵列</b>:32MB 全部用来存模型权重(最乐观,激活另放 SRAM)。<br><b>芯片总存储</b>:32MB 要同时装权重 + 推理时的中间激活 + KV cache,那权重能用的就更少——用下面的“激活预留”滑块切出一块。<br><br>问你朋友:他说的 32MB 是哪种?差很多。"],
+  "<b>纯权重阵列</b>:32MB 全部用来存模型权重(最乐观,激活另放 SRAM)。<br><b>芯片总存储</b>:32MB 要同时装权重 + 推理时的中间激活 + KV cache,那权重能用的就更少——用下面的“激活预留”滑块切出一块。<br><br>先确认:这 32MB 是哪一种?差很多。"],
  cell:["Cell 类型 / 电平 / 差分",
   "ReRAM 的一个存储单元叫 <b>cell</b>。它能区分几个电阻档位(电平)决定能存几 bit:<br><br>• <b>SLC</b>(单层):只分高/低 2 档 = 1 bit。三元有 3 个值,1 bit 不够,所以常用 <b>2 个 cell 做差分对</b>(G⁺−G⁻)来稳稳表示带符号的 ±,= 2 bit/权重,最稳。<br>• <b>MLC-4</b>(4 电平):1 个 cell 存 2 bit。三元只用其中 3 档,浪费 1 档,= 2 bit/权重。<br>• <b>MLC-3 原生三元</b>:cell 精确分 3 档,刚好对上 {−1,0,+1},1 cell 装 1 个三元值 = 理论 1.58 bit,密度最高 ⭐。<br>• <b>保守</b>:单 cell 再加纠错位,~3 bit/权重。<br><br>电平越多越省地方,但越难分清(模拟精度),这正是要在真硅上测的点——三元只需分少数几档,容差比 8-bit DNN 宽得多。"],
  overhead:["ECC / 冗余 / 外围开销",

@@ -55,10 +55,10 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <a href="#count">①数数(bit/Mb)</a><a href="#cell">②一个cell</a><a href="#reram">③ReRAM物理</a><a href="#mat">④材料+论文</a><a href="#mlc">⑤多电平</a><a href="#cim">⑥存算一体</a><a href="#vs">⑦SRAM vs ReRAM</a><a href="#density">⑧能放多少</a><a href="#next">⑨接下来</a>
 </div></div>
 <div class="wrap">
-<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a><a href="reram-cim-expert-consult.md">📋 专家咨询清单</a></div>
+<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
 <h1>ReRAM-CIM,从最底层说起 🧱</h1>
 <div class="tagline">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</div>
-<p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、正在请教专家的那个问题。</p>
+<p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、最想弄清的那个问题。</p>
 
 <h2 id="count">① 先学会数数:bit、byte、Mb、MB</h2>
 <p>所有"容量"都是在数同一个东西:能存多少个 <span class="g" data-k="bit">bit</span>。</p>
@@ -70,9 +70,20 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <tr><td><b>Mb / MB</b></td><td>100万 bit / 100万 byte</td><td>一张图 / 一本书</td></tr>
 <tr><td><b>Gb / GB</b></td><td>10亿 bit / 10亿 byte</td><td>一部电影</td></tr>
 </table>
+<div class="card" style="border:1px solid #2a3550">
+<h3>🤔 "我们不是用三元组吗,为什么 byte 还是 8 bit?"</h3>
+<p class="note">好问题,这是两层不同的事——<b>byte=8bit 只是"数容量的尺子",和数据是二元还是三元无关</b>。就像"一打=12 个",不管你数鸡蛋还是苹果都是 12。</p>
+<table>
+<tr><th>层</th><th>在说什么</th><th>数值</th></tr>
+<tr><td><b>容量(尺子)</b></td><td>芯片能存多少 bit/byte</td><td>16.32 Mb(固定,byte=8bit)</td></tr>
+<tr><td><b>三元编码</b></td><td>我们模型<b>每个权重</b>占几 bit</td><td>~1.58–2 bit/权重</td></tr>
+<tr><td><b>能装多少权重</b></td><td>容量 ÷ 每权重 bit</td><td>总 bit ÷ 2</td></tr>
+</table>
+<p class="note">三元的好处在<b>第二层</b>:普通权重要 16 bit(fp16),三元只要 ~2 bit → 同容量多塞 <b>8 倍</b>权重。但第一层那把尺子(byte=8bit)<b>本身没变</b>。<br>为什么 byte 恰好 8 bit?纯历史约定:8 bit=2⁸=256 种,刚好够编一个字符,就定成标准单位了。Mb 和 MB 差 8 倍,根子就在 1 byte=8 bit。</p>
+</div>
 <div class="callout">
 <b>⚠️ 全场最大的坑:小写 b = bit,大写 B = byte,差 8 倍。</b><br>
-专家说"可以实现 <b>16.32 Mb</b>"(megabit)= 只有 <b>2.04 MB</b>(megabyte)。如果我们误当成 32 MB,就高估了 16 倍。<span class="g" data-k="trap">为什么这要命?</span>
+举个工程量级:28nm 上<b>单个 ReRAM-CIM macro</b> 大约 <b>16 Mb</b>(megabit)= 只有 <b>2 MB</b>(megabyte)。如果误当成 32 MB,就高估了 16 倍。<span class="g" data-k="trap">为什么这要命?</span>
 </div>
 <div class="card">
 <h3>🔢 自己换算一下</h3>
@@ -91,7 +102,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <div><h4 class="blue" style="color:var(--blue)">SRAM cell</h4><p class="note">用 <b>6 个晶体管</b>搭一个"跷跷板",靠通电保持 0/1。<br>• 快、成熟<br>• 但占地大(6 个管子存 1 bit)<br>• <b>断电就忘</b>(易失)<br>• 权重每次要重新搬进来</p></div>
 <div><h4 style="color:var(--hot)">ReRAM cell</h4><p class="note">用 <b>1 个晶体管 + 1 个电阻开关</b>(叫 <span class="g" data-k="1t1r">1T1R</span>)。<br>• 小得多(密度高)<br>• <b>断电不忘</b>(非易失)<br>• 权重刻进去就一直在<br>• 但写得慢、会"老化"、多电平不稳</p></div>
 </div>
-<p class="dim">注意专家的话:"reram 只是换了工艺和存储单元,整体架构一样"——意思是上层电路设计(尤其外围)两者高度相通,所以做 SRAM-CIM 的人能很快看懂 ReRAM-CIM。</p>
+<p class="dim">关键一点:ReRAM 相对 SRAM 只是换了工艺和存储单元,<b>整体架构(尤其外围电路)高度相通</b>——所以做 SRAM-CIM 的经验能很快迁移到 ReRAM-CIM。</p>
 
 <h2 id="reram">③ ReRAM 到底是什么物理?(点一下亲手"造"一个)</h2>
 <p>ReRAM = <b>Re</b>sistive <b>RAM</b>,电阻式存储器。结构简单到不可思议:<b>金属 — 氧化物 — 金属</b>,像个三明治。给它加电压,中间的氧化物里会<span class="g" data-k="filament">长出或断开一根导电细丝</span>:</p>
@@ -124,7 +135,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <div class="paper"><b>Ielmini & Wong,"In-memory computing with resistive switching devices"</b> <span class="y">Nature Electronics 2018</span> — 存内计算(CIM)的奠基综述。</div>
 <div class="paper"><b>Yao 等,"Fully hardware-implemented memristor CNN"</b> <span class="y">Nature 2020</span> — 清华(吴华强/钱鹤组)做出<b>完整的 RRAM CIM 芯片</b>跑 CNN,里程碑。</div>
 <div class="paper"><b>Wan 等,"A compute-in-memory chip based on RRAM (NeuRRAM)"</b> <span class="y">Nature 2022</span> — Stanford/UCSD,48 核 RRAM-CIM,能效与精度兼顾的标杆。</div>
-<p class="note">这几篇就是你跟专家对话时的共同语言。专家说"reram cim 除了论文没有公开资料"——上面就是那些论文。</p>
+<p class="note">这几篇是这个领域的共同语言。ReRAM-CIM 除论文外少有公开资料——上面就是那些奠基论文。</p>
 
 <h2 id="mlc">⑤ 多电平(MLC):一个 cell 能不能存更多?</h2>
 <p>如果导电细丝能调出<b>好几种粗细</b>(几档电阻),一个 cell 就能存不止 1 bit。这叫 <span class="g" data-k="mlc">MLC</span>。听起来很美——但这正是我最担心、也是 ReRAM 最大的软肋:</p>
@@ -149,12 +160,12 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <tr><td><b>欧姆定律</b></td><td>电流 = 电压 × 电导(=1/电阻)。把输入做成电压、权重做成 cell 电阻 → 电流自动 = 输入×权重。<b>一次乘法,零指令。</b></td></tr>
 <tr><td><b>基尔霍夫定律</b></td><td>一整列 cell 的电流在导线上自动相加 → 一列就是一次"乘加求和"(<span class="g" data-k="mac">MAC</span>)。整个矩阵乘法在一瞬间、用物理完成。</td></tr>
 </table>
-<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种模拟乘加。代价是:要把模拟电流读成数字,需要大量 <span class="g" data-k="adc">ADC</span>——这玩意又大又费电,正是专家说"电路设计很大"的地方。</p>
+<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种模拟乘加。代价是:要把模拟电流读成数字,需要大量 <span class="g" data-k="adc">ADC</span>——这玩意又大又费电,正是 ReRAM-CIM 里电路设计最难、最吃面积和功耗的地方。</p>
 
-<h2 id="vs">⑦ 专家做的 SRAM-CIM,和我们的 ReRAM-CIM 差在哪?</h2>
-<p>你问的好问题。两者<b>架构、外围、ADC 那套几乎一样</b>(所以专家的经验能迁移),区别只在"用什么 cell 存权重":</p>
+<h2 id="vs">⑦ SRAM-CIM、ReRAM-CIM……各种存储怎么选?</h2>
+<p>先看最常拿来对比的两种:两者<b>架构、外围、ADC 那套几乎一样</b>,区别只在"用什么 cell 存权重":</p>
 <table>
-<tr><th>维度</th><th>SRAM-CIM(专家方向)</th><th>ReRAM-CIM(我们方向)</th></tr>
+<tr><th>维度</th><th>SRAM-CIM</th><th>ReRAM-CIM(我们的方向)</th></tr>
 <tr><td>存储单元</td><td>6+ 晶体管搭的 SRAM</td><td>1 晶体管 + 1 电阻开关</td></tr>
 <tr><td>断电</td><td class="bad">就忘(<span class="g" data-k="volatile">易失</span>)→ 权重每次重搬</td><td class="ok">不忘(非易失)→ 权重刻进去常驻 ⭐</td></tr>
 <tr><td>密度(同面积存多少)</td><td class="bad">低(管子多)</td><td class="ok">高 3–10×</td></tr>
@@ -164,33 +175,46 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <tr><td>成熟度</td><td class="ok">标准 CMOS,谁都能做</td><td class="bad">要特殊工艺,资料只在论文里</td></tr>
 </table>
 <div class="callout">
-<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进只读卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的不精确,正好被三元算法吃下。专家做 SRAM-CIM,但因为架构相通 + 他在存算企业实习,完全能帮我们看 ReRAM 论文、判断密度真伪。
+<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进只读卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的不精确,正好被三元算法吃下。
 </div>
 
+<h3>再放宽一点:整个存储 / 存内计算家族</h3>
+<p>世界上不止 SRAM 和 ReRAM。把常见的几种排一排,就明白为什么我们押 ReRAM(也明白别人为什么选别的):</p>
+<table>
+<tr><th>技术</th><th>断电</th><th>密度</th><th>写入</th><th>适合存内计算?</th><th>一句话 / 谁在用</th></tr>
+<tr><td><b>SRAM</b></td><td class="bad">易失</td><td class="bad">低</td><td class="ok">极快·无限次</td><td class="ok">✅ 成熟</td><td>CPU 缓存;快但占地、断电忘(存算公司主流之一)</td></tr>
+<tr><td><b>DRAM</b></td><td class="bad">易失</td><td>中</td><td class="ok">快</td><td>△ 在研</td><td>电脑内存条;要不停刷新</td></tr>
+<tr><td><b>NOR Flash</b></td><td class="ok">非易失</td><td>中</td><td class="bad">慢</td><td class="ok">✅ 模拟CIM</td><td>存固件;Mythic 用它做模拟存算</td></tr>
+<tr><td><b>NAND Flash</b></td><td class="ok">非易失</td><td class="ok">极高(3D 堆叠王)</td><td class="bad">慢·有限次</td><td>△</td><td>U盘/SSD;最便宜的大容量</td></tr>
+<tr><td><b>ReRAM</b>(我们)</td><td class="ok">非易失 ⭐</td><td class="ok">高</td><td>中·有限次</td><td class="ok">✅ 主攻</td><td>电阻丝;非易失+高密度+容忍低精度</td></tr>
+<tr><td><b>MRAM</b></td><td class="ok">非易失</td><td>中</td><td class="ok">快·耐久好</td><td>△</td><td>磁存储;耐久好但密度一般</td></tr>
+<tr><td><b>PCM</b></td><td class="ok">非易失</td><td class="ok">高</td><td class="bad">慢·发热</td><td>△</td><td>相变材料;Intel Optane 那一类,IBM 也在做 CIM</td></tr>
+</table>
+<p class="note">看这张表就懂我们的取舍:LLM 权重又大又想常驻又想省电 → 要<b>非易失 + 高密度</b>(排除 SRAM/DRAM)、又要能在原地做模拟乘加(排除纯 NAND)、又能容忍器件不精确(三元/HDC 的低精度正好接得住 ReRAM 的飘)。这几条交集,<b>ReRAM 最顺</b>。但这不是唯一解——NOR Flash(Mythic)、PCM(IBM)都是真在做的路线。</p>
+
 <h2 id="density">⑧ 那……到底能放下多大的模型?(我心里没底的那个数)</h2>
-<p>"能放多少"不是一个数,是 <b>6 个因子相乘</b>。把它拆开,就知道该问专家什么:</p>
+<p>"能放多少"不是一个数,是 <b>6 个因子相乘</b>。把它拆开,就知道该去确认哪几个数:</p>
 <div class="card stack">
 <div class="row"><div class="n">A</div><div><b>每个 cell 存几 bit</b> — 多电平可靠吗?<span class="dim">(第⑤节,我们的三元命门)</span></div></div>
 <div class="row"><div class="n">B</div><div><b>每 mm² 多少 cell</b> — 28nm 下单元多大</div></div>
 <div class="row"><div class="n">C</div><div><b>阵列有效率</b> — macro 里真正是 cell 的面积占比(ADC/驱动吃掉 50–80%)<span class="dim">← 理论 vs 实操最大落差</span></div></div>
 <div class="row"><div class="n">D</div><div><b>可用面积</b> — 良率/reticle 限制下实际能用多大</div></div>
-<div class="row"><div class="n">E</div><div><b>层数</b> — 能不能 3D 堆叠(专家:400mm² ReRAM CIM 没人做过)</div></div>
+<div class="row"><div class="n">E</div><div><b>层数</b> — 能不能 3D 堆叠(目前业界还没人做过 400mm² 的 ReRAM-CIM)</div></div>
 </div>
-<p>峰值密度(Mb/mm²)= A×B×C。<b>只要从专家那拿到 A、C 和"峰值密度"这三个数,前面那个计算器就能填准,我就有底了。</b></p>
-<div class="callout"><b>当前已知锚点:</b> 专家说 28nm 可实现 <b>16.32 Mb</b>(八成是单个 macro)。要拼到能跑 BERT-base(~110M 参数 ≈ 256 Mb)需要拼 ~16 个这样的 macro——能不能拼、拼到 400mm² 行不行,就是没人验证过的无人区。</div>
+<p>峰值密度(Mb/mm²)= A×B×C。<b>只要拿到 A、C 和"峰值密度"这三个数,前面那个计算器就能填准,心里就有底了。</b></p>
+<div class="callout"><b>一个工程量级:</b> 28nm 上单个 ReRAM-CIM macro 大约 <b>16 Mb</b>。要拼到能跑 BERT-base(~110M 参数 ≈ 256 Mb)需要拼 ~16 个这样的 macro——能不能拼、拼到大面积行不行,就是没人验证过的无人区。</div>
 
 <h2 id="next">⑨ 接下来:把空格填上</h2>
-<p>这页讲清了<b>是什么</b>。剩下的是<b>拿数字</b>——已经约了一位做 SRAM-CIM、在存算企业实习的博士。配套两份:</p>
-<p>📋 <a href="reram-cim-expert-consult.md" style="color:var(--hot)">给专家的问题清单</a>(问什么、为什么、好答案长啥样)<br>
-⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)">容量计算器</a>(专家一报数,当场算能跑多大模型)</p>
+<p>这页讲清了<b>是什么</b>。剩下的是<b>拿真实数字</b>——向行业一线请教、读论文、做实验。配套一个工具:</p>
+<p>⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)">容量计算器</a>(拿到真实密度数,当场算能跑多大的三元模型 + 落在速度阶梯哪一档)</p>
 <p class="dim">这是一个半年前还不写代码的人,用 AI 当帮手,一砖一瓦学底层的记录。错了就改(见 README 的 Bayesian 修正史)。</p>
 
-<div class="foot">millisecond-era · 毫秒纪 · ReRAM-CIM 101 · 2026-06-01<br>声明:科普向,数字以论文与专家确认为准;材料/论文条目均为公开文献,如有出入以原文为准。</div>
+<div class="foot">millisecond-era · 毫秒纪 · ReRAM-CIM 101 · 2026-06-01<br>声明:科普向,数字以公开论文为准;材料/论文条目均为公开文献,如有出入以原文为准。</div>
 </div>
 
 <!-- glossary sources (kept in DOM to avoid JS-string escaping issues) -->
 <div class="defsrc" id="def-bit"><b>bit(比特)</b>：信息的最小单位，只有 0 或 1，就像一个开关。8 个 bit = 1 个 byte（字节）= 1 个英文字母的存储量。芯片"容量"本质就是在数能存多少个 bit。</div>
-<div class="defsrc" id="def-trap">小写 b 是 bit，大写 B 是 byte，1 byte = 8 bit。"16.32 Mb" = 16.32 兆比特 = 2.04 兆字节(MB)。如果误读成 32 MB，就把容量高估了约 16 倍——能跑的模型从"几百万参数的小玩具"被错当成"上亿参数的 BERT"。所以跟专家、跟朋友核对时，第一句先问：你说的是 Mb 还是 MB？</div>
+<div class="defsrc" id="def-trap">小写 b 是 bit，大写 B 是 byte，1 byte = 8 bit。"16.32 Mb" = 16.32 兆比特 = 2.04 兆字节(MB)。如果误读成 32 MB，就把容量高估了约 16 倍——能跑的模型从"几百万参数的小玩具"被错当成"上亿参数的 BERT"。所以拿到任何容量数字，第一句先确认：是 Mb 还是 MB？</div>
 <div class="defsrc" id="def-bpw">三元权重只有 {−1,0,+1} 三个值，理论上用 log₂3 ≈ 1.58 bit 就能表示。但物理上一个 cell 往往要占 2 bit（比如用两个单元做差分、或一个四电平单元只用其中三档）。所以估算容量时按 2 bit/权重比较稳妥，1.58 是最乐观的理论地板。</div>
 <div class="defsrc" id="def-cell">cell（存储单元）：芯片里存 1 个 bit 的最小零件。SRAM 用 6 个晶体管搭一个，ReRAM 用 1 个晶体管 + 1 个电阻开关。cell 越小，同样面积能存越多，密度越高。</div>
 <div class="defsrc" id="def-1t1r">1T1R = 1 Transistor + 1 Resistor，一个晶体管串一个电阻开关。晶体管负责"选中这个单元"，电阻开关负责"存 0 还是 1"。这是 ReRAM 阵列最常见的单元结构，比 SRAM 的 6 管小很多。</div>
@@ -201,7 +225,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <div class="defsrc" id="def-ternfit">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元权重只有 3 个值、HDC 是二元只有 2 个值——只需要 cell 分出 2–3 档，这是 ReRAM 最容易、最可靠做到的。于是"算法故意低精度"和"器件天生不精确"刚好对上。这是 millisecond-era 整个技术押注的核心假设，需要在真硅上验证（见 README）。</div>
 <div class="defsrc" id="def-memwall">内存墙（memory wall）：现代芯片算得很快，但数据要从内存搬到计算单元，这段"搬运"又慢又费电，成了真正的瓶颈。大模型推理时反复搬几个 GB 的权重，大量时间和电力耗在搬运上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
 <div class="defsrc" id="def-mac">MAC = Multiply-Accumulate（乘加）：神经网络最基本的运算——把输入乘以权重再累加。一个 1000×1000 的矩阵乘法就是上百万次 MAC。CIM 用一列 cell 的电流自动相加，一瞬间完成一整列的 MAC，这就是它快的来源。</div>
-<div class="defsrc" id="def-adc">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这就是专家说"电路设计很大"的具体所指，也是"理论密度"远高于"实际能放"的主因。</div>
+<div class="defsrc" id="def-adc">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这正是 CIM 里电路设计最难的部分，也是"理论密度"远高于"实际能放"的主因。</div>
 <div class="defsrc" id="def-volatile">易失 vs 非易失：易失（volatile）= 一断电就忘，SRAM/DRAM 都是，所以每次开机要重新把权重搬进去。非易失（non-volatile）= 断电也记得，ReRAM/闪存是，权重一次刻进去就常驻芯片。对"权重大又想常驻又想省电"的 LLM，非易失是 ReRAM 的关键卖点。</div>
 
 <div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>

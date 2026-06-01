@@ -194,11 +194,11 @@ HDC (Hyperdimensional Computing) = 10 万维 binary 向量 + 3 个操作 (bind/b
 
 这个发现让 Mini SKU 从"单一推理芯片"变成了"推理 + 记忆 双系统"。
 
-### 发现 3: DP.tech (NN-MD) 应用场景 (2026-05-20)
+### 发现 3: NN-MD（神经网络分子动力学）应用场景 (2026-05-20)
 
 DP-GEN + DeePMD-kit = 用神经网络做分子动力学模拟。原本需要 GPU 集群。
 
-我们的 ReRAM CIM 对这类 workload 的能效优势可能达到 100-1000×。这让 Mid/Pro SKU 有了一个明确的 AI-for-Science 客户锚点。
+我们的 ReRAM CIM 对这类 workload 的能效优势可能达到 100-1000×。这让 Mid/Pro SKU 有了一个明确的 AI-for-Science 应用方向。
 
 ---
 

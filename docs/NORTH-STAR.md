@@ -75,7 +75,7 @@ This is also why this work is, by nature, **open** (open-source, open-ecosystem)
 ## 这对项目意味着什么 · What this means for the project (the operating rule)
 
 1. **The north star is the EXPLORATION itself — not any single artifact.** The chip is a *vehicle*. HDC is a *vehicle* (a bet on a more reliable, higher-ceiling intelligence than today's LLMs). If one path is infeasible, we take another. *There are tons of possibilities there. Don't worry.*
-2. **Feasibility of a sub-goal never overrides the star.** "Can we build this chip? Is this SKU feasible?" is a question about a vehicle — never about the destination. (This is also why `feedback_chip_spec_derives_from_science` holds: science → spec, not spec → science.)
+2. **Feasibility of a sub-goal never overrides the star.** "Can we build this chip? Is this SKU feasible?" is a question about a vehicle — never about the destination. (This is also why science → spec, not spec → science.)
 3. **The road is hard; the future is not doomed.** Life is not easy — but the future is vastly *bigger, brighter, more complex, completely different* from now. Pessimism here is just the small-room frame, again.
 4. **The time horizon is a century.** Michael's daughter is 2. If she lives 100 years, the world she inherits is unimaginable from here — *and it is partly built by those who chose to walk toward the trillion.*
 

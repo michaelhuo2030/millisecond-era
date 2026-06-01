@@ -32,7 +32,7 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 .pop .body{max-width:820px;font-size:15px;line-height:1.75}.defsrc{display:none}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#tern">①三元权重</a><a href="#mlc">①·多电平怎么实现</a><a href="#xbar">②crossbar 阵列</a><a href="#mac">③一次计算</a><a href="#macro">④有用的占多少</a><a href="#chip">⑤整片芯片 2D/2.5D/3D</a><a href="#yield">⑥良率</a><a href="#llm">⑦LLM 怎么存怎么算</a>
+<a href="#vs0">⓪ CIM vs 传统</a><a href="#tern">①三元权重</a><a href="#mlc">①·多电平怎么实现</a><a href="#xbar">②crossbar 阵列</a><a href="#mac">③一次计算</a><a href="#macro">④有用的占多少</a><a href="#chip">⑤整片芯片 2D/2.5D/3D</a><a href="#yield">⑥良率</a><a href="#llm">⑦LLM 怎么存怎么算</a>
 </div></div>
 <div class="wrap">
 <div class="topnav"><a href="reram-cim-101.html">← 回科普 101</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
@@ -42,6 +42,20 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 <div style="margin-top:8px;line-height:2.2">
 <span class="t" data-k="adc">ADC 转换器</span> <span class="t" data-k="macro">macro 存算宏</span> <span class="t" data-k="cell">cell 存储单元</span> <span class="t" data-k="wl">wordline/bitline 横竖线</span> <span class="t" data-k="mac">MAC 乘加</span> <span class="t" data-k="kirch">基尔霍夫定律</span> <span class="t" data-k="die">die 裸片</span> <span class="t" data-k="chiplet">chiplet 芯粒</span> <span class="t" data-k="interposer">interposer 转接板</span> <span class="t" data-k="tsv">TSV 硅通孔</span> <span class="t" data-k="d25">2.5D / 3D</span> <span class="t" data-k="yield">yield 良率</span> <span class="t" data-k="redun">冗余修复</span> <span class="t" data-k="transformer">transformer 层</span>
 </div></div>
+
+<!-- ⓪ CIM vs traditional -->
+<h2 id="vs0">⓪ CIM 和传统电脑,差在哪?(先看这个大局)</h2>
+<p>这是整件事的"为什么"。<b>传统电脑:权重存在内存里,要算就得把它们一趟趟搬到计算单元,算完再搬回——搬运又慢又费电(这叫<span class="t" data-k="memwall">内存墙</span>)。CIM:权重不动,在原地算掉。</b> 点一下,看两边同时跑:</p>
+<div class="card" style="text-align:center">
+<div class="ctl" style="justify-content:center"><button onclick="runVS()" id="vsBtn">▶ 跑一次推理(两边同时)</button><button class="sec" onclick="drawVS()">↺ 重置</button></div>
+<div style="font-size:13px;color:var(--bad);margin:4px 0">传统(冯·诺依曼):权重在内存↔计算单元之间反复搬</div>
+<svg id="tradSvg" viewBox="0 0 400 140" width="400"></svg>
+<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span>搬运次数 <b class="r" id="tMoves">0</b></span><span>能耗 <b class="r" id="tEnergy">0</b></span><span>用时 <b class="r" id="tTime">0</b></span></div>
+<div style="font-size:13px;color:var(--ok);margin:10px 0 4px">CIM 存内计算:权重常驻,原地算</div>
+<svg id="cimSvg" viewBox="0 0 400 140" width="400"></svg>
+<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span>搬运次数 <b class="g" id="cMoves">0</b></span><span>能耗 <b class="g" id="cEnergy">0</b></span><span>用时 <b class="g" id="cTime">0</b></span></div>
+<div class="note" id="vsNote" style="margin-top:10px"></div>
+</div>
 
 <!-- ① ternary weight -->
 <h2 id="tern">① 一个三元权重长什么样?</h2>
@@ -162,6 +176,7 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 <div class="defsrc" id="d-redun"><b>冗余修复（redundancy）</b>：多造一些备用的行/列/macro，造好后用好的去顶替坏的。能把一部分本来报废的芯片救回来，提升良率。</div>
 <div class="defsrc" id="d-transformer"><b>transformer 层</b>：现代 LLM 的基本积木，一摞同样结构的层叠起来。每层主要就是几个大权重矩阵（注意力 + 前馈）。一个字从下往上穿过每一层，每层做一次大矩阵乘（=一堆 MAC）。层数越多、矩阵越大，模型越强也越大。</div>
 
+<div class="defsrc" id="d-memwall"><b>内存墙（memory wall）</b>：现代芯片算得飞快，但数据要从内存搬到计算单元，这段“搬运”又慢又费电，成了真正的瓶颈。大模型推理时要反复搬几个 GB 的权重，大量时间和电力耗在搬运上，而不是计算上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
 <div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>
 <script>
 document.querySelectorAll('.t').forEach(function(el){el.addEventListener('click',function(){
@@ -383,6 +398,41 @@ async function flowToken(){
  b.disabled=false;
 }
 
+// ===== ⓪ CIM vs traditional =====
+let vsRunning=false;
+function vsScene(){
+ const t=document.getElementById('tradSvg');clear(t);
+ t.appendChild(el('rect',{x:14,y:30,width:120,height:80,rx:8,fill:'#3a2030',stroke:'#7a3040'}));
+ t.appendChild(el('text',{x:74,y:24,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent='内存（权重住这）';
+ for(let i=0;i<6;i++)t.appendChild(el('circle',{cx:34+(i%3)*34,cy:52+Math.floor(i/3)*30,r:7,fill:'#ff8aa0'}));
+ t.appendChild(el('rect',{x:266,y:30,width:120,height:80,rx:8,fill:'#23303a',stroke:'#33454f'}));
+ t.appendChild(el('text',{x:326,y:24,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent='计算单元（CPU/GPU）';
+ t.appendChild(el('line',{x1:134,y1:70,x2:266,y2:70,stroke:'#5a5d72','stroke-width':2,'stroke-dasharray':'4 4'}));
+ t.appendChild(el('text',{x:200,y:64,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent='总线（来回搬）';
+ const c=document.getElementById('cimSvg');clear(c);
+ c.appendChild(el('rect',{x:80,y:30,width:240,height:80,rx:8,fill:'#163a22',stroke:'#2f7a45'}));
+ c.appendChild(el('text',{x:200,y:24,fill:'#8ee59a','text-anchor':'middle','font-size':12})).textContent='存算一体阵列（权重常驻·原地算）';
+ for(let i=0;i<6;i++)c.appendChild(el('circle',{cx:120+(i%3)*40,cy:55+Math.floor(i/3)*30,r:7,fill:'#8ee59a'}));
+ c.appendChild(el('line',{x1:14,y1:70,x2:80,y2:70,stroke:'#7aa9ff','stroke-width':2}));
+ c.appendChild(el('text',{x:40,y:64,fill:'#7aa9ff','text-anchor':'middle','font-size':10})).textContent='输入';
+ c.appendChild(el('line',{x1:320,y1:70,x2:386,y2:70,stroke:'#ffd36b','stroke-width':2}));
+ c.appendChild(el('text',{x:358,y:64,fill:'#ffd36b','text-anchor':'middle','font-size':10})).textContent='输出';
+}
+function drawVS(){vsScene();['tMoves','tEnergy','tTime','cMoves','cEnergy','cTime'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('vsNote').textContent='';}
+function mvDot(svg,x1,y1,x2,y2,color,dur){return new Promise(res=>{const d=el('circle',{cx:x1,cy:y1,r:6,fill:color});svg.appendChild(d);const t0=performance.now();function st(t){const k=Math.min(1,(t-t0)/dur);d.setAttribute('cx',x1+(x2-x1)*k);d.setAttribute('cy',y1+(y2-y1)*k);if(k<1)requestAnimationFrame(st);else{d.remove();res();}}requestAnimationFrame(st);});}
+async function runVS(){
+ if(vsRunning)return;vsRunning=true;document.getElementById('vsBtn').disabled=true;drawVS();
+ let tM=0,tE=0,tT=0,cM=0,cE=0,cT=0;
+ const upd=()=>{tMoves.textContent=tM;tEnergy.textContent=tE;tTime.textContent=tT;cMoves.textContent=cM;cEnergy.textContent=cE;cTime.textContent=cT;};
+ const tMoves=document.getElementById('tMoves'),tEnergy=document.getElementById('tEnergy'),tTime=document.getElementById('tTime'),cMoves=document.getElementById('cMoves'),cEnergy=document.getElementById('cEnergy'),cTime=document.getElementById('cTime');
+ const t=document.getElementById('tradSvg'),c=document.getElementById('cimSvg');
+ const trad=(async()=>{for(let k=0;k<6;k++){await mvDot(t,134,70,266,70,'#ff8aa0',330);tM++;tE+=10;tT+=2;upd();await mvDot(t,266,70,134,70,'#ffd36b',330);tM++;tE+=6;tT+=2;upd();}})();
+ const cim=(async()=>{await mvDot(c,14,70,80,70,'#7aa9ff',280);cM=1;cE+=2;cT+=1;upd();const box=c.querySelector('rect');box.setAttribute('fill','#1f5a30');await sleep(220);box.setAttribute('fill','#163a22');cE+=3;upd();await mvDot(c,320,70,386,70,'#8ee59a',280);cM=2;cT+=1;upd();})();
+ await Promise.all([trad,cim]);
+ document.getElementById('vsNote').innerHTML='传统:搬了 <b class="r">'+tM+'</b> 趟、能耗 <b class="r">'+tE+'</b>、用时 <b class="r">'+tT+'</b>;CIM:搬 <b class="g">'+cM+'</b> 次、能耗 <b class="g">'+cE+'</b>、用时 <b class="g">'+cT+'</b>。同一次推理,<b>CIM 几乎不搬运</b> → 省下约 <b class="y">'+Math.round(tE/cE)+'×</b> 能耗和大半时间。模型越大、权重越多,搬运差距越夸张。';
+ vsRunning=false;document.getElementById('vsBtn').disabled=false;
+}
+
 // ===== ①· MLC physical =====
 let mlcPick=0;
 function drawMLC(){
@@ -421,6 +471,7 @@ function drawMLC(){
 }
 
 // ===== init + wiring =====
+drawVS();
 drawTern();
 drawMLC();
 document.querySelectorAll('#xsize button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#xsize button').forEach(x=>x.classList.remove('on'));b.classList.add('on');initX(+b.dataset.n);}));

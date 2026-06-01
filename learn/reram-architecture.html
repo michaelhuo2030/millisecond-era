@@ -25,7 +25,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}th,td{pa
 b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--blue)}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#cell">①单元 1T1R/2T2R</a><a href="#xbar">②crossbar 子阵列</a><a href="#adc">③ADC 三种方案</a><a href="#macro">④macro 拼 tile</a><a href="#tile">⑤核拼接·时钟墙</a><a href="#d3">⑥3D 堆叠</a>
+<a href="#cell">①单元 1T1R/2T2R</a><a href="#xbar">②crossbar 子阵列</a><a href="#adc">③ADC 三种方案</a><a href="#counter">③·计数器</a><a href="#macro">④macro 拼 tile</a><a href="#tile">⑤核拼接·时钟墙</a><a href="#d3">⑥3D 堆叠</a>
 </div></div>
 <div class="wrap">
 <div class="topnav"><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-cim-101.html">🧱 ReRAM 101</a><a href="reram-cim-calculator.html">⚙️ 计算器</a></div>
@@ -68,6 +68,25 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 <div class="note" id="adcNote"></div>
 </div>
 
+<!-- ③· counter -->
+<h2 id="counter">③· 时域计数器:512 长列怎么数得准?(SPIKA 真招)</h2>
+<p>难点:一列累加几百行,电流幅值大、难量准。SPIKA 的解法 = <b>不量幅值,数 click</b>:正权重一列、负权重一列(二态 cell),电流给电容充电,过阈值就"click"一下<b>共享计数器</b>(+列加、−列减),最后计数=两列之差。<b>点"读出":</b></p>
+<div class="card" style="text-align:center">
+<div class="ctl" style="justify-content:center"><button class="go" id="cntRun" style="background:#244d24;color:#fff;border:1px solid #356a35;border-radius:9px;padding:9px 16px;cursor:pointer">▶ 读出(数 click)</button><button class="go" id="cntRand" style="background:#262838;border:1px solid #33354a;color:#fff;border-radius:9px;padding:9px 14px;cursor:pointer">🎲 换权重</button></div>
+<svg id="cntSvg" viewBox="0 0 440 250" width="440"></svg>
+<div class="note" id="cntNote">点"读出":+列每个出电流的 cell 让计数器+1,−列每个−1,最后=列和(差分)。</div>
+</div>
+<div class="card" style="border:1px solid #2a3550">
+<h3>为什么这样就准?(顺便答两个问题)</h3>
+<table>
+<tr><td>① <b>数整数,不量幅值</b></td><td>二态 cell:列和本质是"几个 +1 减几个 −1"=整数。数 click 比量模拟电流稳得多。</td></tr>
+<tr><td>② <b>差分消共模</b></td><td>±两列相减,温漂/IR-drop/老化对两列一样 → 抵消。</td></tr>
+<tr><td>③ <b>全局时钟·并行</b></td><td>一个时钟广播给所有列的计数器,<b>所有列同时数自己的 click</b> —— 这就是"并行发时间",可以。</td></tr>
+<tr><td>④ <b>不需要原子钟</b></td><td>GHz 片上时钟对 µs 读出绰绰有余;<b>精度瓶颈在模拟侧</b>(电容/阈值偏差),原子钟修不了它,还上不了片。</td></tr>
+<tr><td>⑤ <b>大电流的真招</b>(ISSCC'24 34.8)</td><td>输入多bit压缩(不一次发完)+ HRS偏置(多数 cell 是低电流0态)+ 残差共享ADC,把动态范围框住。</td></tr>
+</table>
+</div>
+
 <!-- ④ macro -->
 <h2 id="macro">④ macro:多个子阵列 + 加法树合并</h2>
 <p>一个 <b>macro</b> = 几个子阵列 + 读出 + <b>加法树/XOR 树</b>把各子阵列的部分和合并。真芯片(二元那款):<b>4 个 512×12 子阵列 → XOR 树合并</b>。一个 macro 大概 ~16–32 Mbit。</p>
@@ -85,7 +104,13 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 
 <!-- ⑥ 3D -->
 <h2 id="d3">⑥ 怎么"黏一起":单 die / 4 die / 3D 堆叠</h2>
-<p><b>点切换</b>三种封装。3D 把上下距离缩到最短 → 带宽/频率↑(专家说的真突破口)。</p>
+<p><b>先分清两种"3D"(别混):</b></p>
+<table>
+<tr><th>类型</th><th>每层是什么</th><th>外围(ADC/计数器/驱动)</th><th>用来</th></tr>
+<tr><td><b>单片 3D</b>(vertical ReRAM)</td><td>一片 <b>cell 单元层</b>(像 3D NAND 纵向叠 cell)</td><td>在<b>底层 CMOS,几层共享一套</b></td><td><b>提密度</b>(我们容量公式的"6 层"= 这个;cell 翻倍、外围不翻倍)</td></tr>
+<tr><td><b>die 堆叠</b>(TSV / 3D-PIM)</td><td>一整片 <b>die</b>(自带 macro+外围)</td><td>每层 die <b>各带一套</b></td><td><b>提带宽</b>(三星 3D-PIM;专家说的真突破口)</td></tr>
+</table>
+<p class="note"><b>所以不是"macro 堆 macro",也不是堆 16×16:</b>提密度时堆的是 cell 单元层(共享一套外围);提带宽时堆的是整片 die(TSV 连)。<b>点切换看:</b></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center"><span class="seg" id="pkg"><button data-p="1" class="on">单 die(平铺)</button><button data-p="4">4 die · 2.5D 封装</button><button data-p="3d">3D 堆叠(TSV)</button></span></div>
 <svg id="pkgSvg" viewBox="0 0 420 240" width="420"></svg>
@@ -172,6 +197,38 @@ function drawADC(scheme){const s=document.getElementById('adcSvg');clr(s);const 
 }
 document.querySelectorAll('#adcseg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adcseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawADC(b.dataset.s);});
 drawADC('full');
+
+// ③· time-domain counter
+let cPlus=[1,0,1,1,0], cMinus=[0,1,0,0,1], cntRunning=false;
+function randCnt(){cPlus=cPlus.map(()=>Math.random()<0.5?1:0);cMinus=cMinus.map(()=>Math.random()<0.5?1:0);drawCnt(0);}
+function drawCnt(count,hi){const s=document.getElementById('cntSvg');clr(s);
+ // + column (left), - column (right)
+ const cols=[{arr:cPlus,x:90,lab:'+ 列',c:'#8ee59a'},{arr:cMinus,x:350,lab:'− 列',c:'#ff8aa0'}];
+ cols.forEach(co=>{txt(s,co.x,22,co.lab,co.c,13);
+   s.appendChild(el('line',{x1:co.x,y1:30,x2:co.x,y2:150,stroke:'#2a2d40','stroke-width':2}));
+   co.arr.forEach((v,i)=>{const y=42+i*22;s.appendChild(el('circle',{cx:co.x,cy:y,r:7,fill:v?co.c:'#3a3d55'}));txt(s,co.x+(co.x<200?-22:22),y+4,v?'±1':'0',v?co.c:'#556',10);});
+   // capacitor
+   s.appendChild(el('rect',{x:co.x-16,y:158,width:32,height:24,rx:4,fill:'#11131e',stroke:hi===co.lab?'#ffd36b':'#33354a'}));txt(s,co.x,174,'⏚电容','#8a8ca6',9);
+ });
+ // shared counter (center)
+ s.appendChild(el('rect',{x:175,y:95,width:90,height:50,rx:8,fill:'#1a1c2b',stroke:'#4a3a6a','stroke-width':2}));
+ txt(s,220,118,'共享计数器','#caa9ff',11);txt(s,220,140,(count>=0?'+':'')+count,'#ffd36b',22);
+ // arrows
+ s.appendChild(el('line',{x1:106,y1:120,x2:173,y2:120,stroke:'#8ee59a','stroke-width':1.5,'stroke-dasharray':'4 3'}));txt(s,140,114,'+1/click','#8ee59a',9);
+ s.appendChild(el('line',{x1:334,y1:120,x2:267,y2:120,stroke:'#ff8aa0','stroke-width':1.5,'stroke-dasharray':'4 3'}));txt(s,300,114,'−1/click','#ff8aa0',9);
+ txt(s,220,210,'click 数 = 列和(差分)= +列出电流数 − −列出电流数','#8a8ca6',11);
+}
+async function runCnt(){if(cntRunning)return;cntRunning=true;document.getElementById('cntRun').disabled=true;
+ let cnt=0;drawCnt(0);await new Promise(r=>setTimeout(r,300));
+ for(let i=0;i<cPlus.length;i++){if(cPlus[i]){cnt++;drawCnt(cnt,'+ 列');document.getElementById('cntNote').textContent='+列 cell '+(i+1)+' 出电流 → 电容充电 → click → 计数器 +1 = '+cnt;await new Promise(r=>setTimeout(r,420));}}
+ for(let i=0;i<cMinus.length;i++){if(cMinus[i]){cnt--;drawCnt(cnt,'− 列');document.getElementById('cntNote').textContent='−列 cell '+(i+1)+' 出电流 → click → 计数器 −1 = '+cnt;await new Promise(r=>setTimeout(r,420));}}
+ const np=cPlus.reduce((a,b)=>a+b,0),nm=cMinus.reduce((a,b)=>a+b,0);
+ document.getElementById('cntNote').innerHTML='完成:列和 = '+np+' − '+nm+' = <b style="color:#ffd36b">'+cnt+'</b>。全程<b>数 click 不量幅值</b> + <b>差分消共模</b> → 稳。';
+ cntRunning=false;document.getElementById('cntRun').disabled=false;
+}
+document.getElementById('cntRun').onclick=runCnt;
+document.getElementById('cntRand').onclick=randCnt;
+drawCnt(0);
 
 // ④ macro
 function drawMacro(){const s=document.getElementById('macroSvg');clr(s);

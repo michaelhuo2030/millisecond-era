@@ -59,6 +59,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <h1>ReRAM-CIM,从最底层说起 🧱</h1>
 <div class="tagline">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</div>
 <p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、最想弄清的那个问题。</p>
+<div class="callout"><b>📌 先记一条,免得绊倒:RRAM = ReRAM = 阻变存储器,是同一个东西。</b> 英文全称都是 <b>Re</b>sistive <b>RAM</b>,有人写 RRAM、有人写 ReRAM、有人叫 memristor(忆阻器)——指同一个物理器件(金属–氧化物–金属,靠电阻高低存数据)。就像 US 和 USA 是同一个国家。看到论文写 RRAM,直接当 ReRAM 读。</div>
 
 <h2 id="count">① 先学会数数:bit、byte、Mb、MB</h2>
 <p>所有"容量"都是在数同一个东西:能存多少个 <span class="g" data-k="bit">bit</span>。</p>

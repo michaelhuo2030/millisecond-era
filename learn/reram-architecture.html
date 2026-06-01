@@ -31,7 +31,13 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 <div class="topnav"><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-cim-101.html">🧱 ReRAM 101</a><a href="reram-cim-calculator.html">⚙️ 计算器</a></div>
 <h1>ReRAM-CIM 架构探索 🔬 从一个单元到一整片(基于真文献)</h1>
 <div class="lead">"32Mb 怎么拼起来、crossbar 怎么做、ADC 是不是每块都有、怎么黏一起" —— 用真实芯片的架构,一层层点开看。数字都标了文献来源。</div>
-<div class="real">📚 <b>真文献锚点</b>:① 清华 <b>28nm 576K RRAM-CIM macro</b>,用 <b>2T2R 差分单元</b>,DSDC-ADC,2.82 TOPS/mm² · 35.6 TOPS/W;② 一款二元 RRAM-CIM 用 <b>512×12 子阵列 + PCSPC 取代 ADC</b>(3.3-bit,0.097mW,vs 4-bit ADC 1–78mW)、4 子阵列经 <b>XOR/加法树</b>合并;③ <b>华为-字节 ISSCC'26</b> RRAM 芯片(清华参与,66× CPU);④ 专家提的 <b>HYDAR(清华,500+Mb 板级互联)</b>。下面架构按这些公认组织方式还原。</div>
+<div class="real">📚 <b>真文献锚点(ReRAM = RRAM,神经网络/LLM CIM)</b>:
+<br>① 清华 <b>28nm 576K RRAM-CIM macro</b>,2T2R 差分,2.82 TOPS/mm²;
+<br>② ★ <b>SPIKA</b>(RRAM ML 加速器,64×128 crossbar):<b>三元权重 = 二态单元(LRS=±1 / HRS=0)+ 正负权重放相邻两列 + 每 2 列共享 1 个 5-bit 计数器(时域读出,无 ADC,天然做减法)</b>。180nm,195 TOPS/W;
+<br>③ 清华台 <b>ISSCC'24 22nm 16Mb 浮点 ReRAM-CIM</b>(FP16/BF16,28–31 TFLOPS/W);
+<br>④ <b>Cascaded ReRAM crossbar for Transformer</b> + <b>ADC 虚拟化</b>(多阵列动态共享 ADC);
+<br>⑤ <b>华为-字节 ISSCC'26</b> RRAM 芯片(清华,66× CPU)。
+<br><b style="color:#ffd36b">⭐ SPIKA 直接指明三元落硅路径:二态单元 + 相邻 ± 列差分 + 共享计数器 → 不用 3 电平 cell,也不用 ADC。</b></div>
 
 <!-- ① cell -->
 <h2 id="cell">① 最小单元:1T1R vs 2T2R(差分)</h2>
@@ -87,11 +93,13 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 </div>
 
 <div class="foot">
-架构按公开文献还原(具体某片的内部 tiling 未全公开,如华为-字节 ISSCC'26 付费墙)。来源:
-<a href="https://www.jos.ac.cn/en/article/doi/10.1088/1674-4926/24100017" target="_blank">JoS 28nm 576K RRAM-CIM macro (2.82 TOPS/mm²)</a> ·
-<a href="https://arxiv.org/html/2501.10702v4" target="_blank">arXiv 2501.10702 binary RRAM-CIM (512×12, PCSPC 无 ADC)</a> ·
+架构按公开 ReRAM 神经网络 CIM 文献还原(某片内部 tiling 未全公开,如华为-字节 ISSCC'26 付费墙)。来源:
+<a href="https://www.frontiersin.org/journals/electronics/articles/10.3389/felec.2025.1567562/full" target="_blank">SPIKA RRAM CIM(64×128,三元,时域计数器无 ADC)</a> ·
+<a href="https://www.jos.ac.cn/en/article/doi/10.1088/1674-4926/24100017" target="_blank">JoS 28nm 576K RRAM-CIM macro (2T2R, 2.82 TOPS/mm²)</a> ·
+<a href="https://dl.acm.org/doi/10.1145/3701034" target="_blank">Cascaded ReRAM Crossbar for Transformer (ACM TODAES)</a> ·
+<a href="https://github.com/witmemtech/CIM-Technical-Papers-Collection/blob/main/readme.EN" target="_blank">知存 witmem · CIM 论文合集</a> ·
 <a href="https://www.digitimes.com/news/a20260302PD215/huawei-bytedance-rram-isscc-2026.html" target="_blank">Huawei-ByteDance RRAM ISSCC 2026</a> ·
-HYDAR(清华,专家口述 500+Mb 板级)。图为示意,帮助理解机理。
+ISSCC'24 22nm 16Mb FP-ReRAM-CIM(National Tsing Hua) · HYDAR(清华,500+Mb 板级)。图为示意。
 </div>
 
 <script>

@@ -34,6 +34,8 @@
 
 [Jump to the civilizational speed ladder ↓](#what-different-speeds-actually-unlock--the-civilizational-ladder) for what each speed tier 0→1 unlocks. [Jump to the 18-row transparency matrix ↓](#what-we-havent-verified--18-row-transparency-matrix) for what's verified vs assumed.
 
+> 🧪 **New — case study you can run in your browser:** [**`office-memory`** — live demo](https://michaelhuo2030.github.io/office-memory/) ([repo](https://github.com/michaelhuo2030/office-memory)). Compress an hour of talk into **one ~10 KB hypervector**, then ask it **by time / by content / by similarity** — a runnable demonstration of the **private, reversible, on-device memory** this chip exists to make µW-always-on. Writeup → [CASE-STUDY-office-memory.md](CASE-STUDY-office-memory.md).
+
 > 📚 **New — learn the substrate from the ground up (interactive, for-dummies):**
 > - 🧱 [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — ReRAM-CIM from "what is a bit" → device physics → materials + papers → storage family → "how big a ternary model can it hold."
 > - 👀 [`learn/reram-cim-visual.html`](learn/reram-cim-visual.html) — **see it move**: ternary cell, multi-level (MLC) physics, crossbar array, a live MAC computation (current summing down the columns), macro floorplan/efficiency, 2D/2.5D/3D packaging, yield, and how an LLM's layers map onto macros.

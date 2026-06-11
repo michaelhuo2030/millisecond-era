@@ -36,6 +36,8 @@
 
 > 🧪 **New — case study you can run in your browser:** [**`office-memory`** — live demo](https://michaelhuo2030.github.io/office-memory/) ([repo](https://github.com/michaelhuo2030/office-memory)). Compress an hour of talk into **one ~10 KB hypervector**, then ask it **by time / by content / by similarity** — a runnable demonstration of the **private, reversible, on-device memory** this chip exists to make µW-always-on. Writeup → [CASE-STUDY-office-memory.md](CASE-STUDY-office-memory.md).
 
+> 🏎️ **New — [Speed Trial](https://michaelhuo2030.github.io/millisecond-era/learn/speed-trial.html): click and run our speed proofs in your own browser.** WebGPU HDC retrieval (89× numpy, on *your* GPU) · a 50→184k tok/s ladder on one Mac · a world that forms while one AI says a word — each badged **✓measured / ◇real-sim / ?projected**, proof separated from roadmap.
+
 > 📚 **New — learn the substrate from the ground up (interactive, for-dummies):**
 > - 🧱 [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — ReRAM-CIM from "what is a bit" → device physics → materials + papers → storage family → "how big a ternary model can it hold."
 > - 👀 [`learn/reram-cim-visual.html`](learn/reram-cim-visual.html) — **see it move**: ternary cell, multi-level (MLC) physics, crossbar array, a live MAC computation (current summing down the columns), macro floorplan/efficiency, 2D/2.5D/3D packaging, yield, and how an LLM's layers map onto macros.

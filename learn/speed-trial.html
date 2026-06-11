@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>毫秒纪 · Speed Trial — 别信我们,自己点</title>
+<meta name="description" content="Don't take our word — click and run our speed proofs in your own browser. Measured vs projected, separated honestly." />
+<style>
+  :root{--bg:#0a0d12;--card:#141a22;--line:#2a323c;--txt:#e8eef5;--mut:#8b97a6;--acc:#3b9bff;--good:#3fb950;--warn:#e3a008;--proj:#a371f7;--sim:#2dd4bf}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#13203a 0%,var(--bg) 60%);color:var(--txt);
+       font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",Helvetica,Arial,sans-serif}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+  header{padding:54px 0 26px;text-align:center}
+  h1{margin:0;font-size:38px;letter-spacing:-.5px} h1 span{color:var(--acc)}
+  .tag{color:var(--mut);font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+  .lede{color:#c4cdd8;font-size:18px;max-width:680px;margin:14px auto 0}
+  .legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 6px}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid}
+  .b-meas{color:var(--good);border-color:#23502f;background:#0f1f15}
+  .b-proj{color:var(--proj);border-color:#3b2f5c;background:#160f24}
+  .b-sim{color:var(--sim);border-color:#1d4d49;background:#0c1f1d}
+  h2{font-size:14px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;margin:42px 0 14px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;
+        text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--acc)}
+  .card h3{margin:8px 0 4px;font-size:19px}
+  .num{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:6px 0 2px}
+  .num.meas{color:var(--good)} .num.sim{color:var(--sim)} .num.proj{color:var(--proj)}
+  .card p{color:#bcc6d2;font-size:14px;margin:6px 0 14px;flex:1}
+  .go{font-size:13px;font-weight:700;color:var(--acc)}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+  td b{color:var(--txt)} .meas{color:var(--good)} .proj{color:var(--proj)} .sim{color:var(--sim)}
+  .honest{background:#10161e;border:1px dashed var(--warn);border-radius:12px;padding:16px 18px;margin:18px 0;font-size:14px;color:#cdd6e0}
+  .honest b{color:var(--warn)}
+  footer{color:var(--mut);font-size:13px;text-align:center;padding:34px 0 50px}
+  footer a{color:var(--acc);text-decoration:none}
+  .small{font-size:12.5px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="tag">毫秒纪 · The Millisecond Era</div>
+  <h1>Speed Trial — <span>别信我们,自己点。</span></h1>
+  <div class="lede">速度是我们的护城河之一。下面不是 PPT,是<b>你现在就能在自己浏览器里跑</b>的真东西。
+  每张卡都标清楚:<b>实测</b>、<b>推算</b>、还是<b>真实模拟</b>——把证明和愿景分开,这比混在一起更有说服力。</div>
+  <div class="legend">
+    <span class="badge b-meas">✓ 实测 measured — 此刻在你机器上跑</span>
+    <span class="badge b-sim">◇ 真实模拟 real HDC sim — 算法是真的</span>
+    <span class="badge b-proj">? 推算 projected — 芯片未流片</span>
+  </div>
+</header>
+
+<h2>三个你现在就能跑 · run these now</h2>
+<div class="grid">
+  <a class="card" href="https://michaelhuo2030.github.io/hdc-neon/" target="_blank" rel="noopener">
+    <span class="badge b-meas">✓ 实测</span>
+    <div class="num meas">89×</div>
+    <h3>WebGPU 上的 HDC 检索</h3>
+    <p>在<b>你自己的 GPU</b> 上跑真正的 HDC 检索(WGSL kernel,与参考实现比特一致):20 万条向量 <b>~4 ms/查询</b>,比 numpy 基线快 <b>89×</b>。点开就能按 N=5万/20万 自己测。</p>
+    <span class="go">▶ 在你的 GPU 上跑 →</span>
+  </a>
+  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/speed_ladder.html" target="_blank" rel="noopener">
+    <span class="badge b-meas">✓ 实测</span>
+    <div class="num meas">50 → 184k</div>
+    <h3>速度阶梯 · 同一台 Mac</h3>
+    <p>同一台 M4 Mac 上实测:<b>50</b>(ChatGPT 体感)→ <b>147</b>(本地 Qwen-0.5B)→ <b>14,166</b> → <b>184,320</b> tok/s。看清"速度↔能力"的取舍——快不是炫,是解锁不同的活。</p>
+    <span class="go">▶ 看计数器按真实速度狂飙 →</span>
+  </a>
+  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/micro_world_live.html" target="_blank" rel="noopener">
+    <span class="badge b-sim">◇ 真实模拟</span>
+    <div class="num sim">8,000 步/秒</div>
+    <h3>速度解锁世界</h3>
+    <p>真 HDC 代数(bind/bundle/match)驱动:<b>8000 步/秒</b>一个社会涌现出文化与地理。配套 <a href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/reflex.html" target="_blank" style="color:var(--sim)">反射 demo</a>:400 个体、<b>~2.5 万决策/秒</b>、亚毫秒反应(≈比慢 AI 快 500×)。在一个 AI 说出一个词的时间里,一整个世界已经成形。</p>
+    <span class="go">▶ 看一个世界在几秒里长出来 →</span>
+  </a>
+</div>
+
+<h2>佐证 · supporting evidence</h2>
+<div class="grid">
+  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/real-world-speed-proof.html" target="_blank" rel="noopener">
+    <span class="badge b-meas">✓ 他人实测</span> <span class="badge b-proj">? 非我们的芯片</span>
+    <div class="num meas">16,960 tok/s</div>
+    <h3>这不是空想:有人已经做出来了</h3>
+    <p>第三方 <b>Taalas</b> 把权重烧进硅,公开实测 Llama-8B <b>16,960 tok/s</b>(对比 H200 的 230 tok/s)。这证明"<b>权重即硅</b>"的速度论是真的——我们的 ReRAM-CIM 路线(目标 1–5k tok/s)因此可信。</p>
+    <span class="go">▶ 看第三方实测 →</span>
+  </a>
+  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-calculator.html" target="_blank" rel="noopener">
+    <span class="badge b-proj">? 推算</span>
+    <div class="num proj">GB → tok/s</div>
+    <h3>容量↔速度计算器</h3>
+    <p>给定芯片大小/精度/工艺,推算装得下哪个模型、预期吞吐多少。把"速度"落到硅的现实里(例:~5 GB → Qwen3.5-9B Q4 → 1–5k tok/s 推算)。</p>
+    <span class="go">▶ 自己调参数 →</span>
+  </a>
+  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/hdc-101.html" target="_blank" rel="noopener">
+    <span class="badge b-sim">◇ 教学</span>
+    <div class="num sim">从零学</div>
+    <h3>HDC 是什么(可点)</h3>
+    <p>把概念变成随机超向量,亲手点 bind/bundle/permute,看相似度条变化——明白为什么这套代数又快又省、又适合 ReRAM。速度优势背后的原理。</p>
+    <span class="go">▶ 动手玩 HDC →</span>
+  </a>
+</div>
+
+<h2>诚实台账 · measured vs projected vs simulated</h2>
+<div class="honest">
+<table>
+  <tr><th>主张</th><th>数字</th><th>性质</th></tr>
+  <tr><td>WebGPU HDC 检索(你的 GPU)</td><td><b>~4 ms/查询 @ 20 万 · 89× numpy</b></td><td class="meas">✓ 实测(比特一致)</td></tr>
+  <tr><td>本地小模型吞吐(M4 Mac)</td><td><b>147 → 184,320 tok/s</b></td><td class="meas">✓ 实测</td></tr>
+  <tr><td>FPGA 三值 MAC 综合</td><td><b>0 DSP · 194 MHz</b>(真综合)</td><td class="meas">✓ 实测</td></tr>
+  <tr><td>HDC 社会/反射模拟</td><td><b>8,000 步/秒 · 2.5万决策/秒</b></td><td class="sim">◇ 真实 HDC 代数</td></tr>
+  <tr><td>第三方"权重即硅"(Taalas)</td><td><b>16,960 tok/s</b>(Llama-8B)</td><td class="meas">✓ 他人公开实测</td></tr>
+  <tr><td>我们的三值-CIM 芯片吞吐</td><td><b>1–4k tok/s</b>(设计目标)</td><td class="proj">? 推算(未流片)</td></tr>
+  <tr><td>"上芯片再 ~100×"</td><td><b>~µs 级 @ 任意 D</b></td><td class="proj">? 推算</td></tr>
+</table>
+<div class="small" style="margin-top:10px">原则:把<b>能跑给你看的</b>和<b>还在路上的</b>分开。前者建立信任,后者是路线图。声誉复利,诚实复利更快。</div>
+</div>
+
+<footer>
+  代码与方法全开源 · <a href="https://github.com/michaelhuo2030/hdc-neon" target="_blank">hdc-neon</a> ·
+  <a href="https://github.com/michaelhuo2030/millisecond-era" target="_blank">millisecond-era</a> ·
+  <a href="https://github.com/michaelhuo2030/millisecond-era/blob/main/PHILOSOPHY.md" target="_blank">设计哲学</a><br>
+  <span class="small">合抱之木,生于毫末。Built in Shanghai. 上海, 一个人, 1.5 个月, ~$1,400.</span>
+</footer>
+</div>
+</body>
+</html>

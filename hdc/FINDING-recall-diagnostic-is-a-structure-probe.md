@@ -30,6 +30,26 @@ asked: does the *location of the knee* in each relief curve recover the graph's 
 > interconnected the knowledge is (fan-in) and how deep its causal chains run (depth). It doesn't just fix
 > recall; it measures the topology of what you stored.
 
+## Confirmed on a real knowledge graph (Hetionet)
+We then took it to a real, open biomedical graph — Hetionet (~47k nodes / 2.25M edges, built from CTD + 28
+public resources). A unified memory chaining `Disease → Gene → {Compound, Pathway, regulating Gene}` recalled
+the full cross-domain set at only **0.65** — which again *looked* like a representation ceiling. It wasn't. The
+relief curve:
+
+| max_set | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 20 |
+|---|---|---|---|---|---|---|---|---|
+| recall | 0.49 | 0.66 | 0.80 | 0.90 | 0.96 | 0.97 | 0.98 | **0.99** |
+
+The knee sits at **max_set ≈ 14**. We had predicted ≈12 from first principles — a *gene* is pointed at by three
+relation types at once (drugs, pathways, other genes), so its effective fan-in is ~3× the per-relation cap. **The
+recall curve recovered that real-biology hub size on its own**, and opening the knob took recall **0.65 → 0.99**.
+Two clean routes reach it: match `max_set` to the effective fan-in, or *type* the edges (one role key per
+relation) — the latter reaches 0.96 at a quarter of the search effort and is the faithful model of a typed graph.
+Robust across 4 encodings × 3 seeds at adequate dimension (0.95–0.97). A second, independent limiter — capacity
+(dimension) — bites only when D is undersized. *(This also corrected one of our own earlier write-ups, which had
+called the 0.65 gap a "residual representation" limit; it was the tool. Suspect-the-tool includes your own
+theory.)*
+
 ## The companion discipline (the faith principle, quantified)
 A small census across a battery of recall tasks: of the "apparent ceilings" (recall < 1.0 at the default
 config), **~75% were tool artifacts** — a knob set wrong — not real ceilings. Only one was a genuine residual

@@ -26,10 +26,12 @@ into a measurable, machine-scale engine. **Cross-domain compounding = science ac
   produce the whole chain; the unified algebra can.
 - **It scales to a real, open biomedical knowledge graph.** On **Hetionet** (~47k nodes / 2.25M edges, built
   from CTD + 28 public resources), a unified memory over a ~1,160-entity subgraph chains
-  **Disease → Gene → Compound (+ Pathway, + regulating Gene)** across domains: **unified ≈6× the
-  single-domain (disease-gene-only) memory** that stops at genes. (Capacity-limited and honest: recall climbs
-  as dimension grows — the engine reports its own limiter, and real graphs leave a residual representation
-  component the clean toy doesn't.)
+  **Disease → Gene → Compound (+ Pathway, + regulating Gene)** across domains — **unified ≈6× the
+  single-domain (disease-gene-only) memory** that stops at genes — and the full cross-domain chain recovers at
+  **0.65 → 0.99** once the search is matched to the graph's real shape (robust across 4 encodings × 3 seeds at
+  adequate dimension, 0.95–0.97). The 0.65 was not a representation ceiling: a gene is a 3-relation hub, and the
+  recall curve's knee *measured* that hub size on its own — a worked example of the diagnostic doubling as a
+  knowledge-graph measurement instrument (see `hdc/FINDING-recall-diagnostic-is-a-structure-probe.md`).
 - **The memory is one engine across domains** — the same bind-and-invert algebra carries retrosynthesis,
   causal abduction, root-cause, diagnosis, recall, and analogy; only the codebook changes.
 - **Capacity is linear, buyable physics** — a flat memory holds ≈ D/100 facts; sharding multiplies it; the

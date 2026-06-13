@@ -34,6 +34,12 @@ into a measurable, machine-scale engine. **Cross-domain compounding = science ac
   knowledge-graph measurement instrument (see `hdc/FINDING-recall-diagnostic-is-a-structure-probe.md`).
 - **The memory is one engine across domains** — the same bind-and-invert algebra carries retrosynthesis,
   causal abduction, root-cause, diagnosis, recall, and analogy; only the codebook changes.
+- **It reaches a genuinely distant science, and holds two at once.** The same engine carries *materials science*
+  (material → constituent elements, recall **1.000**; the diagnostic's knee reads out composition complexity just
+  as it read gene hub-size in biology). And **biomedicine + materials co-reside in one hypervector with zero
+  cross-domain leakage** (0.000 either way) — each stays queryable, the only cost a shared-capacity tax that more
+  dimension removes. One substrate, two distant sciences, losslessly separable. *(A bridged **chain** across such
+  distant fields awaits a real, selective bridge dataset — flagged, not fabricated.)*
 - **Capacity is linear, buyable physics** — a flat memory holds ≈ D/100 facts; sharding multiplies it; the
   routing index is broken open by free hashing. So holding all of humanity's verified knowledge is a
   linear-cost engineering bill, **not a fundamental wall.**

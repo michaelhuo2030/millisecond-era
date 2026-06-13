@@ -210,10 +210,10 @@ const chartDefaults = {
 new Chart(document.getElementById('vocabChart'), {
   type: 'bar',
   data: {
-    labels: ['5', '8', '10', '15', '20', '25', '30'],
+    labels: ['5', '8', '10', '15', '20', '25', '30', '40'],
     datasets: [
-      { label: 'Raw Bone / 骨骼特征', data: [89.6, 83.2, 81.1, 80.0, 78.3, 75.8, 73.2], backgroundColor: 'rgba(99,102,241,0.4)', borderColor: '#6366f1', borderWidth: 1.5 },
-      { label: 'Raw + SupCon', data: [97.3, 96.0, 94.2, 92.5, 88.8, 86.8, 84.2], backgroundColor: 'rgba(16,185,129,0.5)', borderColor: '#10b981', borderWidth: 1.5 }
+      { label: 'Raw Bone / 骨骼特征', data: [89.6, 83.2, 81.1, 80.0, 78.3, 75.8, 73.2, 71.7], backgroundColor: 'rgba(99,102,241,0.4)', borderColor: '#6366f1', borderWidth: 1.5 },
+      { label: 'Raw + SupCon', data: [97.3, 96.0, 94.2, 92.5, 88.8, 86.8, 84.2, 81.1], backgroundColor: 'rgba(16,185,129,0.5)', borderColor: '#10b981', borderWidth: 1.5 }
     ]
   },
   options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, title: { display: true, text: 'K=1 Accuracy vs Vocabulary Size / 词汇量', color: '#e2e8f0', font: { size: 12 } } } }

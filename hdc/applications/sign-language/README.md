@@ -69,6 +69,7 @@ Encode SupCon embeddings into D=30,000-dimensional sparse ternary hypervectors, 
 | 20    | 5.0%   | 78.3%    | **88.8%** | +10.5pp |
 | 25    | 4.0%   | 75.8%    | **86.8%** | +11.0pp |
 | 30    | 3.3%   | 73.2%    | **84.2%** | +11.0pp |
+| 40    | 2.5%   | 71.7%    | **81.1%** | +9.4pp  |
 
 #### K-Shot Enrollment Curve (dist-10 + SupCon)
 
@@ -177,6 +178,7 @@ Related work in this repository: [HDC Laws Registry](../HDC-LAWS-REGISTRY.md) ·
 | 20    | 5.0%  | 78.3%  | **88.8%** | +10.5pp |
 | 25    | 4.0%  | 75.8%  | **86.8%** | +11.0pp |
 | 30    | 3.3%  | 73.2%  | **84.2%** | +11.0pp |
+| 40    | 2.5%  | 71.7%  | **81.1%** | +9.4pp  |
 
 #### K次录入曲线（dist-10 + SupCon）
 

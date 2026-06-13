@@ -418,3 +418,28 @@ surfaces is the only durable mechanism. Don't promise cross-session tracking fro
 Memory/CLAUDE.md/skills are deprioritized when chasing a sub-goal (this whole discipline kept getting
 skipped). Only a harness HOOK (PreToolUse / UserPromptSubmit injecting the checklist + invoking
 science-method) reliably fires at the decision point, every session. Enforcement > intention.
+
+## Phase 7: Strategic meta-disciplines (added 2026-06-13, from a boundary-scan session)
+
+> 6.3 keeps a *result* from lying. These four keep a *program* from lying — they were distilled after a
+> session that caught two of its own over-claims and corrected them.
+
+### 7.1 Suspect-the-tool includes your OWN theory
+6.3 says a surprising result is a tool bug first. Stronger: an elegant theory *you proposed* is also a
+hypothesis until a breaking-point test survives. In one session we caught two over-claims — a recall
+disambiguator that mislabeled representational confusion as a search-branching limit, and a hierarchical
+router whose "exponential (D/20)·G^depth" capacity law had the mechanism backwards (the real lever was
+hash-WIDTH, not tree-depth). **No claim is real until a kit emit at the breaking point survives.** Elegance
+is an alarm, not a medal.
+
+### 7.2 Simplest mechanism beats elegant (枯れた技術)
+Hash-buckets beat a router-tree; two binary cells in differential columns beat a multilevel cell. Default to
+the dumb-cheap-robust solution — it is usually also the deployable (µW / deterministic) one.
+
+### 7.3 Negative results are half the map
+Where a lever FAILS (a learned map on pure identity tokens; tree-depth adding no router capacity) is as
+valuable as where it works. Log each failure as a boundary on the spot — it saves future rounds.
+
+### 7.4 Push to the breaking point (anti-touch-and-go, quantified)
+Shallow tests flatter wrong theories (8× load looked fine; 128× exposed a placebo). Before "CONFIRM," sweep
+load/scale to **≥100× the suspected wall**; close a thread only at LEVERS-EXHAUSTED.

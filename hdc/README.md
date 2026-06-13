@@ -12,6 +12,16 @@ What lives here is the thing that's harder to copy than code: **how we decide wh
 | **[HDC-WEAPONS-ARSENAL.md](HDC-WEAPONS-ARSENAL.md)** | The computing-stack view: 6-instruction ISA (cos / bind / bundle / permute / unbind / weighted_bundle) → encoding shelf → standard library → orchestration → applications. A map of what exists so we never reinvent a weapon. |
 | **[HDC-EXPERIMENT-OPS-METHOD.md](HDC-EXPERIMENT-OPS-METHOD.md)** | How an experiment actually runs: pre-mortem gate → 1-cell PoC → heavy compute → audit-before-verdict. |
 
+## The runnable standard: [`hdc-mem/`](hdc-mem/)
+
+The laws say *where* HDC's algebra wins; **[`hdc-mem/`](hdc-mem/)** is the runnable proof — a deterministic **memory-algebra standard**: the five operations a vector DB can't do — **forget · undo · merge · audit · compose** — as one HDC bundle `M = Σ bind(content, role)`.
+
+- `forget` = exact subtraction: delete with a *proof* — removed item drops to chance, everyone else stays **bit-identical (Δ=0)**. The GDPR right-to-be-forgotten as an algebra op, not a promise.
+- Verified on synthetic **and public data (LoCoMo)**: forget exact across 10 real conversations; `compose` turns extractable structure into a **2.6–4.7× recall lift** flat embedding can't reach.
+- `python3 hdc-mem/eval/run_suite.py` → **4/4 PASS** (ForgetEval / MergeEval / AuditEval / CompositionEval). Self-contained — `hdcmem_vsa.py` mirrors the [hdc-ops](https://github.com/michaelhuo2030/hdc-ops) primitives.
+
+It concedes flat recall to FAISS and owns a different axis: **memory you can prove you deleted.**
+
 ## Why publish the method and not just the wins
 
 Because the method *is* the moat. Two laws in the registry are load-bearing and uncomfortable on purpose:

@@ -1,0 +1,25 @@
+{
+  "forget": {
+    "target": 0.2876,
+    "after": 0.0042,
+    "chance": 0.0091,
+    "neighbor_delta": 0.0,
+    "neighbor_recall": 0.3003
+  },
+  "merge": {
+    "A": 0.1991,
+    "B": 0.207,
+    "xleak": 0.0169,
+    "unmerge_delta": 0.0
+  },
+  "undo": {
+    "delta": 0.0
+  },
+  "swept_D": [
+    2000,
+    10000,
+    30000
+  ],
+  "seeds": 8,
+  "verified_by": "independent workflow agent, re-implemented + D\u00d7seed sweep"
+}

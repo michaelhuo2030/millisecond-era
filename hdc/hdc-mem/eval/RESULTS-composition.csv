@@ -1,0 +1,13 @@
+system,scheme,D,a1,a2,a3
+HDC,bipolar,10000,0.997,0.985,0.988
+HDC,bipolar,30000,0.997,0.985,0.992
+HDC,bipolar,50000,0.997,0.983,0.992
+HDC,sparse_ternary,10000,1.0,0.997,0.987
+HDC,sparse_ternary,30000,1.0,0.998,0.987
+HDC,sparse_ternary,50000,1.0,0.997,0.987
+HDC,fourier_hrr,10000,1.0,1.0,1.0
+HDC,fourier_hrr,30000,1.0,1.0,1.0
+HDC,fourier_hrr,50000,1.0,1.0,1.0
+flat-bge-m3,bge-m3,0,0.985,0.91,0.915
+flat-bge-m3,bge-m3,0,0.98,0.89,0.895
+flat-bge-m3,bge-m3,0,1.0,0.895,0.92

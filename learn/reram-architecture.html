@@ -114,16 +114,17 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--bl
 </div>
 
 <!-- ⑥ 3D -->
-<h2 id="d3">⑥ 怎么"黏一起":单 die / 4 die / 3D 堆叠</h2>
+<h2 id="d3">⑥ 怎么"黏一起":单 die / 4 die · 2.5D organic（我们的路）/ 3D（已弃）</h2>
+<div class="real" style="border-color:#7a3040;background:#241317;color:#f0bdcf">⚠️ <b style="color:#ff8aa0">2026-06 更新</b>：我们<b>走 2.5D organic 转接板</b>按 die 扩容，<b>已弃 3D 堆叠 / 混合键合</b>——in-place CIM 只在 die 间搬<b>激活</b>(~0.1–0.3 GB/s)，便宜的 organic 基板带宽就够；3D 的垂直 TB/s 买不到收益，且产能被大厂占满、小团队拿不到。下面的 3D 仅作对比科普。</div>
 <p><b>先分清两种"3D"(别混):</b></p>
 <table>
 <tr><th>类型</th><th>每层是什么</th><th>外围(ADC/计数器/驱动)</th><th>用来</th></tr>
-<tr><td><b>单片 3D</b>(vertical ReRAM)</td><td>一片 <b>cell 单元层</b>(像 3D NAND 纵向叠 cell)</td><td>在<b>底层 CMOS,几层共享一套</b></td><td><b>提密度</b>(我们容量公式的"6 层"= 这个;cell 翻倍、外围不翻倍)</td></tr>
-<tr><td><b>die 堆叠</b>(TSV / 3D-PIM)</td><td>一整片 <b>die</b>(自带 macro+外围)</td><td>每层 die <b>各带一套</b></td><td><b>提带宽</b>(三星 3D-PIM;专家说的真突破口)</td></tr>
+<tr><td><b>单片 3D</b>(vertical ReRAM)</td><td>一片 <b>cell 单元层</b>(像 3D NAND 纵向叠 cell)</td><td>在<b>底层 CMOS,几层共享一套</b></td><td><b>提密度</b>(学术界单片多层;⚠️ GB 级量产不存在,我们<b>不</b>依赖它)</td></tr>
+<tr><td><b>die 堆叠</b>(TSV / 3D-PIM)</td><td>一整片 <b>die</b>(自带 macro+外围)</td><td>每层 die <b>各带一套</b></td><td><b>提带宽</b>(三星 3D-PIM)<b style="color:#ff8aa0"> — 我们已弃(只搬激活,用不上)</b></td></tr>
 </table>
 <p class="note"><b>所以不是"macro 堆 macro",也不是堆 16×16:</b>提密度时堆的是 cell 单元层(共享一套外围);提带宽时堆的是整片 die(TSV 连)。<b>点切换看:</b></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center"><span class="seg" id="pkg"><button data-p="1" class="on">单 die(平铺)</button><button data-p="4">4 die · 2.5D 封装</button><button data-p="3d">3D 堆叠(TSV)</button></span></div>
+<div class="ctl" style="justify-content:center"><span class="seg" id="pkg"><button data-p="1">单 die(平铺)</button><button data-p="4" class="on">4 die · 2.5D organic（我们的路）</button><button data-p="3d">3D 堆叠（TSV·已弃）</button></span></div>
 <svg id="pkgSvg" viewBox="0 0 420 240" width="420"></svg>
 <div class="note" id="pkgNote"></div>
 </div>
@@ -288,7 +289,7 @@ function drawTile(){const n=+document.getElementById('cores').value;document.get
  if(first&&last){s.appendChild(el('line',{x1:first[0],y1:first[1],x2:last[0],y2:last[1],stroke:'#ffd36b','stroke-width':2,'stroke-dasharray':'5 4'}));
    txt(s,(first[0]+last[0])/2,(first[1]+last[1])/2-6,'时钟走线','#ffd36b',10);}
  const skew=n<=4?'小':n<=9?'中 ⚠':'大 ❌';
- document.getElementById('tileNote').innerHTML='核 1 → 核 '+n+' 的时钟路径长 ~<b class="y">'+n+'×</b>;时钟偏斜:<b>'+skew+'</b>。瓶颈是<b>布线/时钟/调度</b>(指数级),不是面积。→ 这正是 <b>3D 堆叠</b>要缩短的距离。';
+ document.getElementById('tileNote').innerHTML='核 1 → 核 '+n+' 的时钟路径长 ~<b class="y">'+n+'×</b>;时钟偏斜:<b>'+skew+'</b>。瓶颈是<b>布线/时钟/调度</b>(指数级),不是面积。→ 我们用 <b>2.5D organic</b> 把多 die 并排(不堆叠),按 die 扩容。';
 }
 drawTile();
 
@@ -303,9 +304,9 @@ function drawPkg(p){const s=document.getElementById('pkgSvg');clr(s);
    note='4 die 并排坐转接板:权重分布到 4 die,跨 die 比片内慢 → 切片让跨 die 流量最少。';}
  else {for(let L=3;L>=0;L--){const off=L*16;die(90+off,40+off,200,120,0.93);}
    for(let L=0;L<4;L++)s.appendChild(el('line',{x1:110,y1:50+L*16,x2:110,y2:64+L*16,stroke:'#ffd36b','stroke-width':2}));
-   txt(s,210,225,'4 层垂直叠 · TSV 硅通孔上下贯通','#8ee59a',12);note='3D 堆叠:上下距离最短 → 带宽/频率↑(真突破口)。门槛极高:国内只紫光做 DRAM 3D,三星领先 3D-PIM。';}
+   txt(s,210,225,'4 层垂直叠 · TSV（我们已弃）','#ff8aa0',12);note='⛔ 我们已弃:in-place CIM 只在 die 间搬激活,便宜的 organic 2.5D 带宽就够;3D 的垂直 TB/s 买不到收益,且产能被大厂占满、小团队拿不到。';}
  document.getElementById('pkgNote').textContent=note;
 }
 document.querySelectorAll('#pkg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#pkg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawPkg(b.dataset.p);});
-drawPkg('1');
+drawPkg('4');
 </script></div></body></html>

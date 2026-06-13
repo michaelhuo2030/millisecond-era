@@ -5,6 +5,21 @@
 
 ---
 
+> **✅ 2026-06 — current v1 design (supersedes BOTH boxes below)**
+>
+> The 2026-05 numbers below are kept as the honest iteration record — but they've since been superseded again. Current v1 (full decision in **[chip/ADR-v1-architecture.md](chip/ADR-v1-architecture.md)**):
+>
+> | | Current (2026-06) |
+> |---|---|
+> | **Model** | **4B train-time-ternary {−1,0,+1} text, ~1 GB resident** (8B = stretch). *Not 9B-Q4 (never fits), not Q4 storage-mode.* |
+> | **Compute** | **In-place digital SPIKA CIM**: 2-state cells in differential ± columns, shared ≥7-bit up/down counter, **no ADC**. *Not analog, not a single 3-level cell.* |
+> | **Capacity** | **2.5D organic** — N single-layer dies side-by-side. *3D / hybrid-bonding retired (in-place CIM moves only activations between dies → organic bandwidth suffices).* |
+> | **Measured** | real ternary 8B on the no-ADC path = **+3.8% ppl, Chinese accuracy preserved, int4 KV full quality, maj@16 lifts GSM8K 50→87%** |
+>
+> Everything below this box is the May-2026 record (kept for the iteration story; some numbers there are now outdated). 合抱之木生于毫末.
+
+---
+
 > **⚠️ 2026-05-18 Corrections — please read before the numbers below**
 >
 > The numbers table below was published 2026-05-16. Two days later, a bottom-up physical audit found a fundamental error: **"25 GB/die pure CIM @ 28nm" is physically infeasible** — it requires ~1,500× the cell density of 2026 industry SOTA. The architecture has been recalibrated.

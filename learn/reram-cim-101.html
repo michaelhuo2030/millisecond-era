@@ -151,9 +151,9 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <p class="note" id="lvlMsg"></p>
 </div>
 <div class="callout">
-<b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只需要 3 档 {−1,0,+1},HDC 二元只需要 2 档</b>。<span class="g" data-k="ternfit">我们故意用低精度算法,去吃 ReRAM 器件不精确的亏</span>——这是整个技术路线的赌注。
+<b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只有 3 个值 {−1,0,+1},HDC 二元只有 2 个值</b>。<span class="g" data-k="ternfit">关键:我们<b>不</b>靠"一个 cell 调多档"(那会飘)——而是用<b>两个二态 cell 差分 + 数字无-ADC 计数器读出</b></span>:既避开高档位 MLC、又避开模拟 ADC。低精度算法 + 二态 cell + 数字读出,这是整个技术路线的赌注。
 </div>
-<p class="note">🔎 <b>"MLC=3 是不是就是三元组?"</b> 几乎是,但要分清两层:<b>三元 {−1,0,+1} 说的是"值有 3 个"(算法)</b>;<b>MLC-3 说的是"一个 cell 物理上分 3 挡"(硬件)</b>。把一个三元权重存进一个 3 挡 cell,二者刚好对上——所以"原生三元 cell"=MLC-3。但三元也可以用 2 个普通 1-bit(SLC)cell 差分来存,不一定非走 MLC。关键是:三元只需要 2–3 挡,正好避开高挡位 MLC 那个最难的区。<b><a href="reram-cim-visual.html#mlc" style="color:var(--hot)">→ 点这里玩"多电平物理上怎么实现"的交互图</a></b>,拖到 6–8 挡就能看到挡位挤到一起、开始读错。</p>
+<p class="note">🔎 <b>"MLC=3 是不是就是三元组?"</b> 理论上能对上(单 cell 分 3 挡存一个三元值),<b>但我们不走这条</b>:单 cell 多档会飘、难读。<b>我们走的是另一条:用 2 个普通二态(SLC)cell 差分存三元</b>(+列一个、−列一个,读它俩的差),二态 cell 最好读、最稳,还能用数字计数器无-ADC 读出。所以本项目的"三元落硅"= <b>二态差分,不是 MLC-3</b>。<b><a href="reram-cim-visual.html#tern" style="color:var(--hot)">→ 点这里看"两个二态 cell 差分"的交互图</a></b>(下一档的 MLC 图只是演示"为什么多档会飘、我们为什么不走")。</p>
 
 <h2 id="cim">⑥ "存算一体"(CIM)是什么黑魔法?</h2>
 <p>普通电脑:数据存在内存,要算的时候搬到 CPU,算完搬回去——<b>搬运</b>本身又慢又费电(这叫<span class="g" data-k="memwall">内存墙</span>)。</p>
@@ -162,7 +162,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <tr><td><b>欧姆定律</b></td><td>电流 = 电压 × 电导(=1/电阻)。把输入做成电压、权重做成 cell 电阻 → 电流自动 = 输入×权重。<b>一次乘法,零指令。</b></td></tr>
 <tr><td><b>基尔霍夫定律</b></td><td>一整列 cell 的电流在导线上自动相加 → 一列就是一次"乘加求和"(<span class="g" data-k="mac">MAC</span>)。整个矩阵乘法在一瞬间、用物理完成。</td></tr>
 </table>
-<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种模拟乘加。代价是:要把模拟电流读成数字,需要大量 <span class="g" data-k="adc">ADC</span>——这玩意又大又费电,正是 ReRAM-CIM 里电路设计最难、最吃面积和功耗的地方。</p>
+<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种乘加。模拟 CIM 要把电流读成数字、需要大量 <span class="g" data-k="adc">ADC</span>(又大又费电,常吃掉大半面积/功耗)——<b>我们正是为此走"二态差分 + 数字计数器"读出、无 ADC,把这块最难的省掉</b>。</p>
 
 <h2 id="vs">⑦ SRAM-CIM、ReRAM-CIM……各种存储怎么选?</h2>
 <p>先看最常拿来对比的两种:两者<b>架构、外围、ADC 那套几乎一样</b>,区别只在"用什么 cell 存权重":</p>
@@ -171,13 +171,13 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <tr><td>存储单元</td><td>6+ 晶体管搭的 SRAM</td><td>1 晶体管 + 1 电阻开关</td></tr>
 <tr><td>断电</td><td class="bad">就忘(<span class="g" data-k="volatile">易失</span>)→ 权重每次重搬</td><td class="ok">不忘(非易失)→ 权重刻进去常驻 ⭐</td></tr>
 <tr><td>密度(同面积存多少)</td><td class="bad">低(管子多)</td><td class="ok">高 3–10×</td></tr>
-<tr><td>读/算速度</td><td class="ok">极快、稳</td><td>快,但模拟读出要 ADC</td></tr>
+<tr><td>读/算速度</td><td class="ok">极快、稳</td><td>快;我们走<b>数字无-ADC 计数器读出</b>(不靠模拟 ADC)</td></tr>
 <tr><td>写入</td><td class="ok">快、随便写</td><td class="bad">慢、会老化(耐久有限)</td></tr>
-<tr><td>模拟精度</td><td class="ok">好(数字单元)</td><td class="bad">差(细丝会飘)← 我们用三元绕开</td></tr>
+<tr><td>模拟精度</td><td class="ok">好(数字单元)</td><td class="bad">差(细丝会飘)← 我们用<b>二态差分 + 数字读出</b>绕开,不靠模拟精度</td></tr>
 <tr><td>成熟度</td><td class="ok">标准 CMOS,谁都能做</td><td class="bad">要特殊工艺,资料只在论文里</td></tr>
 </table>
 <div class="callout">
-<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进只读卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的不精确,正好被三元算法吃下。
+<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进<b>可重刷</b>的卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的模拟不精确,被我们的<b>二态差分 + 数字无-ADC 读出</b>绕开(不靠模拟精度)。
 </div>
 
 <h3>再放宽一点:整个存储 / 存内计算家族</h3>
@@ -224,7 +224,7 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 <div class="defsrc" id="def-lrs">LRS = Low Resistance State（低阻态），细丝接通、电流好走，记作 1。反义是 HRS = High Resistance State（高阻态），细丝断开，记作 0。读出时给个小电压看电流大小，就知道存的是 0 还是 1。</div>
 <div class="defsrc" id="def-crossbar">crossbar（交叉阵列）：把横线（行）和竖线（列）交叉排成网格，每个交叉点放一个 cell。这种结构让"一整列同时做乘加求和"成为可能——正是存内计算 CIM 的物理基础。几百万个 cell 就这样排成一大片。</div>
 <div class="defsrc" id="def-mlc">MLC = Multi-Level Cell（多电平单元）：让一个 cell 能区分好几档电阻（不只是高/低两档），从而一个单元存不止 1 bit。能省地方，但 ReRAM 的细丝会随时间漂移、不同单元也不一致，档分得越多越容易读错——良率和可靠性是它的死穴。这恰恰是为什么三元/HDC（只需要 2–3 档）特别适配 ReRAM。</div>
-<div class="defsrc" id="def-ternfit">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元权重只有 3 个值、HDC 是二元只有 2 个值——只需要 cell 分出 2–3 档，这是 ReRAM 最容易、最可靠做到的。于是"算法故意低精度"和"器件天生不精确"刚好对上。这是 millisecond-era 整个技术押注的核心假设，需要在真硅上验证（见 README）。</div>
+<div class="defsrc" id="def-ternfit">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元只有 3 个值、HDC 二元只有 2 个值——我们<b>不</b>用单个多档 cell（会飘），而是用<b>两个二态 cell 差分</b>存一个三元值（每个 cell 只需可靠区分"开/关"两态，这是 ReRAM 最容易做到的），再用<b>数字计数器无-ADC 读出</b>。于是"算法低精度 + 二态 cell + 数字读出"对上，既避开高档位 MLC、又避开模拟 ADC。这是 millisecond-era 的核心押注，需在真硅上验证（见 README）。</div>
 <div class="defsrc" id="def-memwall">内存墙（memory wall）：现代芯片算得很快，但数据要从内存搬到计算单元，这段"搬运"又慢又费电，成了真正的瓶颈。大模型推理时反复搬几个 GB 的权重，大量时间和电力耗在搬运上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
 <div class="defsrc" id="def-mac">MAC = Multiply-Accumulate（乘加）：神经网络最基本的运算——把输入乘以权重再累加。一个 1000×1000 的矩阵乘法就是上百万次 MAC。CIM 用一列 cell 的电流自动相加，一瞬间完成一整列的 MAC，这就是它快的来源。</div>
 <div class="defsrc" id="def-adc">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这正是 CIM 里电路设计最难的部分，也是"理论密度"远高于"实际能放"的主因。</div>
@@ -270,7 +270,7 @@ function lvlCalc(){
   bar.style.width=rel.toFixed(0)+'%';
   var col,txt,m;
   if(n<=2){col='var(--ok)';txt='可靠度:高 ✅';m='2 档 = 标准 0/1。最稳。HDC 二元只要这个。';}
-  else if(n<=3){col='var(--ok)';txt='可靠度:好 ✅';m='3 档 = 刚好对上三元 {−1,0,+1}。ReRAM 还扛得住——这正是我们要的。';}
+  else if(n<=3){col='var(--hot)';txt='可靠度:中 ⚠️';m='3 档虽能对上三元,但单 cell 也会随老化/温度飘 → 我们不赌单 cell,改用 2 个二态 cell 差分(更稳、可数字无-ADC 读出)。';}
   else if(n<=4){col='var(--hot)';txt='可靠度:中 ⚠️';m='4 档(2 bit)开始吃力,论文里有但良率打折。';}
   else if(n<=8){col='var(--hot)';txt='可靠度:差 ⚠️';m='8 档:细丝漂移让相邻档容易读错,实验室能演示、量产很难。';}
   else{col='var(--bad)';txt='可靠度:很差 ❌';m='16+ 档(8-bit DNN 想要的精度):ReRAM 基本扛不住——这就是为什么普通 DNN 难、而三元正合适。';}

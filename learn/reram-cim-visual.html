@@ -59,7 +59,7 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 
 <!-- ① ternary weight -->
 <h2 id="tern">① 一个三元权重长什么样?</h2>
-<p>普通模型的权重是个小数(要 16 位存)。我们的<b>三元权重只有三种值:−1 / 0 / +1</b>。在 ReRAM 里,就是把那根导电丝调成<b>三种粗细</b>(三档电导)。<b>点中间的 cell 循环切换:</b></p>
+<p>普通模型的权重是个小数(要 16 位存)。我们的<b>三元权重只有三种值:−1 / 0 / +1</b>。<b>关键:我们不靠"一个 cell 调三档"</b>(多电平 cell 难读又会飘,见下一节)——而是用<b>两个普通的"开/关"二态 cell:一个放"+列"、一个放"−列"</b>,用它俩的<b>差</b>摆出 −1 / 0 / +1(SPIKA 差分列方案,= 真芯片走的路)。<b>点下面切换看:</b></p>
 <div class="card" style="text-align:center">
 <svg id="ternSvg" viewBox="0 0 240 200" width="240"></svg>
 <div id="ternLbl" style="font-size:18px;font-weight:700"></div>
@@ -67,8 +67,8 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 </div>
 
 <!-- ①· MLC physical -->
-<h2 id="mlc">①· 多电平(MLC)物理上是怎么实现的?</h2>
-<p>怎么让<b>一个 cell</b> 存出 2/3/4…8 个不同的值?物理上就一招:<b>把导电丝长成不同的"粗细"</b>。丝越粗 → 电阻越小 → 电流越大。靠控制写入时的电流/电压,把丝停在不同粗细,就得到不同的<b>电阻挡位(电平)</b>。<b>拖滑块选"想要几档",看挡位怎么被挤窄:</b></p>
+<h2 id="mlc">①· 为什么我们<b>不</b>让一个 cell 存多档(MLC)?</h2>
+<p>另一条路是让<b>一个 cell</b> 存 2/3/4…8 个不同的值(多电平 MLC):靠把导电丝写成不同"粗细"得到不同电阻挡位。<b>但挡位越多、间隔越窄,ReRAM 一飘就读错</b>——这正是我们<b>不走多电平、而用上一节"两个二态 cell 差分"</b>的原因(二态 cell 最好读、最稳)。<b>拖滑块看挡位怎么被挤窄、为什么连 3 档我们都不赌:</b></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
 想分 <input type="range" id="mlcN" min="2" max="8" value="3" oninput="drawMLC()"> <span class="kpi" id="mlcNLbl"></span> 档
@@ -122,7 +122,7 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 <h2 id="readout">④· 读出方式:为什么"低精度"能把 ADC 拆掉?</h2>
 <p>澄清:<b>算账的是阵列物理(电流自动相加),ADC 只是"读数器"</b>——把那条模拟电流量成数字。<b>拖滑块看:要读的精度越高,读数器越大越费电,有用面积被它吃掉;低到 1-bit,它缩成一个小小的"灵敏放大器"。</b></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center">读出精度 <input type="range" id="roB" min="1" max="8" value="8" oninput="drawReadout()"> <span class="kpi" id="roBLbl"></span> bit</div>
+<div class="ctl" style="justify-content:center">读出精度 <input type="range" id="roB" min="1" max="8" value="1" oninput="drawReadout()"> <span class="kpi" id="roBLbl"></span> bit <span class="note">(默认 1-bit = 我们的无-ADC 路线)</span></div>
 <svg id="roSvg" viewBox="0 0 400 250" width="400"></svg>
 <div class="row" style="justify-content:center;gap:16px;font-size:13px"><span>读出方式 <b class="y" id="roName"></b></span><span>要比的阈值线 <b class="y" id="roThr"></b></span></div>
 <div class="row" style="justify-content:center;gap:16px;font-size:13px"><span>有用 cell 面积 <b class="g" id="roEff"></b></span><span>读出能耗 <b class="r" id="roEn"></b></span></div>
@@ -135,7 +135,7 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 <p>一个 macro 不够大,要<b>拼很多个</b>。怎么拼有三种封装方式,芯片面积也有讲究。<b>切换看:</b></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-<span class="seg" id="pack"><button data-p="2d" class="on">平面 2D</button><button data-p="2.5d">2.5D</button><button data-p="3d">3D 堆叠</button></span>
+<span class="seg" id="pack"><button data-p="2d">平面 2D</button><button data-p="2.5d" class="on">2.5D organic（我们的路）</button><button data-p="3d">3D 堆叠（已弃）</button></span>
 </div>
 <div class="ctl" style="justify-content:center">
 芯片面积 <span class="seg" id="area"><button data-a="280">280</button><button data-a="380" class="on">380</button><button data-a="450">450 mm²</button></span>
@@ -208,25 +208,28 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const COL={1:'#8ee59a',0:'#3a3d55','-1':'#ff8aa0'};
 
 // ===== ① ternary cell =====
-let ternState=1;
+let ternState=1; // 权重值；由"+列/−列两个二态cell的差"表示
 function drawTern(){
  const s=document.getElementById('ternSvg');clear(s);
- s.appendChild(el('rect',{x:60,y:14,width:120,height:14,rx:3,fill:'#7aa9ff'}));        // top electrode
- s.appendChild(el('rect',{x:60,y:118,width:120,height:14,rx:3,fill:'#ffd36b'}));       // bottom electrode
- s.appendChild(el('rect',{x:60,y:28,width:120,height:90,fill:'#23283a'}));             // oxide
- // filament by state
- if(ternState!==0){
-   const full=ternState>0?90:60; const c=ternState>0?'#8ee59a':'#ff8aa0';
-   s.appendChild(el('rect',{x:114,y:28,width:12,height:full,fill:c,rx:2}));
- }
- // clickable hit area
- const hit=el('rect',{x:40,y:6,width:160,height:134,fill:'transparent',style:'cursor:pointer'});
+ // 两个二态 cell：左=+列、右=−列。每个只有"开(有丝)/关(无丝)"两态。
+ const cells=[{cx:65,lab:'+列 cell',on:ternState>0,c:'#8ee59a'},
+              {cx:175,lab:'−列 cell',on:ternState<0,c:'#ff8aa0'}];
+ cells.forEach(co=>{
+   s.appendChild(el('rect',{x:co.cx-30,y:24,width:60,height:11,rx:3,fill:'#7aa9ff'}));   // top electrode
+   s.appendChild(el('rect',{x:co.cx-30,y:112,width:60,height:11,rx:3,fill:'#ffd36b'}));  // bottom electrode
+   s.appendChild(el('rect',{x:co.cx-30,y:35,width:60,height:77,fill:'#23283a'}));         // oxide
+   if(co.on) s.appendChild(el('rect',{x:co.cx-5,y:35,width:10,height:77,fill:co.c,rx:2})); // 二态:开才有丝
+   s.appendChild(el('text',{x:co.cx,y:140,fill:co.on?co.c:'#5a5d72','text-anchor':'middle','font-size':12})).textContent=co.lab+(co.on?'·开':'·关');
+ });
+ s.appendChild(el('text',{x:120,y:78,fill:'#8a8ca6','text-anchor':'middle','font-size':22})).textContent='−';
+ s.appendChild(el('text',{x:120,y:18,fill:'#caa9ff','text-anchor':'middle','font-size':11})).textContent='共享计数器：+列 − −列';
+ const hit=el('rect',{x:10,y:6,width:220,height:150,fill:'transparent',style:'cursor:pointer'});
  hit.addEventListener('click',()=>{ternState=ternState===1?0:ternState===0?-1:1;drawTern();});
  s.appendChild(hit);
- const dots={'-1':'最粗·反向','0':'无丝·断开','1':'最粗·正向'};
- const G={'-1':'G = −1（强导通，反向）','0':'G = 0（高阻，不导）','1':'G = +1（强导通，正向）'};
- document.getElementById('ternLbl').innerHTML='权重 = <span style="color:'+(COL[ternState])+'">'+(ternState>0?'+1':ternState)+'</span>';
- document.getElementById('ternNote').textContent='电导挡位：'+G[ternState]+'。一个 cell 区分这 3 挡 = 1 个三元值（约 1.58 bit）。';
+ const W={'1':'+1','0':'0','-1':'−1'};
+ const expl={'1':'+列开、−列关 → (1)−(0) = +1','0':'两个都关 → (0)−(0) = 0','-1':'+列关、−列开 → (0)−(1) = −1'};
+ document.getElementById('ternLbl').innerHTML='权重 = <span style="color:'+(COL[ternState])+'">'+W[ternState]+'</span>';
+ document.getElementById('ternNote').textContent='两个"开/关"二态 cell 摆出三元:'+expl[ternState]+'。读出 = 共享计数器数 +列 click 减 −列 click,无 ADC、天然做减法。一个三元值 ≈ 1.58 bit。(不是"一个 cell 调三档"——那种多电平 cell 难读又会飘,下一节。)';
 }
 
 // ===== ② crossbar =====
@@ -311,7 +314,7 @@ function drawMacro(){
  s.appendChild(el('rect',{x:10,y:10,width:340,height:260,rx:8,fill:'#181a28',stroke:'#33354a'}));
  // peripheral blocks (ADC bottom, drivers left, decoder top)
  s.appendChild(el('rect',{x:10,y:200,width:340,height:70,rx:6,fill:'#3a2030',stroke:'#5a3040'}));
- s.appendChild(el('text',{x:180,y:240,fill:'#ff8aa0','text-anchor':'middle','font-size':13})).textContent='ADC（模数转换，最吃面积/功耗）';
+ s.appendChild(el('text',{x:180,y:240,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent='读出外围（高精度=ADC 最吃面积；我们走无-ADC 计数器）';
  s.appendChild(el('rect',{x:10,y:10,width:60,height:190,rx:6,fill:'#2a2438',stroke:'#443a5a'}));
  s.appendChild(el('text',{x:40,y:110,fill:'#caa9ff','text-anchor':'middle','font-size':11,transform:'rotate(-90 40 110)'})).textContent='行驱动';
  s.appendChild(el('rect',{x:70,y:10,width:280,height:34,rx:6,fill:'#23303a',stroke:'#33454f'}));
@@ -363,7 +366,7 @@ function drawReadout(){
 }
 
 // ===== ⑤ chip packaging =====
-let packMode='2d',chipArea=380;
+let packMode='2.5d',chipArea=380;
 function drawChip(){
  const s=document.getElementById('chipSvg');clear(s);
  const macroMb=16; // per macro
@@ -371,8 +374,8 @@ function drawChip(){
  const perDie=Math.round(chipArea/3.0); // illustrative macros per die layer
  let layers=1,dies=1,label='';
  if(packMode==='2d'){layers=1;dies=1;label='一块 die 上平铺很多 macro';}
- if(packMode==='2.5d'){layers=1;dies=4;label='多个小芯片(chiplet)并排坐在「转接板 interposer」上，像拼积木';}
- if(packMode==='3d'){layers=4;dies=1;label='多层 macro 垂直叠起来，用 TSV 硅通孔上下连，密度最高、最难散热';}
+ if(packMode==='2.5d'){layers=1;dies=4;label='✅ 我们的路:多个小 die 并排坐在便宜的 organic 转接板上(2.5D)，按 die 扩容';}
+ if(packMode==='3d'){layers=4;dies=1;label='⛔ 已弃:垂直叠+TSV，密度最高，但 in-place CIM 只在 die 间搬激活、organic 带宽已足够→3D 的垂直 TB/s 买不到收益，且小团队拿不到产能、最难散热';}
  // draw
  if(packMode==='2.5d'){
    for(let d=0;d<dies;d++){const x=20+d*92;
@@ -393,7 +396,7 @@ function drawChip(){
    s.appendChild(el('text',{x:200,y:262,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent='单 die 平面铺满 macro（2D）';
  }
  const totalMacros=perDie*layers*dies;
- document.getElementById('chipNote').innerHTML=label+'。<br>'+chipArea+' mm² · '+packMode.toUpperCase()+' ≈ <b class="y">'+totalMacros+'</b> 个 macro × 16 Mb ≈ <b class="y">'+(totalMacros*macroMb/8/1024).toFixed(1)+' GB</b> 等效三元容量（示意）。3D 同面积容量最大，但散热与良率是代价。';
+ document.getElementById('chipNote').innerHTML=label+'。<br>'+chipArea+' mm² · '+packMode.toUpperCase()+' ≈ <b class="y">'+totalMacros+'</b> 个 macro × 16 Mb ≈ <b class="y">'+(totalMacros*macroMb/8/1024).toFixed(1)+' GB</b> 等效三元容量（示意）。<b>我们走 2.5D organic 按 die 扩容</b>;3D 容量虽最大但对"只搬激活"的 in-place CIM 买不到收益,已弃。';
 }
 function tile(s,x,y,w,h,n){const cols=Math.ceil(Math.sqrt(n*w/h)),rows=Math.ceil(n/cols);const cw=w/cols,ch=h/rows;let k=0;
  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){if(k++>=n)break;s.appendChild(el('rect',{x:x+c*cw+1,y:y+r*ch+1,width:cw-2,height:ch-2,rx:1.5,fill:'#163a22',stroke:'#2f7a45','stroke-width':0.6}));}}
@@ -514,7 +517,7 @@ function drawMLC(){
    s.appendChild(el('text',{x:axX+162,y:y+4,fill:col,'font-size':11})).textContent='挡 '+(k+1);
  }
  let msg;
- if(N<=3)msg='✅ '+N+' 档:间隔很宽,噪声/漂移撞不到一起,稳。'+(N===3?' ←【这正好是三元 {−1,0,+1} 需要的 3 档】':'');
+ if(N<=3)msg='✅ '+N+' 档:间隔还宽,但仍会随器件老化/温度漂移。'+(N===3?' ←【就算只要 3 档,我们也不赌单 cell——改用两个二态 cell 差分:更稳、读出更简单、无 ADC】':'');
  else if(!crowded)msg='⚠️ '+N+' 档:还分得开,但每档间隔变窄了,良率开始打折。';
  else msg='❌ '+N+' 档:间隔 < 噪声宽度 → 相邻档重叠(红)→ 读的时候会认错档。这就是高档位 MLC 量产难、ReRAM 飘一下就错的根源。';
  document.getElementById('mlcNote').innerHTML=msg+'<br><span class="note">点右边的挡位圆点,左边的丝就长到那个粗细。</span>';

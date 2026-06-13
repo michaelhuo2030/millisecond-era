@@ -40,8 +40,8 @@ a.btn:hover{border-color:var(--hot)}
 <tr><td>权重怎么"住"在片上</td><td>硬编码<b>焊死</b>进硅(固定)</td><td>ReRAM-CIM,常驻但<b>可反复重写</b>(换模型/更新)</td></tr>
 <tr><td>工艺节点</td><td>TSMC <b>6nm</b>(尖端、贵)</td><td><b>28nm 成熟节点</b>(便宜、可及)</td></tr>
 <tr><td>体量 / 功耗</td><td>815mm² · 53B 管 · <b>2.5 kW 服务器</b></td><td><b>边缘形态</b> · ~25–60 W</td></tr>
-<tr><td>精度路线</td><td>(其 LLM)</td><td><b>三元 + HDC</b>(低精度,正好吃 ReRAM 模拟不精确)</td></tr>
-<tr><td>模型</td><td>Llama 3.1 8B,固定</td><td>Qwen3.5-9B 三元,可更新</td></tr>
+<tr><td>精度路线</td><td>(其 LLM)</td><td><b>三元 + HDC</b>(低精度;<b>数字无-ADC</b>计数器读出,不靠模拟精度)</td></tr>
+<tr><td>模型</td><td>Llama 3.1 8B,固定</td><td><b>4B 三元(~1 GB),可重刷更新</b></td></tr>
 <tr><td>开放性</td><td>专有</td><td><b>开放 / 可编程</b>生态(毫末)</td></tr>
 <tr><td>速度</td><td>16,960 tok/s(发布值)</td><td>Mini 目标 1.5–5k 持续 / 4–12k 峰(投影,未流片)</td></tr>
 </table>

@@ -64,9 +64,9 @@ td:first-child,th:first-child{text-align:left}
 
     <label>Cell 类型 / 每个权重占几个 cell <span class="q" onclick="explainTopic('cell')">?</span></label>
     <select id="cell" onchange="calc()">
-      <option value="2|SLC 差分对(2×1bit cell,最稳)">SLC 差分对 — 2 cell/权重 (2.0 bit)</option>
+      <option value="2|SLC 差分对(2×二态cell·我们的路·无ADC)">SLC 差分对 — 2 cell/权重 (2.0 bit) ⭐我们的路</option>
       <option value="2|MLC-4 单 cell(4 电平,浪费1档)">MLC 4 电平 单 cell — 2.0 bit/权重</option>
-      <option value="1.58|MLC-3 原生三元(3 电平/cell)">MLC 3 电平 原生三元 — 1.58 bit/权重 ⭐</option>
+      <option value="1.58|MLC-3 原生三元(3 电平/cell·我们不用,会飘)">MLC 3 电平 原生三元 — 1.58 bit/权重 (纸面最密·我们不用)</option>
       <option value="1.58|理论极限(完美打包)">理论极限 packed — 1.58 bit/权重</option>
       <option value="3|保守(含纠错冗余)">保守(单 cell + 1bit ECC) — 3.0 bit/权重</option>
     </select>
@@ -142,7 +142,7 @@ const EXP={
  whatcap:["这容量指什么",
   "<b>纯权重阵列</b>:32MB 全部用来存模型权重(最乐观,激活另放 SRAM)。<br><b>芯片总存储</b>:32MB 要同时装权重 + 推理时的中间激活 + KV cache,那权重能用的就更少——用下面的“激活预留”滑块切出一块。<br><br>先确认:这 32MB 是哪一种?差很多。"],
  cell:["Cell 类型 / 电平 / 差分",
-  "ReRAM 的一个存储单元叫 <b>cell</b>。它能区分几个电阻档位(电平)决定能存几 bit:<br><br>• <b>SLC</b>(单层):只分高/低 2 档 = 1 bit。三元有 3 个值,1 bit 不够,所以常用 <b>2 个 cell 做差分对</b>(G⁺−G⁻)来稳稳表示带符号的 ±,= 2 bit/权重,最稳。<br>• <b>MLC-4</b>(4 电平):1 个 cell 存 2 bit。三元只用其中 3 档,浪费 1 档,= 2 bit/权重。<br>• <b>MLC-3 原生三元</b>:cell 精确分 3 档,刚好对上 {−1,0,+1},1 cell 装 1 个三元值 = 理论 1.58 bit,密度最高 ⭐。<br>• <b>保守</b>:单 cell 再加纠错位,~3 bit/权重。<br><br>电平越多越省地方,但越难分清(模拟精度),这正是要在真硅上测的点——三元只需分少数几档,容差比 8-bit DNN 宽得多。"],
+  "ReRAM 的一个存储单元叫 <b>cell</b>。它能区分几个电阻档位(电平)决定能存几 bit:<br><br>• <b>SLC 差分对(我们的路)⭐</b>:每个 cell 只分高/低 2 档(最好读、最稳),用 <b>2 个 cell 做差分</b>(+列 − −列)稳稳表示带符号的 ±1/0,= 2 bit/权重,还能用<b>数字计数器无-ADC 读出</b>。<br>• <b>MLC-4</b>(4 电平):1 个 cell 存 2 bit。三元只用其中 3 档,浪费 1 档。<br>• <b>MLC-3 原生三元</b>:cell 精确分 3 档,纸面密度最高(1.58 bit),<b>但我们不用</b>——单 cell 多档会随老化/温度飘、还要模拟读出。<br>• <b>保守</b>:单 cell 再加纠错位,~3 bit/权重。<br><br>电平越多纸面越省地方,但越难分清(会飘),这正是我们<b>走二态差分而非 MLC</b>的原因——二态 cell 容差最宽、最适合 ReRAM,还能避开模拟 ADC。"],
  overhead:["ECC / 冗余 / 外围开销",
   "真芯片不可能 100% 都拿来存权重:<br>• <b>ECC</b>(纠错码):ReRAM 会有坏点/漂移,要加校验位。<br>• <b>冗余</b>:备用行列替换坏的。<br>• <b>外围</b>:ADC、读出、行列译码也占面积(不占容量但占预算)。<br><br>典型扣掉 10–20%。保守就拉高。"],
  activation:["激活 / KV cache 预留",

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDC Sign Language Recognition | HDC手语识别</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg:#0f1117; --card:#1a1d27; --accent:#6366f1; --accent2:#10b981; --text:#e2e8f0; --muted:#94a3b8; --border:#2d3148; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; line-height: 1.6; }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { text-align: center; padding: 3rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; }
+  header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header .sub { color: var(--muted); margin-top: 0.5rem; font-size: 1rem; }
+  .lang-toggle { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.2rem; }
+  .lang-btn { padding: 0.3rem 1rem; border-radius: 99px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .section { margin-bottom: 2.5rem; }
+  .section h2 { font-size: 1.2rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .chart-wrap { position: relative; height: 280px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:640px) { .grid-2 { grid-template-columns: 1fr; } }
+  .highlight-box { background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(16,185,129,0.08)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 1.5rem; }
+  .highlight-box .num { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .highlight-box .label { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+  .metrics-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .metric { flex: 1; min-width: 140px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th { color: var(--muted); font-weight: 500; text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); }
+  td { padding: 0.45rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+  .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: rgba(16,185,129,0.15); color: #10b981; }
+  .badge-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .badge-blue { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .insight { background: rgba(99,102,241,0.08); border-left: 3px solid var(--accent); padding: 0.8rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.92rem; }
+  .sim-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+  .sim-bar-fill { height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 0.72rem; font-weight: 600; color: #fff; }
+  footer { text-align: center; padding: 2rem 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 3rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  .zh { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1 id="title-en">HDC Sign Language Recognition</h1>
+  <p class="sub" id="sub-en">One enrollment · 95% accuracy · On-device · Private</p>
+  <h1 id="title-zh" style="display:none">HDC 手语识别</h1>
+  <p class="sub" id="sub-zh" style="display:none">一次录入 · 95% 准确率 · 端侧运行 · 完全私有</p>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">English</button>
+    <button class="lang-btn" onclick="setLang('zh')">中文</button>
+  </div>
+</header>
+
+<!-- KEY METRICS -->
+<div class="metrics-row">
+  <div class="card metric highlight-box">
+    <div class="num">95.0%</div>
+    <div class="label en">K=1 Accuracy · 10 signs</div>
+    <div class="label zh" style="display:none">K=1 准确率 · 10个手势</div>
+  </div>
+  <div class="card metric highlight-box">
+    <div class="num">99.4%</div>
+    <div class="label en">With 20% abstention</div>
+    <div class="label zh" style="display:none">拒识20%不确定后</div>
+  </div>
+  <div class="card metric highlight-box">
+    <div class="num">86.8%</div>
+    <div class="label en">K=1 Accuracy · 25 signs</div>
+    <div class="label zh" style="display:none">K=1 准确率 · 25个手势</div>
+  </div>
+  <div class="card metric highlight-box">
+    <div class="num">43</div>
+    <div class="label en">Signers in training set</div>
+    <div class="label zh" style="display:none">训练集人数</div>
+  </div>
+</div>
+
+<!-- KEY INSIGHT -->
+<div class="section">
+  <h2><span class="en">The Core Discovery</span><span class="zh" style="display:none">核心发现</span></h2>
+  <div class="card">
+    <div class="insight en">
+      <strong>The popular vocabulary is the wrong vocabulary.</strong> The 25 most common signs in any dataset are NOT the 25 most distinguishable signs. Some popular sign pairs have cosine similarity 0.999 — nearly identical in feature space. Supervised contrastive learning (SupCon) only works when signs are genuinely distinct.
+    </div>
+    <div class="insight zh" style="display:none">
+      <strong>最常用的词汇，不是最好区分的词汇。</strong>数据集里最常见的25个手势，不是最容易被识别的25个。有些常用手势配对的余弦相似度高达0.999——在特征空间里几乎完全一样。监督对比学习（SupCon）只有在手势本身有足够差异时才能正常收敛。
+    </div>
+
+    <div style="margin-top:1.2rem;">
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.7rem;" class="en">Worst-pair cosine similarity (lower = more distinguishable):</p>
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.7rem;" class="zh" style="display:none">最大配对余弦相似度（越低 = 越好区分）：</p>
+      <div class="sim-bar"><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="en">Popular-25</span><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="zh" style="display:none">最常用-25</span><div class="sim-bar-fill" style="width:99.9%;background:#ef4444">0.999</div></div>
+      <div class="sim-bar"><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="en">Dist-10</span><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="zh" style="display:none">最优-10</span><div class="sim-bar-fill" style="width:94.3%;background:#10b981">0.943</div></div>
+      <div class="sim-bar"><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="en">Dist-25</span><span style="width:90px;font-size:0.8rem;color:var(--muted)" class="zh" style="display:none">最优-25</span><div class="sim-bar-fill" style="width:97.6%;background:#6366f1">0.976</div></div>
+    </div>
+
+    <div style="margin-top:1.4rem;">
+      <table>
+        <tr><th class="en">Vocabulary</th><th class="zh" style="display:none">词汇</th><th class="en">SupCon?</th><th class="zh" style="display:none">SupCon?</th><th class="en">K=1 Accuracy</th><th class="zh" style="display:none">K=1 准确率</th><th></th></tr>
+        <tr><td class="en">Popular-25 (worst sim=0.999)</td><td class="zh" style="display:none">常用-25 (最差相似度0.999)</td><td>No</td><td>76.2%</td><td><span class="badge badge-blue">baseline</span></td></tr>
+        <tr><td class="en">Popular-25</td><td class="zh" style="display:none">常用-25</td><td>Yes</td><td>62.9%</td><td><span class="badge badge-red">↓ SupCon hurts</span></td></tr>
+        <tr><td class="en">Dist-10 (worst sim=0.943)</td><td class="zh" style="display:none">最优-10 (最差相似度0.943)</td><td>No</td><td>78.6%</td><td></td></tr>
+        <tr><td class="en">Dist-10</td><td class="zh" style="display:none">最优-10</td><td>Yes</td><td><strong>94.9%</strong></td><td><span class="badge badge-green">↑ +14.5pp CONFIRM</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- VOCAB SIZE CURVE -->
+<div class="section">
+  <h2><span class="en">Vocabulary Size vs. Accuracy</span><span class="zh" style="display:none">词汇量 vs 准确率</span></h2>
+  <div class="card">
+    <div class="chart-wrap"><canvas id="vocabChart"></canvas></div>
+    <p style="font-size:0.8rem;color:var(--muted);margin-top:0.8rem;text-align:center" class="en">AUTSL dataset · Greedy max-min-distance vocabulary selection · K=1 enrollment · 3 seeds × 15 folds</p>
+    <p style="font-size:0.8rem;color:var(--muted);margin-top:0.8rem;text-align:center" class="zh" style="display:none">AUTSL数据集 · 贪心最大-最小距离词汇选择 · K=1录入 · 3种子×15折</p>
+  </div>
+</div>
+
+<!-- K-SHOT CURVE -->
+<div class="grid-2">
+  <div class="section">
+    <h2><span class="en">K-Shot Enrollment Curve</span><span class="zh" style="display:none">K次录入曲线</span></h2>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="kshotChart"></canvas></div>
+      <div class="insight en" style="margin-top:1rem">The encoder saturates at K=1. One example per sign is enough.</div>
+      <div class="insight zh" style="display:none;margin-top:1rem">编码器在K=1时已饱和，一次录入就够了。</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="en">Abstention vs. Accuracy</span><span class="zh" style="display:none">置信拒识曲线</span></h2>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="abstainChart"></canvas></div>
+      <div class="insight en" style="margin-top:1rem">Rejecting 20% low-confidence predictions → 99.4% on remaining 80%.</div>
+      <div class="insight zh" style="display:none;margin-top:1rem">拒识20%低置信预测 → 剩余80%达到99.4%准确率。</div>
+    </div>
+  </div>
+</div>
+
+<!-- METHOD -->
+<div class="section">
+  <h2><span class="en">Pipeline</span><span class="zh" style="display:none">流水线</span></h2>
+  <div class="card">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:1;min-width:180px;text-align:center;padding:1rem;background:rgba(99,102,241,0.08);border-radius:8px">
+        <div style="font-size:1.5rem;margin-bottom:0.4rem">🎯</div>
+        <div style="font-weight:600;font-size:0.9rem" class="en">Step 1: Select Vocabulary</div>
+        <div style="font-weight:600;font-size:0.9rem" class="zh" style="display:none">步骤1：选词汇</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="en">Greedy max-min-distance<br>from HDC prototypes</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="zh" style="display:none">贪心最大最小距离<br>基于HDC原型向量</div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--muted);font-size:1.2rem">→</div>
+      <div style="flex:1;min-width:180px;text-align:center;padding:1rem;background:rgba(99,102,241,0.08);border-radius:8px">
+        <div style="font-size:1.5rem;margin-bottom:0.4rem">🧠</div>
+        <div style="font-weight:600;font-size:0.9rem" class="en">Step 2: Train SupCon Encoder</div>
+        <div style="font-weight:600;font-size:0.9rem" class="zh" style="display:none">步骤2：训练SupCon编码器</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="en">Signer-invariant 64-dim<br>embedding from 43 signers</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="zh" style="display:none">跨人不变64维嵌入<br>基于43人数据训练</div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--muted);font-size:1.2rem">→</div>
+      <div style="flex:1;min-width:180px;text-align:center;padding:1rem;background:rgba(16,185,129,0.08);border-radius:8px">
+        <div style="font-size:1.5rem;margin-bottom:0.4rem">⚡</div>
+        <div style="font-weight:600;font-size:0.9rem" class="en">Step 3: K=1 Enrollment</div>
+        <div style="font-weight:600;font-size:0.9rem" class="zh" style="display:none">步骤3：K=1录入识别</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="en">HDC sparse-ternary + kernel ridge<br>D=30,000 hypervectors</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem" class="zh" style="display:none">HDC稀疏三值+核岭回归<br>D=30,000维超向量</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="en">Independent research · Michael Huo · Shanghai · <a href="https://github.com/michaelhuo2030/millisecond-era">github.com/michaelhuo2030/millisecond-era</a></p>
+  <p class="zh" style="display:none">独立研究 · Michael Huo · 上海 · <a href="https://github.com/michaelhuo2030/millisecond-era">github.com/michaelhuo2030/millisecond-era</a></p>
+</footer>
+
+</div>
+
+<script>
+// Language toggle
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.lang-btn')[lang==='en'?0:1].classList.add('active');
+  const show = lang, hide = lang==='en'?'zh':'en';
+  // Toggle title/sub
+  document.getElementById('title-en').style.display = lang==='en'?'':'none';
+  document.getElementById('sub-en').style.display = lang==='en'?'':'none';
+  document.getElementById('title-zh').style.display = lang==='zh'?'':'none';
+  document.getElementById('sub-zh').style.display = lang==='zh'?'':'none';
+  // Toggle all .en / .zh elements
+  document.querySelectorAll('.en').forEach(el => el.style.display = lang==='en'?'':'none');
+  document.querySelectorAll('.zh').forEach(el => el.style.display = lang==='zh'?'':'none');
+}
+
+const chartDefaults = {
+  plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+    y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+  }
+};
+
+// Vocab size chart
+new Chart(document.getElementById('vocabChart'), {
+  type: 'bar',
+  data: {
+    labels: ['5', '8', '10', '15', '20', '25', '30'],
+    datasets: [
+      { label: 'Raw Bone / 骨骼特征', data: [89.6, 83.2, 81.1, 80.0, 78.3, 75.8, 73.2], backgroundColor: 'rgba(99,102,241,0.4)', borderColor: '#6366f1', borderWidth: 1.5 },
+      { label: 'Raw + SupCon', data: [97.3, 96.0, 94.2, 92.5, 88.8, 86.8, 84.2], backgroundColor: 'rgba(16,185,129,0.5)', borderColor: '#10b981', borderWidth: 1.5 }
+    ]
+  },
+  options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, title: { display: true, text: 'K=1 Accuracy vs Vocabulary Size / 词汇量', color: '#e2e8f0', font: { size: 12 } } } }
+});
+
+// K-shot chart
+new Chart(document.getElementById('kshotChart'), {
+  type: 'line',
+  data: {
+    labels: ['K=1', 'K=2', 'K=3', 'K=5', 'K=10', 'K=ALL'],
+    datasets: [{ label: 'Dist-10 + SupCon', data: [95.0, 95.3, 95.5, 95.5, 95.5, 95.5], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3, pointRadius: 5 }]
+  },
+  options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 80 } } }
+});
+
+// Abstention chart
+new Chart(document.getElementById('abstainChart'), {
+  type: 'line',
+  data: {
+    labels: ['0%', '10%', '20%', '30%', '40%', '50%'],
+    datasets: [
+      { label: 'Accuracy / 准确率', data: [95.0, 98.5, 99.4, 99.5, 99.4, 99.3], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.3, pointRadius: 5, yAxisID: 'y' },
+      { label: 'Coverage / 覆盖率', data: [100, 90, 80, 70, 60, 50], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.05)', fill: false, tension: 0.3, pointRadius: 5, yAxisID: 'y' }
+    ]
+  },
+  options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 40 } } }
+});
+</script>
+</body>
+</html>

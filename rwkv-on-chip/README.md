@@ -7,7 +7,7 @@
 > **Scope note** — our chip is a **general ternary-inference substrate** (it runs ternary-quantized models broadly). RWKV is the architecture we found fits it *best*; this folder is that case study, **not** a claim that the chip only runs RWKV.
 
 > **为什么这是比"跑一个 LLM"更大的故事（capacity 的真身）** — RWKV 这套轻量线性时间引擎已被移植到几乎所有模态：文本、视觉、语音、音乐、时间序列、嵌入/检索…… 而且每个领域它的赢点都是**同一组物理**：效率 / 恒定内存 / 流式 / 端侧 / 高并发。这不是巧合，是架构决定的，也**正是我们三值芯片放大的那几条**。所以一块三值芯片 = 一个**通用的端侧"感知 + 记忆 + 推理"基底**：同一块芯片、同一架构，就能在眼镜上跑视觉前端 + 听说语音 + 语言推理 + 私有记忆——全部恒定内存、µW 级、离线。我们押的不是"某个最强的模型"，是"**那个能在端上通吃所有模态的架构**"。
-> *(各模态的第三方证据为 `[EXTERNAL]`、出自各自论文；按我们一贯的纪律，逐条带出处的能力地图会单列，并明确区分"我们 measured / 别人 claimed"。)*
+> *(各模态的第三方证据见 [`CAPABILITY-MAP.md`](CAPABILITY-MAP.md) —— 全 `[EXTERNAL]`、逐条带出处、已 link-check（2026-06-14），并明确区分"我们 measured / 别人 claimed"。)*
 
 ---
 

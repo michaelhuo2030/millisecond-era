@@ -1,0 +1,4 @@
+cond,ce_mean,ce_std
+fp32,3.7449,0.0051
+tern,3.9517,0.0066
+tern_posthoc,7.1215,0.0066

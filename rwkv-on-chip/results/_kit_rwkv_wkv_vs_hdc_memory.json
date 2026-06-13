@@ -1,0 +1,23 @@
+{
+  "ts": "2026-06-13T17:07:48",
+  "experiment": "rwkv_wkv_vs_hdc_memory",
+  "verdict": "PARTIAL",
+  "declared_verdict": "PARTIAL",
+  "gate": "PASS",
+  "gate_reasons": [],
+  "laws_applied": [
+    "L1",
+    "L18"
+  ],
+  "could_update": [],
+  "result": {
+    "L18_reversibility": "CONFIRM: HDC remove-gap=0.00 (exact, commutative) vs RWKV delta remove-gap=0.116 (path-dependent)",
+    "L1_capacity_race": "INCONCLUSIVE: rank-1-among-N too lenient; cosine-fidelity favors continuous + is D-independent for sign-bundle (HDC fid=0 is sign-tie artifact NOT territory). delta vs hebbian ~tied on fidelity.",
+    "real_elephant": "capacity<->editability TRADEOFF: delta-rule buys capacity(prop d) at cost of commutative-editability; HDC plain-sum buys exact editability at cost of capacity. opposite ends = complementary tiers."
+  },
+  "note": "Corrects prior CONFIRM which overweighted L1. L18 reversibility is the clean robust win (definitional: HDC bundle remove=subtraction of commutative sum=exact; RWKV delta state is path-entangled). L1 delta>>hebbian per-byte NOT demonstrated (metric-confounded) -> INCONCLUSIVE, needs MQAR-style retrieval benchmark.",
+  "csv": "results/capacity_fidelity.csv",
+  "held_out": true,
+  "baseline": "prior over-confident CONFIRM",
+  "seeds": 5
+}

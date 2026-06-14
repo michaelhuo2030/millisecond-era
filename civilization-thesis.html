@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Other Kind of Machine Vision</title>
+<meta name="description" content="A µW, private, reversible perception-and-memory stack for the edge the cloud can't reach — and the person the cloud shouldn't see.">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 18px/1.7 Georgia, "Times New Roman", serif; max-width: 720px; margin: 0 auto;
+         padding: 2.6rem 1.2rem 5rem; color: #1a1a1a; background: #fff; }
+  @media (prefers-color-scheme: dark){ body{ color:#e6e6e6; background:#141414 } a{color:#7db0ff} hr{border-color:#333} blockquote{color:#bbb;border-color:#444} }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .4rem; font-family: -apple-system, system-ui, sans-serif; }
+  .sub { font-size: 1.15rem; color: #555; font-style: italic; margin: 0 0 .6rem; }
+  .byline { font-family: -apple-system, system-ui, sans-serif; font-size: .9rem; color: #888; margin: 0 0 2rem; font-style: normal; }
+  h2 { font-size: 1.4rem; margin: 2.4rem 0 .6rem; font-family: -apple-system, system-ui, sans-serif; line-height:1.25; }
+  blockquote { border-left: 3px solid #ccc; margin: 1.4rem 0; padding: .2rem 0 .2rem 1.1rem; color:#555; }
+  hr { border: none; border-top: 1px solid #e3e3e3; margin: 2.4rem 0; }
+  ol li, ul li { margin: .5rem 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; background: rgba(128,128,128,.14); padding: .08em .35em; border-radius: 4px; }
+  .person { margin: .7rem 0; }
+</style>
+</head>
+<body>
+
+<h1>The Other Kind of Machine Vision</h1>
+<p class="sub">A µW, private, reversible perception-and-memory stack for the edge the cloud can't reach — and the person the cloud shouldn't see.</p>
+<p class="byline">Millisecond Era · public thesis · 2026</p>
+
+<hr>
+
+<h2>The thesis</h2>
+
+<p>Mainstream AI perceives the world <strong>frame by frame</strong> and remembers it <strong>in the cloud</strong>. It is expensive, always watching, and the record it keeps is permanent, copyable, and not yours. Animals don't work this way. A frog — and your own retina — perceives by <strong>change</strong>: the static world is discarded almost for free, and attention flares only when something moves. And human memory is <strong>private, editable, and forgettable</strong> — you hold it, you revise it, you let it go.</p>
+
+<p>We built the second kind. Four parts, one chain:</p>
+
+<ol>
+  <li>a <strong>µW always-on change-attention layer</strong> that coasts through static scenes for almost nothing and wakes only on change;</li>
+  <li>a <strong>predictive-surprise router</strong> that decides <em>when</em> to look thoroughly and <em>which eye</em> to use — spending recognition cost only on what reality fails to predict;</li>
+  <li>a <strong>private, reversible, deterministic, forgettable on-device memory</strong> — bind a moment, recall it exactly, <em>subtract</em> it to forget it, merge and cleanly separate across devices, all bit-exact;</li>
+  <li>a <strong>microwatt ReRAM-CIM chip</strong> that runs all of the above for weeks on a coin cell, on-device, with no cloud round-trip.</li>
+</ol>
+
+<p><strong>The moat is physics, not intelligence.</strong> We do not claim to be smarter than the cloud, and we do not try to out-recognize it. Our edge is four properties the cloud <em>structurally</em> cannot offer: <strong>µW · private · reversible · deterministic.</strong> That combination serves two markets the cloud was never built for — <strong>the edge it can't reach</strong> (off-grid, solar, weeks-on-a-battery) and <strong>the person it shouldn't see</strong> (the surveilled body, the right to be forgotten as a real operation).</p>
+
+<hr>
+
+<h2>1. The shift: change is the signal, and frugal-then-thorough beats both</h2>
+
+<p>Two ideas, both concrete.</p>
+
+<p><strong>Change is the signal.</strong> A conventional camera-plus-model digests every frame whether or not anything happened — burning power and bandwidth to re-confirm that the kitchen is still empty. The frog inverts this: the static scene is <em>free</em>, and the system only pays attention when the world changes. In our stack this is a near-free gate (<code>CHANGE_THR = 0.92</code>): if a frame is too similar to the last stored one, the system coasts — stores nothing, wakes nothing — at a projected sub-2µW. The road at 3am, the transformer yard, the sleeping infant: these are <em>predictable</em> scenes, and predictable scenes are nearly free.</p>
+
+<p><strong>Frugal first, thorough on surprise — the best of both.</strong> Human perception is cheap because it's lazy, but it is not <em>blind</em>: when something genuinely unexpected happens, attention floods in and looks hard. We reproduce that "flash on surprise." The cheap gate runs forever; when it fires, a <strong>predictive-residual</strong> test asks not "did a lot move?" but "did reality diverge from what I <em>believed</em> would happen?" Raw motion saturates under chaos — when everything is bursty, nothing stands out and the system under-looks (measured F1 collapse to 0.678 at high volatility). Surprise-as-prediction-error cannot saturate: it fires exactly on appear / disappear / swap / scene-switch, and it restored the lost accuracy in test. Only <em>then</em> — and only on the surprising region — does a heavier eye run.</p>
+
+<p>The result is the combination nature and the datacenter each only half-have: <strong>the frugality of an animal and the exhaustiveness of a machine.</strong> The cheap gate gives us animal-grade power budgets; the surprise flash gives us machine-grade thoroughness exactly when it matters — and, honestly, only then. (No free lunch in chaos: when the world is genuinely unpredictable the router looks often and the µW advantage shrinks. We don't hide this; the law is "the frog wins when the world is predictable," which is most always-on scenes, not all.)</p>
+
+<hr>
+
+<h2>2. The moat, one line each</h2>
+
+<p>We claim exactly four things, and nothing more:</p>
+
+<ul>
+  <li><strong>µW</strong> — sparse change-attention projects to ~<strong>1.6µW</strong>, roughly <strong>364× cheaper</strong> than dense frame-by-frame processing. This is what turns a 7-day wearable into a 7-week one, and a tethered sensor into a solar-autonomous node.</li>
+  <li><strong>Private</strong> — everything runs <strong>on-device</strong>; the <strong>raw frame/audio is discarded</strong> after summarizing into an embedding. No raw video stream leaves the device. There is no honeypot to leak, subpoena, or weaponize, because there is no center.</li>
+  <li><strong>Reversible / forgettable</strong> — the memory is one summed vector; <strong>forgetting is an exact subtraction</strong> (<code>M = M − record</code>), undo is an exact re-add, and a counterfactual is a preview that's never committed. Right-to-be-forgotten becomes an <em>operation</em>, not a deletion request a server may ignore. <strong>A neural network cannot do this</strong> — you cannot cleanly subtract one memory from a trained net without retraining.</li>
+  <li><strong>Deterministic / auditable</strong> — every operation is <strong>bit-exact at D=30k</strong>, seeded and reproducible. An auditor can verify <em>what</em> was recorded, <em>when</em>, and that it has not been altered. LLMs hallucinate; this does not.</li>
+</ul>
+
+<p>And — stated plainly, because it is the discipline that keeps us honest — <strong>we do not out-recognize anyone.</strong> Turning messy pixels and audio into clean symbolic labels is the cloud's lane, and the cloud is better at it; that is fine. We consume those clean keys behind a stable contract and <strong>own the back-end algebra and the physics floor</strong> — the parts the front-end model can't touch. Computation is table stakes. Physics is the moat.</p>
+
+<hr>
+
+<h2>3. Who it liberates</h2>
+
+<p>Every application below names a <strong>real person outside the Shanghai tech bubble</strong> and the constraint the stack frees them from. If we can't name them, it's a daydream. These are the strongest of an eight-lens map spanning care, the global majority, the policed body, the physical economy, ecology, science, cognition, and governance.</p>
+
+<ol>
+  <li class="person"><strong>You / Alex</strong>, cognitively overloaded, anywhere — freed from <em>a memory you can't delete and don't own</em>: a private wearable hippocampus that recalls exactly, <em>forgets surgically</em>, and lets you audit your own erasures — never sold to anyone.</li>
+  <li class="person"><strong>Hassan</strong>, Syrian refugee crossing three borders to asylum — freed from <em>forced biometric exposure that endangers family still home</em>: an owned, reversible identity that proves "same person" with a commitment, holds the key himself, and surgically separates a dangerous family record.</li>
+  <li class="person"><strong>Mei</strong>, migrant domestic worker, Hong Kong — freed from <em>her word vs. the employer's camera she doesn't control</em>: <em>her own</em> deterministic record (IMU + audio hash, <strong>no video</strong>), able to forget the bedroom hours, that can't be subpoenaed or gaslit.</li>
+  <li class="person"><strong>Maria</strong>, 79, off-grid, rural Portugal — freed from <em>the false choice between isolation and a cloud wearable that dies in 3 days</em>: µW change-only gait tracking that catches <em>decline before falls</em> and runs <strong>weeks</strong> on a coin cell — no broadband, no subscription.</li>
+  <li class="person"><strong>Rita</strong>, plant manager, mid-size textile factory, India — freed from <em>$2k/day downtime + costly cloud IoT she can't trust with supplier data</em>: per-loom solar vibration sensing where <strong>change = surprise</strong> (not load-sensitive thresholds), with editable in-field baselines and no IT staff.</li>
+  <li class="person"><strong>Aisha</strong>, midwife, rural Nigeria — freed from <em>the choice between no monitoring and uploading a family's birth to the cloud</em>: on-device newborn vitals, <strong>alert-on-surprise</strong> (absolute thresholds are useless for variable infants), with an auditable, deletable record.</li>
+  <li class="person"><strong>João</strong>, artisanal fisher, off Mozambique — freed from <em>dependence on expensive satellite + overfishing a shared zone</em>: solar edge radar, change-triggered new-vessel alerts, and an <strong>editable seabed memory that moves boat-to-boat</strong> — no central server.</li>
+  <li class="person"><strong>Maria José</strong>, forest manager of 10,000 ha, the Amazon — freed from <em>mega-fires + weather stations that miss local fuel state</em>: a solar ground network sensing <em>faster-than-normal drying</em>, per-microhabitat editable risk maps, <strong>no uplink needed</strong>.</li>
+  <li class="person"><strong>Samira</strong>, human-rights journalist in a monitored state — freed from <em>documenting abuse without creating a weapon for her own prosecution</em>: a private on-device waveform record (chants/shots, <em>not faces</em>) that survives device seizure, supports <strong>surgical redaction</strong>, and is provably authentic.</li>
+  <li class="person"><strong>George</strong>, wrongly arrested citizen, anywhere — freed from <em>investigative opacity and one-sided records</em>: a deterministic, federated complaint ledger — <strong>a copy held by him, the police, AND a watchdog</strong>. Accountability watches the watchers, not only the citizen.</li>
+</ol>
+
+<p>The pattern repeats across ~500M smallholder farmers, 100M+ pastoralists, 230M domestic workers, 60M dementia households, anti-poaching rangers, coral-reef biologists, and election observers — everywhere the binding constraint is <em>power, privacy, ownership, or connectivity</em> rather than raw recognition accuracy.</p>
+
+<hr>
+
+<h2>4. Proof — five demos you can open in a browser</h2>
+
+<p>These are not slides. Each is a working demo that runs entirely on-device, in your browser tab — open it and drive it yourself.</p>
+
+<ul>
+  <li><a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/owned-identity.html"><strong>Owned identity</strong></a> — Hassan's case. Watch a biometric <em>commitment</em> prove "same person" without exposing the raw biometric, then <strong>surgically separate</strong> a dangerous family binding with an audit note. (Ranked #1 of the demoable shortlist; the full reversible algebra — recall → forget → counterfactual → undo → audit — runs bit-exact in 5 minutes.)</li>
+  <li><a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/dashcam-evidence.html"><strong>Dashcam evidence helper</strong></a> — the personal itch. A driver's video flags <em>exactly</em> the moment someone runs a red light, packages a deterministic, auditable evidence bundle (plate + timestamped clip + violation + location), and the driver <strong>chooses</strong> to submit it. On-device, owned, forgettable. Not auto-report, not mass surveillance: documentation of a violation committed <em>against him</em>.</li>
+  <li><a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/home-baby-safety.html"><strong>Home / baby safety</strong></a> — care, not surveillance. Process an <em>existing</em> home camera on-device, flag an anomaly (baby rolled prone, stranger, fall) via surprise, keep only a tiny private event record, and <strong>discard the raw footage</strong>. The footage never leaves home — the discipline that separates care from a data breach.</li>
+  <li><a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/factory-predictive-maintenance.html"><strong>Factory predictive maintenance</strong></a> — Rita's looms. Per-machine vibration where the alert fires on a <em>change in harmonic structure</em> (a failure precursor), not a fixed threshold that false-alarms under load; baselines are editable in the field.</li>
+  <li><a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/elderly-decline-care.html"><strong>Elderly decline care</strong></a> — Maria's gait. Change-only watching of <em>her</em> learned walking pattern, flagging the slow drift that precedes a fall — at a power budget that lasts weeks, with no cloud video of her home.</li>
+</ul>
+
+<p>(All five, in one place: <a href="https://michaelhuo2030.github.io/millisecond-era/learn/civilization/">the demo index</a>.)</p>
+
+<hr>
+
+<h2>5. Honest boundaries</h2>
+
+<p>We publish our own corrections, and we refuse "faster/smarter than the cloud" claims. The honest ledger:</p>
+
+<ul>
+  <li><strong>Recognition is the bottleneck, and it's not ours.</strong> Turning messy pixels/audio into clean atomic keys is the L1 front-end — the cloud and tiny on-device models win there. Misrecognition upstream becomes a confident-but-wrong key downstream; our contract makes that seam <em>explicit and auditable</em>, but it does not fix recognition. We consume clean keys; we don't manufacture them.</li>
+  <li><strong>Much of the sensing is commodity.</strong> Event cameras (DVS / Prophesee / Samsung) already do change-only sensing in silicon — we are <em>not</em> reinventing the event camera. Industrial vibration monitoring (Emerson, Siemens), fall detection, soil sensors, dissolved-gas analysis: all mature. Our gap is the <em>combination they don't offer</em> — µW <strong>+</strong> private <strong>+</strong> reversible <strong>+</strong> on-device <strong>+</strong> federated, with no central honeypot.</li>
+  <li><strong>What's already owned vs. what we add.</strong> Event cameras and cloud VLMs own raw perception; our addition is the <strong>predictive-residual surprise</strong> (relative to a belief, not raw event volume), the <strong>task-demand + periodic</strong> triggers that close change-detection's blind spot (a stove left on never <em>changes</em> — pure change-detection would never look again), and the reversible/federated/deterministic back-end behind it.</li>
+  <li><strong>Determinism is a different axis from accuracy.</strong> We do not trade for higher accuracy — we trade for auditability and reversibility. Where the cloud is more accurate, good: swap it in behind the contract.</li>
+  <li><strong>The chip is the open unknown.</strong> The µW power story rests on a ReRAM-CIM floor that is moving lab → prototype; <strong>density is the honest unknown.</strong> A few entries (e.g., petabyte-scale particle-detector triggering) are aspirational analogies at scale, flagged as such, not hidden. No vaporware.</li>
+</ul>
+
+<hr>
+
+<h2>6. Why now</h2>
+
+<p>Four curves are converging, and they all point the same way.</p>
+
+<ul>
+  <li><strong>Regulation is creating demand for auditable, reversible AI.</strong> GDPR's right-to-be-forgotten, the EU AI Act, SR 11-7 and FDA determinism requirements all want what cloud LLMs structurally can't give: a model whose memory can be <em>provably</em> deleted and audited. Reversibility-as-an-operation is becoming a compliance requirement, not a nicety.</li>
+  <li><strong>Wearable power budgets are tightening.</strong> Always-on glasses, hearables, and medical wearables are pinned by battery and bandwidth. A 364×-cheaper change-attention front-end is the difference between a feature that ships and one that drains in a day.</li>
+  <li><strong>ReRAM-CIM is crossing lab → prototype.</strong> The physics floor that makes µW-on-a-coin-cell real is arriving now — early enough that the architecture and the contract matter, late enough that it's no longer fiction.</li>
+  <li><strong>The global majority wants tools it owns.</strong> Four billion people with unreliable grids, seasonal connectivity, and a justified distrust of data extracted to Silicon Valley do not want a cloud subscription — they want a device that works through a three-month blackout and keeps their record local. That is exactly the lane the cloud was never built to serve.</li>
+</ul>
+
+<hr>
+
+<h2>The telos</h2>
+
+<p>The point is not to beat the cloud, and it is not to build a better surveillance machine. The point is to <strong>take care of the human being</strong> — especially the human the cloud can't reach and shouldn't see. Privacy here is not a setting; it is <em>liberation</em> — a memory the state, the employer, or the abuser cannot read, and a right to be forgotten that is a subtraction, not a promise. We will build it with the red lines or not build it at all.</p>
+
+<blockquote>The edge the cloud can't reach. The person the cloud shouldn't see. The memory that is finally yours.</blockquote>
+
+</body>
+</html>

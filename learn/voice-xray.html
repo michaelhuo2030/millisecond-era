@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Voice X-Ray · what a speech model already knows about how you feel</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#8b949e;--acc:#58a6ff;--good:#3fb950;--bad:#f85149;--warn:#d29922}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,Segoe UI,Roboto,"PingFang SC",sans-serif}
+  header{padding:22px 24px 8px} h1{margin:0 0 4px;font-size:23px} .sub{color:var(--mut);font-size:13px}
+  .honest{margin:12px 24px;padding:10px 14px;border-left:3px solid var(--warn);background:#1c2128;border-radius:6px;font-size:12.5px;color:#c9d1d9}
+  .wrap{display:grid;grid-template-columns:1fr;gap:16px;padding:8px 24px 50px;max-width:980px}
+  .card{background:var(--panel);border:1px solid #30363d;border-radius:10px;padding:16px 18px}
+  .card h2{margin:0 0 4px;font-size:16px} .card .why{color:var(--mut);font-size:12.5px;margin:0 0 12px}
+  button{background:#21262d;color:var(--ink);border:1px solid #30363d;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:14px}
+  button:hover{border-color:var(--acc)} button.act{background:#1f6feb;border-color:#1f6feb}
+  button.rec{background:#da3633;border-color:#da3633}
+  .gauges{display:flex;gap:22px;flex-wrap:wrap;margin-top:12px}
+  .gauge{flex:1;min-width:150px;text-align:center;background:#0b0f14;border:1px solid #30363d;border-radius:8px;padding:14px}
+  .gauge .lab{color:var(--mut);font-size:12px;margin-bottom:6px} .gauge .val{font-size:26px;font-weight:600}
+  .floors{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+  .floor{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:7px;background:#0b0f14;border:1px solid #30363d;cursor:default;transition:.2s}
+  .floor:hover{border-color:var(--acc)}
+  .floor .fl{width:34px;color:var(--mut);font-weight:600;font-size:13px}
+  .floor .ico{font-size:18px;width:26px;text-align:center}
+  .floor .what{flex:1;font-size:13.5px}
+  .floor .num{font-size:12px;color:#a5d6ff;background:#0d1117;padding:2px 8px;border-radius:5px;white-space:nowrap}
+  .bar{height:4px;border-radius:2px;background:#1f6feb;margin-top:3px}
+  table{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #21262d} th{color:var(--mut);font-weight:500}
+  .ok{color:var(--good)} .no{color:var(--bad)} .wc{color:var(--warn)} .acc{color:var(--acc)} .mut{color:var(--mut)}
+  .big{font-size:17px;font-weight:600}
+  code{background:#0b0f14;padding:1px 5px;border-radius:4px;color:#a5d6ff;font-size:12.5px}
+  a{color:var(--acc)} .foot{color:var(--mut);font-size:12px;padding:0 24px 30px;max-width:980px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🩻 Voice X-Ray</h1>
+  <div class="sub">What a "speech-to-text" model already knows about <i>how</i> you speak — before it knows <i>what</i> you said.</div>
+</header>
+
+<div class="honest">
+  <b>Honest box.</b> Two kinds of thing live on this page. (1) The <b>live gauges</b> below run <b>entirely in your browser</b> with the Web Audio API — your microphone audio <b>never leaves this page</b>, nothing is uploaded or stored. (2) The <b>measured science</b> (the brain-floor map, the scorecard) comes from offline experiments on public datasets (RAVDESS, ESD), tested on <b>speakers the model had never heard</b>. Emotion read-out itself needs a model too big to run in a web page, so its numbers are reported, not run live here. Demo = proof-of-concept; the chip is a roadmap.
+</div>
+
+<div class="wrap">
+
+  <!-- 1. LIVE GAUGES -->
+  <div class="card">
+    <h2>1 · Your voice, live (in-browser, private)</h2>
+    <p class="why">Pitch, energy and "flow" are pure acoustics — they need no model, so they run right here on your device. Speak for a few seconds.</p>
+    <button id="mic">🎙️ Start microphone</button>
+    <span id="micmsg" class="mut" style="margin-left:10px"></span>
+    <div class="gauges">
+      <div class="gauge"><div class="lab">🎹 Pitch</div><div class="val" id="gPitch">—</div></div>
+      <div class="gauge"><div class="lab">🔥 Energy</div><div class="val" id="gEnergy">—</div></div>
+      <div class="gauge"><div class="lab">💧 Flow (voiced)</div><div class="val" id="gFlow">—</div></div>
+    </div>
+    <p class="why" style="margin-top:12px">These three are the shallow layers of the map below — the raw acoustic ground. The deeper percepts (who's speaking, gender, intensity, emotion, the words) need the model.</p>
+  </div>
+
+  <!-- 2. THE BRAIN FLOORS -->
+  <div class="card">
+    <h2>2 · The brain floors — what lives in each layer</h2>
+    <p class="why">We cut open three speech models (wav2vec2, WavLM, Whisper) layer by layer and probed what each layer can predict. One forward pass, tap a pipe at the right floor, get seven percepts — <b>no extra model</b>. Numbers below: WavLM, measured on RAVDESS, speaker-independent. <span class="acc">UAR</span> = balanced accuracy (chance shown); <span class="acc">R²</span> = regression fit.</p>
+    <div class="floors" id="floors"></div>
+    <p class="why" style="margin-top:10px">Notice the gradient: the <b>shallow</b> floors hold raw sound (pitch, energy); the <b>middle</b> floors hold <i>who</i> is speaking; only the <b>deep</b> floors hold emotion and the actual words. The model learns to throw away "how" on its way to "what" — but the "how" is still in there, on the middle floors, for free.</p>
+  </div>
+
+  <!-- 3. THREE HAMMERS -->
+  <div class="card">
+    <h2>3 · Three things nobody else does</h2>
+    <p class="why">"Emotion lives in speech-model layers" is known. Our angle is what you can do with it once you treat it as algebra you can run on a chip.</p>
+    <p><span class="big">① Freeze-dry it onto a chip, almost losslessly.</span><br/>
+    <span class="mut">The emotion features compress to ternary (-1/0/+1) chip format keeping ≥95% of the signal — Whisper's layers even round-trip at ≥100%. The physical basis for an emotion-aware µW chip that needs no cloud and almost no power. <span class="acc">[MEASURED: 2 corpora × 3 models × 6 encodings × 3 seeds]</span></span></p>
+    <p><span class="big">② One hour of voice → a 10 KB memory.</span><br/>
+    <span class="mut">Each 10-second window's emotion fingerprint is bound to a time-key and summed into one vector. An hour = one 10 KB vector (raw audio is ~600 MB), and you can ask it "what was I feeling at minute 23?" — 85% correct. It stores the <i>fingerprint</i>, not a label, so a question you invent next month can be asked of memories recorded today — while the original audio is long gone. Privacy isn't a promise not to listen; it's <b>physically</b> unable to. <span class="acc">[MEASURED: fidelity 0.85; scales to 1M-dim = a full day in 8 MB]</span></span></p>
+    <p><span class="big">③ It sees through performance.</span><br/>
+    <span class="mut">In one test the system missed <i>acted</i> anger almost entirely, but nailed the one moment of <i>genuine</i> delight with the highest confidence of the whole clip. If that holds (it's one sample — we don't over-claim), it's exactly what a coaching tool wants: faked confidence doesn't fool it; real ease earns the score. It also draws an honest line — restrained, low-arousal negatives (held-back anger, quiet sadness) are the hardest to read from sound alone, and those are exactly what a coach most needs. Knowing where the map ends is itself knowledge.</span></p>
+  </div>
+
+  <!-- 4. SCORECARD -->
+  <div class="card">
+    <h2>4 · We wrote the rulers before we ran the tests</h2>
+    <p class="why">Seven falsifiable thresholds, locked before any experiment. Two failed — and the two failures produced the most useful findings (a chip design rule; a sharpened law). You can't fool yourself if the ruler is nailed down first.</p>
+    <table>
+      <tr><th>Ruler</th><th>Verdict</th><th>The number</th></tr>
+      <tr><td>R1 · emotion readable mid-layer, unseen speaker, EN + ZH</td><td class="ok">✓ CONFIRM</td><td>up to 0.81 UAR (chance 0.20); ZH ≥ EN</td></tr>
+      <tr><td>R2 · crystallizes to chip format near-losslessly</td><td class="ok">✓ CONFIRM</td><td>yield ≥0.95; Whisper ≥1.0 all layers</td></tr>
+      <tr><td>R3 · few-shot HDC beats a retrained head</td><td class="no">✗ FALSIFY</td><td>lost — but gave a chip design rule</td></tr>
+      <tr><td>R4 · 1-hour emotional ledger, queryable</td><td class="ok">✓ CONFIRM</td><td>10 KB/hr, 0.85 recall, capacity law held</td></tr>
+      <tr><td>R5 · ASR-trained Whisper keeps prosody</td><td class="ok">✓ FIRED</td><td>best emotion reader of the three</td></tr>
+      <tr><td>E1 · models trained on emotion win</td><td class="wc">✓ provisional</td><td>stronger — but may have "seen the exam"</td></tr>
+      <tr><td>E2 · concentrated signal pays a freeze cost</td><td class="wc">↺ flipped</td><td>no cost → a sharper version of the law</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Why emotion, and why now</h2>
+    <p class="why" style="font-size:13.5px;line-height:1.7">Bruce Lee had a line that stuck with me: the conscious mind doesn't drive behavior directly — emotion is the switch in between. Relaxed and positive, your ability amplifies; tense and afraid, it narrows. Emotion has <i>bandwidth</i>, and — this is the part people miss — it can be trained. It's the most under-rated, hardest-to-quantify thing in human performance. These hammers are the first time I could make it measurable, compressible, recordable, and re-queryable. The goal was never a smarter AI. It was a more private, portable, <i>visible</i> memory — to take care of the human being, especially where the cloud can't reach.</p>
+  </div>
+
+</div>
+
+<div class="foot">
+  Part of the <a href="https://michaelhuo2030.github.io/millisecond-era/">millisecond-era</a> research notes · all numbers measured on public datasets, speaker-independent · the live gauges never upload your audio · built by Michael Huo with AI as a force multiplier.
+</div>
+
+<script>
+// ---------- 2. brain floors (measured, WavLM on RAVDESS, speaker-independent) ----------
+const FLOORS = [
+  ["L7","💬","The actual words (content)","UAR 1.00 · chance .50",1.0],
+  ["L7","😊","Emotion","UAR 0.70 · chance .125",0.70/1.0],
+  ["L6","💪","Intensity (how hard you push)","UAR 0.78 · chance .50",0.78],
+  ["L4","👤","Who is speaking","UAR 0.96 · chance .04",0.96],
+  ["L2","⚥","Gender","UAR 1.00 · chance .50",1.0],
+  ["L1","🔥","Energy","R² 0.77",0.77],
+  ["L1","🎹","Pitch","R² 0.47",0.47],
+];
+const fc=document.getElementById("floors");
+FLOORS.forEach(([fl,ico,what,num,frac])=>{
+  const d=document.createElement("div"); d.className="floor";
+  d.innerHTML=`<div class="fl">${fl}</div><div class="ico">${ico}</div>`+
+    `<div class="what">${what}<div class="bar" style="width:${Math.round(frac*100)}%"></div></div>`+
+    `<div class="num">${num}</div>`;
+  fc.appendChild(d);
+});
+
+// ---------- 1. live in-browser prosody (Web Audio API, nothing leaves the page) ----------
+let actx,analyser,buf,raf,running=false;
+const micBtn=document.getElementById("mic"), micMsg=document.getElementById("micmsg");
+const gP=document.getElementById("gPitch"),gE=document.getElementById("gEnergy"),gF=document.getElementById("gFlow");
+let flowHist=[];
+micBtn.onclick=async()=>{
+  if(running){ stop(); return; }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=actx.createMediaStreamSource(stream);
+    analyser=actx.createAnalyser(); analyser.fftSize=2048;
+    buf=new Float32Array(analyser.fftSize); src.connect(analyser);
+    running=true; micBtn.textContent="⏹ Stop"; micBtn.classList.add("rec");
+    micMsg.textContent="listening — your audio stays on this device";
+    window._stream=stream; loop();
+  }catch(e){ micMsg.textContent="mic blocked — allow microphone to try it"; }
+};
+function stop(){
+  running=false; cancelAnimationFrame(raf);
+  if(window._stream) window._stream.getTracks().forEach(t=>t.stop());
+  if(actx) actx.close();
+  micBtn.textContent="🎙️ Start microphone"; micBtn.classList.remove("rec"); micMsg.textContent="stopped";
+}
+function noteName(hz){
+  if(hz<=0) return "—";
+  const m=Math.round(69+12*Math.log2(hz/440));
+  const n=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  return n[(m%12+12)%12]+(Math.floor(m/12)-1);
+}
+function acfPitch(b,sr){           // autocorrelation pitch, 75–400 Hz
+  let rms=0; for(let i=0;i<b.length;i++) rms+=b[i]*b[i]; rms=Math.sqrt(rms/b.length);
+  if(rms<0.01) return {hz:0,rms};  // silence/unvoiced
+  const lo=Math.floor(sr/400), hi=Math.floor(sr/75);
+  let best=-1,bestlag=-1;
+  for(let lag=lo;lag<=hi;lag++){
+    let s=0; for(let i=0;i<b.length-lag;i++) s+=b[i]*b[i+lag];
+    if(s>best){best=s;bestlag=lag;}
+  }
+  const norm=best/ (b.length-bestlag);
+  if(bestlag<=0 || norm<0.003) return {hz:0,rms};
+  return {hz:sr/bestlag, rms};
+}
+function loop(){
+  analyser.getFloatTimeDomainData(buf);
+  const {hz,rms}=acfPitch(buf,actx.sampleRate);
+  gP.textContent = hz>0 ? noteName(hz)+" · "+Math.round(hz)+"Hz" : "—";
+  gE.textContent = "🔥".repeat(Math.max(1,Math.min(5,Math.round(rms/0.04))));
+  flowHist.push(hz>0?1:0); if(flowHist.length>40) flowHist.shift();
+  const flow=flowHist.reduce((a,b)=>a+b,0)/flowHist.length;
+  gF.textContent = "💧".repeat(Math.max(1,Math.round(flow*5)))+" "+Math.round(flow*100)+"%";
+  raf=requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>

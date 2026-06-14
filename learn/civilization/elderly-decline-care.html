@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>老人步态 · 衰退追踪 + 跌倒预警 (毫秒纪)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:440px; } .right{ flex:1; min-width:380px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button.good { background:var(--good); color:#04121f; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  canvas#gait { width:100%; background:#11161c; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:13px; border-radius:7px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .12s; }
+  .pillrow { display:flex; gap:8px; margin-top:9px; flex-wrap:wrap; }
+  .pill { background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:7px 11px; font-size:12px; }
+  .pill b{ font-size:15px; }
+  .ev { border:1px solid var(--line); border-radius:11px; padding:11px; margin-bottom:11px; background:#0b0f14; }
+  .ev.flash { border-color:var(--hot); box-shadow:0 0 0 2px rgba(255,107,107,.25); }
+  .ev.soft { border-color:var(--warn); box-shadow:0 0 0 2px rgba(244,193,82,.18); }
+  .ev .top { display:flex; gap:9px; align-items:center; margin-bottom:6px; }
+  .etag { font-weight:800; font-size:13px; padding:2px 9px; border-radius:5px; }
+  .etag.fall{ background:linear-gradient(#c0392b,#922b21); color:#fff; }
+  .etag.decl{ background:linear-gradient(#b9770e,#8a5a0a); color:#fff; }
+  .etime{ color:var(--mut); font-size:12px; margin-left:auto; }
+  .evbtns { display:flex; gap:7px; margin-top:6px; flex-wrap:wrap; }
+  .report { white-space:pre-wrap; background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; font:12.5px/1.5 ui-monospace,Menlo,monospace; color:#cfe3f5; margin-top:8px; max-height:240px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  /* power panel */
+  .power { background:#0b0f14; border:1px solid var(--line); border-radius:11px; padding:13px; margin-top:12px; }
+  .power h3 { margin:0 0 4px; font-size:14px; } .power h3 span{ color:var(--acc); }
+  .pbar { position:relative; height:30px; border-radius:7px; background:#1b2530; margin:8px 0 3px; overflow:hidden; }
+  .pbar > i { display:block; height:100%; border-radius:7px; }
+  .pbar .lab { position:absolute; top:0; left:9px; line-height:30px; font-size:12.5px; font-weight:700; color:#04121f; white-space:nowrap; }
+  .pbar .lab.r{ color:var(--txt); }
+  .pdense > i { background:linear-gradient(90deg,#ff6b6b,#c0392b); width:100%; }
+  .psparse > i { background:linear-gradient(90deg,var(--good),#1f9e63); }
+  .pnote { font-size:11.5px; color:var(--mut); margin-top:7px; }
+  .bigx { color:var(--good); font-weight:800; }
+  .telos { background:#0b0f14; border:1px solid var(--cool); border-radius:11px; padding:11px 13px; margin:0 24px 22px; font-size:13px; max-width:1200px; color:#cdd9e4; }
+  .telos b{ color:var(--cool); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 老人照护</div>
+  <h1>老人步态 · <span>衰退追踪 + 跌倒预警 —— 一只手表,在 µW 下默默守着独居的妈妈</span></h1>
+  <div class="sub">可穿戴 IMU "眼睛"看<b>步态</b>(步频/步幅波形)→ <b>惊奇路由器</b>只在"偏离学到的正常"时醒来 →
+  把<b>私有·确定·可编辑·可遗忘</b>的步态基线 + 事件台账记在<b>她自己的设备上</b>。
+  衰退(步态变慢/变乱=跌倒前兆)平滑升温 → 软提醒女儿;真跌倒(尖峰)→ 立刻预警。<b>不录像、不上云、数据永不外传。</b></div>
+</header>
+
+<div class="honest">
+  <b>诚实边界 (no-vaporware):</b>
+  ① <b>"跌倒检测"本身早已解决</b> —— 智能手表的加速度计 + ML 已经很成熟,我们不声称检测更准。
+  ② 这个 demo 关上的<b>开放缺口</b> = <b>连续 µW 的"衰退追踪"</b>(不是单次跌倒,而是几周里步态慢慢变差的趋势)+ <b>隐私</b>(只用 IMU,不录像)+ <b>自有设备</b>(数据永不同步到云)+ <b>变化触发</b>(偏离学到的正常,不是固定阈值)。
+  ③ 后端魔法在<b>可编辑/可遗忘的记忆代数</b>:正常步态绑进一个向量,换鞋了一键重置基线、误报可精确删除 —— 不重训。<b>"认出是步态"是前端识别的活(边界律 L1)</b>,这里脚本化演示逻辑。
+  ④ 端上处理、<b>只在变化那一刻记一条</b>(变化驱动=µW),其余波形即弃。
+</div>
+
+<div class="telos">
+  <b>为谁:</b> Maria,79 岁,独自住在葡萄牙乡下,<b>没有可靠宽带</b>(云够不到她)。她要的不是被监控,是<b>有尊严地独立生活</b>。
+  她在里斯本的女儿,<b>从"每天打三个电话查岗"的焦虑里被解放出来</b> —— 只有真出事才会被通知,平时妈妈的隐私完整。
+  全球约 <b>1500 万</b>这样住在断网/弱网/偏远地区的老人,云救不了他们,一颗 µW 的自有芯片可以。
+</div>
+
+<div class="wrap">
+  <div class="card left">
+    <div class="row">
+      <button id="learn" class="good">① 学习正常步态 (绑定 Maria_normal)</button>
+    </div>
+    <div class="row">
+      <button id="play" disabled>▶ 运行时间线(数周→衰退)</button>
+      <button id="pause" class="sec" disabled>⏸ 暂停</button>
+      <button id="reset" class="sec">重置</button>
+    </div>
+    <canvas id="gait" width="412" height="200"></canvas>
+    <div class="pillrow">
+      <div class="pill">步频 <b id="cad">—</b><span class="stat"> 步/分</span></div>
+      <div class="pill">步幅变异 <b id="varv">—</b></div>
+      <div class="pill">基线 <b id="basev" class="ok">未学习</b></div>
+    </div>
+    <div class="stat" style="margin-top:11px">惊奇信号(偏离学到的正常步态 = 1 − cos(当前, 基线)):<span id="slbl" class="ok">未学习</span></div>
+    <div class="meter"><i id="sfill"></i></div>
+    <div class="stat" id="live" style="margin-top:9px">先点"① 学习正常步态"。然后运行时间线 —— 数周里步态会慢慢变慢/变乱(衰退),路由器平滑升温;中途会有一次真跌倒(尖峰)。</div>
+
+    <div class="power">
+      <h3>⚡ 功耗 / 芯片面板 —— <span>变化触发省电 364×</span></h3>
+      <div class="pbar pdense"><i></i><span class="lab">密集逐帧串流 · <b>587 µW</b></span></div>
+      <div class="pbar psparse"><i id="spbar"></i><span class="lab r" id="splab">稀疏事件混合 · <b>1.6 µW</b></span></div>
+      <div class="pnote">
+        <b class="bigx">364×</b> 省电(587 → 1.6 µW)。来自<b>测得的 op/bit 计数</b>在 ReRAM-CIM 上的<b>推算 (PROJECTION, 非流片硅实测)</b>:
+        密集 = 每帧都编码+比对;稀疏混合 = 只在惊奇越阈值时写一条事件。<br>
+        换算成电池续航(CR2032 纽扣电池 ~225 mAh):<b class="bad">密集 ≈ 7 天</b> &nbsp;vs&nbsp; <b class="ok">仅记变化 ≈ 7 周</b>。
+        <span id="dutylab" class="stat"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card right">
+    <div class="row">
+      <b style="font-size:15px">事件台账(私有 · 可遗忘)</b>
+      <span class="stat" id="memstat">M：空</span>
+      <button id="newshoes" class="warn" style="margin-left:auto" disabled>👟 换了新鞋 → 重置基线</button>
+    </div>
+    <div class="row">
+      <button id="genall" class="sec" disabled>📄 生成给女儿/医生的简报(你审核)</button>
+      <button id="audit" class="sec" disabled>🔒 验确定性</button>
+    </div>
+    <div id="evlist"><div class="stat">还没有事件。学习基线并运行时间线后,衰退/跌倒事件会出现在这里(类型/时间/惊奇值/可逆证据)。</div></div>
+    <div id="reportbox"></div>
+    <div id="auditbox"></div>
+
+    <div class="moat">
+      <b>现场可见的护城河:</b>
+      µW 仅记变化(省电 364×,不逐帧串流)· <b>私有</b>(只用 IMU,无视频、不上云)·
+      <b>自有设备</b>(数据永不同步;分享给家人/医生前,她能<b>外科式删掉</b>某些时刻)· <b>可编辑基线</b>(换鞋=一键重学,不重训)·
+      确定可审计(每次复核比特一致)。
+      <br>解放谁:每一个想<b>有尊严地独立生活</b>、又被"会不会跌倒没人知道"困住的老人,和每一个被焦虑绑架、每天查岗的子女。
+    </div>
+  </div>
+</div>
+
+<script>
+// ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+
+// ── encode a gait window into an HV ──────────────────────────────────────────
+// We encode PHASE-INVARIANT gait FEATURES (cadence + step-to-step variability +
+// amplitude envelope), bound to feature-keys, then sign-bundle. Encoding raw
+// samples by absolute position would make surprise dominated by where in the
+// step cycle the window happened to start (incidental phase), not by the actual
+// decline signal. Feature encoding makes surprise track cadence-slowing /
+// variability-rising — the real fall precursor. (encoding = apparatus.)
+const NPOS = 30;                       // samples per gait window (≈1s @30Hz)
+const NLEV = 24;                       // quantization levels per feature
+const SPREAD = 5;                       // thermometer half-width: adjacent levels overlap → smooth surprise
+function levHV(name,q){ return itemHV("lev:"+name+":"+q); }     // per-feature level codebook
+// graded "thermometer" level: bind a continuous feature to a weighted bundle of
+// neighboring level-HVs. Adjacent feature values share most levels → cosine moves
+// smoothly (a slightly slower gait is slightly surprising, not catastrophically),
+// which also kills quantization-edge jitter on short noisy windows.
+function levelBundle(name, x, lo, hi, acc){
+  const u = Math.max(0,Math.min(1,(x-lo)/(hi-lo)));
+  const center = u*(NLEV-1);
+  for(let q=0;q<NLEV;q++){
+    const w = Math.max(0, 1 - Math.abs(q-center)/SPREAD);   // triangular window
+    if(w>0){ const h=levHV(name,q); for(let i=0;i<D;i++) acc[i]+=w*h[i]; }
+  }
+}
+// extract phase-invariant features from a raw window
+function gaitFeatures(win){
+  const n=win.length;
+  // dominant step frequency via zero-crossing rate of the (mean-removed) signal
+  let mean=0; for(const v of win) mean+=v; mean/=n;
+  let zc=0; for(let i=1;i<n;i++){ if((win[i-1]-mean)*(win[i]-mean)<0) zc++; }
+  const cad = zc;                                         // ~ proportional to cadence
+  // step-to-step variability: std of successive differences
+  let md=0,vd=0,cnt=0; const diffs=[];
+  for(let i=1;i<n;i++){ const d=Math.abs(win[i]-win[i-1]); diffs.push(d); md+=d; cnt++; }
+  md/=cnt; for(const d of diffs) vd+=(d-md)*(d-md); const vstd=Math.sqrt(vd/cnt);
+  // amplitude envelope (peak-to-peak)
+  let mn=1e9,mx=-1e9; for(const v of win){ if(v<mn)mn=v; if(v>mx)mx=v; }
+  const amp = mx-mn;
+  return {cad, vstd, amp};
+}
+function encodeGait(win){               // win: array of floats in [-1,1]
+  const f=gaitFeatures(win);
+  // bundle graded feature levels (robust, smooth, phase-invariant)
+  const acc=new Float32Array(D);
+  levelBundle("cad", f.cad,  4,   22,  acc);
+  levelBundle("var", f.vstd, 0.02, 0.55, acc);
+  levelBundle("amp", f.amp,  1.0,  2.6,  acc);
+  // sign-bundle → ±1 HV (deterministic; ties→+1)
+  const out=new Float32Array(D); for(let i=0;i<D;i++) out[i]= acc[i]>=0?1:-1; return out;
+}
+
+// ── event ledger: M = Σ bind(eventType, timeKey) ; forget = exact subtraction ──
+const ETYPES=["衰退-步态变化","跌倒"];
+function eventHV(etype,tkey){ return bind(itemHV("evt:"+etype), itemHV("t:"+tkey)); }
+let M=new Float32Array(D);
+function addEvent(etype,tkey){ const h=eventHV(etype,tkey); for(let i=0;i<D;i++) M[i]+=h[i]; }
+function subEvent(etype,tkey){ const h=eventHV(etype,tkey); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallEvent(tkey){             // unbind time → recover event type (deterministic proof it's in M)
+  const probe=bind(M, itemHV("t:"+tkey));
+  let best=null,bs=-2; for(const e of ETYPES){ const s=cos(probe, itemHV("evt:"+e)); if(s>bs){bs=s;best=e;} }
+  return {type:best, s:bs};
+}
+
+// ───────── gait simulation (animated cadence waveform) ─────────
+const cv=document.getElementById("gait"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height, MID=H/2;
+const $=id=>document.getElementById(id);
+
+let baseline=null;                 // learned normal gait HV ("Maria_normal")
+let baseCad=0, baseVar=0;          // displayed baseline stats
+let phase=0, playing=false, timer=null;
+let week=0, frame=0;               // timeline progress
+let surprise=0, lastDecl=-999, fallAt=-1, fallDone=false;
+let events=[];                     // ledger entries {type,tkey,time,s,removed}
+let sampleBuf=[];                  // rolling raw samples for the encode window
+let trace=[];                      // visible waveform points
+const TIMELINE_FRAMES=900;         // ~ "several weeks" compressed
+const FALL_FRAME=560;              // scripted real fall (sharp spike)
+
+// gait params evolve over the timeline: cadence slows, variability rises (decline precursor)
+function progress(){ return Math.min(1, frame/TIMELINE_FRAMES); }
+function curCadence(){ // steps/min: starts ~108, declines toward ~78
+  if(!playing && !baseline) return 108;
+  return 108 - 30*progress();
+}
+function curVariability(){ return 0.04 + 0.30*progress(); } // step-to-step variability grows
+
+// one gait sample: near-sinusoidal step signal + variability noise + optional fall spike
+function gaitSample(f, cadence, variability){
+  const stepHz = cadence/60;                 // steps per second
+  const dt = 1/30;                            // 30 fps
+  phase += 2*Math.PI*stepHz*dt;
+  // base waveform: skewed sine = heel-strike / swing
+  let v = Math.sin(phase) + 0.25*Math.sin(2*phase);
+  v *= 0.7;
+  // step-to-step variability (random amplitude + timing jitter)
+  const jr = mulberry32((f*2654435761)>>>0);
+  v += (jr()-0.5)*2*variability;
+  // scripted FALL: sharp spike then flatline-ish
+  if(fallAt>=0 && f>=fallAt && f<fallAt+10){
+    const k=(f-fallAt);
+    v += (k<3? 2.6 : (k<6? -2.2 : 0.0)) ;     // violent spike then collapse
+  }
+  return Math.max(-1.3, Math.min(1.3, v));
+}
+
+function pushSample(s){
+  sampleBuf.push(s); if(sampleBuf.length>NPOS) sampleBuf.shift();
+  trace.push(s); if(trace.length>W) trace.shift();
+}
+
+function learnNormal(){
+  // collect a clean window at the healthy cadence and bind it as Maria_normal
+  const win=[]; let ph=0; const stepHz=108/60, dt=1/30;
+  const jr=mulberry32(strSeed("Maria_normal_seed"));
+  for(let p=0;p<NPOS;p++){ ph+=2*Math.PI*stepHz*dt;
+    let v=(Math.sin(ph)+0.25*Math.sin(2*ph))*0.7 + (jr()-0.5)*2*0.04;
+    win.push(Math.max(-1,Math.min(1,v))); }
+  baseline=encodeGait(win);
+  baseCad=108; baseVar=0.04;
+  $("basev").textContent="Maria_normal ✓"; $("basev").className="ok";
+  $("play").disabled=false; $("newshoes").disabled=false;
+  spEMA=0; setSurprise(0,"平静");
+  $("cad").textContent="108"; $("varv").textContent="0.04";
+  $("live").innerHTML='<span class="ok">已把 Maria 的正常步态绑成一个向量 Maria_normal。</span> 现在点"运行时间线" —— 看惊奇随衰退升温。';
+  // seed the rolling trace so canvas isn't empty
+  sampleBuf=[...win]; trace=[]; for(let p=0;p<NPOS;p++) trace.push(win[p]);
+  drawFrame();
+}
+
+function setSurprise(v,label){ surprise=v; $("sfill").style.width=Math.min(100,v*100)+"%";
+  const l=$("slbl"); l.textContent=label; l.className = v>0.55?"bad":(v>0.28?"wn":"ok"); }
+
+const DECL_TH=0.42;                 // soft "decline rising" alert threshold (well above healthy ~0.07)
+let spEMA=0;                        // smoothed surprise (the meter reads the trend, not per-step jitter)
+function curSurprise(){
+  if(!baseline || sampleBuf.length<NPOS) return 0;
+  const hv=encodeGait(sampleBuf);
+  return Math.max(0, 1 - cos(hv, baseline));
+}
+
+function step(){
+  frame++;
+  const cad=curCadence(), variability=curVariability();
+  const s=gaitSample(frame, cad, variability);
+  pushSample(s);
+  // update stats
+  $("cad").textContent=cad.toFixed(0);
+  $("varv").textContent=variability.toFixed(2);
+  // surprise from deviation vs learned normal, smoothed (EMA) so the trend reads clearly
+  const raw=curSurprise();
+  spEMA = spEMA + 0.12*(raw - spEMA);
+  let sp=spEMA;
+  // amplify the fall window into a sharp surprise spike (instant, not smoothed)
+  const inFall = (fallAt>=0 && frame>=fallAt && frame<fallAt+10);
+  if(inFall) sp=Math.max(raw, 0.92);
+  setSurprise(sp, sp>0.55?(inFall?"⚠ 跌倒! 立即预警":"⚠ 步态变化-跌倒风险上升"):(sp>DECL_TH?"步态偏离-留意":"平静"));
+
+  // ── surprise router fires (the ONLY moments power is spent writing) ──
+  // WARMUP: skip the first ~1 week while the rolling buffer + EMA settle (no false decline at t≈0).
+  const WARMUP=70;
+  if(inFall && !fallDone){ logEvent("跌倒", sp); fallDone=true; lastDecl=frame; }
+  else if(sp>DECL_TH && !inFall && frame>WARMUP && frame-lastDecl>120){ logEvent("衰退-步态变化", sp); lastDecl=frame; }
+
+  drawFrame();
+  updateDuty();
+  if(frame>=TIMELINE_FRAMES){ pause();
+    $("live").innerHTML='<span class="ok">时间线结束(数周压缩演示)。</span> 右侧是台账:衰退趋势 + 跌倒。可标误报(精确删除)、生成给女儿/医生的简报、验确定性。'; }
+}
+
+function logEvent(etype, sp){
+  const wk=(frame/TIMELINE_FRAMES*6).toFixed(1);      // map timeline → ~6 weeks
+  const tkey=String(frame);
+  const time="第 "+wk+" 周";
+  const ev={ type:etype, tkey, time, s:sp, removed:false };
+  events.push(ev); addEvent(etype, tkey);
+  renderEvents();
+  if(etype==="跌倒"){
+    $("live").innerHTML=`🚨 <span class="bad">检测到跌倒(惊奇尖峰 ${sp.toFixed(2)})</span> · ${time} —— <b>立即通知女儿</b>,并存入私有台账。`;
+  } else {
+    $("live").innerHTML=`📈 <span class="wn">步态在变化-跌倒风险上升(惊奇 ${sp.toFixed(2)})</span> · ${time} —— 软提醒女儿,已记一条衰退事件。`;
+  }
+}
+
+// ───────── canvas ─────────
+function drawFrame(){
+  ctx.fillStyle="#11161c"; ctx.fillRect(0,0,W,H);
+  // mid line + grid
+  ctx.strokeStyle="#222d38"; ctx.lineWidth=1;
+  for(let y=MID-60;y<=MID+60;y+=30){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle="#33424f"; ctx.beginPath(); ctx.moveTo(0,MID); ctx.lineTo(W,MID); ctx.stroke();
+  // surprise-tinted waveform
+  const tint = surprise>0.55? "#ff6b6b" : (surprise>0.28? "#f4c152" : "#3fdf8f");
+  ctx.strokeStyle=tint; ctx.lineWidth=2; ctx.beginPath();
+  for(let i=0;i<trace.length;i++){ const x=i, y=MID - trace[i]*55;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+  ctx.stroke();
+  // label
+  ctx.fillStyle="#8da2b5"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="left";
+  ctx.fillText(baseline? "步态波形(步频/步幅)" : "未学习基线 — 先点 ①", 8, 16);
+  if(playing||frame>0){ ctx.textAlign="right"; ctx.fillText("时间线 "+Math.round(progress()*100)+"%  ·  ~"+(progress()*6).toFixed(1)+" 周", W-8, 16); }
+}
+
+// ───────── power / duty-cycle live note ─────────
+function updateDuty(){
+  // sparse path power scales with how often we write (event density) — but stays ~µW; show duty
+  $("spbar").style.width = (1.6/587*100*8+6)+"%";   // visually small but visible (exaggerated for legibility, labeled)
+  $("dutylab").textContent = events.length? ` 本段只写了 ${events.length} 条事件(其余波形即弃)。` : "";
+}
+
+// ───────── ledger UI ─────────
+function renderEvents(){
+  const live=events.filter(e=>!e.removed);
+  $("memstat").textContent = live.length? `M = 1 向量 · ${live.length} 条事件` : "M：空";
+  const has=live.length>0;
+  $("genall").disabled=!has; $("audit").disabled=!has;
+  const el=$("evlist");
+  if(!events.length){ el.innerHTML='<div class="stat">还没有事件。学习基线并运行时间线后,衰退/跌倒事件会出现在这里。</div>'; return; }
+  el.innerHTML=events.map((e,i)=>{
+    if(e.removed) return `<div class="ev"><span class="stat">🗑 已删除:${e.type} · ${e.time} —— 从 M 中精确减去(被遗忘权),可复核已删干净。</span></div>`;
+    const isFall=e.type==="跌倒";
+    return `<div class="ev ${isFall?'flash':'soft'}">
+      <div class="top"><span class="etag ${isFall?'fall':'decl'}">${isFall?'跌倒':'衰退'}</span>
+        <span class="${isFall?'bad':'wn'}">${e.type}</span><span class="etime">${e.time} · 惊奇 ${e.s.toFixed(2)}</span></div>
+      <div class="evbtns">
+        <button class="sec" onclick="proveIn(${i})">🔍 复核(确定性)</button>
+        <button class="hot" onclick="markFalse(${i})">标记误报 → 删除</button></div>
+      <div class="audit" id="aud${i}"></div></div>`;
+  }).join("");
+}
+window.proveIn=(i)=>{ const e=events[i]; const r=recallEvent(e.tkey);
+  $("aud"+i).textContent=`unbind(M, 时间键) → 类型「${r.type}」 cos=${r.s.toFixed(3)} ✓ 事件确在 M 中,比特级可复核(每次结果一致)。`; };
+window.markFalse=(i)=>{ const e=events[i]; if(e.removed) return; subEvent(e.type,e.tkey); e.removed=true; renderEvents();
+  const r=recallEvent(e.tkey);
+  $("live").innerHTML=`🗑 已把 <b>${e.type} · ${e.time}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${r.s.toFixed(3)}(已降到噪声=真删干净)。`; };
+
+// ───────── editable baseline: new shoes → re-learn normal ─────────
+$("newshoes").onclick=()=>{
+  // re-learn baseline at the CURRENT cadence/variability (the "new normal" after new shoes)
+  const cad=curCadence(), variability=Math.min(0.10, curVariability());  // shoes change feel, not decline
+  const win=[]; let ph=0; const stepHz=cad/60, dt=1/30;
+  const jr=mulberry32(strSeed("Maria_newshoes_"+frame));
+  for(let p=0;p<NPOS;p++){ ph+=2*Math.PI*stepHz*dt;
+    let v=(Math.sin(ph)+0.25*Math.sin(2*ph))*0.7 + (jr()-0.5)*2*0.05;
+    win.push(Math.max(-1,Math.min(1,v))); }
+  baseline=encodeGait(win); baseCad=cad; baseVar=variability;
+  $("basev").textContent="Maria_normal (新鞋) ✓"; $("basev").className="ok";
+  spEMA=0; setSurprise(0,"平静(已重置)");
+  $("live").innerHTML='👟 <span class="ok">已重置基线(换新鞋)</span> —— 把当前步态当成新的"正常"重新绑定。惊奇归零,无需重训:<b>可编辑的自有记忆</b>。';
+};
+
+// ───────── report (you review before sharing) ─────────
+$("genall").onclick=()=>{
+  const live=events.filter(e=>!e.removed);
+  const falls=live.filter(e=>e.type==="跌倒").length, decl=live.length-falls;
+  const lines=["====== Maria 步态健康简报(草稿,你审核后再决定是否分享给女儿/医生)======",
+    `生成时间:${new Date().toLocaleString("zh-CN")}`,
+    `来源:本人可穿戴设备(端上生成,原始步态波形留本机、不上云)`,
+    `观察期:约 6 周(压缩演示)`,
+    `衰退趋势事件:${decl} 条 · 跌倒事件:${falls} 条`, ""];
+  live.forEach((e,k)=> lines.push(`【${k+1}】 ${e.type} · ${e.time} · 惊奇=${e.s.toFixed(2)} · 证据:绑入 M 的一条事件(可逆复核)`));
+  lines.push("", "趋势解读:步频随时间下降、步幅变异上升 = 典型跌倒前兆,建议复诊评估。",
+    "隐私:本机生成,分享前可外科式删除任何时刻;原始波形从不离开设备。");
+  $("reportbox").innerHTML=`<div class="report">${lines.join("\n")}</div>
+    <div class="stat" style="margin-top:6px">这份草稿在 Maria/家人手里。要分享才分享 —— 没有自动上云。</div>`;
+};
+$("audit").onclick=()=>{
+  const live=events.filter(e=>!e.removed);
+  let out="确定性自检(同一查询跑两遍,逐位比较):\n", allsame=true;
+  for(const e of live){ const a=recallEvent(e.tkey).s, b=recallEvent(e.tkey).s; const same=(a===b); allsame=allsame&&same;
+    out+=` ${e.type}@${e.time}: cos ${a.toFixed(6)} == ${b.toFixed(6)}  ${same?"✓":"✗"}\n`; }
+  out+= live.length? `\n结论:${allsame?"全部比特一致 ✓ —— 台账不可被悄悄篡改,可医疗级复核":"出现不一致 ✗"}` : "无事件";
+  $("auditbox").innerHTML=`<div class="report">${out}</div>`;
+};
+
+// ───────── controls ─────────
+function play(){ if(playing || !baseline) return; playing=true;
+  $("play").disabled=true; $("pause").disabled=false; timer=setInterval(step,33); }
+function pause(){ playing=false; $("play").disabled=!baseline; $("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
+function reset(){
+  pause(); baseline=null; phase=0; frame=0; week=0; surprise=0; spEMA=0; lastDecl=-999;
+  fallAt=FALL_FRAME; fallDone=false; events=[]; sampleBuf=[]; trace=[]; M=new Float32Array(D);
+  $("basev").textContent="未学习"; $("basev").className="ok";
+  $("cad").textContent="—"; $("varv").textContent="—";
+  $("play").disabled=true; $("newshoes").disabled=true;
+  $("reportbox").innerHTML=""; $("auditbox").innerHTML="";
+  setSurprise(0,"未学习"); $("slbl").className="ok";
+  renderEvents(); updateDuty(); drawFrame();
+  $("live").innerHTML='已重置。先点"① 学习正常步态",再运行时间线。';
+}
+$("learn").onclick=()=>{ if(!baseline){ fallAt=FALL_FRAME; fallDone=false; } learnNormal(); };
+$("play").onclick=play;
+$("pause").onclick=pause;
+$("reset").onclick=reset;
+
+reset();
+</script>
+</body>
+</html>

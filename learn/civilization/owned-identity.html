@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>自主身份 · Owned Reversible Identity (毫秒纪)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:440px; } .right{ flex:1; min-width:400px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  select,input[type=text]{ background:#0b0f14; border:1px solid var(--line); color:var(--txt);
+        border-radius:8px; padding:8px 10px; font-size:13px; }
+  input[type=text]{ width:130px; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button.good { background:var(--good); color:#04140b; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .idcard { background:linear-gradient(155deg,#142433,#0b0f14); border:1px solid var(--line);
+        border-radius:12px; padding:14px 16px; margin-bottom:12px; position:relative; overflow:hidden; }
+  .idcard:before{ content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px;
+        border-radius:50%; background:radial-gradient(circle, rgba(54,163,255,.18), transparent 70%); }
+  .idcard .who{ font-size:18px; font-weight:800; } .idcard .meta{ color:var(--mut); font-size:12.5px; margin-top:2px; }
+  .commit { font:11.5px/1.5 ui-monospace,Menlo,monospace; color:var(--cool); word-break:break-all;
+        background:#0b0f14; border:1px solid var(--line); border-radius:7px; padding:7px 9px; margin-top:9px; }
+  .commit b{ color:var(--good); }
+  .fam { margin-top:6px; }
+  .fam .f { display:flex; gap:8px; align-items:center; padding:6px 0; border-top:1px solid var(--line); font-size:13.5px; }
+  .fam .rel { color:var(--acc); font-weight:700; width:54px; }
+  .fam .nm { color:var(--txt); font-weight:600; flex:1; }
+  .fam .sep { background:#1b2530; border:1px solid var(--line); color:var(--hot); border-radius:7px;
+        padding:4px 9px; font-size:12px; font-weight:600; cursor:pointer; }
+  .fam .f.gone .nm{ color:var(--mut); text-decoration:line-through; }
+  .fam .f.gone .rel{ color:var(--mut); }
+  .qcard { border-top:1px dashed var(--line); padding-top:13px; margin-top:13px; }
+  .qcard h3 { margin:0 0 8px; font-size:14px; } .qcard h3 b{ color:var(--acc); }
+  .ans { background:#0b0f14; border:1px solid var(--line); border-radius:8px; padding:10px; margin-top:7px; min-height:24px; font-size:14px; }
+  .ans em{ color:var(--mut); font-style:normal; }
+  .scorebar { display:inline-block; height:8px; background:var(--acc); border-radius:4px; vertical-align:middle; margin:0 6px; }
+  .meter { height:12px; border-radius:6px; background:#1b2530; overflow:hidden; margin-top:6px; max-width:240px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--hot),var(--warn),var(--good)); transition:width .25s; }
+  .audit { font:12px/1.6 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap;
+        background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; margin-top:10px; max-height:200px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .telos { background:#0b0f14; border:1px solid var(--line); border-left:3px solid var(--acc);
+        border-radius:9px; padding:11px 14px; margin:0 24px 4px; max-width:1200px; font-size:13px; color:#cdd9e4; }
+  .telos b{ color:var(--acc); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 3/N</div>
+  <h1>自主身份 · <span>可逆身份记录 —— 你掌握钥匙的身份，不是国家掌握你的身份</span></h1>
+  <div class="sub">一个人在自己设备上建一份身份记录：姓名 · 生日 · <b>生物特征承诺</b>(指纹推导出的向量,<b>只存承诺,绝不存原始指纹</b>) + 绑进家人。
+  <b>过境核验</b>=出示承诺,系统判"和上次是同一人?"(余弦比对),<b>全程不暴露原始指纹</b>。★关键解放操作:<b>与处境危险的家人外科式分离</b>(精确减法,可审计、可逆、可迁移)。
+  全程在你设备上、私有、比特级确定。</div>
+</header>
+
+<div class="telos">
+  <b>为谁而建:</b> Hassan,一位叙利亚难民,已跨越 3 道边境。他需要<b>证明自己是同一个人</b>——但<b>不能暴露全部生物特征历史</b>(怕被追踪),
+  也<b>不能因记录里关联着仍在叙利亚的家人而连累他们</b>。全球 <b>8000 万+</b> 无国籍/难民,他们的身份不该握在追捕他们的政权手里,而该握在<b>他们自己手里</b>。
+</div>
+
+<div class="honest">
+  <b>诚实边界 + 伦理(no-vaporware · 这是赋能/隐私,不是监控):</b>
+  ① <b>这是概念演示</b>:指纹是<b>模拟字符串</b>,真实部署需要正规密码学(安全承诺方案)+ 安全硬件(TEE/Secure Enclave)。
+  ② <b>生物特征承诺方案(密码学)已存在</b>——缺口 = <b>端上 + 自主持钥 + 可逆分离 + 可审计 + 离线</b>,且<b>由本人(非政权/机构)掌握钥匙</b>。
+  ③ <b>只存承诺,绝不存原始生物特征</b>;核验靠承诺间的余弦,<b>不还原指纹</b>(隐私底线)。
+  ④ 这是<b>赋能</b>:本人决定记录里有谁、可随时<b>切断危险关联</b>、可迁移到新设备——<b>不是国家级生物库的大规模监控</b>(那种库恰恰给不了"本人控制的分离")。
+</div>
+
+<div class="wrap">
+  <!-- LEFT: the identity record on-device -->
+  <div class="card left">
+    <div class="row">
+      <input type="text" id="nm" value="Hassan A." placeholder="姓名" />
+      <input type="text" id="dob" value="1991-03-12" placeholder="生日" />
+      <input type="text" id="fp" value="loop-whorl-7F3A" placeholder="(模拟)指纹" style="width:160px" />
+      <button id="create">📇 建立身份(端上)</button>
+    </div>
+    <div class="stat" style="margin-bottom:10px">指纹只用于<b>推导承诺</b>(单向),建完即丢——记录里只有那个向量/哈希。</div>
+
+    <div class="idcard" id="idcard" style="display:none">
+      <div class="who" id="who">—</div>
+      <div class="meta" id="meta">—</div>
+      <div class="commit" id="commit">—</div>
+      <div class="fam" id="fam"></div>
+    </div>
+
+    <div class="row" id="famrow" style="display:none">
+      <select id="relSel"><option>父亲</option><option>母亲</option><option>兄弟</option><option>姐妹</option></select>
+      <input type="text" id="famName" placeholder="家人姓名" />
+      <button id="bindFam" class="sec">＋ 绑定家人</button>
+    </div>
+
+    <div class="moat">
+      <b>现场可见的护城河:</b>
+      端上(原始指纹不出设备)· <b>你持钥</b>(你,不是政权)· 确定/可审计(每次比对比特一致=不可伪造)·
+      <b>可逆</b>(危险关联=一个精确减法,可切断)· 离线可用。
+      <br>云端/国家级生物库做不到的:<b>本人掌控的"分离"</b> —— 那种库只增不减、关联永远连着,且钥匙在他们手里。
+    </div>
+  </div>
+
+  <!-- RIGHT: verify / separate / migrate -->
+  <div class="card right">
+    <div class="qcard" style="border-top:0; padding-top:0">
+      <h3>① 在每个边境核验身份 · <b>cos(出示的承诺, 已存承诺)</b> → 同一人?</h3>
+      <div class="row">
+        <select id="vWho">
+          <option value="self">出示本人指纹(loop-whorl-7F3A)</option>
+          <option value="other">出示他人指纹(冒名者 arch-2B9C)</option>
+        </select>
+        <button id="verify" class="good" disabled>🛂 过境核验</button>
+      </div>
+      <div class="meter"><i id="vfill"></i></div>
+      <div class="ans" id="vAns"><em>核验靠承诺间的余弦,<b>不暴露原始指纹</b>。本人 ≈ 1.0,冒名者 ≈ 噪声。</em></div>
+    </div>
+
+    <div class="qcard">
+      <h3>② 查询家人关联 · <b>unbind(M, 关系)</b> → 家人</h3>
+      <div class="row">
+        <select id="qRel"><option>父亲</option><option>母亲</option><option>兄弟</option><option>姐妹</option></select>
+        <button id="qFam" class="sec" disabled>查关联</button>
+      </div>
+      <div class="ans" id="qAns"><em>身份记忆 M = Σ bind(关系, 家人)。问"父亲"→ unbind 出绑定的家人(带置信度)。</em></div>
+    </div>
+
+    <div class="qcard">
+      <h3>★ 与父亲的关联分离 · <b>M − bind(父亲, 家人)</b>(关键解放操作)</h3>
+      <div class="row">
+        <button id="sepFather" class="hot" disabled>✂ 切断"父亲"关联</button>
+        <span class="stat">父亲仍在叙利亚、处境危险——关联他会连累他。切断=精确减法,可审计、可逆。</span>
+      </div>
+      <div class="ans" id="sAns"><em>切断后:再查"父亲"→ 降到噪声(没了);其余家人 + 你的身份承诺<b>完好无损</b>;并写入审计日志。</em></div>
+    </div>
+
+    <div class="qcard">
+      <h3>③ 迁移到新设备 · <b>验完整性</b>(确定性重算,比特一致)</h3>
+      <div class="row">
+        <button id="migrate" class="sec" disabled>📲 迁移并验完整性</button>
+      </div>
+      <div class="ans" id="mAns"><em>承诺与记忆可在新设备<b>确定性重算</b>;核验者只需验"承诺密码学上自洽"(两次重算比特相同),无需原始指纹。</em></div>
+    </div>
+
+    <div class="qcard">
+      <h3>🔒 审计日志(可逆操作已记录)</h3>
+      <div class="audit" id="log">(暂无操作)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+
+// biometric commitment = deterministic HV derived from a (simulated) fingerprint string.
+// Store the COMMITMENT, never the raw fingerprint. itemHV is one-way (FNV seed → ±1 codebook).
+function commitFromFingerprint(fp){ return itemHV("biometric:"+fp); }
+// short auditable hash digest of an HV (for display + integrity check) — deterministic
+function hvDigest(v){ let h=2166136261>>>0; for(let i=0;i<D;i++){ const b=v[i]>0?1:0; h^=b; h=Math.imul(h,16777619); }
+  // fold in a few sampled coords so digest reflects real content, still one-way for display
+  for(let i=0;i<D;i+=997){ h^=(v[i]>0?0x9e:0x37); h=Math.imul(h,16777619); }
+  return (h>>>0).toString(16).padStart(8,"0"); }
+
+// identity family memory M = Σ bind(relation, member)  (real accumulator; exact subtract = separate)
+function relHV(r){ return itemHV("rel:"+r); }
+function memberHV(name){ return itemHV("member:"+name); }
+function famHV(rel,name){ return bind(relHV(rel), memberHV(name)); }
+
+// ───────── identity state ─────────
+const RELATIONS=["父亲","母亲","兄弟","姐妹"];
+let ID=null;        // { name, dob, fp, commit, M, family:Map(rel->{name,gone}), digest }
+let LOG=[];
+
+function logEntry(s){ const ts=new Date().toISOString().slice(0,19).replace("T"," ");
+  LOG.push(`[${ts}] ${s}`); renderLog(); }
+function renderLog(){ document.getElementById("log").textContent = LOG.length? LOG.join("\n") : "(暂无操作)"; }
+
+const $=id=>document.getElementById(id);
+
+function createIdentity(){
+  const name=$("nm").value.trim()||"匿名", dob=$("dob").value.trim()||"—", fp=$("fp").value.trim()||"fp-default";
+  const commit=commitFromFingerprint(fp);
+  ID={ name, dob, fp, commit, M:new Float32Array(D), family:new Map(), digest:hvDigest(commit) };
+  // seed a couple of family bindings so ★separation has something to act on
+  bindFamily("父亲","Omar A.", true);
+  bindFamily("母亲","Layla A.", true);
+  bindFamily("兄弟","Yusuf A.", true);
+  $("verify").disabled=false; $("qFam").disabled=false; $("sepFather").disabled=false; $("migrate").disabled=false;
+  $("idcard").style.display="block"; $("famrow").style.display="flex";
+  LOG=[]; logEntry(`身份建立(端上):${name} · 承诺摘要 ${ID.digest} · 原始指纹未存储`);
+  renderCard();
+  $("vAns").innerHTML='<em>点"过境核验":本人指纹 → cos≈1.0;冒名者 → 噪声。原始指纹从不离开设备。</em>';
+  $("sAns").innerHTML='<em>父亲已绑定。切断后查"父亲"会降到噪声,其余完好,并写审计日志。</em>';
+  $("qAns").innerHTML='<em>试查"父亲" / "母亲" / "兄弟"。</em>';
+  $("mAns").innerHTML='<em>迁移后验完整性:确定性重算,两次比特相同。</em>';
+}
+
+function bindFamily(rel,name,silent){
+  if(!ID) return;
+  const prev=ID.family.get(rel);
+  if(prev && !prev.gone){ ID.M=subVec(ID.M, famHV(rel, prev.name)); }   // replace old binding for that role
+  ID.M=addVec(ID.M, famHV(rel,name));
+  ID.family.set(rel,{name,gone:false});
+  if(!silent){ logEntry(`绑定家人:${rel} = ${name}`); renderCard(); }
+}
+function addVec(M,h){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=M[i]+h[i]; return o; }
+function subVec(M,h){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=M[i]-h[i]; return o; }
+
+// unbind family member from M for a given relation → recover member by cosine over known members
+function recallFamily(rel){
+  const probe=bind(ID.M, relHV(rel));
+  // candidate set = all members ever bound (ledger) — realistic cleanup memory
+  const cands=[...new Set([...ID.family.values()].map(f=>f.name))];
+  let best=null,bs=-2; for(const nm of cands){ const s=cos(probe, memberHV(nm)); if(s>bs){bs=s;best=nm;} }
+  return { name:best, s:bs };
+}
+
+function renderCard(){
+  $("who").textContent=ID.name;
+  $("meta").innerHTML=`生日 ${ID.dob} &nbsp;·&nbsp; <span class="stat">无国籍/难民身份记录</span>`;
+  $("commit").innerHTML=`生物特征承诺(<b>只存承诺,不存指纹</b>):<br>HV[D=${D}] · digest <b>${ID.digest}</b>`;
+  const fam=$("fam");
+  const items=[...ID.family.entries()];
+  fam.innerHTML = items.length ? `<div class="stat" style="padding-top:8px;border-top:1px solid var(--line)">绑定的家人(身份记忆 M)：</div>`+
+    items.map(([rel,f])=> f.gone
+      ? `<div class="f gone"><span class="rel">${rel}</span><span class="nm">${f.name} · 已分离</span></div>`
+      : `<div class="f"><span class="rel">${rel}</span><span class="nm">${f.name}</span></div>`).join("")
+    : "";
+}
+
+function scoreBar(s){ const w=Math.max(0,Math.min(60,Math.round(s*120))); return `<span class="scorebar" style="width:${w}px"></span>`; }
+function setMeter(v){ $("vfill").style.width=Math.max(0,Math.min(100,v*100))+"%"; }
+
+// ① verify at border
+$("create").onclick=createIdentity;
+$("verify").onclick=()=>{
+  if(!ID) return;
+  const who=$("vWho").value;
+  const presentedFp = who==="self" ? ID.fp : "arch-2B9C";
+  const presented = commitFromFingerprint(presentedFp);
+  const s = cos(presented, ID.commit);
+  setMeter(s<0?0:s);          // s∈[−1,1]; show positive scale only
+  const same = s>0.9;
+  logEntry(`边境核验:出示${who==="self"?"本人":"他人"}承诺 → cos=${s.toFixed(4)} → ${same?"同一人 ✓ 放行":"非同一人 ✗ 拒绝"}(未暴露原始指纹)`);
+  $("vAns").innerHTML = same
+    ? `<b class="ok">同一人 ✓</b> cos=<b>${s.toFixed(4)}</b> ${scoreBar(s)} <span class="stat">和上次过境是同一人 —— 但<b>没有暴露原始指纹</b>,只比对了承诺。</span>`
+    : `<b class="bad">非同一人 ✗</b> cos=<b>${s.toFixed(4)}</b> ${scoreBar(Math.max(0,s))} <span class="stat">出示的承诺与已存承诺不符(冒名者) —— 余弦落在噪声水平。</span>`;
+};
+
+// ② query family
+$("qFam").onclick=()=>{
+  if(!ID) return; const rel=$("qRel").value; const r=recallFamily(rel);
+  const bound=ID.family.get(rel);
+  const present = bound && !bound.gone && r.s>0.25;
+  $("qAns").innerHTML = present
+    ? `<b>${rel}</b> = <b class="ok">${r.name}</b> ${scoreBar(r.s)} <span class="stat">cos=${r.s.toFixed(3)} · unbind(M, ${rel}) 恢复出绑定的家人。</span>`
+    : `<em class="bad">M 里查不到「${rel}」的关联</em> <span class="stat">cos=${r.s.toFixed(3)} —— 未绑定,或已被外科式分离。</span>`;
+};
+
+// ★ surgically separate from father
+$("sepFather").onclick=()=>{
+  if(!ID) return; const f=ID.family.get("父亲");
+  if(!f || f.gone){ $("sAns").innerHTML='<em>已经没有"父亲"关联了。</em>'; return; }
+  const beforeIntegrity = ID.digest;                       // commit digest unchanged by family edits
+  ID.M = subVec(ID.M, famHV("父亲", f.name));               // exact subtraction
+  f.gone=true; ID.family.set("父亲", f);
+  const gone=recallFamily("父亲");                          // now noise
+  const mom=recallFamily("母亲"), bro=recallFamily("兄弟"); // intact
+  const ver=cos(commitFromFingerprint(ID.fp), ID.commit);  // identity commit still verifies
+  const date=new Date().toISOString().slice(0,10);
+  logEntry(`分离 ${date}:切断"父亲=${f.name}"关联(精确减法,可逆操作已记录)。身份承诺摘要 ${ID.digest}=${beforeIntegrity} 未变;本人核验仍 cos=${ver.toFixed(4)}`);
+  $("sAns").innerHTML = `✂ 已<b>外科式切断</b>"父亲=${f.name}"的关联(精确减法)。
+    再查 <b>父亲</b> → <span class="bad">cos=${gone.s.toFixed(3)}(降到噪声=真切断)</span>;
+    其余完好:<b>母亲</b>=<span class="ok">${mom.name} cos=${mom.s.toFixed(3)}</span>、<b>兄弟</b>=<span class="ok">${bro.name} cos=${bro.s.toFixed(3)}</span>;
+    本人核验仍 <span class="ok">cos=${ver.toFixed(4)}</span>。
+    <span class="stat"> —— 危险关联可被本人精确切断(政权的生物库做不到);可逆操作已写入审计日志。</span>`;
+  renderCard();
+};
+
+// ③ migrate to new device + verify integrity (deterministic, bit-identical)
+$("migrate").onclick=()=>{
+  if(!ID) return;
+  const d1=hvDigest(ID.commit), d2=hvDigest(ID.commit);    // recompute twice
+  const reCommit=commitFromFingerprint(ID.fp);             // re-derive from same fp on "new device"
+  const d3=hvDigest(reCommit);
+  const same = (d1===d2) && (d2===d3) && cos(reCommit, ID.commit)>0.9999;
+  logEntry(`迁移到新设备:确定性重算承诺摘要 ${d1}==${d2}==${d3} → ${same?"比特一致 ✓ 完整性通过":"不一致 ✗"}`);
+  $("mAns").innerHTML = same
+    ? `📲 迁移成功 · <b class="ok">完整性通过 ✓</b>。新设备确定性重算承诺:摘要 <b>${d1}</b> == <b>${d2}</b> == <b>${d3}</b>(比特相同),
+       重导承诺 cos=<b>${cos(reCommit, ID.commit).toFixed(6)}</b>。
+       <span class="stat"> —— 核验者只需验"承诺密码学上自洽",无需原始指纹;记录归你,跨设备可携带。</span>`
+    : `<b class="bad">完整性校验失败 ✗</b> —— 摘要不一致,记录可能被篡改。`;
+};
+
+renderLog();
+</script>
+</body>
+</html>

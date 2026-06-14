@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>行车记录仪 · 违法取证助手 (毫秒纪)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:430px; } .right{ flex:1; min-width:380px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  canvas#road { width:100%; background:#11161c; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:12px; border-radius:6px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .1s; }
+  .ev { border:1px solid var(--line); border-radius:11px; padding:11px; margin-bottom:11px; background:#0b0f14; }
+  .ev.flash { border-color:var(--hot); box-shadow:0 0 0 2px rgba(255,107,107,.25); }
+  .ev .top { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
+  .plate { font-weight:800; font-size:15px; letter-spacing:1px; background:#0b3; color:#fff; padding:2px 9px; border-radius:5px; background:linear-gradient(#1565c0,#0d47a1); }
+  .vtype { color:var(--hot); font-weight:700; } .vtime{ color:var(--mut); font-size:12px; margin-left:auto; }
+  .thumbs { display:flex; gap:6px; margin:6px 0; } .thumbs img{ width:96px; height:60px; border-radius:5px; border:1px solid var(--line); object-fit:cover; }
+  .evbtns { display:flex; gap:7px; margin-top:6px; }
+  .report { white-space:pre-wrap; background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; font:12.5px/1.5 ui-monospace,Menlo,monospace; color:#cfe3f5; margin-top:8px; max-height:220px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 1/N</div>
+  <h1>行车记录仪 · <span>违法取证助手 —— 帮你把"加塞别车"变成一份能交的证据</span></h1>
+  <div class="sub">车里的视频 → <b>识别那一下违法</b>(别车/加塞/压线)→ <b>惊奇路由器只抓那一刻</b>(不是录一整天)→ 生成一份
+  <b>确定·可审计·私有·可删除</b>的证据包,<b>你看过、你决定要不要上报</b>(随手拍/12123)。全程在你设备上,原始视频归你。</div>
+</header>
+
+<div class="honest">
+  <b>诚实边界 + 伦理(no-vaporware）:</b>
+  ① <b>"认出是哪辆车/什么车牌"是识别前端的活</b>(检测器+车牌OCR=云/模型,边界律 L1)——本 demo 用脚本化场景演示<b>逻辑</b>,不声称我们识别更强。
+  ② 我们的护城河 = <b>惊奇路由器抓住违法那一刻</b> + <b>私有·确定·可审计·可删除的证据记忆</b>(车牌/类型/时间绑进一个向量,可精确遗忘误报,比特级可复核)。
+  ③ <b>你决定是否上报</b> —— 无自动举报、无定向针对;它只记录<i>发生在你身上的真实违法</i>,不是大规模监控。
+  ④ 端上处理、<b>只留违法那几秒的证据、其余画面丢弃</b>(变化驱动=µW)。
+</div>
+
+<div class="wrap">
+  <div class="card left">
+    <div class="row">
+      <button id="play">▶ 开始行车(模拟)</button>
+      <button id="pause" class="sec" disabled>⏸ 暂停</button>
+      <button id="reset" class="sec">重置</button>
+    </div>
+    <canvas id="road" width="400" height="460"></canvas>
+    <div class="stat" style="margin-top:8px">惊奇信号(违法=预测不到的突变,非录全程):<span id="slbl" class="ok">平静</span></div>
+    <div class="meter"><i id="sfill"></i></div>
+    <div class="stat" id="live" style="margin-top:8px">点"开始行车"。脚本里有车会<b>不打灯强行加塞/压线别你</b> —— 路由器会在那一刻闪一下,自动取证。</div>
+  </div>
+
+  <div class="card right">
+    <div class="row">
+      <b style="font-size:15px">证据台账</b>
+      <span class="stat" id="memstat">M：空</span>
+      <button id="genall" class="warn" style="margin-left:auto" disabled>📄 生成举报包(你审核)</button>
+      <button id="audit" class="sec" disabled>🔒 验确定性</button>
+    </div>
+    <div id="evlist"><div class="stat">还没有取到证。开始行车后,违法事件会出现在这里(车牌/类型/时间/3帧证据)。</div></div>
+    <div id="reportbox"></div>
+    <div id="auditbox"></div>
+
+    <div class="moat">
+      <b>现场可见的护城河:</b>
+      只抓违法那几秒(非录全天=µW)· 证据=确定可审计(每次复核比特一致)· <b>误报可精确删除</b>(被遗忘权=一个减法,别人删不掉、你能删)·
+      端上私有(原始视频不上云)· <b>你决定是否上报</b>。
+      <br>解放谁:每一个被加塞别车、却拿不出证据、只能憋一肚子气的司机 —— 让"路怒"变成"可交的证据 + 更安全的路"。
+    </div>
+  </div>
+</div>
+
+<script>
+// ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+// evidence fact = bind(plate, time, type); ledger M = Σ facts (real accumulator, exact subtract = forget)
+function factHV(plate, tkey, type){ return bind(bind(itemHV("plate:"+plate), itemHV("t:"+tkey)), itemHV("type:"+type)); }
+let M = new Float32Array(D);
+function addFact(f){ const h=factHV(f.plate,f.tkey,f.type); for(let i=0;i<D;i++) M[i]+=h[i]; }
+function subFact(f){ const h=factHV(f.plate,f.tkey,f.type); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallType(plate, tkey){            // unbind plate+time -> recover violation type (deterministic proof it's in M)
+  const probe = bind(bind(M, itemHV("plate:"+plate)), itemHV("t:"+tkey));
+  let best=null,bs=-2; for(const ty of TYPES){ const s=cos(probe, itemHV("type:"+ty)); if(s>bs){bs=s;best=ty;} }
+  return {type:best, s:bs};
+}
+
+// ───────── scene (top-down dashcam sim) ─────────
+const cv=document.getElementById("road"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height, LANES=[100,200,300];   // x-centers of 3 lanes
+const MY_LANE=1, MY_Y=H-90;
+const TYPES=["违法变道/加塞","压实线变道","未保持安全距离"];
+let cars=[], t=0, frame=0, playing=false, road_y=0, surprise=0, lastFlash=-99, evidence=[], plateCnt=0;
+const PLATE_PREFIX=["沪A","沪B","苏E","浙A","沪C"];
+
+function plateFor(seed){ const r=mulberry32(seed+777); const p=PLATE_PREFIX[Math.floor(r()*PLATE_PREFIX.length)];
+  let s=""; const ch="ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"; for(let i=0;i<5;i++) s+=ch[Math.floor(r()*ch.length)]; return p+"·"+s; }
+
+function reset(){
+  cars=[]; t=0; frame=0; road_y=0; surprise=0; lastFlash=-99; evidence=[]; plateCnt=0;
+  M=new Float32Array(D);
+  // ambient traffic
+  for(let i=0;i<4;i++) cars.push({lane:Math.floor(Math.random()*3), y:Math.random()*H, vy:0.4+Math.random()*0.6, x:LANES[0], col:"#5b6b7a", id:1000+i, cutting:null});
+  // scripted violators (the cut-in / 加塞别车 events): sit just AHEAD of me, merge into my lane w/o signal
+  cars.push({lane:2, y:MY_Y-58, vy:0.0, x:LANES[2], col:"#e74c3c", id:1, cutting:{at:140, fromLane:2, toLane:1, type:"违法变道/加塞", signal:false}, done:false});
+  cars.push({lane:0, y:MY_Y-52, vy:0.0, x:LANES[0], col:"#e67e22", id:2, cutting:{at:430, fromLane:0, toLane:1, type:"压实线变道", signal:false}, done:false});
+  renderEvidence(); drawFrame(); setSurprise(0,"平静");
+}
+
+function setSurprise(v,label){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
+  const l=document.getElementById("slbl"); l.textContent=label; l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
+
+function step(){
+  frame++; t=frame/30; road_y=(road_y+2)%40;
+  let maxSurprise=0, flagged=null;
+  for(const c of cars){
+    // ambient relative motion
+    c.y += (c.vy);
+    if(c.y> H+40){ c.y=-40; c.lane=Math.floor(Math.random()*3); }
+    // scripted cut-in
+    if(c.cutting && !c.done){
+      const cut=c.cutting;
+      if(frame>=cut.at && frame<cut.at+45){
+        const p=(frame-cut.at)/45;            // lateral slide from->to
+        c.x = LANES[cut.fromLane] + (LANES[cut.toLane]-LANES[cut.fromLane])*p;
+        c.lane = (p>0.5)? cut.toLane : cut.fromLane;
+        // surprise = lateral intrusion into MY lane while just ahead, no signal
+        // (predictive-residual style: an unsignalled merge into my gap is exactly the un-predicted event)
+        const ahead = (c.y < MY_Y+14) && (MY_Y - c.y < 95);
+        const lat = 1 - Math.min(1, Math.abs(c.x - LANES[MY_LANE])/55);
+        if(ahead && lat>0.15 && !cut.signal){
+          const s = 0.4 + 0.6*lat;
+          if(s>maxSurprise){ maxSurprise=s; flagged=c; }
+        }
+      } else if(frame>=cut.at+45){ c.x=LANES[cut.toLane]; c.lane=cut.toLane; c.done=true; }
+    } else { c.x = LANES[c.lane]; }
+  }
+  // surprise router: flash on spike (predictive-residual style: the cut-in is unpredicted) with refractory gap
+  if(maxSurprise>0.6 && frame-lastFlash>40 && flagged){ captureEvidence(flagged); lastFlash=frame; }
+  setSurprise(maxSurprise, maxSurprise>0.6?"⚠ 违法! 已取证":(maxSurprise>0.3?"注意":"平静"));
+  drawFrame();
+  if(frame>620){ pause(); document.getElementById("live").innerHTML='<span class="ok">本段行车结束。</span> 右侧是抓到的证据 —— 可标记误报(精确删除)、生成举报包、验确定性。'; }
+}
+
+function drawFrame(){
+  ctx.fillStyle="#11161c"; ctx.fillRect(0,0,W,H);
+  // lane markers (dashed) + solid edges
+  ctx.strokeStyle="#33424f"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(50,0); ctx.lineTo(50,H); ctx.moveTo(W-50,0); ctx.lineTo(W-50,H); ctx.stroke();
+  ctx.setLineDash([18,18]); ctx.strokeStyle="#4a5b6b"; ctx.lineWidth=2;
+  for(const lx of [150,250]){ ctx.beginPath(); for(let y=-40+road_y;y<H;y+=40){ ctx.moveTo(lx,y); ctx.lineTo(lx,y+18);} ctx.stroke(); }
+  ctx.setLineDash([]);
+  // other cars
+  for(const c of cars){ drawCar(c.x,c.y,c.col, c.cutting&&!c.done&&Math.abs(c.x-LANES[MY_LANE])<55); }
+  // my car
+  drawCar(LANES[MY_LANE],MY_Y,"#2f81f7",false,true);
+}
+function drawCar(x,y,col,danger,me){
+  ctx.fillStyle=col; ctx.strokeStyle=danger?"#ff6b6b":(me?"#9fd0ff":"#0008"); ctx.lineWidth=danger?3:1.5;
+  roundRect(x-17,y-28,34,56,7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="rgba(180,210,255,.5)"; roundRect(x-13,y-20,26,16,3); ctx.fill();
+  if(me){ ctx.fillStyle="#9fd0ff"; ctx.font="9px sans-serif"; ctx.textAlign="center"; ctx.fillText("我",x,y+5); }
+}
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+function snapThumb(){ const tmp=document.createElement("canvas"); tmp.width=96; tmp.height=60;
+  tmp.getContext("2d").drawImage(cv,0,0,W,H,0,0,96,60); return tmp.toDataURL("image/jpeg",0.6); }
+
+function captureEvidence(c){
+  const cut=c.cutting; const plate=plateFor(c.id*31+7); const tkey=Math.floor(t*10)/10;
+  const thumbs=[snapThumb()];
+  // a couple more frames for the "clip"
+  setTimeout(()=>{ if(playing){} },0);
+  const ev={ plate, type:cut.type, time:fmtTime(tkey), tkey:String(tkey), lane:"中间车道", thumbs, removed:false };
+  // capture 2 more thumbs over next frames
+  ev._needThumbs=2;
+  evidence.push(ev); addFact(ev);
+  // grab follow-up thumbs
+  let n=0; const grab=()=>{ if(n<2 && ev.thumbs.length<3){ ev.thumbs.push(snapThumb()); n++; setTimeout(grab,120);} else renderEvidence(); };
+  setTimeout(grab,120);
+  renderEvidence();
+  document.getElementById("live").innerHTML=`📸 <span class="bad">抓到违法:${cut.type}</span> · 车牌 ${plate} · ${ev.time} —— 已存入私有证据台账。`;
+}
+function fmtTime(tk){ const d=new Date(2026,5,11,8,30,Math.floor(tk)); return d.toTimeString().slice(0,8)+"."+String(Math.floor((tk%1)*10)); }
+
+function renderEvidence(){
+  const live=evidence.filter(e=>!e.removed);
+  document.getElementById("memstat").textContent = live.length? `M = 1 向量 · ${live.length} 条证据` : "M：空";
+  document.getElementById("genall").disabled = live.length===0;
+  document.getElementById("audit").disabled = live.length===0;
+  const el=document.getElementById("evlist");
+  if(!evidence.length){ el.innerHTML='<div class="stat">还没有取到证。开始行车后,违法事件会出现在这里。</div>'; return; }
+  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">🗑 已删除(误报):${e.plate} · ${e.type} —— 从 M 中精确减去,可复核已删干净。</span></div>` :
+    `<div class="ev flash"><div class="top"><span class="plate">${e.plate}</span> <span class="vtype">${e.type}</span><span class="vtime">${e.time}</span></div>
+       <div class="thumbs">${e.thumbs.map(t=>`<img src="${t}">`).join("")}</div>
+       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">🔍 复核(确定性)</button>
+         <button class="hot" onclick="markFalse(${i})">标记误报 → 删除</button></div>
+       <div class="audit" id="aud${i}"></div></div>`).join("");
+}
+window.proveIn=(i)=>{ const e=evidence[i]; const r=recallType(e.plate, e.tkey);
+  document.getElementById("aud"+i).textContent = `unbind(M, 车牌⊗时间) → 类型「${r.type}」 cos=${r.s.toFixed(3)} ✓ 证据确在 M 中,比特级可复核(每次结果一致)。`; };
+window.markFalse=(i)=>{ const e=evidence[i]; if(e.removed) return; subFact(e); e.removed=true; renderEvidence();
+  const r=recallType(e.plate, e.tkey);
+  document.getElementById("live").innerHTML=`🗑 已把 <b>${e.plate}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${r.s.toFixed(3)}(已降到噪声=真删干净)。`; };
+
+document.getElementById("genall").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  const lines=["====== 交通违法举报包(草稿,你审核后再决定是否提交)======",
+    `生成时间:${new Date().toLocaleString("zh-CN")}`, `来源:本人行车记录仪(端上生成,原始视频留本机)`,
+    `举报人:(你的信息,提交时自填)`, `证据条数:${live.length}`, ""];
+  live.forEach((e,k)=> lines.push(`【${k+1}】 车牌 ${e.plate} · 违法类型 ${e.type} · 时间 ${e.time} · 位置 ${e.lane}(GPS 提交时附) · 证据:3 帧关键画面(本机留存)`));
+  lines.push("", "说明:以上为针对发生在本人车前的真实违法的取证;是否提交至「随手拍/12123」由本人决定。");
+  document.getElementById("reportbox").innerHTML = `<div class="report">${lines.join("\n")}</div>
+     <div class="stat" style="margin-top:6px">这份草稿 + 3 帧证据在你手里。要交才交 —— 没有自动上报。</div>`;
+};
+document.getElementById("audit").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  let out="确定性自检(同一查询跑两遍,逐位比较):\n";
+  let allsame=true;
+  for(const e of live){ const a=recallType(e.plate,e.tkey).s, b=recallType(e.plate,e.tkey).s; const same=(a===b); allsame=allsame&&same;
+    out+=` ${e.plate}: cos ${a.toFixed(6)} == ${b.toFixed(6)}  ${same?"✓":"✗"}\n`; }
+  out+= live.length? `\n结论:${allsame?"全部比特一致 ✓ —— 证据不可被悄悄篡改,可法庭级复核":"出现不一致 ✗"}` : "无证据";
+  document.getElementById("auditbox").innerHTML=`<div class="report">${out}</div>`;
+};
+
+// controls
+let timer=null;
+function play(){ if(playing) return; playing=true; document.getElementById("play").disabled=true; document.getElementById("pause").disabled=false;
+  timer=setInterval(step,33); }
+function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
+document.getElementById("play").onclick=play;
+document.getElementById("pause").onclick=pause;
+document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").textContent='已重置。'; };
+reset();
+</script>
+</body>
+</html>

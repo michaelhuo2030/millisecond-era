@@ -546,6 +546,7 @@ The path forward — open thesis, public 18-row transparency, public invitations
 
 - **README.md** (this file) — English thesis + transparency
 - **article-2.md** — Stage 1 validation report (15 hypotheses checked, one architecture locked) ★ **NEW 2026-05-18**
+- **article-3.md** — Scaling to big models: the wall we don't have (KV cache, throughput, tensor parallelism, ReRAM's real limits) ★ **NEW 2026-06-15**
 - **docs/article-1-zh.md** — Article 1 Chinese version (公众号 / 知乎 / Substack-zh)
 - **docs/article-2-zh.md** — Article 2 Chinese version ★ **NEW 2026-05-18**
 - **docs/stage-1-validation/** — Stage 1 empirical evidence (JSON summaries from 6 experiments) ★ **NEW 2026-05-18**

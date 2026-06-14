@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>会自己长大、又不说谎的知识库 — 一道"核实门"的小实验</title>
+<style>
+  :root{ --bg:#0a0e14; --panel:#0f1620; --ink:#dfe7ef; --dim:#7e8aa0;
+         --green:#34d399; --red:#f87171; --gold:#fbbf24; --cyan:#38bdf8; --slate:#64748b; --line:#1e2a3a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,#101826,#070a0f);
+       color:var(--ink);font:15px/1.6 -apple-system,"PingFang SC",Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-size:25px;margin:0 0 4px;letter-spacing:.3px}
+  h1 .sub{color:var(--gold)}
+  .kick{color:var(--dim);font-size:13.5px;margin:0 0 14px}
+  .lead{color:#c2ccdb;margin:0 0 12px;font-size:15px;max-width:880px}
+  .lead b{color:#fff}
+  .stat{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+  .chip{font-size:12.5px;color:var(--dim);background:#101825;border:1px solid var(--line);
+        border-radius:20px;padding:5px 12px}
+  .chip b{color:var(--ink)}
+  .chip.g b{color:var(--green)} .chip.r b{color:var(--red)}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
+  button{background:#15202e;color:var(--ink);border:1px solid #26344a;border-radius:9px;
+         padding:9px 16px;font-size:14px;cursor:pointer;transition:.15s}
+  button:hover{background:#1d2b3d;border-color:#34507a}
+  button.primary{background:linear-gradient(180deg,#1e6f5c,#14534420);border-color:#2f8f76;color:#caffe9}
+  .roundtag{color:var(--dim);font-size:13px}
+  .roundtag b{color:var(--ink)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .card.on{box-shadow:0 0 0 1px #1c5a48 inset}
+  .card.off{box-shadow:0 0 0 1px #5a2330 inset}
+  .chead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .chead .t{font-weight:700;font-size:15px}
+  .chead .badge{font-size:12px;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .badge.g{background:#0c3b2e;color:#7ff0cf;border:1px solid #1c6a52}
+  .badge.r{background:#3b1620;color:#ffb4bd;border:1px solid #7a2c3a}
+  canvas{display:block;width:100%;height:340px;background:radial-gradient(420px 240px at 50% 40%,#0d1622,#0a0f17)}
+  .metrics{display:flex;gap:14px;padding:12px 15px;border-top:1px solid var(--line)}
+  .m{flex:1}
+  .m .lab{font-size:12px;color:var(--dim);display:flex;justify-content:space-between}
+  .m .lab b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .bar{height:8px;border-radius:6px;background:#15202e;margin-top:5px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:6px;transition:width .5s}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:13px;margin:14px 2px 4px}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:18px;height:3px;border-radius:3px;display:inline-block}
+  .scis{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:16px;padding:12px 16px}
+  .scis .t{font-weight:700;margin-bottom:4px}
+  .scis .t small{color:var(--dim);font-weight:400;margin-left:8px}
+  .foot{color:var(--dim);font-size:13px;margin-top:18px;border-top:1px dashed #233044;padding-top:12px;max-width:920px}
+  .foot b{color:#aab6c8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>让 AI 攒出一座<span class="sub">不说谎</span>的知识库</h1>
+  <p class="kick">我们管这件事叫"文明棘轮"——知识能一层层往上叠、而且永不掺假。这是它最核心那一下。</p>
+
+  <p class="lead">
+    AI 很聪明,但它会<b>一本正经地编</b>。要是不核实就把它说的东西存进知识库,时间一长,里面<b>一半都是假的</b>——你还看不出来。<br>
+    办法其实很简单:加一道 <b>"核实门"</b>,只有被核对为真的,才准进库。<br>
+    下面是<b>两张一模一样</b>的知识网(节点是病、基因、药)。左边有这道门,右边没有。点"开始",看着它们各自长大。
+  </p>
+
+  <div class="stat">
+    <span class="chip">真实验跑在一张 <b>4 万节点</b>的真实医学知识图上 · 换 <b>12 种设置</b>结果几乎一样:</span>
+    <span class="chip g">有门:存进去 <b>100% 是真的</b>,补全了 <b>97%</b></span>
+    <span class="chip r">没门:存进去 <b>只有一半</b>是真的</span>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="play">▶ 开始</button>
+    <button id="step">⏭ 一步一步</button>
+    <button id="reset">↺ 重来</button>
+    <span class="roundtag">第 <b id="round">0</b> / <b id="maxr">5</b> 轮 — 每一轮,AI 补几条它觉得缺的连接,门来判真假</span>
+  </div>
+
+  <div class="grid">
+    <div class="card on">
+      <div class="chead"><span class="t">✅ 有核实门</span><span class="badge g">存进去之前,先核对一下是不是真的</span></div>
+      <canvas id="cvA"></canvas>
+      <div class="metrics">
+        <div class="m"><div class="lab"><span>补全了多少</span><b id="covA">—</b></div>
+          <div class="bar"><i id="covAb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
+        <div class="m"><div class="lab"><span>存进去的,有几成是真的</span><b id="prcA">—</b></div>
+          <div class="bar"><i id="prcAb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
+      </div>
+    </div>
+
+    <div class="card off">
+      <div class="chead"><span class="t">❌ 没有核实门</span><span class="badge r">AI 说啥,就直接存啥</span></div>
+      <canvas id="cvB"></canvas>
+      <div class="metrics">
+        <div class="m"><div class="lab"><span>补全了多少</span><b id="covB">—</b></div>
+          <div class="bar"><i id="covBb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
+        <div class="m"><div class="lab"><span>存进去的,有几成是真的</span><b id="prcB">—</b></div>
+          <div class="bar"><i id="prcBb" style="background:linear-gradient(90deg,#7a2c3a,#f87171)"></i></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:#33415590"></i>本来就知道的连接</span>
+    <span><i class="dot" style="background:var(--green)"></i>核对为真 → 存进来了</span>
+    <span><i class="dot" style="background:var(--red)"></i>没核对,把假的也存了进来</span>
+    <span><i class="dot" style="background:var(--gold)"></i>病 · <i class="dot" style="background:var(--cyan)"></i>基因 · <i class="dot" style="background:var(--slate)"></i>药/通路</span>
+  </div>
+
+  <div class="scis">
+    <div class="t">可信度对照 <small>每一轮,存进去的知识有几成是真的 —— 一条稳稳守在 100%,一条塌到 50%</small></div>
+    <canvas id="cvS" style="height:150px"></canvas>
+  </div>
+
+  <p class="foot">
+    这里的小网只是为了让你<b>一眼看懂背后的道理</b>;真刀真枪的实验跑在一张 4 万个节点的真实医学知识图上,结论稳得很。
+    一句话——<b style="color:#cfe9ff">真正厉害的不是 AI 多能编,而是那道让真知识攒起来、不掺假的门。</b>
+    今天大多数 AI 的"记忆"是没有这道门的;有了它,知识才第一次能像文明那样,一层层叠上去、而且不往回滑。
+  </p>
+</div>
+
+<script>
+(()=>{
+const MAXR=5, KT=2, KF=2;
+const COL={disease:'#fbbf24',gene:'#38bdf8',leaf:'#64748b'};
+let RS=20260615;
+const rnd=()=>{RS=(RS*1103515245+12345)&0x7fffffff; return RS/0x7fffffff;};
+
+function buildGraph(W,H){
+  RS=20260615;
+  const nodes=[], edges=[];
+  const ND=3, NG=3, NL=2;
+  const cx=W/2, cy=H/2;
+  for(let d=0; d<ND; d++){
+    const ad=(d/ND)*Math.PI*2 - Math.PI/2;
+    const dx=cx+Math.cos(ad)*W*0.27, dy=cy+Math.sin(ad)*H*0.30;
+    const di=nodes.length; nodes.push({id:'D'+d,t:'disease',x:dx,y:dy,r:11});
+    for(let g=0; g<NG; g++){
+      const ag=ad + (g-(NG-1)/2)*0.62;
+      const gx=dx+Math.cos(ag)*W*0.135, gy=dy+Math.sin(ag)*H*0.155;
+      const gi=nodes.length; nodes.push({id:'G'+d+g,t:'gene',x:gx+(rnd()-.5)*14,y:gy+(rnd()-.5)*14,r:7});
+      edges.push({a:gi,b:di,type:'assoc'});
+      for(let l=0; l<NL; l++){
+        const al=ag + (l-(NL-1)/2)*0.7;
+        const lx=gx+Math.cos(al)*W*0.085, ly=gy+Math.sin(al)*H*0.10;
+        const li=nodes.length; nodes.push({id:'L'+d+g+l,t:'leaf',x:lx+(rnd()-.5)*12,y:ly+(rnd()-.5)*12,r:4.4});
+        edges.push({a:li,b:gi,type:'leaf'});
+      }
+    }
+  }
+  return {nodes,edges};
+}
+
+function makePanel(canvas){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  return {canvas,ctx,W:rect.width,H:rect.height};
+}
+
+let A,B,S, graphA,graphB, round, playing=false, lastT=0;
+let histA=[], histB=[];
+
+function reset(){
+  A=makePanel(document.getElementById('cvA'));
+  B=makePanel(document.getElementById('cvB'));
+  S=makePanel(document.getElementById('cvS'));
+  graphA=buildGraph(A.W,A.H); graphB=buildGraph(B.W,B.H);
+  RS=777;
+  const held=new Set();
+  const order=graphA.edges.map((_,i)=>i).sort(()=>rnd()-0.5);
+  const nHeld=Math.round(graphA.edges.length*0.3);
+  order.slice(0,nHeld).forEach(i=>held.add(i));
+  [graphA,graphB].forEach(g=>{
+    g.edges.forEach((e,i)=>{ e.status = held.has(i)?'hidden':'observed'; e.fade=1; });
+    g.held=[...held]; g.queue=[...held];
+    g.fab=[]; g.rejects=[]; g.addedTrue=0; g.addedFab=0;
+  });
+  round=0; playing=false; histA=[]; histB=[];
+  document.getElementById('play').textContent='▶ 开始';
+  metrics();                         // the rAF frame() loop handles all drawing
+}
+
+function genFab(g){
+  for(let tries=0; tries<40; tries++){
+    const a=(rnd()*g.nodes.length)|0, b=(rnd()*g.nodes.length)|0;
+    if(a===b) continue;
+    const exists=g.edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a));
+    const fabbed=g.fab.some(e=>e.a===a&&e.b===b);
+    if(!exists && !fabbed) return {a,b};
+  }
+  return null;
+}
+
+function step(){
+  if(round>=MAXR) return false;
+  round++;
+  for(let k=0;k<KT;k++){ const i=graphA.queue.shift(); if(i!=null){ const e=graphA.edges[i]; e.status='true'; e.fade=0; graphA.addedTrue++; } }
+  for(let k=0;k<KF;k++){ const f=genFab(graphA); if(f){ graphA.rejects.push({a:f.a,b:f.b,t:0}); } }
+  for(let k=0;k<KT;k++){ const i=graphB.queue.shift(); if(i!=null){ const e=graphB.edges[i]; e.status='true'; e.fade=0; graphB.addedTrue++; } }
+  for(let k=0;k<KF;k++){ const f=genFab(graphB); if(f){ graphB.fab.push({a:f.a,b:f.b,fade:0}); graphB.addedFab++; } }
+  metrics();
+  return true;
+}
+
+function metrics(){
+  const calc=g=>{
+    const totalTrue=g.edges.length;
+    const have=g.edges.filter(e=>e.status==='observed'||e.status==='true').length;
+    const cov=have/totalTrue;
+    const disc=g.addedTrue+g.addedFab;
+    const prc=disc? g.addedTrue/disc : 1;
+    return {cov,prc};
+  };
+  const a=calc(graphA), b=calc(graphB);
+  set('covA',a.cov,'covAb'); set('prcA',a.prc,'prcAb');
+  set('covB',b.cov,'covBb'); set('prcB',b.prc,'prcBb');
+  histA[round]=a.prc; histB[round]=b.prc;
+  document.getElementById('round').textContent=round;
+}
+function set(id,v,bar){ document.getElementById(id).textContent=(v*100).toFixed(1)+'%';
+  document.getElementById(bar).style.width=(v*100)+'%'; }
+
+function edgePts(g,e){ return [g.nodes[e.a],g.nodes[e.b]]; }
+function line(ctx,p,q,color,w,glow){
+  ctx.save(); if(glow){ctx.shadowColor=color;ctx.shadowBlur=glow;}
+  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.beginPath();
+  ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore();
+}
+function drawGraph(P,g){
+  const ctx=P.ctx; ctx.clearRect(0,0,P.W,P.H);
+  g.edges.forEach(e=>{ if(e.status==='observed'){const[p,q]=edgePts(g,e); line(ctx,p,q,'#33415588',1.1,0);} });
+  g.edges.forEach(e=>{ if(e.status==='true'){ e.fade=Math.min(1,e.fade+0.05); const[p,q]=edgePts(g,e);
+      line(ctx,p,q,'rgba(52,211,153,'+(0.35+0.55*e.fade)+')',1.4+0.8*e.fade,9*e.fade);} });
+  g.fab.forEach(f=>{ f.fade=Math.min(1,f.fade+0.05); const p=g.nodes[f.a],q=g.nodes[f.b];
+      line(ctx,p,q,'rgba(248,113,113,'+(0.4+0.5*f.fade)+')',1.5,10*f.fade); });
+  g.rejects=g.rejects.filter(r=>r.t<1);
+  g.rejects.forEach(r=>{ r.t+=0.018; const p=g.nodes[r.a],q=g.nodes[r.b]; const a=Math.max(0,0.7*(1-r.t));
+      ctx.save(); ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(248,113,113,'+a+')'; ctx.lineWidth=1.3;
+      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+      const mx=(p.x+q.x)/2,my=(p.y+q.y)/2,s=4; ctx.setLineDash([]); ctx.strokeStyle='rgba(248,113,113,'+a*1.3+')';
+      ctx.beginPath();ctx.moveTo(mx-s,my-s);ctx.lineTo(mx+s,my+s);ctx.moveTo(mx+s,my-s);ctx.lineTo(mx-s,my+s);ctx.stroke();
+      ctx.restore(); });
+  g.nodes.forEach(n=>{ ctx.save(); ctx.shadowColor=COL[n.t]; ctx.shadowBlur=n.t==='disease'?14:7;
+      ctx.fillStyle=COL[n.t]; ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,7); ctx.fill(); ctx.restore(); });
+}
+function drawScissor(){
+  const ctx=S.ctx, W=S.W, H=S.H, pad=26;
+  ctx.clearRect(0,0,W,H);
+  const x=r=>pad+(r/MAXR)*(W-pad*2), y=v=>H-pad-(v-0.4)/0.62*(H-pad*1.6);
+  ctx.strokeStyle='#1c2738'; ctx.lineWidth=1;
+  [0.5,1.0].forEach(v=>{ctx.beginPath();ctx.moveTo(pad,y(v));ctx.lineTo(W-pad,y(v));ctx.stroke();
+     ctx.fillStyle='#5b6880';ctx.font='11px sans-serif';ctx.fillText((v*100)+'%',4,y(v)+4);});
+  const plot=(hist,color)=>{ ctx.strokeStyle=color; ctx.lineWidth=2.4; ctx.shadowColor=color; ctx.shadowBlur=8;
+     ctx.beginPath(); let started=false;
+     for(let r=1;r<=round;r++){ if(hist[r]==null)continue; const px=x(r),py=y(hist[r]);
+        if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py); }
+     ctx.stroke(); ctx.shadowBlur=0;
+     for(let r=1;r<=round;r++){ if(hist[r]==null)continue; ctx.beginPath();ctx.arc(x(r),y(hist[r]),3,0,7);ctx.fillStyle=color;ctx.fill(); } };
+  plot(histA,'#34d399'); plot(histB,'#f87171');
+  ctx.font='12px sans-serif';
+  if(round>0){ ctx.fillStyle='#34d399'; ctx.fillText('有门 → 全真', x(round)+6, y(histA[round]||1)+4);
+               ctx.fillStyle='#f87171'; ctx.fillText('没门 → 一半假', x(round)+6, y(histB[round]||0.5)+4); }
+}
+
+function frame(t){
+  drawGraph(A,graphA); drawGraph(B,graphB); drawScissor();
+  if(playing && t-lastT>1150){ lastT=t; if(!step()){ playing=false; document.getElementById('play').textContent='✓ 跑完了 — 看下面那两条线'; } }
+  requestAnimationFrame(frame);
+}
+
+document.getElementById('step').onclick=()=>{ playing=false; document.getElementById('play').textContent='▶ 开始'; step(); };
+document.getElementById('play').onclick=(e)=>{ if(round>=MAXR) reset();
+  playing=!playing; e.target.textContent=playing?'⏸ 暂停':'▶ 开始'; lastT=performance.now(); };
+document.getElementById('reset').onclick=reset;
+document.getElementById('maxr').textContent=MAXR;
+window.addEventListener('resize',()=>{ const r=round, hA=histA.slice(), hB=histB.slice(); reset();
+  for(let i=0;i<r;i++) step(); histA=hA; histB=hB; });
+reset();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

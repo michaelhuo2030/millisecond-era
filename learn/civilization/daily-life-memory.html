@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily-Life Memory · your day, remembered by your glasses (Millisecond Era)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#62b8ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:radial-gradient(1200px 600px at 70% -10%,#15212e,transparent),var(--bg); color:var(--txt);
+         font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:22px 26px 16px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:23px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13.5px; margin-top:7px; max-width:1120px; }
+  .sub b{ color:#d4e2ee; }
+  .pitch { background:linear-gradient(180deg,#15202c,#121922); border:1px solid var(--line); border-left:3px solid var(--acc);
+           border-radius:12px; padding:14px 16px; margin:16px 26px 0; max-width:1180px; font-size:13.5px; color:#d4e2ee; }
+  .pitch b{ color:var(--acc); } .pitch .k{ color:var(--good); font-weight:700; }
+  .wrap { display:flex; gap:18px; padding:18px 26px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:17px; }
+  .panel { flex:1; min-width:372px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  select,input[type=text]{ background:#0b0f14; border:1px solid var(--line); color:var(--txt);
+        border-radius:9px; padding:9px 11px; font-size:13.5px; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 15px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button:disabled { opacity:.38; cursor:not-allowed; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok { color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .membox { background:#0b0f14; border:1px solid var(--line); border-radius:11px; padding:13px; margin-bottom:13px; }
+  .membig { font-size:21px; font-weight:800; } .membig small{ font-size:12.5px; color:var(--mut); font-weight:500; }
+  .day { max-height:300px; overflow:auto; margin-top:6px; }
+  .ev { display:flex; gap:9px; align-items:flex-start; padding:7px 0; border-top:1px solid var(--line); font-size:13.5px; }
+  .ev .ent { color:var(--acc); font-weight:700; min-width:74px; }
+  .ev .at { color:var(--mut); min-width:54px; } .ev .v{ color:var(--txt); }
+  .ev.b .ent{ color:#c08cff; }
+  .qcard { border-top:1px dashed var(--line); padding-top:13px; margin-top:13px; }
+  .qcard h3 { margin:0 0 8px; font-size:14px; } .qcard h3 b{ color:var(--acc); }
+  .ans { background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; margin-top:7px; min-height:24px; font-size:14px; }
+  .ans em{ color:var(--mut); font-style:normal; }
+  .bar { display:inline-block; height:8px; background:var(--acc); border-radius:4px; vertical-align:middle; margin:0 6px; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:12px 14px; margin-top:13px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  /* change-gate strip */
+  .gate { background:#0b0f14; border:1px solid var(--line); border-radius:11px; padding:13px; margin-top:13px; }
+  .gate canvas{ width:100%; background:#11161c; border:1px solid var(--line); border-radius:8px; display:block; margin-top:8px; }
+  .gate .meta{ display:flex; gap:14px; margin-top:8px; flex-wrap:wrap; }
+  .gate .meta b{ color:var(--txt); } .gate .big{ font-size:18px; font-weight:800; }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 15px; margin:0 26px 20px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  footer{ color:var(--mut); font-size:12px; padding:0 26px 26px; max-width:1180px; }
+  footer b{ color:var(--txt); }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
+</style>
+</head>
+<body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
+<header>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
+</header>
+
+<div class="pitch" data-i18n-html="pitch"></div>
+
+<div class="honest" data-i18n-html="honest"></div>
+
+<div class="wrap">
+  <!-- LEFT: the day + change-gated capture -->
+  <div class="card panel">
+    <div class="row">
+      <button id="sample" data-i18n="btnSample"></button>
+      <button id="merge" class="sec" data-i18n="btnMerge"></button>
+      <button id="sep" class="sec" disabled data-i18n="btnSep"></button>
+      <button id="clear" class="sec" data-i18n="btnClear"></button>
+    </div>
+    <div class="membox">
+      <div class="membig" id="memsize"></div>
+      <div class="stat" id="memnote"></div>
+    </div>
+    <div class="stat" data-i18n-html="dayCaption"></div>
+    <div class="day" id="day"></div>
+
+    <!-- change-gated capture visualization -->
+    <div class="gate">
+      <div class="stat" data-i18n-html="gateHead"></div>
+      <canvas id="gateCv" width="520" height="92"></canvas>
+      <div class="meta">
+        <div><span class="stat" data-i18n="gSeenLbl"></span> <span class="big" id="gFrames">0</span></div>
+        <div><span class="stat" data-i18n="gStoredLbl"></span> <span class="big ok" id="gStored">0</span></div>
+        <div><span class="stat" data-i18n="gSkipLbl"></span> <span class="big" id="gSkip">0</span></div>
+        <div><span class="stat" data-i18n="gSaveLbl"></span> <span class="big ok" id="gSave">0%</span></div>
+      </div>
+      <div class="stat" id="gLive" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: interactions -->
+  <div class="card panel">
+    <div class="qcard">
+      <h3 data-i18n-html="q1Title"></h3>
+      <div class="row">
+        <select id="aE"></select><select id="aR"></select>
+        <button id="aB" data-i18n="btnAsk"></button>
+        <button id="aKey" class="sec" data-i18n="btnAskKey"></button>
+        <button id="aCar" class="sec" data-i18n="btnAskCar"></button>
+        <button id="aProm" class="sec" data-i18n="btnAskProm"></button>
+      </div>
+      <div class="ans" id="aA"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q2Title"></h3>
+      <div class="row">
+        <button id="bLock" class="sec" data-i18n="btnLock"></button>
+        <button id="bMed" class="sec" data-i18n="btnMed"></button>
+        <button id="bEat" class="sec" data-i18n="btnEat"></button>
+      </div>
+      <div class="ans" id="bA"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q3Title"></h3>
+      <div class="row">
+        <select id="fE"></select>
+        <button id="fB" class="hot" data-i18n="btnForget"></button>
+      </div>
+      <div class="ans" id="fA"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q4Title"></h3>
+      <div class="row">
+        <select id="wE"></select><select id="wR"></select>
+        <input type="text" id="wV" style="flex:1;min-width:120px" />
+        <button id="wPrev" class="sec" data-i18n="btnPreview"></button>
+        <button id="wCommit" class="warn" disabled data-i18n="btnCommit"></button>
+        <button id="undo" class="sec" disabled data-i18n="btnUndo"></button>
+      </div>
+      <div class="ans" id="wA"></div>
+    </div>
+
+    <div class="moat">
+      <b data-i18n="moatHead"></b>
+      <span data-i18n-html="moatBody"></span>
+      <span id="detnote"></span>
+      <span data-i18n-html="moatTail"></span>
+      <br><span data-i18n-html="moatLast"></span>
+    </div>
+  </div>
+</div>
+
+<footer data-i18n-html="footer"></footer>
+
+<script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Daily-Life Memory · your day, remembered by your glasses (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 3/N  |  daily-life edition",
+    h1: "Daily-Life Memory — your day, remembered by your glasses; and this memory belongs only to you",
+    sub: "The glasses' “eye” sees the little things of daily life (where the keys are, did I lock the door, where I parked, what I promised whom, did I take my meds, what I ate today) → <b>store one frame only when the scene “changes”</b> (no change = skip = µW) → compress into <b>a single fixed-length hypervector M</b>. " +
+         "You can <b>ask</b> it (where are my keys / what did I promise whom) · do <b>yes/no recall</b> (did I lock the door?) · <b>surgically forget</b> (delete a private moment) · do <b>counterfactual / undo</b>. <b>All on the glasses, never to the cloud, you hold the delete key.</b>",
+    pitch: "<b>Why this piece belongs to the device, not the cloud:</b> " +
+           "Big models beat us at <i>complex reasoning / complex Q&A</i> — that is not the work we are after. What we own is the thing the cloud cannot give: <span class=\"k\">it stays on your device, it is provably exact, and you hold the delete key</span>. " +
+           "This daily memory is <span class=\"k\">µW-class, always-on, on-device</span> pure vector algebra (bind / unbind / add-subtract) — it does not compete with your LLM for compute, " +
+           "it gives the LLM a <b>private, forgettable, auditable long-term memory</b>: the cloud cannot “precisely erase a conversation with someone today from my memory, and prove it was erased clean” — <b>and that is exactly the soft spot of a private device</b>." +
+           "<br><span class=\"stat\">(This edition is the <b>broader daily-life version</b> of the monako “private memory layer” demo — the same memory core, spread across a hundred small things in your life.)</span>",
+    honest: "<b>Honest boundary (no-vaporware, for engineers):</b> " +
+            "① <b>Turning the image/voice into “keys / door-locked / parking spot B2 / Mom / metformin” is the recognition front-end's job</b> (detector / VLM / encoder = front-end + cloud / model, boundary law L1) — this demo uses <b>scripted scenes</b> to show the <b>logic of the memory algebra</b>, and <b>does not claim we recognize better</b>. " +
+            "② <b>“Episodic-memory Q&A” itself is not trivial, and big models can do complex Q&A</b> — we are not smarter than them. Our moat = <b>on-device + private + reversible (you delete) + deterministic (provably exact)</b>. " +
+            "③ <b>Capacity is a theorem (~D/20)</b>: D=10,000 comfortably holds ~500 experiences; once full it crosstalks — it is not “remember everything.” " +
+            "④ Measured: this algebra (recall / yes-no / forget / counterfactual / undo) is <b>all exactly 1.000</b> at D=30k (<code>t8_app_editable_memory.py</code>, 3 seeds); this page uses the same ±1 VSA at D=10k, and the node self-check passes.",
+    btnSample: "▶ Load a sample day",
+    btnMerge: "＋ Merge a family member's notes",
+    btnSep: "－ Separate the family member",
+    btnClear: "Clear",
+    dayCaption: "<b>This day</b> (the ledger is just for you to read / audit; the truth lives in M, each row = <code>bind(entity, relation, value)</code>):",
+    dayEmpty: "No memory yet.",
+    gateHead: "<b>⑤ Change-driven capture</b>: the eye looks frame by frame, <b>no change in the scene = skip = don't store (µW)</b>; only a <b>change</b> stores one frame and binds it into M.",
+    gSeenLbl: "frames seen", gStoredLbl: "actually stored", gSkipLbl: "skipped (static)", gSaveLbl: "writes saved",
+    gateInit: "Clicking “Load a sample day” auto-runs once: it sees 1 stretch of repeated static frames (skipped), then sees 1 change (stored).",
+    gateDone: (seen,stored,skipped,pct)=>`In this stretch <b>${seen}</b> frames, only <b class="ok">${stored}</b> frames that “changed” were stored into M, <b>${skipped}</b> static frames were skipped (µW) — ` +
+      `saving <b class="ok">${pct}%</b> of the writes / energy. <b>This is store-on-CHANGE: static = skip = µW.</b>`,
+    gateStore: "store", gateSkip: "skip",
+    gateLegChanged: "changed → store one frame (write M)", gateLegSkipped: "no change → skip (µW, no write)",
+    q1Title: "① Ask the glasses · <b>unbind(M, entity⊙relation)</b>",
+    btnAsk: "Ask", btnAskKey: "Where are my keys?", btnAskCar: "Where did I park?", btnAskProm: "What did I promise whom?",
+    q1Init: "e.g. “keys · location” → it unbinds the answer out of M; or click “Where did I park / What did I promise whom.”",
+    q2Title: "② Yes/no recall · <b>did I lock the door? / did I take my meds?</b> (boolean recall)",
+    btnLock: "🚪 Did I lock the door?", btnMed: "💊 Did I take my meds?", btnEat: "🍱 What did I eat today?",
+    q2Init: "e.g. ask “did I lock up” → it queries “door · state” in M; found = yes (with time), not found = unsure.",
+    q3Title: "③ Surgically forget a private moment · <b>M − Σ all its facts</b> (right to be forgotten)",
+    btnForget: "Erase from memory",
+    q3Init: "Pick a private moment (e.g. a conversation with someone) → delete everything about it. Ask again after = empty; ask about others = unchanged. <b>Real deletion, not hiding.</b>",
+    q4Title: "④ Counterfactual / undo · <b>M − old + new</b> (no retraining)",
+    btnPreview: "Preview", btnCommit: "Commit", btnUndo: "↶ Undo",
+    wVPlaceholder: "change to… (new value)",
+    q4Init: "e.g. change “car · location” → preview changes only this row, the rest stay; commit or undo.",
+    moatHead: "The moat, visible on the spot (to tell a partner):",
+    moatBody: " On-device · private (we don't sell a profile of your memory to the cloud) · deterministic (every re-query is bit-identical, not a hallucination) · forgettable (the delete key is in your hand) · µW change-driven (static is skipped). ",
+    moatTail: " The whole day = <b id=\"memkb\">one ~10 KB vector</b> · always-on at µW on a ternary-CIM chip.",
+    moatLast: "Big models beat us at reasoning; what we own exclusively is <b>“it stays on your device, you press the delete key, and it is provably exact.”</b>",
+    footer: "Who it liberates: <b>Alex</b>, a <b>nurse / caregiver</b> working night shifts with a hundred things in her head at once (cognitive overload, not cognitive impairment) — " +
+            "she needs to be relieved of the background processes “keys, door, meds, parking spot, who I promised,” yet she <b>does not want to be watched by a camera that would sell her day to the cloud</b>. " +
+            "This layer hands her brain back to what truly matters, <b>and the price is not her privacy</b>. " +
+            "<br>Millisecond Era · millisecond-era — <b>枯れた技術の水平思考 (lateral thinking with seasoned technology)</b>: using mature vector-symbolic algebra to give a wearable a private daily-memory core the cloud cannot give. " +
+            "This page can be shipped as-is; the substrate = pure ±1 VSA (bind / unbind / add-subtract), no dependencies, single file, runs offline.",
+    // ── dynamic-string helpers ──
+    memEmpty: 'Memory M: empty <small>still empty</small>',
+    memEmptyNote: "All of this day's little things = this <b>one</b> vector; raw images / recordings are not kept (private).",
+    memFull: (D,kb,n)=>`Memory M = 1 vector <small>D=${D.toLocaleString()} · ≈${kb} KB · ${n} experiences</small>`,
+    memFullNote: (n)=>`This day's ${n} little things = the <b>one</b> vector above; raw images / recordings dropped (private).`,
+    needSample: "<em>Load a sample day first.</em>",
+    askResultHit: (e,r,v,barHtml,cosTxt)=>`<b>${e}</b>'s <b>${r}</b> = <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askResultMiss: (e,r,cosTxt)=>`<em class="bad">Can't find “${e}·${r}” in M</em> <span class="stat">cos=${cosTxt} — never stored, or already erased.</span>`,
+    askKeyHit: (v,barHtml,cosTxt)=>`🔑 <b>Keys</b> are at <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askKeyMiss: '<em class="bad">No key location stored.</em>',
+    askCarHit: (v,barHtml,cosTxt)=>`🚗 <b>Car</b> is parked at <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askCarMiss: '<em class="bad">No record of where the car is parked.</em>',
+    askPromHit: (listHtml)=>`📌 Promised: ${listHtml}`,
+    askPromNone: '<em>Nothing promised today.</em>',
+    boolHit: (yesWord,e,r,v,barHtml,cosTxt)=>`✅ <b class="ok">${yesWord}</b>: <b>${e}·${r}</b> = <b>${v}</b> ${barHtml} <span class="stat">cos=${cosTxt} (this memory really is in M)</span>`,
+    boolMiss: (e,r,cosTxt)=>`❓ <span class="wn">Unsure</span>: no “${e}·${r}” in M <span class="stat">cos=${cosTxt} — not stored, or already erased. Knowing you don't know beats inventing an answer.</span>`,
+    eatHit: (listHtml)=>`🍱 Ate today: ${listHtml}`,
+    eatNone: '<em>No record of what was eaten today.</em>',
+    yesLocked: "Locked", yesTookMeds: "Taken",
+    forgetNoEntity: '<em>No such entity.</em>',
+    forgetDone: (e,n,r,cosTxt,otherInfo)=>`🗑️ Erased <b>${e}</b>'s ${n} rows from M. Ask <b>${e}·${r}</b> again → <span class="bad">cos=${cosTxt} (gone)</span>${otherInfo} ` +
+      `<span class="stat"> — real deletion, provably wiped clean; the right to be forgotten = a subtraction.</span>`,
+    forgetOther: (other,v)=>` ; ask <b>${other}</b> → <span class="ok">${v} (unchanged)</span>`,
+    forgetUndo: (e)=>`restore ${e}`,
+    q3Cleared: '<em>Pick a private moment → surgically forget.</em>',
+    cfNoNew: '<em>Enter a new value.</em>',
+    cfNoRel: (e,r)=>`<em>${e} has no “${r}.”</em>`,
+    cfPreview: (e,r,vOld,best,barHtml,intactHtml)=>`🔮 Suppose <b>${e}·${r}</b>: ${vOld} → <b class="ok">${best}</b> ${barHtml}${intactHtml} <span class="stat">(preview, M unchanged)</span>`,
+    cfIntact: (oe,or_,ov)=>` ; the rest, e.g. <b>${oe}·${or_}</b> still = <span class="ok">${ov}</span> (unchanged)`,
+    cfUndoLabel: (e,r)=>`undo ${e}·${r}`,
+    cfCommitted: (e,r,vNew)=>`✅ Committed: <b>${e}·${r}</b> = <b class="ok">${vNew}</b> (the rest untouched, reversible)`,
+    q4Cleared: '<em>Pick entity/relation/new value → preview a counterfactual.</em>',
+    undoDone: (label)=>`↶ Undone: ${label} (deterministically reversible, restored as before)`,
+    mergeDone: (keyV,pkgV)=>`After merge, one and the same M answers for both: <b>keys·location</b>=<span class="ok">${keyV}</span> , <b>parcel (family)·location</b>=<span class="ok">${pkgV}</span>. <span class="stat">bundle = multi-device / family federated memory.</span>`,
+    sepDone: (cosTxt)=>`Family notes separated: ask <b>parcel·location</b> again → <span class="bad">cos=${cosTxt} (gone)</span>, your memory is <span class="ok">intact</span>.<span class="stat"> Federation is detachable.</span>`,
+    sampleLoaded: '<span class="ok">Loaded a sample day (9 rows, covering keys/lock/parking/who-promised/meds/what-eaten).</span> Try: ① ask “where are my keys / where did I park”; ② “did I lock up / did I take my meds”; ③ erase “private chat with a friend” then ask about them; ④ change “car·location” and watch the rest stay.',
+    detNote: (a,b,same)=>`Re-queried “keys·location” twice cos=${a} == ${b} ${same?'<span class="ok">✓ bit-identical</span>':'<span class="bad">✗</span>'} ·`,
+    famTag: " ·family",
+    promArrow: (e,v)=>`<b>${e}</b> → <span class="ok">${v}</span>`,
+    eatArrow: (e,v)=>`<b>${e}</b> → <span class="ok">${v}</span>`
+  },
+  zh: {
+    docTitle: "日常记忆助手 · 你的一天，眼镜替你记着 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 3/N  |  日常生活版",
+    h1: "日常记忆助手 — 你的一天，眼镜替你记着；而且这份记忆只属于你",
+    sub: "眼镜的“眼睛”看见日常的小事(钥匙放哪、有没有锁门、车停哪、答应了谁、吃没吃药、今天吃了啥)→ <b>只在画面“变了”时存一帧</b>(没变=跳过=µW)→ 压成<b>一个定长超向量 M</b>。" +
+         "可<b>问</b>(钥匙在哪 / 我答应谁什么)· 可<b>是否判断</b>(锁门没?)· 可<b>外科式遗忘</b>(删掉一段私事)· 可<b>反事实/撤销</b>。<b>全程在眼镜上、永不上云、你握着删除键。</b>",
+    pitch: "<b>为什么这块属于设备、不属于云：</b>" +
+           "大模型在“复杂推理 / 复杂问答”上比我们强 —— 那不是我们抢的活。我们抢的是<span class=\"k\">留在你设备上、可证明精确、你拥有删除键</span>这件云端给不了的事。" +
+           "这份日常记忆是 <span class=\"k\">µW 级、端上常开</span>的纯向量代数(bind / unbind / 加减)——它不跟你的 LLM 抢算力，" +
+           "而是给它配一个<b>私有、可遗忘、可审计的长记忆</b>：云端没法“把今天和某人的一段对话从我的记忆里精确抹掉、还能证明抹干净了”——<b>这正是私有设备的命门</b>。" +
+           "<br><span class=\"stat\">（这一版是 monako「私有记忆层」demo 的<b>更广日常版</b>——同一个记忆核，铺到生活里的一百件小事。）</span>",
+    honest: "<b>诚实边界（no-vaporware，给工程师看）：</b>" +
+            "① <b>把画面/语音变成「钥匙 / 已锁门 / B2 车位 / 妈妈 / 二甲双胍」是识别前端的活</b>(检测器 / VLM / 编码器 = 前端 + 云 / 模型，边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>记忆代数的逻辑</b>，<b>不声称我们识别更强</b>。" +
+            "② <b>“情景记忆问答”本身不简单，大模型能做复杂问答</b>——我们不比它聪明。我们的护城河 = <b>端上 + 私有 + 可逆(你删) + 确定(可证明精确)</b>。" +
+            "③ <b>容量是定理(~D/20)</b>：D=10,000 舒服装 ~500 条经历，满了会串扰，不是“记住一切”。" +
+            "④ 实测：这套代数(回忆 / 是否判断 / 遗忘 / 反事实 / 撤销)在 D=30k <b>全部精确 1.000</b>(<code>t8_app_editable_memory.py</code>，3 seed)；本页用 D=10k 同一套 ±1 VSA，节点已自检通过。",
+    btnSample: "▶ 载入示例的一天",
+    btnMerge: "＋ 合并家人的备忘",
+    btnSep: "－ 分离家人",
+    btnClear: "清空",
+    dayCaption: "<b>这一天</b>（台账仅供你看 / 审计；真相在 M 里，每条 = <code>bind(对象, 关系, 值)</code>）：",
+    dayEmpty: "还没有记忆。",
+    gateHead: "<b>⑤ 变化驱动的捕获</b>：眼睛逐帧看，<b>画面没变 = 跳过 = 不存(µW)</b>；只有<b>变了</b>才存一帧、绑进 M。",
+    gSeenLbl: "看过的帧", gStoredLbl: "真正存下的", gSkipLbl: "跳过的(静止)", gSaveLbl: "省下的写入",
+    gateInit: "点“载入示例的一天”会自动跑一遍：看 1 段重复静止画面(跳过)、再看 1 个变化(存下)。",
+    gateDone: (seen,stored,skipped,pct)=>`这段里 <b>${seen}</b> 帧，只有 <b class="ok">${stored}</b> 帧“变了”被存进 M，<b>${skipped}</b> 帧静止被跳过(µW)——` +
+      `省下 <b class="ok">${pct}%</b> 的写入 / 能耗。<b>这就是 store-on-CHANGE：静止 = 跳过 = µW。</b>`,
+    gateStore: "存", gateSkip: "跳",
+    gateLegChanged: "变了 → 存一帧(写 M)", gateLegSkipped: "没变 → 跳过(µW，不写)",
+    q1Title: "① 问眼镜 · <b>unbind(M, 对象⊙关系)</b>",
+    btnAsk: "问", btnAskKey: "钥匙在哪？", btnAskCar: "车停哪了？", btnAskProm: "我答应了谁什么？",
+    q1Init: "例：「钥匙 · 位置」→ 它从 M 里 unbind 出答案；或点“车停哪了 / 我答应了谁什么”。",
+    q2Title: "② 是否判断 · <b>锁门没？ / 吃药了没？</b>（boolean recall）",
+    btnLock: "🚪 我锁门了吗？", btnMed: "💊 我吃药了吗？", btnEat: "🍱 我今天吃了啥？",
+    q2Init: "例：问“锁门没” → 从 M 里查「门 · 状态」，查到=是(带时间)，查不到=不确定。",
+    q3Title: "③ 外科式遗忘一段私事 · <b>M − Σ其全部事实</b>（被遗忘权）",
+    btnForget: "从记忆里抹掉",
+    q3Init: "选一段私事(如和某人的对话) → 删掉关于它的一切。抹后再问 = 空；问别的 = 照旧。<b>真删，不是隐藏。</b>",
+    q4Title: "④ 反事实 / 撤销 · <b>M − 旧 + 新</b>（不重训）",
+    btnPreview: "预览", btnCommit: "提交", btnUndo: "↶ 撤销",
+    wVPlaceholder: "改成…（新值）",
+    q4Init: "例：把「车 · 位置」改一下 → 预览只改这一条，其余不变；可提交或撤销。",
+    moatHead: "现场可见的护城河（讲给伙伴听）：",
+    moatBody: " 端上 · 私有(不卖你的记忆画像给云)· 确定(每次重查比特一致、不是幻觉)· 可遗忘(删除键在你手里)· µW 变化驱动(静止跳过)。 ",
+    moatTail: " 整天 = <b id=\"memkb\">一个 ~10 KB 向量</b> · 在三值-CIM 芯片上 µW 常开。",
+    moatLast: "大模型在推理上赢我们；我们独占的是 <b>“留在你设备上、删除键你按、且可证明精确”</b>。",
+    footer: "解放谁：<b>Alex</b>，一名上夜班、脑子里同时装着一百件事的<b>护士 / 照护者</b>(认知超载，不是认知障碍)——" +
+            "她需要被卸下“钥匙锁门吃药车位答应谁”这些后台进程，却<b>不愿意被一个会把她一天卖给云的摄像头监视</b>。" +
+            "这一层让她把脑子还给真正重要的事，<b>而代价不是隐私</b>。" +
+            "<br>毫秒纪 · millisecond-era — <b>枯れた技術の水平思考</b>：用成熟的向量符号代数，给随身设备一个云给不了的私有日常记忆核。" +
+            "这页可直接发；底层 = 纯 ±1 VSA(bind / unbind / 加减)，无依赖、单文件、离线可跑。",
+    // ── dynamic-string helpers ──
+    memEmpty: '记忆 M：空 <small>still empty</small>',
+    memEmptyNote: '这一天的全部小事 = 这<b>一个</b>向量；原始画面 / 录音不保留(私有)。',
+    memFull: (D,kb,n)=>`记忆 M = 1 个向量 <small>D=${D.toLocaleString()} · ≈${kb} KB · ${n} 条经历</small>`,
+    memFullNote: (n)=>`这一天 ${n} 条小事 = 上面<b>一个</b>向量；原始画面 / 录音已丢(私有)。`,
+    needSample: "<em>先载入示例的一天。</em>",
+    askResultHit: (e,r,v,barHtml,cosTxt)=>`<b>${e}</b> 的 <b>${r}</b> = <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askResultMiss: (e,r,cosTxt)=>`<em class="bad">M 里查不到「${e}·${r}」</em> <span class="stat">cos=${cosTxt} —— 没记，或已被抹掉。</span>`,
+    askKeyHit: (v,barHtml,cosTxt)=>`🔑 <b>钥匙</b> 在 <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askKeyMiss: '<em class="bad">没记到钥匙位置。</em>',
+    askCarHit: (v,barHtml,cosTxt)=>`🚗 <b>车</b> 停在 <b class="ok">${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}</span>`,
+    askCarMiss: '<em class="bad">没记到车停哪。</em>',
+    askPromHit: (listHtml)=>`📌 答应过：${listHtml}`,
+    askPromNone: '<em>今天没答应什么。</em>',
+    boolHit: (yesWord,e,r,v,barHtml,cosTxt)=>`✅ <b class="ok">${yesWord}</b>：<b>${e}·${r}</b> = <b>${v}</b> ${barHtml} <span class="stat">cos=${cosTxt}（M 里确有这条记忆）</span>`,
+    boolMiss: (e,r,cosTxt)=>`❓ <span class="wn">不确定</span>：M 里没有「${e}·${r}」 <span class="stat">cos=${cosTxt} —— 没记到，或已被抹掉。知道自己不知道，胜过编一个答案。</span>`,
+    eatHit: (listHtml)=>`🍱 今天吃了：${listHtml}`,
+    eatNone: '<em>今天没记到吃啥。</em>',
+    yesLocked: "锁了", yesTookMeds: "吃了",
+    forgetNoEntity: '<em>没有这个对象。</em>',
+    forgetDone: (e,n,r,cosTxt,otherInfo)=>`🗑️ 已从 M 抹掉 <b>${e}</b> 的 ${n} 条。再问 <b>${e}·${r}</b> → <span class="bad">cos=${cosTxt}（没了）</span>${otherInfo}` +
+      `<span class="stat"> —— 真删，可证明抹干净；被遗忘权 = 一个减法。</span>`,
+    forgetOther: (other,v)=>` ； 问 <b>${other}</b> → <span class="ok">${v}（照旧）</span>`,
+    forgetUndo: (e)=>`恢复 ${e}`,
+    q3Cleared: '<em>选一段私事 → 外科式遗忘。</em>',
+    cfNoNew: '<em>输入一个新值。</em>',
+    cfNoRel: (e,r)=>`<em>${e} 没有「${r}」。</em>`,
+    cfPreview: (e,r,vOld,best,barHtml,intactHtml)=>`🔮 假设 <b>${e}·${r}</b>：${vOld} → <b class="ok">${best}</b> ${barHtml}${intactHtml} <span class="stat">（预览，M 未改）</span>`,
+    cfIntact: (oe,or_,ov)=>` ；其余如 <b>${oe}·${or_}</b> 仍 = <span class="ok">${ov}</span>（不变）`,
+    cfUndoLabel: (e,r)=>`撤销 ${e}·${r}`,
+    cfCommitted: (e,r,vNew)=>`✅ 已提交：<b>${e}·${r}</b> = <b class="ok">${vNew}</b>（其余未动，可撤销）`,
+    q4Cleared: '<em>选对象/关系/新值 → 预览反事实。</em>',
+    undoDone: (label)=>`↶ 已撤销：${label}（确定可逆，复原如初）`,
+    mergeDone: (keyV,pkgV)=>`合并后同一个 M 同时答两人：<b>钥匙·位置</b>=<span class="ok">${keyV}</span> ， <b>快递(家人)·位置</b>=<span class="ok">${pkgV}</span>. <span class="stat">bundle = 多设备 / 家庭联邦记忆。</span>`,
+    sepDone: (cosTxt)=>`家人备忘已分离：再问 <b>快递·位置</b> → <span class="bad">cos=${cosTxt}（没了）</span>，你的记忆<span class="ok">完好</span>。<span class="stat"> 联邦可拆。</span>`,
+    sampleLoaded: '<span class="ok">已载入示例的一天（9 条，覆盖钥匙/锁门/车位/答应谁/吃药/吃啥）。</span> 试：①问“钥匙在哪/车停哪了”；②“锁门没/吃药了没”；③抹掉“和朋友的私聊”再问 ta；④把“车·位置”改一下看其余不变。',
+    detNote: (a,b,same)=>`重查「钥匙·位置」两遍 cos=${a} == ${b} ${same?'<span class="ok">✓ 比特一致</span>':'<span class="bad">✗</span>'} ·`,
+    famTag: " ·家人",
+    promArrow: (e,v)=>`<b>${e}</b> → <span class="ok">${v}</span>`,
+    eatArrow: (e,v)=>`<b>${e}</b> → <span class="ok">${v}</span>`
+  }
+};
+
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+  // placeholder is an attribute, not text content
+  const wv=document.getElementById('wV'); if(wv) wv.placeholder=t('wVPlaceholder');
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── canonical → display label map (DISPLAY ONLY; canonical keys feed the HV algebra) ─────────
+// The Chinese strings below are the LANGUAGE-INDEPENDENT HV identity keys (entity/relation/value).
+// They MUST stay byte-identical across languages so the vectors never change. We translate only
+// what is shown on screen via DISP_*.  recall()/DAY/FAMILY/boolAsk all use canonical keys.
+const DISP_ENT = {
+  en: { "钥匙":"keys", "门":"door", "车":"car", "妈妈":"Mom", "同事老张":"colleague Mr. Zhang", "药":"meds",
+        "早餐":"breakfast", "午餐":"lunch", "和朋友的私聊":"private chat with a friend",
+        "女儿":"daughter", "快递":"parcel", "燃气":"gas" },
+  zh: { "钥匙":"钥匙", "门":"门", "车":"车", "妈妈":"妈妈", "同事老张":"同事老张", "药":"药",
+        "早餐":"早餐", "午餐":"午餐", "和朋友的私聊":"和朋友的私聊",
+        "女儿":"女儿", "快递":"快递", "燃气":"燃气" }
+};
+const DISP_REL = {
+  en: { "位置":"location", "状态":"state", "我答应":"I promised", "吃了":"ate", "内容":"content" },
+  zh: { "位置":"位置", "状态":"状态", "我答应":"我答应", "吃了":"吃了", "内容":"内容" }
+};
+const DISP_VAL = {
+  en: {
+    "玄关挂钩上":"on the entryway hook",
+    "出门时已反锁(08:12)":"deadbolted on the way out (08:12)",
+    "B2 停车场 J-14 柱旁":"parking lot B2, by pillar J-14",
+    "周日带她去复诊":"take her to her follow-up on Sunday",
+    "明早发季度报表":"send the quarterly report tomorrow morning",
+    "早餐后吃了二甲双胍(07:48)":"took metformin after breakfast (07:48)",
+    "燕麦+水煮蛋+黑咖啡":"oatmeal + boiled egg + black coffee",
+    "食堂番茄牛腩饭":"cafeteria tomato-brisket rice",
+    "聊了她的离婚(私事)":"talked about her divorce (private)",
+    "周六去公园":"go to the park on Saturday",
+    "门口快递柜 7 号":"locker no. 7 at the door",
+    "出门前已关":"turned off before leaving"
+  },
+  zh: {
+    "玄关挂钩上":"玄关挂钩上",
+    "出门时已反锁(08:12)":"出门时已反锁(08:12)",
+    "B2 停车场 J-14 柱旁":"B2 停车场 J-14 柱旁",
+    "周日带她去复诊":"周日带她去复诊",
+    "明早发季度报表":"明早发季度报表",
+    "早餐后吃了二甲双胍(07:48)":"早餐后吃了二甲双胍(07:48)",
+    "燕麦+水煮蛋+黑咖啡":"燕麦+水煮蛋+黑咖啡",
+    "食堂番茄牛腩饭":"食堂番茄牛腩饭",
+    "聊了她的离婚(私事)":"聊了她的离婚(私事)",
+    "周六去公园":"周六去公园",
+    "门口快递柜 7 号":"门口快递柜 7 号",
+    "出门前已关":"出门前已关"
+  }
+};
+function dE(e){ return (DISP_ENT[LANG] && DISP_ENT[LANG][e]) || e; }
+function dR(r){ return (DISP_REL[LANG] && DISP_REL[LANG][r]) || r; }
+function dV(v){ return (DISP_VAL[LANG] && DISP_VAL[LANG][v]) || v; }
+
+// ───────── HDC core (pure ±1 VSA, verified lineage: t8_app_editable_memory.py all-exact) ─────────
+const D = 10000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bindMul(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cosine(a,b){ let dot=0,na=0,nb=0; for(let i=0;i<D;i++){ dot+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return dot/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+function entHV(e){ return itemHV("ent:"+e); }
+function relHV(r){ return itemHV("rel:"+r); }
+function valHV(v){ return itemHV("val:"+v); }
+function factHV(e,r,v){ return bindMul(bindMul(entHV(e), relHV(r)), valHV(v)); }
+
+// ───────── memory state ─────────
+let M=new Float32Array(D);
+let LEDGER=[];                       // [{e,r,v,b}] b=true if family member's
+let SEEN=new Set();                  // value vocabulary (for cleanup)
+let UNDO=[]; let bRows=null; let preview=null;
+
+function addFact(e,r,v,b){ const h=factHV(e,r,v); for(let i=0;i<D;i++) M[i]+=h[i];
+  LEDGER.push({e,r,v,b:!!b}); SEEN.add(v); }
+function subFact(e,r,v){ const h=factHV(e,r,v); for(let i=0;i<D;i++) M[i]-=h[i];
+  const i=LEDGER.findIndex(x=>x.e===e&&x.r===r&&x.v===v); if(i>=0) LEDGER.splice(i,1); }
+function entities(b){ return [...new Set(LEDGER.filter(x=>b===undefined||x.b===b).map(x=>x.e))]; }
+function relsOf(e){ return [...new Set(LEDGER.filter(x=>x.e===e).map(x=>x.r))]; }
+function valOf(e,r){ const f=LEDGER.find(x=>x.e===e&&x.r===r); return f?f.v:null; }
+
+function recall(e,r){                                 // unbind -> value (cleanup vs seen values)
+  const probe=bindMul(bindMul(M, entHV(e)), relHV(r));
+  let best=null,bs=-2; for(const v of SEEN){ const s=cosine(probe, valHV(v)); if(s>bs){ bs=s; best=v; } }
+  return { v:best, s:bs };
+}
+
+// ───────── UI ─────────
+const $=id=>document.getElementById(id);
+// selects show display labels but keep the canonical key as the option VALUE (HV identity)
+function fillSelKeyed(sel, arr, disp){
+  sel.innerHTML=(arr.length?arr:["—"]).map(x=> x==="—" ? `<option value="—">—</option>`
+    : `<option value="${x}">${disp(x)}</option>`).join("");
+}
+function refreshSelectors(){
+  fillSelKeyed($("aE"), entities(), dE); fillSelKeyed($("aR"), relsOf($("aE").value)||[], dR);
+  fillSelKeyed($("fE"), entities(), dE);
+  fillSelKeyed($("wE"), entities(), dE); fillSelKeyed($("wR"), relsOf($("wE").value)||[], dR);
+}
+function bar(s){ const w=Math.max(0,Math.min(64,Math.round(s*128))); return `<span class="bar" style="width:${w}px"></span>`; }
+function renderDay(){
+  $("day").innerHTML = LEDGER.length ? LEDGER.slice().sort((a,b)=>a.e.localeCompare(b.e)).map(f=>
+    `<div class="ev${f.b?' b':''}"><span class="ent">${dE(f.e)}${f.b?t('famTag'):''}</span><span class="at">${dR(f.r)}</span><span class="v">${dV(f.v)}</span></div>`).join("")
+    : '<div class="stat" style="padding-top:8px">'+t('dayEmpty')+'</div>';
+}
+function renderMem(){
+  const n=LEDGER.length;
+  if(!n){ $("memsize").innerHTML=t('memEmpty'); $("memnote").innerHTML=t('memEmptyNote'); return; }
+  const kb=(D/1024).toFixed(1);
+  $("memsize").innerHTML=t('memFull')(D,kb,n);
+  $("memnote").innerHTML=t('memFullNote')(n);
+}
+function refreshAll(){ refreshSelectors();
+  $("wE").onchange=()=>fillSelKeyed($("wR"),relsOf($("wE").value),dR);
+  $("aE").onchange=()=>fillSelKeyed($("aR"),relsOf($("aE").value),dR);
+  renderDay(); renderMem(); }
+
+// ① ask
+$("aB").onclick=()=>{ const e=$("aE").value, r=$("aR").value; if(!LEDGER.length){ $("aA").innerHTML=t('needSample'); return; }
+  const rec=recall(e,r);
+  $("aA").innerHTML = rec.s>0.08
+    ? t('askResultHit')(dE(e), dR(r), dV(rec.v), bar(rec.s), rec.s.toFixed(3))
+    : t('askResultMiss')(dE(e), dR(r), rec.s.toFixed(3)); };
+$("aKey").onclick=()=>{ if(!LEDGER.length){ $("aA").innerHTML=t('needSample'); return; }
+  const rec=recall("钥匙","位置");
+  $("aA").innerHTML = rec.s>0.08 ? t('askKeyHit')(dV(rec.v), bar(rec.s), rec.s.toFixed(3)) : t('askKeyMiss'); };
+$("aCar").onclick=()=>{ if(!LEDGER.length){ $("aA").innerHTML=t('needSample'); return; }
+  const rec=recall("车","位置");
+  $("aA").innerHTML = rec.s>0.08 ? t('askCarHit')(dV(rec.v), bar(rec.s), rec.s.toFixed(3)) : t('askCarMiss'); };
+$("aProm").onclick=()=>{ const ps=LEDGER.filter(x=>x.r==="我答应");
+  $("aA").innerHTML = ps.length ? t('askPromHit')(ps.map(p=>t('promArrow')(dE(p.e), dV(recall(p.e,"我答应").v))).join("； ")) : t('askPromNone'); };
+
+// ② boolean recall (锁门 / 吃药 / 吃了啥)
+function boolAsk(e,r,yesWord){
+  if(!LEDGER.length){ $("bA").innerHTML=t('needSample'); return; }
+  const rec=recall(e,r);
+  if(rec.s>0.08) $("bA").innerHTML=t('boolHit')(yesWord, dE(e), dR(r), dV(rec.v), bar(rec.s), rec.s.toFixed(3));
+  else $("bA").innerHTML=t('boolMiss')(dE(e), dR(r), rec.s.toFixed(3));
+}
+$("bLock").onclick=()=>boolAsk("门","状态",t('yesLocked'));
+$("bMed").onclick=()=>boolAsk("药","状态",t('yesTookMeds'));
+$("bEat").onclick=()=>{ if(!LEDGER.length){ $("bA").innerHTML=t('needSample'); return; }
+  const meals=LEDGER.filter(x=>x.r==="吃了");
+  $("bA").innerHTML = meals.length ? t('eatHit')(meals.map(m=>t('eatArrow')(dE(m.e), dV(recall(m.e,"吃了").v))).join("； ")) : t('eatNone'); };
+
+// ③ surgical forget a private moment / person
+$("fB").onclick=()=>{ const e=$("fE").value; const rows=LEDGER.filter(x=>x.e===e);
+  if(!rows.length){ $("fA").innerHTML=t('forgetNoEntity'); return; }
+  const removed=rows.map(x=>({...x})); removed.forEach(x=>subFact(x.e,x.r,x.v));
+  UNDO.push({label:t('forgetUndo')(dE(e)), do:()=>removed.forEach(x=>addFact(x.e,x.r,x.v,x.b))}); $("undo").disabled=false;
+  const other=entities().find(x=>x!==e);
+  const q=rows[0], after=recall(e,q.r);
+  const oinfo=other? t('forgetOther')(dE(other), dV(recall(other,relsOf(other)[0]).v)) : '';
+  $("fA").innerHTML=t('forgetDone')(dE(e), removed.length, dR(q.r), after.s.toFixed(3), oinfo);
+  refreshAll(); };
+
+// ④ counterfactual / undo
+$("wPrev").onclick=()=>{ const e=$("wE").value, r=$("wR").value, vNew=($("wV").value||"").trim();
+  if(!vNew){ $("wA").innerHTML=t('cfNoNew'); return; }
+  const vOld=valOf(e,r); if(vOld==null){ $("wA").innerHTML=t('cfNoRel')(dE(e), dR(r)); return; }
+  const fOld=factHV(e,r,vOld), fNew=factHV(e,r,vNew), Sp=new Float32Array(D);
+  for(let i=0;i<D;i++) Sp[i]=M[i]-fOld[i]+fNew[i];
+  const probe=bindMul(bindMul(Sp,entHV(e)),relHV(r)); const cand=new Set([...SEEN,vNew]);
+  let best=null,bs=-2; for(const v of cand){ const s=cosine(probe,valHV(v)); if(s>bs){bs=s;best=v;} }
+  const other=LEDGER.find(x=>!(x.e===e&&x.r===r)); let intact="";
+  if(other){ const op=bindMul(bindMul(Sp,entHV(other.e)),relHV(other.r));
+    let ob=null,obs=-2; for(const v of SEEN){ const s=cosine(op,valHV(v)); if(s>obs){obs=s;ob=v;} }
+    intact=t('cfIntact')(dE(other.e), dR(other.r), dV(ob)); }
+  preview={e,r,vOld,vNew};
+  // best may be vNew (a user-typed value not in DISP_VAL) — fall back to raw via dV()
+  $("wA").innerHTML=t('cfPreview')(dE(e), dR(r), dV(vOld), dV(best), bar(bs), intact);
+  $("wCommit").disabled=false; };
+$("wCommit").onclick=()=>{ if(!preview) return; const {e,r,vOld,vNew}=preview;
+  subFact(e,r,vOld); addFact(e,r,vNew);
+  UNDO.push({label:t('cfUndoLabel')(dE(e), dR(r)), do:()=>{ subFact(e,r,vNew); addFact(e,r,vOld); }}); $("undo").disabled=false;
+  $("wA").innerHTML=t('cfCommitted')(dE(e), dR(r), dV(vNew));
+  $("wCommit").disabled=true; preview=null; refreshAll(); };
+$("undo").onclick=()=>{ const u=UNDO.pop(); if(!u) return; u.do(); $("undo").disabled=!UNDO.length;
+  $("wA").innerHTML=t('undoDone')(u.label); refreshAll(); };
+
+// ── family merge / separate (federated memory) ──
+// NOTE: FAMILY entries are HV-identity keys (Chinese, language-independent), display via DISP_*.
+const FAMILY=[["女儿","我答应","周六去公园"],["快递","位置","门口快递柜 7 号"],["燃气","状态","出门前已关"]];
+$("merge").onclick=()=>{ if(!LEDGER.length){ $("aA").innerHTML=t('needSample'); return; } if(bRows) return;
+  bRows=FAMILY.map(([e,r,v])=>({e,r,v})); bRows.forEach(x=>addFact(x.e,x.r,x.v,true));
+  $("sep").disabled=false; refreshAll();
+  $("aA").innerHTML=t('mergeDone')(dV(recall("钥匙","位置").v), dV(recall("快递","位置").v)); };
+$("sep").onclick=()=>{ if(!bRows) return; bRows.forEach(x=>subFact(x.e,x.r,x.v));
+  const gone=recall("快递","位置"); bRows=null; $("sep").disabled=true; refreshAll();
+  $("aA").innerHTML=t('sepDone')(gone.s.toFixed(3)); };
+
+// ───────── sample day (covers all six daily-life jobs) ─────────
+// NOTE: DAY entries are HV-identity keys (Chinese, language-independent), display via DISP_*.
+const DAY=[
+  ["钥匙","位置","玄关挂钩上"],
+  ["门","状态","出门时已反锁(08:12)"],
+  ["车","位置","B2 停车场 J-14 柱旁"],
+  ["妈妈","我答应","周日带她去复诊"],
+  ["同事老张","我答应","明早发季度报表"],
+  ["药","状态","早餐后吃了二甲双胍(07:48)"],
+  ["早餐","吃了","燕麦+水煮蛋+黑咖啡"],
+  ["午餐","吃了","食堂番茄牛腩饭"],
+  ["和朋友的私聊","内容","聊了她的离婚(私事)"],
+];
+$("sample").onclick=()=>{ doClear(); runGate(()=>{
+    DAY.forEach(([e,r,v])=>addFact(e,r,v,false)); refreshAll();
+    $("aA").innerHTML=t('sampleLoaded');
+  }); };
+
+function doClear(){ M=new Float32Array(D); LEDGER=[]; SEEN=new Set(); UNDO=[]; bRows=null; preview=null;
+  $("undo").disabled=true; $("wCommit").disabled=true; $("sep").disabled=true; refreshAll();
+  $("aA").innerHTML=t('q1Init'); $("bA").innerHTML=t('q2Init');
+  $("fA").innerHTML=t('q3Cleared'); $("wA").innerHTML=t('q4Cleared');
+  resetGate(); }
+$("clear").onclick=doClear;
+
+// ───────── ⑤ change-gated capture (drives a small animation, ALSO driven in node) ─────────
+// model a stream of "frames"; identical-to-previous frames are SKIPPED (µW), changed frames STORED.
+const gcv=$("gateCv"), gctx=gcv?gcv.getContext("2d"):null;
+// a frame = a small fingerprint number. repeated value = static scene = skip.
+const FRAME_STREAM = [10,10,10,10,10, 23, 23,23,23, 41, 41,41,41,41,41, 58, 58,58, 77];
+let gState=null;
+
+function gateScan(stream){
+  // returns {seen, stored, skipped, marks[]} ; mark.stored=true if frame differed from prev
+  let prev=null, seen=0, stored=0, skipped=0; const marks=[];
+  for(const f of stream){ seen++; const changed=(f!==prev);
+    if(changed){ stored++; marks.push({v:f,stored:true}); prev=f; }
+    else { skipped++; marks.push({v:f,stored:false}); } }
+  return {seen, stored, skipped, marks};
+}
+function resetGate(){ gState=null; if($("gFrames")){ $("gFrames").textContent="0"; $("gStored").textContent="0";
+  $("gSkip").textContent="0"; $("gSave").textContent="0%"; }
+  if(gctx){ gctx.fillStyle="#11161c"; gctx.fillRect(0,0,gcv.width,gcv.height); }
+  if($("gLive")) $("gLive").innerHTML=t('gateInit'); }
+
+function drawGate(idx){
+  if(!gctx) return; const W=gcv.width,H=gcv.height; gctx.fillStyle="#11161c"; gctx.fillRect(0,0,W,H);
+  const n=FRAME_STREAM.length, bw=Math.floor((W-20)/n), top=14, bh=46;
+  for(let i=0;i<n;i++){ const m=gState.marks[i]; const x=10+i*bw;
+    const shown = i<=idx;
+    if(!shown){ gctx.fillStyle="#1b2530"; }
+    else if(m.stored){ gctx.fillStyle = (i===idx)?"#3fdf8f":"#256b48"; }
+    else { gctx.fillStyle = (i===idx)?"#33424f":"#202a34"; }
+    gctx.fillRect(x, top, bw-3, bh);
+    if(shown){ gctx.fillStyle = m.stored? "#0b160f" : "#7d8ea0"; gctx.font="9px sans-serif"; gctx.textAlign="center";
+      gctx.fillText(m.stored?t('gateStore'):t('gateSkip'), x+(bw-3)/2, top+bh/2+3); }
+  }
+  // legend
+  gctx.textAlign="left"; gctx.font="11px sans-serif";
+  gctx.fillStyle="#3fdf8f"; gctx.fillRect(10, top+bh+12, 12,12); gctx.fillStyle="#8da2b5"; gctx.fillText(t('gateLegChanged'), 28, top+bh+22);
+  gctx.fillStyle="#202a34"; gctx.fillRect(190, top+bh+12, 12,12); gctx.fillStyle="#8da2b5"; gctx.fillText(t('gateLegSkipped'), 208, top+bh+22);
+}
+function runGate(done){
+  gState=gateScan(FRAME_STREAM); let i=0;
+  const tick=()=>{ if(i>=FRAME_STREAM.length){
+      const r=gState; const pct=Math.round(r.skipped/r.seen*100);
+      $("gLive").innerHTML=t('gateDone')(r.seen, r.stored, r.skipped, pct);
+      if(done) done(); return; }
+    const seenN=i+1; let st=0,sk=0; for(let k=0;k<=i;k++){ gState.marks[k].stored?st++:sk++; }
+    $("gFrames").textContent=seenN; $("gStored").textContent=st; $("gSkip").textContent=sk;
+    $("gSave").textContent=Math.round(sk/seenN*100)+"%";
+    drawGate(i); i++; setTimeout(tick, 80); };
+  tick();
+}
+
+// detnote: surface a tiny live determinism proof line in the moat box
+function setDetNote(){ // (filled after sample load — re-query bit-identical)
+  if(!LEDGER.length){ $("detnote").textContent=""; return; }
+  const a=recall("钥匙","位置").s, b=recall("钥匙","位置").s;
+  $("detnote").innerHTML = t('detNote')(a.toFixed(6), b.toFixed(6), a===b);
+}
+const _origRefresh = refreshAll;
+refreshAll = function(){ _origRefresh(); setDetNote(); };
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  refreshAll();               // re-renders day ledger, mem box, selectors, detnote in current LANG
+  // re-render the gate strip + its live text in the current language
+  if(gState){
+    drawGate(FRAME_STREAM.length-1);
+    const r=gState; const pct=Math.round(r.skipped/r.seen*100);
+    $("gLive").innerHTML=t('gateDone')(r.seen, r.stored, r.skipped, pct);
+  } else {
+    resetGate();
+  }
+}
+
+// init
+applyStatic();
+resetGate();
+refreshAll();
+// seed the four answer panes with their localized init text
+$("aA").innerHTML=t('q1Init'); $("bA").innerHTML=t('q2Init');
+$("fA").innerHTML=t('q3Cleared'); $("wA").innerHTML=t('q4Cleared');
+</script>
+</body>
+</html>
+</content>
+</invoke>

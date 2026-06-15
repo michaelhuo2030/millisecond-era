@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rare-Event Microscopy · autonomous capture of circulating tumor cells (Millisecond Era)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#58a6ff;
+          --ctc:#5ee6c0; --her2:#c792ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:520px; } .right{ flex:1; min-width:360px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button.good{ background:var(--good); color:#04210f; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  canvas#field { width:100%; background:#05080b; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:14px; border-radius:7px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .1s; }
+  .gauges { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .gauge { flex:1; min-width:120px; background:#0b0f14; border:1px solid var(--line); border-radius:10px; padding:9px 11px; }
+  .gauge .k{ color:var(--mut); font-size:11px; } .gauge .v{ font-size:18px; font-weight:800; margin-top:2px; }
+  .panel-h { font-size:15px; font-weight:800; }
+  .ev { border:1px solid var(--line); border-radius:11px; padding:11px; margin-bottom:11px; background:#0b0f14; }
+  .ev.flash { border-color:var(--ctc); box-shadow:0 0 0 2px rgba(94,230,192,.22); }
+  .ev.debris { border-color:var(--warn); opacity:.92; }
+  .ev .top { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
+  .badge { font-weight:800; font-size:12px; letter-spacing:.5px; padding:2px 9px; border-radius:5px;
+        background:linear-gradient(#168f74,#0c5f4d); color:#eafff8; }
+  .badge.debris{ background:linear-gradient(#9a6f12,#6e4e0a); color:#fff4d6; }
+  .badge.her2{ background:linear-gradient(#7d4fc0,#5a338f); color:#f3eaff; }
+  .vtime{ color:var(--mut); font-size:12px; margin-left:auto; }
+  .thumb { display:flex; gap:8px; margin:6px 0; align-items:center; }
+  .thumb canvas{ width:84px; height:84px; border-radius:7px; border:1px solid var(--line); background:#05080b; }
+  .meta { font-size:12px; color:#cdd9e4; }
+  .meta b{ color:var(--txt); }
+  .evbtns { display:flex; gap:7px; margin-top:7px; flex-wrap:wrap; }
+  .evbtns button{ padding:6px 10px; font-size:12.5px; }
+  .report { white-space:pre-wrap; background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px;
+        font:12.5px/1.5 ui-monospace,Menlo,monospace; color:#cfe3f5; margin-top:8px; max-height:240px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  .legend{ display:flex; gap:14px; font-size:11.5px; color:var(--mut); margin-top:6px; flex-wrap:wrap; }
+  .legend i{ display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin-right:4px; }
+  .editbox { border-top:1px dashed var(--line); margin-top:13px; padding-top:12px; }
+  .editbox h3{ margin:0 0 8px; font-size:14px; } .editbox h3 b{ color:var(--her2); }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
+</style>
+</head>
+<body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
+<header>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
+</header>
+
+<div class="honest" data-i18n-html="honest"></div>
+
+<div class="wrap">
+  <!-- LEFT: scanning field + surprise router -->
+  <div class="card left">
+    <div class="row">
+      <button id="run" class="good" data-i18n="btnRun"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
+    </div>
+    <canvas id="field" width="500" height="320"></canvas>
+    <div class="legend">
+      <span><i style="background:#1a2a33"></i><span data-i18n="legNormal"></span></span>
+      <span><i style="background:#5ee6c0"></i><span data-i18n="legCtc"></span></span>
+      <span><i style="background:#f4c152"></i><span data-i18n="legDebris"></span></span>
+      <span><i style="background:#c792ea"></i><span data-i18n="legHer2"></span></span>
+    </div>
+
+    <div class="stat" style="margin-top:11px"><span data-i18n-html="surpriseLine"></span>
+      <span id="slbl" class="ok"></span></div>
+    <div class="meter"><i id="sfill"></i></div>
+
+    <div class="gauges">
+      <div class="gauge"><div class="k" data-i18n="gTiles"></div><div class="v" id="gtiles">0</div></div>
+      <div class="gauge"><div class="k" data-i18n="gCaps"></div><div class="v" id="gcaps">0</div></div>
+      <div class="gauge"><div class="k" data-i18n="gSave"></div><div class="v" id="gsave">100%</div></div>
+    </div>
+
+    <div class="editbox">
+      <h3 data-i18n-html="editTitle"></h3>
+      <div class="row">
+        <button id="forget" class="warn" disabled data-i18n="btnForget"></button>
+        <button id="her2" class="sec" disabled data-i18n="btnHer2"></button>
+      </div>
+      <div class="stat" id="editNote"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: captured-events ledger -->
+  <div class="card right">
+    <div class="row">
+      <span class="panel-h" data-i18n="panelH"></span>
+      <span class="stat" id="memstat" style="margin-left:auto"></span>
+    </div>
+
+    <div class="row">
+      <button id="report" class="warn" disabled data-i18n="btnReport"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
+    </div>
+
+    <div id="evlist"></div>
+    <div id="reportbox"></div>
+    <div id="auditbox"></div>
+
+    <div class="moat" data-i18n-html="moat"></div>
+  </div>
+</div>
+
+<script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Rare-Event Microscopy · autonomous capture of circulating tumor cells (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 3/N",
+    h1: "Rare-event microscopy · one in a million — autonomously catch circulating tumor cells (CTCs) on a blood smear",
+    sub: "The microscope’s “eye” sweeps a blood smear with a <b>cheap low-resolution</b> scan (a field full of dark normal cells) → a <b>frugal surprise router</b> (rare = deviation from the dark background = <b>predictive residual</b>) aims the expensive <b>high-resolution z-stack focus-capture</b> at that one bright spot → a private, editable, deterministic flagged-cell ledger. <b>Sub-second steering on the edge, no cloud latency.</b>",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>Automated microscopy + deep-learning rare-cell detection already exist</b> (Leica, Zeiss, and a large CTC-detection literature) — we do <b>not</b> claim to detect more accurately; recognition/segmentation is a commodity. ② The real gap = <b>sub-second steering on the edge</b> (the moment surprise appears → focus-capture; a cloud round-trip would miss it) + <b>reversible memory</b> (refine “what counts as a true CTC” after the fact, surgically forget artifacts, <b>no retraining</b>) + <b>deterministic provenance</b> (prove <b>when and on what grounds</b> each cell was flagged — not “the model said so”). ③ What HDC memory does here is the <b>back-end</b>: bind a flagged cell as <code>bind(cellID, fluorescent signature)</code> — deterministic, reversible, surgically deletable. Extracting “what the cell looks like” is the front-end imaging/segmentation’s job (mature). ④ <b>This demo scripts the field to show the logic</b> (dark background + a few real rare bright spots + distractor debris); brightness, residual and capture are really computed, not a pre-recorded video.",
+    legNormal: "normal cells (dark background)",
+    legCtc: "rare bright spot, CTC (surprise)",
+    legDebris: "debris/artifact (nucleus <8µm)",
+    legHer2: "HER2+ flagged",
+    surpriseLine: "Surprise = <b>field brightness deviation from the dark background</b> (predictive residual, <b>not</b> a full-resolution scan of the whole slide):",
+    gTiles: "fields scanned", gCaps: "captures (only on surprise)", gSave: "high-res shots saved",
+    editTitle: "★ Editable memory (the moat) · <b>refine what counts as a true CTC after the fact, zero retraining</b>",
+    btnRun: "▶ Start scanning (low-res eye)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    btnForget: "Nucleus <8µm = debris/artifact → forget this class",
+    btnHer2: "Add HER2 marker signature → ignore the old one",
+    panelH: "Capture ledger (ranked by surprise magnitude = true-CTC likelihood)",
+    btnReport: "📄 Generate pathology flag report (Dr. Chen reviews)",
+    btnAudit: "🔒 Verify determinism (provenance)",
+    memEmpty: "M: empty",
+    memFull: (n)=>`M = 1 vector · ${n} flagged cells`,
+    editNoteInit: "After a few captures, you can <b>surgically forget</b> debris here (subtraction, exactly removed from M), or <b>add a new fluorescent-marker</b> search signature — all without a factory trip or retraining.",
+    evEmpty: "No captures yet. After scanning starts, the surprise router triggers a high-res z-stack capture only at bright spots, listed here (cellID / signature / surprise / time / thumbnail).",
+    evEmptyMid: "No captures yet. After scanning starts, the surprise router triggers a high-res capture only at bright spots.",
+    slCalm: "calm (background)",
+    slSurprise: "⚠ surprise! bright spot deviates from dark background → focus-capture",
+    slRising: "note: brightness rising",
+    slDone: "✓ slide scan complete",
+    captureNote: (id,dia,resid,sig)=>`📸 <b class="bad">high-res z-stack capture</b>: ${id} · nucleus ${dia}µm · surprise ${resid} — bound into the private ledger <code>bind(cellID, ${sig})</code>.`,
+    evRemoved: (id,dia)=>`🗑 surgically forgotten (artifact): ${id} · nucleus ${dia}µm — exactly subtracted from M, verifiably wiped clean.`,
+    labelDebris: "suspected debris/artifact",
+    labelHer2: "HER2+ positive candidate",
+    labelCtc: "CTC candidate",
+    metaNucleus: "nucleus",
+    metaTooSmall: '(&lt;8µm = too small, typical debris)',
+    metaSurpMag: "surprise magnitude (true-CTC likelihood)",
+    metaTrigger: (th)=>`trigger: <b>predictive residual</b> of brightness vs dark background &gt; ${th} (<b>not</b> a full-resolution whole-slide scan)`,
+    btnProve: "🔍 trace provenance (deterministic)",
+    btnForgetOne: "surgically forget",
+    proveOut: (id,sig,cosv)=>`unbind(M, cellID “${id}”) → signature “${sig}” cos=${cosv} ✓ this cell is indeed in M; when/on-what-grounds it was flagged is bit-level reproducible (same result every time).`,
+    forgetOneNote: (id,cosv)=>`🗑 ${id} surgically forgotten (right-to-be-forgotten = subtraction). Check: unbind → cos=${cosv} (dropped to noise = truly wiped clean).`,
+    forgetAllNote: (n)=>`★ <b>Editable memory</b>: surgically forget the whole <b>nucleus &lt;8µm debris/artifact</b> class (${n} of them, exactly subtracted from M). This is <b>refining what counts as a true CTC after the fact</b> — subtraction, zero retraining. Future scans will also ignore this kind of bright spot.`,
+    her2Note: `★ <b>Editable memory</b>: add the new fluorescent-marker <b style="color:var(--her2)">HER2+</b> search signature (ignore the old CK marker). As scanning continues, HER2+ cells previously treated as “another type” will be captured as <b>true targets</b> — switching the search target, <b>no retraining</b>.`,
+    repTitle: "====== Circulating tumor cell (CTC) flag report (draft, pathologist reviews) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repSlide: "Slide: blood smear BS-2026-0612-07 · Device: on-edge autonomous microscopy node (sub-second steering, no cloud)",
+    repSig: (sig,debris)=>`Search signature (current): ${sig}${debris?" · ignoring nucleus<8µm debris":""}`,
+    repCount: (total,live)=>`Total captures (focused only on surprise): ${total} · current active flags: ${live}`,
+    repRankHdr: "—— ranked by surprise magnitude (true-CTC likelihood) ——",
+    repRow: (k,id,sig,dia,surp,tile,when)=>`【${k}】 ${id} · signature ${sig} · nucleus ${dia}µm · surprise ${surp} · captured at field ${tile} @ ${when}`,
+    repNote1: "Note: this report is generated autonomously on the edge; the raw z-stack stays on-device;",
+    repNote2: "final diagnosis and whether to re-examine is Dr. Chen's (the pathologist's) call — no automatic diagnosis.",
+    repFoot: "This draft + the high-res z-stacks are in your hands, kept on-device. Re-examine only if you choose — no automatic diagnosis.",
+    auditHdr: "Deterministic provenance self-check (run the same query twice, compare bit-by-bit):",
+    auditRow: (id,sig,a,b,ok)=>` ${id} → signature ${sig}: cos ${a} == ${b}  ${ok?"✓":"✗"}\n`,
+    auditPass: "all bits identical ✓ — when and on what grounds each cell was flagged is court-/audit-grade reproducible, not “the model said so”.",
+    auditFail: "inconsistency detected ✗",
+    auditVerdict: (txt)=>`\nVerdict: ${txt}`,
+    auditNone: "no active flags",
+    moat: "<b>The moat, visible at the bench:</b> sub-second steering on the edge (a cloud round-trip would miss the capture window) · <b>reversible memory</b> (refine after the fact what counts as a true rare cell, surgically forget artifacts, no retraining) · deterministic provenance (prove when and on what grounds each cell was flagged) · <b>capture only the anomalies</b> (cheap, not the whole slide at full resolution).<br>Who it liberates: Dr. Chen — a pathologist hunting CTCs (one in a million) in blood for cancer diagnosis; speeds up diagnosis, frees pathologists from the drudgery of whole-slide scanning, and the editable cell library can even be shared across institutions.",
+    scanBand: "low-res scan band (cheap eye) ↓",
+    // display labels for HV-key signatures (keys themselves are language-independent constants)
+    sigCTC: "CK+/CTC", sigHER2: "HER2+", sigDEBRIS: "debris/artifact",
+    locale: "en-US"
+  },
+  zh: {
+    docTitle: "稀有事件显微 · 自主捕获循环肿瘤细胞 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 3/N",
+    h1: "稀有事件显微 · 百万里挑一 —— 在血涂片里自主捕获循环肿瘤细胞(CTC)",
+    sub: "显微镜的“眼睛”用<b>廉价低分辨</b>扫过血涂片(满屏暗的正常细胞)→ <b>俭省的惊奇路由器</b>(稀有 = 偏离暗背景 = <b>预测残差</b>)只把昂贵的<b>高分辨 z-stack 对焦捕获</b>对准那一个亮点 → 私有·可编辑·确定的标记台账。<b>端上亚秒级转向,没有云延迟。</b>",
+    honest: "<b>诚实边界 + 伦理(no-vaporware)：</b> ① <b>自动化显微 + 深度学习稀有细胞检测早已存在</b>(Leica、Zeiss、以及大量 CTC-detection 文献) —— 我们<b>不声称</b>检出更准,识别/分割是商品。 ② 真正的缝隙 = <b>端上亚秒级转向</b>(惊奇出现→对焦捕获那一刻,云往返延迟会错过)+ <b>可逆记忆</b>(事后细化“什么算真 CTC”,外科式遗忘伪影,<b>不重训</b>)+ <b>确定性溯源</b>(证明每个细胞是<b>何时、凭什么</b>被标记,不是“模型说的”)。 ③ HDC 记忆这里做的是<b>后端</b>:把标记的细胞绑成 <code>bind(细胞ID, 荧光签名)</code>,确定、可逆、可外科式删除。把“细胞长什么样”提出来是前端成像/分割的活(成熟)。 ④ <b>本 demo 用脚本化的视野演示逻辑</b>(暗背景 + 少量真稀有亮点 + 干扰碎屑),亮度、残差、捕获都是真算出来的,不是预录视频。",
+    legNormal: "正常细胞(暗背景)",
+    legCtc: "稀有亮点 CTC(惊奇)",
+    legDebris: "碎屑/伪影(核径<8µm)",
+    legHer2: "HER2+ 标记",
+    surpriseLine: "惊奇信号 = <b>视野亮度偏离暗背景</b>(预测残差,<b>非</b>全片满分辨扫描):",
+    gTiles: "已扫视野", gCaps: "捕获次数(只在惊奇)", gSave: "省下的高分辨拍摄",
+    editTitle: "★ 可编辑记忆(护城河) · <b>事后细化什么算真 CTC,零重训</b>",
+    btnRun: "▶ 开始扫描(低分辨眼)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    btnForget: "核径 &lt;8µm = 碎屑/伪影 → 忘掉这类",
+    btnHer2: "加入 HER2 标记签名 → 忽略旧标记",
+    panelH: "捕获台账(按惊奇幅值 = 真 CTC 似然 排序)",
+    btnReport: "📄 生成病理标记报告(Dr. Chen 审核)",
+    btnAudit: "🔒 验确定性(溯源)",
+    memEmpty: "M：空",
+    memFull: (n)=>`M = 1 向量 · ${n} 个标记细胞`,
+    editNoteInit: "扫描出几个捕获后,可在此<b>外科式遗忘</b>碎屑(减法,从 M 精确减去),或<b>加入新荧光标记</b>的搜索签名 —— 都不回厂、不重训。",
+    evEmpty: "还没有捕获。开始扫描后,惊奇路由器只在亮点处触发高分辨 z-stack 捕获,出现在这里(细胞ID/签名/惊奇/时间/缩略图)。",
+    evEmptyMid: "还没有捕获。开始扫描后,惊奇路由器只在亮点处触发高分辨捕获。",
+    slCalm: "平静(背景)",
+    slSurprise: "⚠ 惊奇! 亮点偏离暗背景 → 对焦捕获",
+    slRising: "注意:亮度上升中",
+    slDone: "✓ 本片扫描结束",
+    captureNote: (id,dia,resid,sig)=>`📸 <b class="bad">高分辨 z-stack 捕获</b>:${id} · 核径 ${dia}µm · 惊奇 ${resid} —— 已绑进私有台账 <code>bind(细胞ID, ${sig})</code>。`,
+    evRemoved: (id,dia)=>`🗑 已外科式遗忘(伪影):${id} · 核径 ${dia}µm —— 从 M 精确减去,可复核已删干净。`,
+    labelDebris: "疑似碎屑/伪影",
+    labelHer2: "HER2+ 阳性候选",
+    labelCtc: "CTC 候选",
+    metaNucleus: "核径",
+    metaTooSmall: '(&lt;8µm = 太小,典型碎屑)',
+    metaSurpMag: "惊奇幅值(真 CTC 似然)",
+    metaTrigger: (th)=>`触发方式:亮度偏离暗背景的<b>预测残差</b> &gt; ${th}(<b>非</b>全片满分辨)`,
+    btnProve: "🔍 溯源复核(确定性)",
+    btnForgetOne: "外科式遗忘",
+    proveOut: (id,sig,cosv)=>`unbind(M, 细胞ID「${id}」) → 签名「${sig}」 cos=${cosv} ✓ 该细胞确在 M 中,何时/凭什么标记可比特级复核(每次结果一致)。`,
+    forgetOneNote: (id,cosv)=>`🗑 已把 <b>${id}</b> 外科式遗忘(被遗忘权=减法)。复核:unbind → cos=${cosv}(已降到噪声=真删干净)。`,
+    forgetAllNote: (n)=>`★ <b>可编辑记忆</b>:把<b>核径&lt;8µm 的碎屑/伪影</b>这一类外科式遗忘(${n} 个,从 M 精确减去)。这是<b>事后细化什么算真 CTC</b> —— 减法,零重训。今后扫描也会忽略这类亮点。`,
+    her2Note: `★ <b>可编辑记忆</b>:加入新荧光标记 <b style="color:var(--her2)">HER2+</b> 的搜索签名(忽略旧 CK 标记)。继续扫描时,之前被当作“其他类型”的 HER2+ 细胞会被当作<b>真目标</b>捕获 —— 切换搜索目标,<b>无需重训</b>。`,
+    repTitle: "====== 循环肿瘤细胞(CTC)标记报告(草稿,病理医生审核)======",
+    repGen: (t)=>`生成时间:${t}`,
+    repSlide: "载玻片:血涂片 BS-2026-0612-07 · 设备:端上自主显微节点(亚秒级转向,无云)",
+    repSig: (sig,debris)=>`搜索签名(当前):${sig}${debris?" · 已忽略 核径<8µm 碎屑":""}`,
+    repCount: (total,live)=>`捕获总数(只在惊奇处对焦):${total} · 当前有效标记:${live}`,
+    repRankHdr: "—— 按惊奇幅值(真 CTC 似然)排序 ——",
+    repRow: (k,id,sig,dia,surp,tile,when)=>`【${k}】 ${id} · 签名 ${sig} · 核径 ${dia}µm · 惊奇 ${surp} · 捕获于视野 ${tile} @ ${when}`,
+    repNote1: "说明:本报告在端上自主生成,原始 z-stack 留本机;",
+    repNote2: "最终诊断与是否复检由 Dr. Chen(病理医生)决定 —— 无自动诊断。",
+    repFoot: "这份草稿 + 高分辨 z-stack 在你手里,本机留存。要复检才复检 —— 没有自动诊断。",
+    auditHdr: "确定性溯源自检(同一查询跑两遍,逐位比较):",
+    auditRow: (id,sig,a,b,ok)=>` ${id} → 签名 ${sig}: cos ${a} == ${b}  ${ok?"✓":"✗"}\n`,
+    auditPass: "全部比特一致 ✓ —— 每个细胞何时、凭什么被标记可法庭级/审计级复核,不是“模型说的”。",
+    auditFail: "出现不一致 ✗",
+    auditVerdict: (txt)=>`\n结论:${txt}`,
+    auditNone: "无有效标记",
+    moat: "<b>现场可见的护城河：</b>端上亚秒级转向(云往返延迟会错过捕获窗口) · <b>可逆记忆</b>(事后细化什么是真稀有细胞,外科式遗忘伪影,不重训) · 确定性溯源(证明每个细胞何时、凭什么被标记) · <b>只捕获异常</b>(廉价,不全片满分辨)。<br>解放谁:Dr. Chen —— 一位在血里找 CTC(百万里挑一)做癌症诊断的病理医生;加速诊断、把病理医生从枯燥的全片扫描里解放,可编辑的细胞库还能跨院所共享。",
+    scanBand: "低分辨扫描带(廉价眼) ↓",
+    // display labels for HV-key signatures (keys themselves are language-independent constants)
+    sigCTC: "CK+/CTC", sigHER2: "HER2+", sigDEBRIS: "碎屑/伪影",
+    locale: "zh-CN"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+
+// ── flagged-cell ledger ──
+// SIGS = fluorescent-marker classes the instrument is searching for. These are INTERNAL HV
+// KEYS — language-independent on purpose (byte-identical across EN/中) so the vectors never
+// change. Their human-readable display label comes from t() via sigLabel().
+const SIGS = ["CK+/CTC", "HER2+", "DEBRIS"];
+function sigLabel(sig){ if(sig==="HER2+") return t('sigHER2'); if(sig==="DEBRIS") return t('sigDEBRIS'); return t('sigCTC'); }
+// fact = bind(cellID, signature); ledger M = Σ facts (real accumulator, exact subtract = forget).
+function factHV(cellId, sig){ return bind(itemHV("cell:"+cellId), itemHV("sig:"+sig)); }
+let M = new Float32Array(D);
+function addFact(cellId, sig){ const h=factHV(cellId,sig); for(let i=0;i<D;i++) M[i]+=h[i]; }
+function subFact(cellId, sig){ const h=factHV(cellId,sig); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallSig(cellId){            // unbind cellID -> recover its flagged signature (deterministic proof it's in M)
+  const probe = bind(M, itemHV("cell:"+cellId));
+  let best=null,bs=-2; for(const s of SIGS){ const c=cos(probe, itemHV("sig:"+s)); if(c>bs){bs=c;best=s;} }
+  return {sig:best, s:bs};
+}
+
+// ───────── scene: a blood smear under low-res scan ─────────
+// The field scrolls; the "eye" reads a cheap low-res brightness. Most of the field is
+// dark normal cells (low brightness). RARE events = bright fluorescent spots. surprise =
+// brightness deviation from the running dark background (predictive residual, not a fixed level).
+const cv=document.getElementById("field"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height;
+// active search signature (editable). forgetDebris removes debris captures from M; addHER2 switches signature.
+let activeSig = "CK+/CTC";
+let forgetDebrisOn = false;
+
+// scripted rare events: pos in a long virtual strip (scrollY). dia = nuclear diameter (µm),
+// debris are SMALL (<8µm) bright artifacts that LOOK like CTCs to the cheap eye but are not.
+// kind: "ctc" (true), "debris" (small bright artifact), "her2" (a HER2+ cell — only a true target AFTER user adds HER2 signature)
+const RARE = [
+  { id:"C-1041", sy:520,  dia:14.2, bright:0.92, kind:"ctc"    },
+  { id:"D-2207", sy:980,  dia:6.4,  bright:0.83, kind:"debris" },
+  { id:"C-1058", sy:1480, dia:16.8, bright:0.97, kind:"ctc"    },
+  { id:"H-3120", sy:1960, dia:13.1, bright:0.88, kind:"her2"   },
+  { id:"D-2244", sy:2360, dia:7.1,  bright:0.79, kind:"debris" },
+  { id:"C-1072", sy:2820, dia:15.5, bright:0.94, kind:"ctc"    }
+];
+const STRIP_LEN = 3300;            // virtual strip length (px of travel)
+const VIEW_RANGE = 26;             // a rare event is "in view" within ±26px of scan line
+const BG_BRIGHT = 0.10;            // dark normal-cell background brightness
+const SURPRISE_TH = 0.45;          // residual threshold for capture
+let dotsBg = [];                   // ambient dark normal cells (decorative)
+
+// fire-ONCE-per-rare-event-by-IDENTITY: a Set keyed on the event id (its onset), NOT a frame-gap refractory.
+let firedIds = new Set();
+
+let scrollY=0, running=false, timer=null, tilesScanned=0, captures=[], surprise=0, scanT=0;
+
+function seedBackground(){
+  dotsBg=[]; const rng=mulberry32(20260612);
+  for(let i=0;i<150;i++) dotsBg.push({ x:24+rng()*(W-48), y0:rng()*STRIP_LEN, r:3+rng()*4, b:0.06+rng()*0.10 });
+}
+
+// brightness the cheap eye reads at current scan position = background + any rare event in view
+function eyeBrightness(){
+  let b = BG_BRIGHT + 0.02*Math.sin(scanT*0.21);   // mild background ripple
+  let inView = null, best = 0;
+  for(const e of RARE){
+    const d = Math.abs(e.sy - scrollY);
+    if(d < VIEW_RANGE){
+      const prox = 1 - d/VIEW_RANGE;                // triangular in-view profile
+      const contrib = e.bright * prox;
+      if(contrib > best){ best = contrib; inView = e; }
+    }
+  }
+  if(inView) b = Math.max(b, BG_BRIGHT + (inView.bright-BG_BRIGHT)*(best/inView.bright));
+  return { b: Math.min(1, b), inView, prox: inView? best/inView.bright : 0 };
+}
+
+// is this rare event one we currently CARE about? (editable search policy)
+// - debris: a true target only if forget NOT applied (before edit) — after forget, debris is ignored
+// - her2:  a true target only AFTER the user adds the HER2 signature
+// - ctc:   always a target
+function isTarget(kind){
+  if(kind==="ctc")    return true;
+  if(kind==="debris") return !forgetDebrisOn;        // before forgetting, the cheap eye still flags it
+  if(kind==="her2")   return activeSig==="HER2+";    // only after switching search signature
+  return true;
+}
+function sigForKind(kind){
+  if(kind==="her2")   return "HER2+";
+  if(kind==="debris") return "DEBRIS";
+  return "CK+/CTC";
+}
+
+// ───────── drawing ─────────
+function draw(){
+  ctx.fillStyle="#05080b"; ctx.fillRect(0,0,W,H);
+  // dark normal cells scrolling past (decorative, deterministic)
+  for(const d of dotsBg){
+    let y = ((d.y0 - scrollY) % STRIP_LEN + STRIP_LEN) % STRIP_LEN;
+    y = (y/STRIP_LEN)*H*1.0;
+    ctx.beginPath(); ctx.arc(d.x, y, d.r, 0, 7);
+    ctx.fillStyle="rgba(40,70,85,"+d.b.toFixed(2)+")"; ctx.fill();
+  }
+  // rare events near the scan band
+  for(const e of RARE){
+    const d = e.sy - scrollY;
+    if(Math.abs(d) < H*0.5){
+      const y = H*0.5 + d;
+      const target = isTarget(e.kind);
+      let col;
+      if(e.kind==="her2")        col = target? "94,230,192" : "199,146,234";
+      else if(e.kind==="debris") col = "244,193,82";
+      else                        col = "94,230,192";
+      const glow = 6 + 14*e.bright;
+      const g = ctx.createRadialGradient(W*0.5, y, 1, W*0.5, y, glow*1.7);
+      g.addColorStop(0, "rgba("+col+","+(0.95*e.bright)+")");
+      g.addColorStop(1, "rgba("+col+",0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(W*0.5, y, glow*1.7, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(W*0.5, y, glow*0.45, 0, 7);
+      ctx.fillStyle="rgba("+col+",0.95)"; ctx.fill();
+    }
+  }
+  // scan band (the cheap low-res eye's current view)
+  ctx.strokeStyle="rgba(54,163,255,0.55)"; ctx.lineWidth=2;
+  ctx.strokeRect(18, H*0.5-VIEW_RANGE, W-36, VIEW_RANGE*2);
+  ctx.fillStyle="rgba(54,163,255,0.07)"; ctx.fillRect(18, H*0.5-VIEW_RANGE, W-36, VIEW_RANGE*2);
+  ctx.fillStyle="#6f8499"; ctx.font="10px sans-serif"; ctx.textAlign="left"; ctx.textBaseline="bottom";
+  ctx.fillText(t('scanBand'), 22, H*0.5-VIEW_RANGE-3);
+  // progress strip on the right
+  const prog = Math.min(1, scrollY/STRIP_LEN);
+  ctx.fillStyle="#1b2530"; ctx.fillRect(W-12, 10, 5, H-20);
+  ctx.fillStyle="#36a3ff"; ctx.fillRect(W-12, 10, 5, (H-20)*prog);
+}
+
+// captured-event high-res z-stack thumbnail (drawn deterministically from the event)
+function drawThumb(canvas, e){
+  const c=canvas.getContext("2d"), s=canvas.width;
+  c.fillStyle="#05080b"; c.fillRect(0,0,s,s);
+  const rng=mulberry32(strSeed(e.id));
+  for(let i=0;i<22;i++){ const x=rng()*s, y=rng()*s, r=2+rng()*3;
+    c.beginPath(); c.arc(x,y,r,0,7); c.fillStyle="rgba(40,70,85,0.5)"; c.fill(); }
+  let col = e.kind==="debris" ? "244,193,82" : (e.kind==="her2" && e.sig==="HER2+" ? "199,146,234" : "94,230,192");
+  const cx=s/2, cy=s/2, R = (e.dia/18)*s*0.42;
+  const g=c.createRadialGradient(cx,cy,1,cx,cy,R*1.4);
+  g.addColorStop(0,"rgba("+col+",0.98)"); g.addColorStop(1,"rgba("+col+",0)");
+  c.fillStyle=g; c.beginPath(); c.arc(cx,cy,R*1.4,0,7); c.fill();
+  c.beginPath(); c.arc(cx,cy,R*0.5,0,7); c.fillStyle="rgba("+col+",0.95)"; c.fill();
+  c.strokeStyle="rgba(255,255,255,0.25)"; c.lineWidth=1; c.beginPath(); c.arc(cx,cy,R,0,7); c.stroke();
+  c.fillStyle="#9fd0ff"; c.font="9px ui-monospace,monospace"; c.textAlign="left"; c.textBaseline="bottom";
+  c.fillText(e.dia.toFixed(1)+"µm", 4, s-4);
+}
+
+// ───────── surprise router + capture ─────────
+const $=id=>document.getElementById(id);
+function setSurprise(v){
+  surprise=v;
+  $("sfill").style.width=Math.min(100, Math.round(v/(SURPRISE_TH/0.62)*100))+"%";
+  const l=$("slbl");
+  if(v>SURPRISE_TH){ l.textContent=t('slSurprise'); l.className="bad"; }
+  else if(v>SURPRISE_TH*0.5){ l.textContent=t('slRising'); l.className="wn"; }
+  else { l.textContent=t('slCalm'); l.className="ok"; }
+}
+
+function step(){
+  scanT++;
+  scrollY += 6;                 // scan advances
+  if(scanT % 4 === 0) tilesScanned++;
+  const eye = eyeBrightness();
+  const resid = Math.max(0, eye.b - BG_BRIGHT);    // predictive residual vs dark background
+  setSurprise(resid);
+
+  // change-triggered steering: only when residual crosses threshold AND there's a rare event in view
+  if(resid > SURPRISE_TH && eye.inView){
+    const e = eye.inView;
+    // fire ONCE per rare event by IDENTITY (its id), not a frame-gap refractory
+    if(!firedIds.has(e.id) && isTarget(e.kind)){
+      firedIds.add(e.id);
+      capture(e, resid);
+    }
+  }
+  $("gtiles").textContent = tilesScanned.toLocaleString();
+  draw();
+  if(scrollY >= STRIP_LEN){ pause(); finish(); }
+}
+
+function capture(e, resid){
+  const sig = sigForKind(e.kind);
+  const ev = { id:e.id, dia:e.dia, kind:e.kind, sig, surprise:resid, bright:e.bright,
+    when:new Date().toLocaleTimeString(t('locale')), tile:tilesScanned, removed:false };
+  captures.push(ev);
+  addFact(ev.id, sig);            // bind(cellID, signature) into the private editable ledger M
+  renderEvidence();
+  $("editNote").innerHTML = t('captureNote')(e.id, e.dia.toFixed(1), resid.toFixed(3), sigLabel(sig));
+}
+
+function finish(){
+  $("slbl").textContent=t('slDone'); $("slbl").className="ok";
+  $("run").disabled=true; $("pause").disabled=true;
+}
+
+function renderEvidence(){
+  const live=captures.filter(e=>!e.removed);
+  $("memstat").textContent = live.length? t('memFull')(live.length) : t('memEmpty');
+  $("report").disabled = live.length===0;
+  $("audit").disabled = live.length===0;
+  $("forget").disabled = !captures.some(e=>e.kind==="debris" && !e.removed);
+  $("her2").disabled = !captures.length;
+  const el=$("evlist");
+  if(!captures.length){ el.innerHTML='<div class="stat">'+t('evEmptyMid')+'</div>'; return; }
+  // rank by surprise magnitude (= true-CTC likelihood)
+  const ranked=[...captures].sort((a,b)=> b.surprise - a.surprise);
+  el.innerHTML = ranked.map((e)=>{
+    const idx = captures.indexOf(e);
+    if(e.removed) return `<div class="ev debris"><span class="stat">${t('evRemoved')(e.id, e.dia.toFixed(1))}</span></div>`;
+    const isDeb = e.kind==="debris";
+    const isHer = e.sig==="HER2+";
+    const badgeCls = isDeb? "badge debris" : (isHer? "badge her2" : "badge");
+    const evCls = isDeb? "ev debris" : "ev flash";
+    const label = isDeb? t('labelDebris') : (isHer? t('labelHer2') : t('labelCtc'));
+    return `<div class="${evCls}"><div class="top"><span class="${badgeCls}">${sigLabel(e.sig)}</span>
+      <b>${label} · ${e.id}</b><span class="vtime">@ ${t('gTiles')} ${e.tile} · ${e.when}</span></div>
+      <div class="thumb"><canvas width="84" height="84" id="th${idx}"></canvas>
+        <div class="meta">${t('metaNucleus')} <b>${e.dia.toFixed(1)}µm</b>${isDeb?' <span class="wn">'+t('metaTooSmall')+'</span>':''}<br>
+        ${t('metaSurpMag')} <b class="${isDeb?'wn':'ok'}">${e.surprise.toFixed(3)}</b><br>
+        ${t('metaTrigger')(SURPRISE_TH)}</div></div>
+      <div class="evbtns"><button class="sec" onclick="proveIn(${idx})">${t('btnProve')}</button>
+        <button class="hot" onclick="forgetOne(${idx})">${t('btnForgetOne')}</button></div>
+      <div class="audit" id="aud${idx}"></div></div>`;
+  }).join("");
+  // paint thumbnails
+  captures.forEach((e,i)=>{ if(!e.removed){ const cnv=$("th"+i); if(cnv) drawThumb(cnv,e); } });
+}
+
+window.proveIn=(i)=>{ const e=captures[i]; const r=recallSig(e.id);
+  $("aud"+i).textContent = t('proveOut')(e.id, sigLabel(r.sig), r.s.toFixed(3)); };
+
+window.forgetOne=(i)=>{ const e=captures[i]; if(e.removed) return; subFact(e.id, e.sig); e.removed=true;
+  const r=recallSig(e.id); renderEvidence();
+  $("editNote").innerHTML=t('forgetOneNote')(e.id, r.s.toFixed(3)); };
+
+// ───────── editable-memory moat actions ─────────
+$("forget").onclick=()=>{
+  // surgically forget ALL debris-class captures (核径<8µm artifacts) — refine post-hoc, no retraining
+  forgetDebrisOn = true;
+  let n=0;
+  for(const e of captures){ if(e.kind==="debris" && !e.removed){ subFact(e.id, e.sig); e.removed=true; n++; } }
+  renderEvidence();
+  $("editNote").innerHTML = t('forgetAllNote')(n);
+  $("forget").disabled=true;
+};
+$("her2").onclick=()=>{
+  // add a NEW fluorescent-marker search signature (HER2+), ignore the old one — editable, no retraining
+  activeSig = "HER2+";
+  $("editNote").innerHTML = t('her2Note');
+  $("her2").disabled=true;
+  // re-arm so a HER2 event in front of us can now fire
+  for(const e of RARE){ if(e.kind==="her2" && scrollY < e.sy - VIEW_RANGE) firedIds.delete(e.id); }
+};
+
+$("report").onclick=()=>{
+  const live=captures.filter(e=>!e.removed);
+  const ranked=[...live].sort((a,b)=> b.surprise - a.surprise);
+  const lines=[ t('repTitle'),
+    t('repGen')(new Date().toLocaleString(t('locale'))),
+    t('repSlide'),
+    t('repSig')(sigLabel(activeSig), forgetDebrisOn),
+    t('repCount')(captures.length, live.length),
+    "",
+    t('repRankHdr')];
+  ranked.forEach((e,k)=> lines.push(
+    t('repRow')(k+1, e.id, sigLabel(e.sig), e.dia.toFixed(1), e.surprise.toFixed(3), e.tile, e.when)));
+  lines.push("", t('repNote1'), t('repNote2'));
+  $("reportbox").innerHTML=`<div class="report">${lines.join("\n")}</div>
+    <div class="stat" style="margin-top:6px">${t('repFoot')}</div>`;
+};
+
+$("audit").onclick=()=>{
+  const live=captures.filter(e=>!e.removed);
+  let out=t('auditHdr')+"\n";
+  let allsame=true;
+  for(const e of live){ const a=recallSig(e.id).s, b=recallSig(e.id).s; const same=(a===b); allsame=allsame&&same;
+    out+=t('auditRow')(e.id, sigLabel(recallSig(e.id).sig), a.toFixed(6), b.toFixed(6), same); }
+  out+= live.length? t('auditVerdict')(allsame?t('auditPass'):t('auditFail')) : t('auditNone');
+  $("auditbox").innerHTML=`<div class="report">${out}</div>`;
+};
+
+// ───────── derived gauges ─────────
+function refreshGauges(){
+  $("gcaps").textContent = captures.length;
+  // "saved" = fraction of scanned field NOT shot at full res (only captures got the expensive z-stack)
+  const saved = tilesScanned>0 ? Math.max(0, 100 - (captures.length/tilesScanned*100)) : 100;
+  $("gsave").textContent = saved.toFixed(saved>=99.5?0:1)+"%";
+}
+
+// ───────── controls ─────────
+$("run").onclick=()=>{ if(running) return; running=true;
+  $("run").disabled=true; $("pause").disabled=false;
+  timer=setInterval(()=>{ step(); refreshGauges(); }, 33); };
+function pause(){ running=false; $("pause").disabled=true; if(timer){clearInterval(timer);timer=null;}
+  if(scrollY < STRIP_LEN) $("run").disabled=false; }
+$("pause").onclick=pause;
+
+$("reset").onclick=()=>{
+  pause();
+  scrollY=0; scanT=0; tilesScanned=0; captures=[]; surprise=0;
+  M=new Float32Array(D); firedIds=new Set(); activeSig="CK+/CTC"; forgetDebrisOn=false;
+  seedBackground();
+  $("gtiles").textContent="0"; $("gcaps").textContent="0"; $("gsave").textContent="100%";
+  $("run").disabled=false; $("pause").disabled=true;
+  $("report").disabled=true; $("audit").disabled=true; $("forget").disabled=true; $("her2").disabled=true;
+  $("reportbox").innerHTML=""; $("auditbox").innerHTML="";
+  $("editNote").innerHTML=t('editNoteInit');
+  renderEvidence(); setSurprise(0); draw();
+};
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  // editNote: only reset to the init copy when no captures exist (otherwise keep the live note)
+  if(!captures.length){ $("editNote").innerHTML=t('editNoteInit'); }
+  if(scrollY >= STRIP_LEN){ $("slbl").textContent=t('slDone'); $("slbl").className="ok"; }
+  else { setSurprise(surprise); }
+  renderEvidence(); refreshGauges(); draw();
+}
+
+// init
+applyStatic();
+seedBackground();
+$("editNote").innerHTML=t('editNoteInit');
+renderEvidence(); setSurprise(0); draw(); refreshGauges();
+</script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Home Safety Watch · on-device, never the cloud (Millisecond Era)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:430px; } .right{ flex:1; min-width:380px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  canvas#home { width:100%; background:#11161c; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:12px; border-radius:6px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .1s; }
+  .eye { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .pill { font-size:11px; padding:3px 9px; border-radius:11px; border:1px solid var(--line); background:#0b0f14; color:var(--mut); }
+  .pill b{ color:var(--txt); font-weight:700; }
+  .pill.alert{ border-color:var(--hot); color:var(--hot); }
+  .ev { border:1px solid var(--line); border-radius:11px; padding:11px; margin-bottom:11px; background:#0b0f14; }
+  .ev.flash { border-color:var(--hot); box-shadow:0 0 0 2px rgba(255,107,107,.25); }
+  .ev .top { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
+  .etag { font-weight:800; font-size:14px; letter-spacing:.5px; padding:2px 9px; border-radius:5px; background:linear-gradient(#b3261e,#7a160f); color:#fff; }
+  .etag.amber{ background:linear-gradient(#a9710b,#7a4f08); } .etag.blue{ background:linear-gradient(#1565c0,#0d47a1); } .etag.teal{ background:linear-gradient(#0e7490,#0a4f63); }
+  .etype { color:var(--hot); font-weight:700; } .etime{ color:var(--mut); font-size:12px; margin-left:auto; }
+  .thumbs { display:flex; gap:6px; margin:6px 0; } .thumbs img{ width:96px; height:64px; border-radius:5px; border:1px solid var(--line); object-fit:cover; }
+  .evbtns { display:flex; gap:7px; margin-top:6px; }
+  .report { white-space:pre-wrap; background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; font:12.5px/1.5 ui-monospace,Menlo,monospace; color:#cfe3f5; margin-top:8px; max-height:240px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
+</style>
+</head>
+<body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
+<header>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
+</header>
+
+<div class="honest" data-i18n-html="honest"></div>
+
+<div class="wrap">
+  <div class="card left">
+    <div class="row">
+      <button id="play" data-i18n="btnPlay"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
+    </div>
+    <canvas id="home" width="400" height="430"></canvas>
+    <div class="eye">
+      <span class="pill" id="pGas"></span>
+      <span class="pill" id="pStove"></span>
+      <span class="pill" id="pPerson"></span>
+    </div>
+    <div class="stat" style="margin-top:10px"><span data-i18n="surpriseLine"></span><span id="slbl" class="ok"></span></div>
+    <div class="meter"><i id="sfill"></i></div>
+    <div class="stat" id="live" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card right">
+    <div class="row">
+      <b style="font-size:15px" data-i18n="ledgerH"></b>
+      <span class="stat" id="memstat"></span>
+      <button id="genall" class="warn" style="margin-left:auto" disabled data-i18n="btnGenall"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
+    </div>
+    <div id="evlist"></div>
+    <div id="reportbox"></div>
+    <div id="auditbox"></div>
+
+    <div class="moat" data-i18n-html="moat"></div>
+  </div>
+</div>
+
+<script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Home Safety Watch · on-device, never the cloud (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 3/N",
+    h1: "Home safety watch · use the sensors and cameras you already own — guard the kitchen and the elderly, without ever sending the view of your home to the cloud",
+    sub: "Sensors / cameras → <b>an “eye” recognizes the state of your home</b> (gas concentration / stove temperature / is anyone there / is anything moving) → <b>a surprise router wakes only at the moment of anomaly</b> (not recording all day = µW) → it captures one <b>private · deterministic · auditable · deletable</b> <b>event record</b> (time + hazard type + a single thumbnail), and <b>the raw footage is discarded on the spot — only this record is kept.</b> Everything runs on your home’s devices; the video of your home never leaves home.",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>Smoke/gas alarms + home cameras are already commodities</b> (Nest/Ring/Hikvision/Xiaomi/all kinds of smoke detectors) — “can you install a sensor” is not the gap. ② <b>“Seeing that it’s smoking / the stove was left on / an elder fell / a stranger is at the door” is the job of the recognition front-end</b> (the detector = cloud/model, boundary law L1) — this demo uses a <b>scripted scenario</b> to show the <b>logic</b>; the eye’s outputs are simulated, and we do <b>not</b> claim we recognize more accurately. ③ The real gap = <b>on-device + multimodal “change fusion” + private + discard-raw + reporting the “change” rather than a fixed threshold</b> (fixed thresholds = a sea of false alarms, the oil smoke from stir-frying trips them every day) + <b>a forgettable memory that you own</b>. ④ Our moat = <b>µW change-driven + a private · deterministic · auditable · deletable event memory</b> (hazard type bound to time inside one vector, false alarms can be exactly forgotten, bit-level re-verifiable) — <b>not “smarter than the cloud.”</b>",
+    surpriseLine: "Surprise signal (anomaly = an unpredicted change, not recording the whole day): ",
+    ledgerH: "Event ledger (private · editable · forgettable)",
+    btnPlay: "▶ Start watching (simulate one day)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    btnGenall: "📄 Generate today’s safety summary (on-device)",
+    btnAudit: "🔒 Verify determinism",
+    // eye-state pills
+    pGasLabel: "Gas / smoke", pStoveLabel: "Stove", pPersonLabel: "People / activity",
+    gasNormal: "normal", gasRising: "concentration rising ↑",
+    stoveOff: "off", stoveCooking: "cooking", stoveUnattended: "on · no one",
+    personActive: "someone active", personNoneAtStove: "no one at the stove",
+    personDown: "collapsed · no motion for a long time", personStranger: "stranger at the door",
+    // hazard type display names (DISPLAY ONLY — HV identity uses TYPE_IDS, language-independent)
+    typeGas: "Gas leak", typeStove: "Stove left burning", typeFall: "Elder suspected fall", typeStranger: "Stranger at the door",
+    // surprise meter labels
+    surpCalm: "calm", surpWatch: "take note", surpAlert: "⚠ Anomaly! recorded",
+    // live status lines
+    liveIntro: "Click “Start watching.” In the script your home will go through <b>gas concentration rising (suspected leak) → stove left on with no one there (dry burning) → an elder motionless for a long time (suspected fall) → a stranger appears at the door</b> — the router wakes only at that moment and keeps a single event record.",
+    liveDone: '<span class="ok">This watch segment is over.</span> On the right are the captured events — you can mark false alarms (exact deletion), generate today’s summary, and verify determinism.',
+    liveReset: "Reset.",
+    liveCapture: (type, time)=>`🔔 <span class="bad">Anomaly: ${type}</span> · ${time} — stored into the private event ledger. <b>The raw footage has been discarded; only this record is kept.</b>`,
+    liveDeleted: (type, time, cosv)=>`🗑 Marked <b>${type} · ${time}</b> as a false alarm and <b>exactly deleted</b> it (right to be forgotten = a subtraction). Re-check: unbind → cos=${cosv} (dropped to noise = truly deleted clean).`,
+    // canvas captions
+    canvasKitchen: "Kitchen", canvasLiving: "Living room",
+    canvasOnDevice: "Processed on-device · the view never leaves this device",
+    canvasStoveWarn: "⚠ on · no one", canvasGasUp: "Gas ↑",
+    canvasFallWarn: "⚠ collapsed · no motion", canvasDoor: "Door", canvasStranger: "Stranger?",
+    // memory / ledger
+    memEmpty: "M: empty",
+    memFull: (n)=>`M = 1 vector · ${n} event${n===1?"":"s"}`,
+    evEmpty: 'No events yet. Once watching starts, anomalies appear here — <b>the raw footage has been discarded</b>.',
+    evRemoved: (type, time)=>`🗑 Deleted (false alarm): ${type} · ${time} — exactly subtracted from M, re-checkable as cleanly deleted.`,
+    evTag: "EVENT",
+    evThumbsNote: (n)=>`↑ Only these ${n} thumbnail${n===1?"":"s"} are kept; the raw video has been discarded (discard-raw).`,
+    btnProve: "🔍 Re-check (determinism)",
+    btnMarkFalse: "Mark false alarm → delete",
+    proveOut: (type, cosv)=>`unbind(M, time-key) → event “${type}” cos=${cosv} ✓ the record is indeed in M, bit-level re-checkable (same result every time).`,
+    // today's summary report
+    repTitle: "====== Today’s home-safety summary (generated on-device · the raw video never left this device) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repDevice: "Device: home sensors + camera (on-device processing)",
+    repCount: (n)=>`Events today: ${n}`,
+    repKept: "Kept: only event summaries + key thumbnails (raw footage discarded)",
+    repItem: (k, type, time, n)=>`[${k}] Hazard ${type} · time ${time} · evidence: ${n} thumbnail${n===1?"":"s"} (kept on-device)`,
+    repNote: "Note: the above are records only of real anomalies that happened in your home; whether to notify family / property management / emergency services is your call. The raw video does not go to the cloud, is not centralized, and can be deleted at any time.",
+    repFoot: "This summary is in your hands. Cloud cameras upload the view of your home — this one does not.",
+    // determinism audit
+    auditHead: "Determinism self-check (run the same query twice, compare bit-by-bit):\n",
+    auditLine: (time, type, a, b, same)=>` ${time} “${type}”: cos ${a} == ${b}  ${same?"✓":"✗"}\n`,
+    auditPass: (ok)=>`\nVerdict: ${ok?"all bits identical ✓ — event records cannot be quietly tampered with, re-checkable":"inconsistency detected ✗"}`,
+    auditNoEv: "no events",
+    moat: "<b>The moat, visible at home:</b> wakes only at the moment of anomaly (not recording all day = µW) · <b>raw footage discarded on the spot, only the event summary kept</b> (privacy moat) · events = deterministic & auditable (bit-identical on every re-check) · <b>false alarms can be exactly deleted</b> (right to be forgotten = a subtraction; the cloud can’t delete it, you can) · on-device private (the video of your home never goes to the cloud, never centralized) · <b>you own it</b>.<br>A cloud camera uploads the view inside your home to the company’s servers — this one will not.<br>Who it liberates: someone like <b>Auntie Wang</b> (an elder living alone, with children far away), or any son or daughter who wants to guard the kitchen and the elderly but is unwilling to hand the view of their home to a company’s cloud — China’s <b>150 million+</b> seniors living alone / in empty nests, plus every dual-income family afraid of “forgetting to turn off the stove.”"
+  },
+  zh: {
+    docTitle: "家庭安全监护 · 在设备上、不上云 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 3/N",
+    h1: "家庭安全监护 · 用你家已有的传感器和摄像头 —— 守住厨房和老人,却不把家里的画面传上云",
+    sub: "传感器/摄像头 → <b>“眼睛”识别家里的状态</b>(燃气浓度/灶台温度/有没有人/有没有动)→ <b>惊奇路由器只在异常那一刻醒来</b>(不是录一整天=µW)→ 抓一条 <b>私有·确定·可审计·可删除</b>的<b>事件记录</b>(时间+危险类型+一张缩略图),<b>原始画面当场丢弃,只留这条记录</b>。全程在你家设备上,家里的视频永不离家。",
+    honest: "<b>诚实边界 + 伦理(no-vaporware):</b> ① <b>烟感/燃气报警器 + 家用摄像头早已商品化</b>(Nest/Ring/海康/小米/各类烟感)——不缺“能不能装个传感器”。 ② <b>“看出在冒烟/灶台没关/老人摔倒/门口有陌生人”是识别前端的活</b>(检测器=云/模型,边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>逻辑</b>,眼睛输出是模拟的,不声称我们识别更准。 ③ 真正的缺口 = <b>端上 + 多模态“变化融合” + 私有 + 丢弃原始画面(discard-raw) + 报“变化”而非固定阈值</b>(固定阈值=误报海,炒菜的油烟天天触发)+ <b>可遗忘的、你拥有的记忆</b>。 ④ 我们的护城河 = <b>µW 变化驱动 + 私有·确定·可审计·可删除的事件记忆</b>(危险类型绑时间进一个向量,误报可精确遗忘,比特级可复核)——<b>不是“比云更聪明”</b>。",
+    surpriseLine: "惊奇信号(异常=预测不到的变化,非录全程):",
+    ledgerH: "事件台账(私有 · 可编辑 · 可遗忘)",
+    btnPlay: "▶ 开始监护(模拟一天)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    btnGenall: "📄 生成今日安全小结(本机)",
+    btnAudit: "🔒 验确定性",
+    pGasLabel: "燃气/烟雾", pStoveLabel: "灶台", pPersonLabel: "人/活动",
+    gasNormal: "正常", gasRising: "浓度上升 ↑",
+    stoveOff: "已关", stoveCooking: "烹饪中", stoveUnattended: "开着·无人",
+    personActive: "有人活动", personNoneAtStove: "灶前无人",
+    personDown: "倒地·长时间无动作", personStranger: "门口陌生人",
+    typeGas: "燃气泄漏", typeStove: "灶台干烧", typeFall: "老人疑似跌倒", typeStranger: "门口陌生人",
+    surpCalm: "平静", surpWatch: "留意", surpAlert: "⚠ 异常! 已记录",
+    liveIntro: "点“开始监护”。脚本里家里会<b>燃气浓度上升(疑似泄漏)→ 灶台开着却没人(干烧)→ 老人长时间不动(疑似跌倒)→ 门口出现陌生人</b> —— 路由器会在那一刻醒来,只留一条事件记录。",
+    liveDone: '<span class="ok">本段监护结束。</span> 右侧是抓到的事件 —— 可标记误报(精确删除)、生成今日小结、验确定性。',
+    liveReset: "已重置。",
+    liveCapture: (type, time)=>`🔔 <span class="bad">异常:${type}</span> · ${time} —— 已存入私有事件台账。<b>原始画面已丢弃,只留这条记录。</b>`,
+    liveDeleted: (type, time, cosv)=>`🗑 已把 <b>${type} · ${time}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${cosv}(已降到噪声=真删干净)。`,
+    canvasKitchen: "厨房", canvasLiving: "客厅",
+    canvasOnDevice: "端上处理 · 画面不出此设备",
+    canvasStoveWarn: "⚠ 开着·无人", canvasGasUp: "燃气 ↑",
+    canvasFallWarn: "⚠ 倒地·无动作", canvasDoor: "门口", canvasStranger: "陌生人?",
+    memEmpty: "M：空",
+    memFull: (n)=>`M = 1 向量 · ${n} 条事件`,
+    evEmpty: '还没有事件。开始监护后,异常会出现在这里 —— <b>原始画面已丢弃</b>。',
+    evRemoved: (type, time)=>`🗑 已删除(误报):${type} · ${time} —— 从 M 中精确减去,可复核已删干净。`,
+    evTag: "事件",
+    evThumbsNote: (n)=>`↑ 仅这 ${n} 张缩略图被保留,原始视频已丢弃(discard-raw)。`,
+    btnProve: "🔍 复核(确定性)",
+    btnMarkFalse: "标记误报 → 删除",
+    proveOut: (type, cosv)=>`unbind(M, 时间键) → 事件「${type}」 cos=${cosv} ✓ 记录确在 M 中,比特级可复核(每次结果一致)。`,
+    repTitle: "====== 今日家庭安全小结(本机生成 · 原始视频从未离开此设备)======",
+    repGen: (t)=>`生成时间:${t}`,
+    repDevice: "设备:家用传感器 + 摄像头(端上处理)",
+    repCount: (n)=>`今日事件数:${n}`,
+    repKept: "保留内容:仅事件摘要 + 关键缩略图(原始画面已丢弃)",
+    repItem: (k, type, time, n)=>`【${k}】 危险 ${type} · 时间 ${time} · 证据:${n} 张缩略图(本机留存)`,
+    repNote: "说明:以上仅为发生在你家的真实异常的记录;是否通知家人/物业/急救由你决定。原始视频不上云、不集中、可随时删除。",
+    repFoot: "这份小结在你手里。云端摄像头会上传你家里的画面 —— 这个不会。",
+    auditHead: "确定性自检(同一查询跑两遍,逐位比较):\n",
+    auditLine: (time, type, a, b, same)=>` ${time} 「${type}」: cos ${a} == ${b}  ${same?"✓":"✗"}\n`,
+    auditPass: (ok)=>`\n结论:${ok?"全部比特一致 ✓ —— 事件记录不可被悄悄篡改,可复核":"出现不一致 ✗"}`,
+    auditNoEv: "无事件",
+    moat: "<b>现场可见的护城河:</b>只在异常那一刻醒来(非录全天=µW)· <b>原始画面当场丢弃,只留事件摘要</b>(隐私护城河)· 事件=确定可审计(每次复核比特一致)· <b>误报可精确删除</b>(被遗忘权=一个减法,云端删不掉、你能删)· 端上私有(家里的视频不上云、不集中)· <b>你拥有它</b>。<br>云端摄像头会把你家里的画面上传到公司服务器 —— 这个不会。<br>解放谁:像<b>王阿姨</b>(独居、儿女在外地的老人),或任何想守住厨房与老人、却不愿把家里画面交给公司云的子女 —— 全国 <b>1.5 亿+</b> 独居/空巢老人,加上每个怕“忘关灶台”的双职工家庭。"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── HDC core (pure ±1 VSA, verified lineage — identical to dashcam / baby demo) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+// hazard TYPE_IDS are internal HV keys — language-independent on purpose, so the
+// vectors never change between EN/中. Display names come from typeGas/typeStove/... in I18N.
+const TYPE_IDS = ["gas-leak","stove-on","elder-fall","stranger-at-door"];
+const TYPE_DISP = { "gas-leak":"typeGas", "stove-on":"typeStove", "elder-fall":"typeFall", "stranger-at-door":"typeStranger" };
+function typeName(id){ return t(TYPE_DISP[id]); }
+// event-record fact = bind(hazardType, timeKey); ledger M = Σ facts (real accumulator, exact subtract = forget)
+function factHV(type, tkey){ return bind(itemHV("type:"+type), itemHV("t:"+tkey)); }
+let M = new Float32Array(D);
+function addFact(f){ const h=factHV(f.type,f.tkey); for(let i=0;i<D;i++) M[i]+=h[i]; }
+function subFact(f){ const h=factHV(f.type,f.tkey); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallType(tkey){            // unbind time -> recover hazard type (deterministic proof it's in M)
+  const probe = bind(M, itemHV("t:"+tkey));
+  let best=null,bs=-2; for(const ty of TYPE_IDS){ const s=cos(probe, itemHV("type:"+ty)); if(s>bs){bs=s;best=ty;} }
+  return {type:best, s:bs};
+}
+
+// ───────── scene (cutaway floor-plan: kitchen + living room) ─────────
+const cv=document.getElementById("home"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height;
+// scripted timeline (frame-keyed). Each event: window [at, at+dur]; surprise = predicted-vs-observed divergence
+const SCRIPT=[
+  {at:110, dur:70, kind:"gas",      type:"gas-leak",         peak:0.93},
+  {at:300, dur:80, kind:"stove",    type:"stove-on",         peak:0.86},
+  {at:470, dur:80, kind:"fall",     type:"elder-fall",       peak:0.90},
+  {at:620, dur:60, kind:"stranger", type:"stranger-at-door", peak:0.97},
+];
+let simT=0, frame=0, playing=false, surprise=0, lastFlash=-99, evidence=[], firedAt=new Set();
+// eye-state (modeled / simulated upstream recognizer outputs) — stored as keys, displayed via I18N
+let gasState="gasNormal", stoveState="stoveOff", personState="personActive";
+let gasLevel=0, stoveOn=false, stoveNoPerson=false, personDown=false, strangerX=-60, breathe=0, gasPuff=0;
+
+function reset(){
+  simT=0; frame=0; surprise=0; lastFlash=-99; evidence=[]; firedAt=new Set(); breathe=0; gasPuff=0;
+  gasState="gasNormal"; stoveState="stoveOff"; personState="personActive";
+  gasLevel=0; stoveOn=false; stoveNoPerson=false; personDown=false; strangerX=-60;
+  M=new Float32Array(D);
+  renderEvidence(); updateEye(); drawFrame(); setSurprise(0,"calm");
+}
+
+function setSurprise(v,kind){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
+  const l=document.getElementById("slbl");
+  l.textContent = kind==="alert"? t('surpAlert') : (kind==="watch"? t('surpWatch') : t('surpCalm'));
+  l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
+
+function updateEye(){
+  document.getElementById("pGas").innerHTML=t('pGasLabel')+": <b>"+t(gasState)+"</b>";
+  document.getElementById("pGas").className="pill"+(gasState!=="gasNormal"?" alert":"");
+  document.getElementById("pStove").innerHTML=t('pStoveLabel')+": <b>"+t(stoveState)+"</b>";
+  document.getElementById("pStove").className="pill"+(stoveState!=="stoveOff"&&stoveState!=="stoveCooking"?" alert":"");
+  document.getElementById("pPerson").innerHTML=t('pPersonLabel')+": <b>"+t(personState)+"</b>";
+  document.getElementById("pPerson").className="pill"+(personState!=="personActive"?" alert":"");
+}
+
+function activeEvent(){ for(const e of SCRIPT){ if(frame>=e.at && frame<e.at+e.dur) return e; } return null; }
+
+function step(){
+  frame++; simT=frame/30; breathe+=0.16; gasPuff+=0.25;
+  // default calm state each frame; the scripted event overrides
+  gasState="gasNormal"; stoveState="stoveOff"; personState="personActive";
+  gasLevel=0; stoveOn=false; stoveNoPerson=false; personDown=false; strangerX=-60;
+  let s=0, ev=activeEvent(), flagType=null;
+  if(ev){
+    const p=(frame-ev.at)/ev.dur;                 // 0..1 progress through the event window
+    const ramp = Math.min(1, p/0.25);             // quick onset = the un-predicted change
+    s = ev.peak * ramp;
+    flagType = ev.type;
+    if(ev.kind==="gas"){      // gas concentration RISING = predictive residual (not a fixed threshold)
+      gasLevel = Math.min(1, p*1.4); gasState="gasRising"; }
+    if(ev.kind==="stove"){    // stove ON + no person nearby for long = unexpected (dry burning)
+      stoveOn=true; stoveNoPerson=true; stoveState="stoveUnattended"; personState="personNoneAtStove"; }
+    if(ev.kind==="fall"){     // elderly no-motion / collapsed = unexpected
+      personDown=true; personState="personDown"; }
+    if(ev.kind==="stranger"){ // new presence at the door
+      personState="personStranger"; strangerX=-60 + Math.min(1,p/0.4)*64; }
+  }
+  // surprise router: capture on spike (change-driven, NOT absolute threshold).
+  // once-per-event-window (keyed by event onset) = refractory by identity, can't double-fire mid-window.
+  if(ev && s>0.6 && !firedAt.has(ev.at) && flagType){ captureEvent(flagType); firedAt.add(ev.at); lastFlash=frame; }
+  setSurprise(s, s>0.6?"alert":(s>0.3?"watch":"calm"));
+  updateEye(); drawFrame();
+  if(frame>760){ pause(); document.getElementById("live").innerHTML=t('liveDone'); }
+}
+
+function drawFrame(){
+  ctx.fillStyle="#11161c"; ctx.fillRect(0,0,W,H);
+  // outer wall
+  ctx.strokeStyle="#3a4b59"; ctx.lineWidth=8; roundRect(20,20,W-40,H-40,14); ctx.stroke();
+  // room divider (kitchen top, living room bottom)
+  const divY = 200;
+  ctx.strokeStyle="#2a3947"; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(24,divY); ctx.lineTo(150,divY); ctx.moveTo(250,divY); ctx.lineTo(W-24,divY); ctx.stroke(); // doorway gap
+  // room labels
+  ctx.fillStyle="#3a4b59"; ctx.font="11px sans-serif"; ctx.textAlign="left";
+  ctx.fillText(t('canvasKitchen'), 36, 40); ctx.fillText(t('canvasLiving'), 36, divY+22);
+  // floor caption
+  ctx.fillStyle="#2a3947"; ctx.font="10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('canvasOnDevice'), W/2, H-30);
+
+  // ── kitchen: stove + counter ──
+  drawStove(96, 96);
+  // gas cloud spreading from stove when leaking
+  if(gasLevel>0) drawGas(96, 96, gasLevel);
+  // person near stove (gone when stove unattended)
+  if(!stoveNoPerson && !personDown) drawPerson(300, 110, false);
+
+  // ── living room: elderly person on/near sofa ──
+  drawSofa(300, 320);
+  drawPerson(180, 300, personDown);
+
+  // ── door (bottom-left) + stranger ──
+  drawDoor(70, H-44);
+  if(strangerX>-50) drawStranger(strangerX, H-86);
+}
+
+function drawStove(x,y){
+  ctx.save();
+  ctx.fillStyle="#1b2530"; ctx.strokeStyle="#3a4b59"; ctx.lineWidth=2;
+  roundRect(x-34,y-26,68,52,6); ctx.fill(); ctx.stroke();
+  // 4 burners
+  const bp=[[-16,-9],[16,-9],[-16,11],[16,11]];
+  for(let k=0;k<4;k++){ const lit = stoveOn && k===0;
+    ctx.beginPath(); ctx.arc(x+bp[k][0], y+bp[k][1], 9, 0, Math.PI*2);
+    ctx.strokeStyle = lit ? "#ff6b6b" : "#46586a"; ctx.lineWidth = lit?2.5:1.5; ctx.stroke();
+    if(lit){ ctx.fillStyle="rgba(255,107,107,.5)"; ctx.beginPath(); ctx.arc(x+bp[k][0], y+bp[k][1], 5+Math.sin(gasPuff*2)*1.5, 0, Math.PI*2); ctx.fill(); }
+  }
+  if(stoveNoPerson){ ctx.fillStyle="#f4c152"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(t('canvasStoveWarn'), x, y+44); }
+  ctx.restore();
+}
+
+function drawGas(x,y,lvl){
+  ctx.save();
+  for(let i=0;i<7;i++){
+    const a=(i/7)*Math.PI*2 + gasPuff*0.3;
+    const r=14 + lvl*36 + Math.sin(gasPuff+i)*4;
+    const px=x+Math.cos(a)*r, py=y+Math.sin(a)*r - lvl*14;
+    ctx.fillStyle="rgba(244,193,82,"+(0.16+lvl*0.22)+")";
+    ctx.beginPath(); ctx.arc(px,py, 12+lvl*8, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle="#f4c152"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('canvasGasUp'), x, y-30-lvl*16);
+  ctx.restore();
+}
+
+function drawSofa(x,y){
+  ctx.save();
+  ctx.fillStyle="#172029"; ctx.strokeStyle="#2f3e4c"; ctx.lineWidth=2;
+  roundRect(x-44,y-22,88,44,8); ctx.fill(); ctx.stroke();
+  roundRect(x-44,y-30,88,12,6); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+function drawPerson(x,y,down){
+  ctx.save();
+  if(down){
+    // collapsed: lying horizontal on floor = no-motion / suspected fall
+    ctx.fillStyle="#c46b6b"; ctx.strokeStyle="#ff6b6b"; ctx.lineWidth=2.5;
+    roundRect(x-34,y-9,60,18,9); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.fillStyle="#b86060"; ctx.arc(x-40, y, 11, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#ff6b6b"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(t('canvasFallWarn'), x-6, y+26);
+  } else {
+    // standing/sitting: head + body, gentle breathing wobble
+    const br=Math.sin(breathe)*1.2;
+    ctx.fillStyle="#7fb0d8"; ctx.strokeStyle="#9fd0ff"; ctx.lineWidth=2;
+    roundRect(x-13,y-8+br,26,40-br,11); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.fillStyle="#e7c9a0"; ctx.arc(x, y-18, 12, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#caa97e"; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawDoor(x,y){
+  ctx.save();
+  ctx.strokeStyle="#46586a"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y-46); ctx.stroke();          // hinge
+  ctx.strokeStyle="#5a6b7a"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(x,y,46,-Math.PI/2,-Math.PI/6); ctx.stroke();        // swing arc
+  ctx.fillStyle="#2a3947"; ctx.font="10px sans-serif"; ctx.textAlign="left";
+  ctx.fillText(t('canvasDoor'), x+6, y+12);
+  ctx.restore();
+}
+
+function drawStranger(x,y){
+  ctx.save();
+  ctx.globalAlpha=0.92;
+  ctx.fillStyle="#3a2b3b"; ctx.strokeStyle="#ff6b6b"; ctx.lineWidth=2.5;
+  // shadowy figure at the doorway
+  roundRect(x-15, y-30, 38, 76, 10); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.fillStyle="#2c2030"; ctx.arc(x+4, y-40, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#ff6b6b"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center"; ctx.fillText(t('canvasStranger'), x+4, y+58);
+  ctx.restore();
+}
+
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+function snapThumb(){ const tmp=document.createElement("canvas"); tmp.width=96; tmp.height=64;
+  tmp.getContext("2d").drawImage(cv,0,0,W,H,0,0,96,64); return tmp.toDataURL("image/jpeg",0.6); }
+
+function tagClass(type){
+  if(type==="gas-leak") return "";        // red
+  if(type==="stove-on") return "amber";
+  if(type==="stranger-at-door") return "blue";
+  return "teal";                          // elder-fall
+}
+
+function captureEvent(type){
+  const tkey=Math.floor(simT*10)/10;
+  const ev={ type, time:fmtTime(tkey), tkey:String(tkey), thumbs:[snapThumb()], removed:false };
+  evidence.push(ev); addFact(ev);
+  // grab 1-2 follow-up thumbs over next frames (the tiny clip), then DISCARD raw — only this record kept
+  let n=0; const grab=()=>{ if(n<2 && ev.thumbs.length<3){ ev.thumbs.push(snapThumb()); n++; setTimeout(grab,130);} else renderEvidence(); };
+  setTimeout(grab,130);
+  renderEvidence();
+  document.getElementById("live").innerHTML=t('liveCapture')(typeName(type), ev.time);
+}
+function fmtTime(tk){ const d=new Date(2026,5,11,18,40,Math.floor(tk)); return d.toTimeString().slice(0,8)+"."+String(Math.floor((tk%1)*10)); }
+
+function renderEvidence(){
+  const live=evidence.filter(e=>!e.removed);
+  document.getElementById("memstat").textContent = live.length? t('memFull')(live.length) : t('memEmpty');
+  document.getElementById("genall").disabled = live.length===0;
+  document.getElementById("audit").disabled = live.length===0;
+  const el=document.getElementById("evlist");
+  if(!evidence.length){ el.innerHTML='<div class="stat">'+t('evEmpty')+'</div>'; return; }
+  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">${t('evRemoved')(typeName(e.type), e.time)}</span></div>` :
+    `<div class="ev flash"><div class="top"><span class="etag ${tagClass(e.type)}">${t('evTag')}</span> <span class="etype">${typeName(e.type)}</span><span class="etime">${e.time}</span></div>
+       <div class="thumbs">${e.thumbs.map(t=>`<img src="${t}">`).join("")}</div>
+       <div class="stat">${t('evThumbsNote')(e.thumbs.length)}</div>
+       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">${t('btnProve')}</button>
+         <button class="hot" onclick="markFalse(${i})">${t('btnMarkFalse')}</button></div>
+       <div class="audit" id="aud${i}"></div></div>`).join("");
+}
+window.proveIn=(i)=>{ const e=evidence[i]; const r=recallType(e.tkey);
+  document.getElementById("aud"+i).textContent = t('proveOut')(typeName(r.type), r.s.toFixed(3)); };
+window.markFalse=(i)=>{ const e=evidence[i]; if(e.removed) return; subFact(e); e.removed=true; renderEvidence();
+  const r=recallType(e.tkey);
+  document.getElementById("live").innerHTML=t('liveDeleted')(typeName(e.type), e.time, r.s.toFixed(3)); };
+
+document.getElementById("genall").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  const lines=[ t('repTitle'),
+    t('repGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")), t('repDevice'),
+    t('repCount')(live.length), t('repKept'), ""];
+  live.forEach((e,k)=> lines.push(t('repItem')(k+1, typeName(e.type), e.time, e.thumbs.length)));
+  lines.push("", t('repNote'));
+  document.getElementById("reportbox").innerHTML = `<div class="report">${lines.join("\n")}</div>
+     <div class="stat" style="margin-top:6px">${t('repFoot')}</div>`;
+};
+document.getElementById("audit").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  let out=t('auditHead');
+  let allsame=true;
+  for(const e of live){ const a=recallType(e.tkey).s, b=recallType(e.tkey).s; const same=(a===b); allsame=allsame&&same;
+    out+=t('auditLine')(e.time, typeName(e.type), a.toFixed(6), b.toFixed(6), same); }
+  out+= live.length? t('auditPass')(allsame) : t('auditNoEv');
+  document.getElementById("auditbox").innerHTML=`<div class="report">${out}</div>`;
+};
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  setSurprise(surprise, surprise>0.6?"alert":(surprise>0.3?"watch":"calm"));
+  updateEye(); renderEvidence(); drawFrame();
+  const liveEl=document.getElementById("live");
+  if(liveEl && !liveEl.dataset.locked){ /* live text is event-driven; leave as-is unless empty */ }
+}
+
+// controls
+let timer=null;
+function play(){ if(playing) return; playing=true; document.getElementById("play").disabled=true; document.getElementById("pause").disabled=false;
+  timer=setInterval(step,33); }
+function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
+document.getElementById("play").onclick=play;
+document.getElementById("pause").onclick=pause;
+document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").innerHTML=t('liveReset'); };
+
+// init
+applyStatic();
+reset();
+document.getElementById("live").innerHTML=t('liveIntro');
+</script>
+</body>
+</html>

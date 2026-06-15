@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blind / Low-Vision Travel + Scene-Memory Aid · on-device, never cloud (Millisecond Era)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#62b8ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:radial-gradient(1200px 600px at 70% -10%,#15212e,transparent),var(--bg); color:var(--txt);
+         font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:22px 26px 16px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:23px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13.5px; margin-top:7px; max-width:1120px; }
+  .sub b{ color:#d4e2ee; }
+  .pitch { background:linear-gradient(180deg,#15202c,#121922); border:1px solid var(--line); border-left:3px solid var(--acc);
+           border-radius:12px; padding:14px 16px; margin:16px 26px 0; max-width:1180px; font-size:13.5px; color:#d4e2ee; }
+  .pitch b{ color:var(--acc); } .pitch .k{ color:var(--good); font-weight:700; }
+  .wrap { display:flex; gap:18px; padding:18px 26px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:17px; }
+  .left { width:470px; } .right{ flex:1; min-width:380px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  select,input[type=text]{ background:#0b0f14; border:1px solid var(--line); color:var(--txt);
+        border-radius:9px; padding:9px 11px; font-size:13.5px; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 15px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button:disabled { opacity:.38; cursor:not-allowed; }
+  canvas#scene { width:100%; background:#0d1217; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok { color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:12px; border-radius:6px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .12s; }
+  /* the speaking pill + earcon */
+  .speak { background:#0b0f14; border:1px solid var(--cool); border-radius:11px; padding:11px 13px; margin-top:11px; min-height:46px; }
+  .speak.live { border-color:var(--good); box-shadow:0 0 0 2px rgba(63,223,143,.18); }
+  .speak .big { font-size:16px; font-weight:800; color:var(--cool); }
+  .speak .big.say{ color:var(--good); }
+  .speak .q{ color:var(--mut); font-size:12px; margin-top:3px; }
+  /* counter strip */
+  .counter { display:flex; gap:12px; margin-top:11px; flex-wrap:wrap; }
+  .cbox { flex:1; min-width:120px; background:#0b0f14; border:1px solid var(--line); border-radius:10px; padding:9px 11px; }
+  .cbox .n{ font-size:21px; font-weight:800; } .cbox .l{ color:var(--mut); font-size:11.5px; }
+  .cbox.naive .n{ color:var(--hot); } .cbox.actual .n{ color:var(--good); } .cbox.save .n{ color:var(--acc); }
+  /* scene memory ledger */
+  .membox { background:#0b0f14; border:1px solid var(--line); border-radius:11px; padding:12px; margin-bottom:12px; }
+  .membig { font-size:19px; font-weight:800; } .membig small{ font-size:12px; color:var(--mut); font-weight:500; }
+  .qcard { border-top:1px dashed var(--line); padding-top:13px; margin-top:13px; }
+  .qcard h3 { margin:0 0 8px; font-size:14px; } .qcard h3 b{ color:var(--acc); }
+  .ans { background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; margin-top:7px; min-height:24px; font-size:14px; }
+  .ans em{ color:var(--mut); font-style:normal; }
+  .bar { display:inline-block; height:8px; background:var(--acc); border-radius:4px; vertical-align:middle; margin:0 6px; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:12px 14px; margin-top:13px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 15px; margin:0 26px 20px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .log { max-height:170px; overflow:auto; margin-top:7px; font:12px/1.6 ui-monospace,Menlo,monospace; }
+  .log .l{ padding:2px 0; border-top:1px solid var(--line); color:#cfe3f5; }
+  .log .l .t{ color:var(--mut); } .log .l.say .w{ color:var(--good); } .log .l.skip .w{ color:var(--mut); }
+  footer{ color:var(--mut); font-size:12px; padding:0 26px 26px; max-width:1180px; }
+  footer b{ color:var(--txt); }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
+</style>
+</head>
+<body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
+<header>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n-html="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
+</header>
+
+<div class="pitch" data-i18n-html="pitch"></div>
+
+<div class="honest" data-i18n-html="honest"></div>
+
+<div class="wrap">
+  <!-- LEFT: first-person scene + frugal speak router -->
+  <div class="card left">
+    <div class="row">
+      <button id="play" data-i18n="btnPlay"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="count" class="warn" disabled data-i18n="btnCount"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
+    </div>
+    <canvas id="scene" width="470" height="300"></canvas>
+
+    <div class="stat" style="margin-top:9px"><span data-i18n="surpriseLine"></span><span id="slbl" class="ok"></span></div>
+    <div class="meter"><i id="sfill"></i></div>
+
+    <div class="speak" id="speakBox">
+      <div class="big" id="speakBig"></div>
+      <div class="q" id="speakSub"></div>
+    </div>
+
+    <div class="counter">
+      <div class="cbox naive"><div class="n" id="cNaive">0</div><div class="l" data-i18n-html="cNaiveLbl"></div></div>
+      <div class="cbox actual"><div class="n" id="cActual">0</div><div class="l" data-i18n-html="cActualLbl"></div></div>
+      <div class="cbox save"><div class="n" id="cSave">0%</div><div class="l" data-i18n-html="cSaveLbl"></div></div>
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <!-- RIGHT: private editable scene memory -->
+  <div class="card right">
+    <div class="membox">
+      <div class="membig" id="memsize"></div>
+      <div class="stat" id="memnote"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q1Title"></h3>
+      <div class="row">
+        <select id="aObj"></select>
+        <button id="aB" data-i18n="btnAsk"></button>
+        <button id="aCup" class="sec" data-i18n="btnAskCup"></button>
+        <button id="aKey" class="sec" data-i18n="btnAskKey"></button>
+      </div>
+      <div class="ans" id="aA"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q2Title"></h3>
+      <div class="row">
+        <select id="fObj"></select>
+        <button id="fB" class="hot" data-i18n="btnForget"></button>
+      </div>
+      <div class="ans" id="fA"></div>
+    </div>
+
+    <div class="qcard">
+      <h3 data-i18n-html="q3Title"></h3>
+      <div class="row">
+        <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
+        <button id="genall" class="sec" disabled data-i18n="btnExport"></button>
+      </div>
+      <div class="ans" id="auditA"></div>
+    </div>
+
+    <div class="moat" data-i18n-html="moat"></div>
+  </div>
+</div>
+
+<footer data-i18n-html="footer"></footer>
+
+<script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Blind / Low-Vision Travel + Scene-Memory Aid · on-device, never cloud (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 4/N  |  accessible-travel edition",
+    h1: "Blind / Low-Vision travel + scene-memory aid — it watches the path for you, remembers where things are; and it only says what's worth saying, never to the cloud",
+    sub: "A wearable camera \"eye\" sees the scene on your path (door, chair, steps, an oncoming person, a cup on the table) → <b>the surprise router speaks only at the moment something \"changed\"</b> (it says \"door ahead on your left\" the first time a door appears, \"someone is approaching\" when a person nears, and stays <b>silent</b> when nothing changed = µW, no chatter) → it presses \"where things are\" into <b>one private, editable, forgettable hypervector M</b>. You can <b>ask</b> (where is my cup / where were the keys just now) · take a <b>thorough look on demand</b> (count how many objects are on the table) · and <b>forget</b> (an item was taken away → drop it). <b>All on-device — your whole day is never uploaded to a cloud.</b>",
+    pitch: "<b>Why this part belongs to the device, not the cloud:</b> Vision foundation models that can \"understand a scene and describe it in words\" (Be My Eyes + GPT-4o / Seeing AI / Envision) <span class=\"k\">already exist, and they're strong</span> — that's not the part we compete for (the recognition front-end = L1). What we take is the three things the cloud can't give: <span class=\"k\">whether to speak at all (change-driven, not chattering every second)</span>, <span class=\"k\">a µW battery (worn, always-on for a whole day)</span>, <span class=\"k\">your whole day staying off the cloud</span>. An assistant that narrates non-stop will <b>overwhelm</b> the user and <b>drain the battery before lunch</b>; this build speaks only when <b>the scene actually changed</b>, and a live on-screen counter shows you the words / battery saved. <br><span class=\"stat\">(The same monako \"private memory layer\" memory core — this time applied to \"watch the path + remember where things are\".)</span>",
+    honest: "<b>Honest boundary (no-vaporware, for engineers):</b> ① <b>\"Seeing that this is a door / chair / steps / person / cup\" is the recognition front-end's job</b> (detector / VLM = cloud / model, boundary law L1) — this demo uses a <b>scripted scene</b> to show the <b>logic</b>; the eye's output is simulated, and <b>we don't claim to recognize more accurately</b>. ② <b>VLMs that describe scenes for blind users are already commoditized and strong</b> (Be My Eyes / Seeing AI / Envision) — we're no better at describing. ③ The real gap = <b>frugality about \"when to speak\"</b> (speak only on change, not every second = not overwhelming + saves power) + <b>µW battery</b> (worn, always-on for a day) + <b>private</b> (don't upload your life's video stream to a cloud) + <b>on-device editable scene memory</b> (where things are, forgettable). ④ Our moat = <b>change-driven, say only what's worth saying (µW + not overwhelming) · private · on-device · editable, forgettable scene memory · thorough look on demand</b> — <b>not \"better at seeing than the cloud\"</b>.",
+    surpriseLine: "Surprise signal (= the scene shows a \"change you couldn't predict\", not narrating every frame): ",
+    btnPlay: "▶ Start the walk (simulate a stretch of path)",
+    btnPause: "⏸ Pause",
+    btnCount: "🔎 Count what's in front of me (thorough look on demand)",
+    btnReset: "Reset",
+    btnAsk: "Where is it?",
+    btnAskCup: "🥤 Where is my cup?",
+    btnAskKey: "🔑 Where were the keys just now?",
+    btnForget: "This was taken away → forget it",
+    btnAudit: "🔒 Verify determinism (re-query twice, compare)",
+    btnExport: "📄 Export this trip's scene memory (on-device)",
+    q1Title: "① Ask \"where is it\" · <b>unbind(M, object) → place</b>",
+    q2Title: "② An item was taken away → forget · <b>M − bind(object, old place)</b> (right to be forgotten)",
+    q3Title: "③ Re-check (determinism) + private audit · <b>same query, bit-identical every time</b>",
+    speakSilentBig: "🔇 Silent (scene didn't change = no speaking = µW)",
+    speakSilentSub: "Click \"Start the walk\". In the script these appear in turn: door → steps → chair → oncoming person → cup on the table; the router speaks only the <b>first</b> time each thing appears.",
+    speakChange: (obj,place,objStr,placeStr,visN)=>`A new "${obj}" appeared → bound into M: <code>bind(${objStr}, ${placeStr})</code>. A naive assistant would re-announce all ${visN} things in view right now; this build says only this one new one.`,
+    speakChangeBig: "⚠ Scene changed! Speak once",
+    countBig: "🔎 Thorough look on demand (power spent only on this frame)",
+    countBody: (n,list)=>`You asked to "count" → the eye takes one thorough look right now, ${n} objects in front of you: ${list}. <span class="stat">Normally it looks frugally (chases only change); when you need it, it takes a "thorough look" — cheap watching + thorough on demand.</span>`,
+    countNone: "none",
+    sLabelCalm: "calm",
+    sLabelNotice: "take note",
+    sLabelChange: "⚠ Scene changed! Speak once",
+    logSilent: "🔇 silent (scene unchanged, skipped)",
+    cNaiveLbl: "naive assistant \"would say\"<br>(narrate every frame = overwhelm + drain)",
+    cActualLbl: "this build \"actually said\"<br>(only on change)",
+    cSaveLbl: "words / battery saved<br>(no overwhelm + battery life)",
+    memEmpty: "Scene memory M: empty",
+    memEmptySmall: "still empty",
+    memEmptyNote: "What's seen (\"thing + where\") = this <b>one</b> vector; the raw video stream is not kept (private). Each entry = <code>bind(object, place)</code>.",
+    memFull: (D,kb,n)=>`Scene memory M = 1 vector <small>D=${D.toLocaleString()} · ≈${kb} KB · ${n} objects</small>`,
+    memFullNote: (n)=>`The ${n} things seen this trip = the <b>one</b> vector above; the raw video stream is dropped (private).`,
+    walkDone: "✅ This stretch of path is done.",
+    walkDoneSub: (naive,actual,save)=>`Over the whole walk a naive assistant "would say" <b>${naive}</b> times, this build said only <b class="ok">${actual}</b> times (once each, the first time each thing appears) — saving <b class="ok">${save}</b> of the words / battery. On the right: ask "where is it", forget when taken away, verify determinism.`,
+    canvasLabel: "on-device · your video stream never leaves this device · first-person view",
+    canvasHud: (n)=>`in view: ${n} objects`,
+    askPrompt: "Start the walk first, let the glasses see things.",
+    askFound: (obj,place,bar,cos)=>`<b>${obj}</b> is at <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos} (unbound from M)</span>`,
+    askNotFound: (obj,cos)=>`<em class="bad">Can't find "${obj}"'s place in M</em> <span class="stat">cos=${cos} — not seen, or already taken away and forgotten.</span>`,
+    askCupFound: (place,bar,cos)=>`🥤 <b>cup</b> is at <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos}</span>`,
+    askCupNone: "<em class=\"bad\">Haven't seen a cup yet, or it's been taken away.</em>",
+    askKeyFound: (place,bar,cos)=>`🔑 <b>keys</b> were just at <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos}</span>`,
+    askKeyNone: (cos)=>`❓ <span class="wn">unsure</span>: no keys seen this trip <span class="stat">cos=${cos} — knowing it doesn't know beats inventing a place that sends you groping for nothing.</span>`,
+    askA_init: "e.g. \"cup\" → unbind from M the place it was last seen; or click \"where is my cup / where were the keys just now\".",
+    aA_resetEm: "Start the walk first, let the glasses see things.",
+    fA_init: "e.g. the cup was put away in a cupboard → forget its old place. Ask again = not found (it won't mislead you into reaching for an empty tabletop). <b>Truly deleted, not hidden.</b>",
+    fA_resetEm: "An item was taken away → forget it.",
+    fA_noObj: "No such item.",
+    forgetDone: (obj,objStr,placeStr,afterCos,beforeCos)=>`🗑️ <b>${obj}</b> was taken away → exactly subtract <code>bind(${objStr}, ${placeStr})</code> from M. Ask <b>${obj}</b> again → <span class="bad">cos=${afterCos} (gone)</span> <span class="stat">(before delete cos=${beforeCos}) — truly deleted, it won't mislead you to grope an empty place; right to be forgotten = one subtraction.</span>`,
+    auditA_init: "Verify determinism = re-query the same \"where is the cup\" twice, cos bit-identical — proving the memory isn't quietly tampered with, isn't a hallucination.",
+    auditA_resetEm: "Verify determinism = re-query twice and compare.",
+    auditHeader: "Determinism self-check (run the same query twice, compare bit-by-bit):",
+    auditLine: (obj,a,b,same)=>` "${obj}": cos ${a} == ${b}  ${same?"✓":"✗"}`,
+    auditVerdict: (allsame)=>`\nVerdict: ${allsame?"all bits identical ✓ — scene memory can't be quietly tampered with, auditable":"inconsistency detected ✗"}`,
+    auditNone: "no records",
+    exportTitle: "====== This trip's scene memory (generated on-device · raw video never left this device) ======",
+    exportGen: (t)=>`Generated: ${t}`,
+    exportDevice: "Device: wearable camera (on-device processing)",
+    exportSpoke: (actual,naive)=>`Times spoken this trip: ${actual} (a naive assistant would say ${naive} times)`,
+    exportKept: "Kept: only a \"object → place\" summary (raw video stream discarded)",
+    exportItem: (k,obj,place,cos)=>`[${k}] ${obj} → ${place}  (cos=${cos})`,
+    exportFoot: "Note: this memory is in your hands, editable / forgettable anytime; the raw video stream never goes to the cloud, never centralized.",
+    detNote: (a,b,same)=>`Re-querying "door" twice cos=${a} == ${b} ${same?'<span class="ok">✓ bit-identical</span>':'<span class="bad">✗</span>'} ·`,
+    moat: "<b>The moat, visible on the floor (to tell a partner):</b> <b>say only what's worth saying</b> (change-driven = µW + not overwhelming the user) · <b>private</b> (don't upload your life's video stream to a cloud) · on-device · <b>editable, forgettable scene memory</b> (where things are, forget when taken away) · <b>thorough look on demand</b> (frugal looking by default, you ask \"count\" and only then look closely). <span id=\"detnote\"></span> The whole trip = <b>one ~10 KB vector</b> · always-on at µW for a full day on a ternary-CIM chip. <br>The cloud is strong at \"seeing a scene\" — but it can't give you \"frugality about whether to speak + µW battery life + not uploading your life + a memory you can edit\".",
+    footer: "Who it liberates: <b>Fatima</b>, a blind market vendor in Cairo who navigates a souk by memory and a cane — she either has <b>no aid at all</b> (dangerous, isolated) or wears a device that <b>chatters non-stop, dies before lunch, and uploads her whole day to some company's cloud</b> (overwhelming, dependent, surveilled). This layer lets her <b>be reminded only when she should be reminded</b>, makes the device <b>last all day</b>, and keeps her life <b>on her own body</b>. About <b>250 million</b> low-vision / blind people worldwide, most in places the cloud can't reach and the power isn't steady. <br>Millisecond Era · millisecond-era — <b>枯れた技術の水平思考 (lateral thinking with seasoned technology)</b>: using mature vector-symbolic algebra + change-driven sensing to give a wearable a private travel-memory core the cloud can't provide. This page can ship as-is; the substrate = pure ±1 VSA (bind / unbind / add-subtract), dependency-free, single file, runs offline.",
+    detKey: "door",
+    askObjPrompt: "Start the walk first, let the glasses see things."
+  },
+  zh: {
+    docTitle: "盲人/低视力 出行 + 场景记忆助手 · 端上、不上云 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 4/N  |  无障碍出行版",
+    h1: "盲人 / 低视力 出行 + 场景记忆助手 — <span>替你看路、替你记着东西在哪；而且只说该说的、永不上云</span>",
+    sub: "随身摄像头的\"眼睛\"看见路上的场景(门、椅子、台阶、迎面来的人、桌上的杯子)→ <b>惊奇路由器只在\"变了\"那一刻开口</b>(门第一次出现才说\"门在你左前方\"、有人靠近才说\"有人正在靠近\"、没变就<b>安静</b>=µW、不刷屏)→ 把\"东西在哪\"压进 <b>一个私有、可编辑、可遗忘的超向量 M</b>。可<b>问</b>(我的杯子在哪 / 钥匙刚才在哪)· 可<b>按需细看</b>(数一下桌上有几个东西)· 可<b>遗忘</b>(东西被收走→忘掉)。<b>全程在设备上、你这一天不会被传上云。</b>",
+    pitch: "<b>为什么这块属于设备、不属于云：</b> 能\"看懂场景、用语言描述出来\"的视觉大模型(Be My Eyes + GPT-4o / Seeing AI / Envision)<span class=\"k\">早已存在、而且很强</span> —— 那不是我们抢的活(识别前端 = L1)。 我们抢的是云端给不了的三件事：<span class=\"k\">该不该开口(变化驱动、不是每秒念叨)</span>、<span class=\"k\">µW 电池(随身常开一整天)</span>、<span class=\"k\">你的一整天不上云</span>。 一个一秒不停念叨的助手会<b>淹没</b>使用者、<b>一上午就把电池念干</b>；这一版只在<b>场景真的变了</b>时说话，省下的话 / 电由现场计数器实时给你看。 <br><span class=\"stat\">（同一个 monako「私有记忆层」记忆核——这次铺到\"看路 + 记着东西在哪\"。）</span>",
+    honest: "<b>诚实边界（no-vaporware，给工程师看）：</b> ① <b>\"看出这是门 / 椅子 / 台阶 / 人 / 杯子\"是识别前端的活</b>(检测器 / VLM = 云 / 模型，边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>逻辑</b>，眼睛输出是模拟的，<b>不声称我们识别更准</b>。 ② <b>给盲人描述场景的 VLM 已商品化且很强</b>(Be My Eyes / Seeing AI / Envision)——我们不比它会描述。 ③ 真正的缺口 = <b>\"何时开口\"的节俭</b>(只在变化时说、不是每秒念叨=不淹没+省电)+ <b>µW 电池</b>(随身常开一天)+ <b>私有</b>(不把你的一生视频流上云)+ <b>端上可编辑的场景记忆</b>(东西在哪、可遗忘)。 ④ 我们的护城河 = <b>变化驱动只说该说的(µW + 不淹没)· 私有 · 端上 · 可编辑可遗忘的场景记忆 · 按需细看</b>——<b>不是\"比云更会看\"</b>。",
+    surpriseLine: "惊奇信号(=场景出现\"预测不到的变化\",非每帧念叨)：",
+    btnPlay: "▶ 开始出行(模拟一段路)",
+    btnPause: "⏸ 暂停",
+    btnCount: "🔎 数一下眼前有几个东西(按需细看)",
+    btnReset: "重置",
+    btnAsk: "问它在哪",
+    btnAskCup: "🥤 我的杯子在哪？",
+    btnAskKey: "🔑 钥匙刚才在哪儿？",
+    btnForget: "这东西被收走了 → 忘掉",
+    btnAudit: "🔒 验确定性(重查两遍比对)",
+    btnExport: "📄 导出这趟的场景记忆(本机)",
+    q1Title: "① 问\"东西在哪\" · <b>unbind(M, 物体) → 位置</b>",
+    q2Title: "② 东西被收走 → 遗忘 · <b>M − bind(物体, 旧位置)</b>（被遗忘权）",
+    q3Title: "③ 复核(确定性) + 私有审计 · <b>同一查询每次比特一致</b>",
+    speakSilentBig: "🔇 安静（场景没变 = 不开口 = µW）",
+    speakSilentSub: "点\"开始出行\"。脚本里会依次出现：门 → 台阶 → 椅子 → 迎面来人 → 桌上的杯子；路由器只在每个东西<b>第一次</b>出现时开口一次。",
+    speakChange: (obj,place,objStr,placeStr,visN)=>`新出现「${obj}」→ 绑进 M：<code>bind(${objStr}, ${placeStr})</code>。naive 助手此刻会把眼前 ${visN} 个东西全念一遍;这一版只说这一个新的。`,
+    speakChangeBig: "⚠ 场景变了! 开口一次",
+    countBig: "🔎 按需细看(这一帧才花的电)",
+    countBody: (n,list)=>`你问\"数一下\" → 眼睛此刻细看一次,眼前共 <b class="ok">${n}</b> 个物体：${list}。 <span class="stat">平时省着看(只追变化),你需要时才\"细看\"——cheap watching + thorough on demand。</span>`,
+    countNone: "暂无",
+    sLabelCalm: "平静",
+    sLabelNotice: "留意",
+    sLabelChange: "⚠ 场景变了! 开口一次",
+    logSilent: "🔇 安静(场景未变,跳过)",
+    cNaiveLbl: "naive 助手\"本会说\"<br>(每帧都念 = 淹没 + 耗电)",
+    cActualLbl: "这一版\"真正说了\"<br>(只在变化时)",
+    cSaveLbl: "省下的话 / 电<br>(不淹没 + 续航)",
+    memEmpty: "场景记忆 M：空",
+    memEmptySmall: "still empty",
+    memEmptyNote: "看见的\"东西 + 在哪\"= 这<b>一个</b>向量；原始视频流不保留(私有)。每条 = <code>bind(物体, 位置)</code>。",
+    memFull: (D,kb,n)=>`场景记忆 M = 1 个向量 <small>D=${D.toLocaleString()} · ≈${kb} KB · ${n} 个物体</small>`,
+    memFullNote: (n)=>`这趟看见的 ${n} 个东西 = 上面<b>一个</b>向量；原始视频流已丢(私有)。`,
+    walkDone: "✅ 这段路走完。",
+    walkDoneSub: (naive,actual,save)=>`全程 naive 助手\"本会说\"<b>${naive}</b> 次,这一版只说了 <b class="ok">${actual}</b> 次(每个东西第一次出现时各说一次)——省下 <b class="ok">${save}</b> 的话 / 电。右侧:问\"东西在哪\"、被收走就忘、验确定性。`,
+    canvasLabel: "端上处理 · 你的视频流不出此设备 · 第一视角",
+    canvasHud: (n)=>`眼前可见: ${n} 个物体`,
+    askPrompt: "先开始出行,让眼镜看见东西。",
+    askFound: (obj,place,bar,cos)=>`<b>${obj}</b> 在 <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos}（从 M unbind 出来）</span>`,
+    askNotFound: (obj,cos)=>`<em class="bad">M 里查不到「${obj}」的位置</em> <span class="stat">cos=${cos} —— 没看见,或已被收走遗忘。</span>`,
+    askCupFound: (place,bar,cos)=>`🥤 <b>杯子</b> 在 <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos}</span>`,
+    askCupNone: "<em class=\"bad\">还没看见杯子,或它已被收走。</em>",
+    askKeyFound: (place,bar,cos)=>`🔑 <b>钥匙</b> 刚才在 <b class="ok">${place}</b> ${bar} <span class="stat">cos=${cos}</span>`,
+    askKeyNone: (cos)=>`❓ <span class="wn">不确定</span>：这趟没看见过钥匙 <span class="stat">cos=${cos} —— 知道自己不知道,胜过编一个位置害你白摸。</span>`,
+    askA_init: "例：「杯子」→ 从 M 里 unbind 出上次看见它的位置；或点\"我的杯子在哪 / 钥匙刚才在哪\"。",
+    aA_resetEm: "先开始出行,让眼镜看见东西。",
+    fA_init: "例：杯子被收进柜子里了 → 忘掉它的旧位置。再问 = 查不到（不会再误导你去摸一个空桌面）。<b>真删,不是隐藏。</b>",
+    fA_resetEm: "东西被收走 → 忘掉它。",
+    fA_noObj: "没有这个东西。",
+    forgetDone: (obj,objStr,placeStr,afterCos,beforeCos)=>`🗑️ <b>${obj}</b> 被收走了 → 从 M 精确减去 <code>bind(${objStr}, ${placeStr})</code>。再问 <b>${obj}</b> → <span class="bad">cos=${afterCos}（没了）</span> <span class="stat">（删前 cos=${beforeCos}）—— 真删,不会再误导你去摸一个空位置;被遗忘权 = 一个减法。</span>`,
+    auditA_init: "验确定性 = 同一个\"杯子在哪\"重查两遍，cos 逐位一致——证明记忆不被悄悄篡改，不是幻觉。",
+    auditA_resetEm: "验确定性 = 重查两遍比对。",
+    auditHeader: "确定性自检(同一查询跑两遍,逐位比较):",
+    auditLine: (obj,a,b,same)=>` 「${obj}」: cos ${a} == ${b}  ${same?"✓":"✗"}`,
+    auditVerdict: (allsame)=>`\n结论:${allsame?"全部比特一致 ✓ —— 场景记忆不可被悄悄篡改,可复核":"出现不一致 ✗"}`,
+    auditNone: "无记录",
+    exportTitle: "====== 本趟场景记忆(本机生成 · 原始视频从未离开此设备)======",
+    exportGen: (t)=>`生成时间:${t}`,
+    exportDevice: "设备:随身摄像头(端上处理)",
+    exportSpoke: (actual,naive)=>`本趟开口次数:${actual}（naive 助手本会说 ${naive} 次）`,
+    exportKept: "保留内容:仅\"物体 → 位置\"摘要(原始视频流已丢弃)",
+    exportItem: (k,obj,place,cos)=>`【${k}】 ${obj} → ${place}  (cos=${cos})`,
+    exportFoot: "说明:这份记忆在你手里,可随时编辑 / 遗忘;原始视频流不上云、不集中。",
+    detNote: (a,b,same)=>`重查「门」两遍 cos=${a} == ${b} ${same?'<span class="ok">✓ 比特一致</span>':'<span class="bad">✗</span>'} ·`,
+    moat: "<b>现场可见的护城河（讲给伙伴听）：</b> <b>只说该说的</b>(变化驱动 = µW + 不淹没使用者)· <b>私有</b>(不把你一生的视频流上云)· 端上 · <b>可编辑可遗忘的场景记忆</b>(东西在哪、收走就忘)· <b>按需细看</b>(平时省着看、你问\"数一数\"才细看)。 <span id=\"detnote\"></span> 整趟 = <b>一个 ~10 KB 向量</b> · 在三值-CIM 芯片上 µW 常开一整天。 <br>云端\"看场景\"很强 —— 但它给不了\"该不该开口的节俭 + µW 续航 + 不把你一生上云 + 你能编辑的记忆\"。",
+    footer: "解放谁：<b>Fatima</b>，开罗一个集市里凭记忆与拐杖穿行的盲人摊主—— 她要么<b>什么辅助都没有</b>(危险、孤立)，要么戴上一个<b>一秒不停念叨、一上午就没电、还把她一整天上传到某家公司云</b>的设备(淹没、依赖、被监视)。 这一层让她<b>只在该被提醒时被提醒</b>、设备<b>撑一整天</b>、而她的一生<b>留在自己身上</b>。 全球约 <b>2.5 亿</b> 低视力 / 盲人，大多在云够不到、电也不稳的地方。 <br>毫秒纪 · millisecond-era — <b>枯れた技術の水平思考</b>：用成熟的向量符号代数 + 变化驱动，给随身设备一个云给不了的私有出行记忆核。 这页可直接发；底层 = 纯 ±1 VSA(bind / unbind / 加减)，无依赖、单文件、离线可跑。",
+    detKey: "门",
+    askObjPrompt: "先开始出行,让眼镜看见东西。"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── HDC core (pure ±1 VSA, verified lineage — identical to baby-safety / daily-memory demos) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+// scene-memory fact = bind(object, place); ledger M = Σ facts (real accumulator, exact subtract = forget)
+// NOTE: objHV/placeHV keys use language-independent identity IDs (e.objId / e.placeId) so the
+//       hypervectors are byte-identical across EN/ZH. Display strings live in SCRIPT.obj[LANG] etc.
+function objHV(o){ return itemHV("obj:"+o); }
+function placeHV(p){ return itemHV("place:"+p); }
+function factHV(o,p){ return bind(objHV(o), placeHV(p)); }
+
+let M = new Float32Array(D);
+let PLACES = new Set();                 // place vocabulary (cleanup codebook) — holds placeId identity keys
+function addFact(o,p){ const h=factHV(o,p); for(let i=0;i<D;i++) M[i]+=h[i]; PLACES.add(p); }
+function subFact(o,p){ const h=factHV(o,p); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallPlace(o){                 // unbind object -> recover place (deterministic proof it's in M)
+  const probe = bind(M, objHV(o));
+  let best=null,bs=-2; for(const p of PLACES){ const s=cos(probe, placeHV(p)); if(s>bs){bs=s;best=p;} }
+  return {place:best, s:bs};
+}
+
+// ───────── scripted walk: objects appear over time, each with an identity + spoken phrase ─────────
+// kind: door/steps/chair/person/cup ; at=frame it appears ; objId/placeId = LANGUAGE-INDEPENDENT HV keys.
+// obj/place/say are DISPLAY-ONLY {en,zh} and are never fed into the HDC algebra.
+const SCRIPT=[
+  {id:"door1",  kind:"door",   at:80,  objId:"door",   placeId:"front-left",
+     obj:{en:"door",  zh:"门"},   place:{en:"front-left, ~3 steps",      zh:"左前方"},
+     say:{en:"door ahead on your left, about three steps",  zh:"门在你左前方,约三步"},     peak:0.88, persist:true },
+  {id:"steps1", kind:"steps",  at:210, objId:"steps",  placeId:"ahead-down",
+     obj:{en:"steps", zh:"台阶"}, place:{en:"straight ahead, going down", zh:"正前方下行"},
+     say:{en:"careful, steps going down straight ahead",   zh:"注意,正前方有下行台阶"},   peak:0.95, persist:true },
+  {id:"chair1", kind:"chair",  at:330, objId:"chair",  placeId:"front-right",
+     obj:{en:"chair", zh:"椅子"}, place:{en:"front-right",               zh:"右前方"},
+     say:{en:"a chair to your front-right, you can go around it", zh:"右前方有一把椅子,可绕行"}, peak:0.78, persist:true },
+  {id:"person1",kind:"person", at:450, objId:"person", placeId:"ahead-near",
+     obj:{en:"person",zh:"人"},   place:{en:"approaching, straight ahead", zh:"正前方靠近"},
+     say:{en:"someone is approaching, straight ahead",     zh:"有人正在靠近,正前方"},     peak:0.92, persist:false }, // person passes
+  {id:"cup1",   kind:"cup",    at:560, objId:"cup",    placeId:"table-top-right",
+     obj:{en:"cup",   zh:"杯子"}, place:{en:"top-right of the table",     zh:"桌子右上角"},
+     say:{en:"there's a cup on the table, to your right",  zh:"桌上有个杯子,在你右手边"},   peak:0.70, persist:true },
+];
+// helpers to read the display string for an entry in the current language
+function objStr(e){ return e.obj[LANG]; }
+function placeStr(e){ return e.place[LANG]; }
+function sayStr(e){ return e.say[LANG]; }
+function entryByObjId(objId){ return SCRIPT.find(e=>e.objId===objId); }
+// node + browser share this exact constant so verified counts match the page
+const TOTAL_FRAMES = 700;
+
+let frame=0, playing=false, surprise=0, timer=null;
+let activeObjs=[];                       // objects currently visible in scene (for drawing + count)
+let spokenIds=new Set();                 // ★ fire-ONCE-per-object-by-IDENTITY (NOT a frame-gap)
+let naiveCount=0, actualCount=0;         // naive = would-narrate-every-visible-frame ; actual = on-change
+let walkX=0;
+let lastSpoke=null;                      // remember the most-recently spoken entry (for repaint)
+
+function reset(){
+  frame=0; surprise=0; playing=false; activeObjs=[]; spokenIds=new Set();
+  naiveCount=0; actualCount=0; walkX=0; lastSpoke=null;
+  M=new Float32Array(D); PLACES=new Set();
+  document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true;
+  document.getElementById("count").disabled=true; document.getElementById("audit").disabled=true; document.getElementById("genall").disabled=true;
+  setSurprise(0, t('sLabelCalm')); setSpeak(null, t('speakSilentBig'), t('speakSilentSub'));
+  document.getElementById("log").innerHTML="";
+  updateCounters(); refreshSelectors(); renderMem(); drawScene();
+}
+
+function setSurprise(v,label){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
+  const l=document.getElementById("slbl"); l.textContent=label; l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
+function setSpeak(say, big, sub){ const box=document.getElementById("speakBox");
+  document.getElementById("speakBig").innerHTML = (say? '🗣 "'+say+'"' : big);
+  document.getElementById("speakBig").className = "big"+(say?" say":"");
+  document.getElementById("speakSub").innerHTML = sub||"";
+  box.className = "speak"+(say?" live":""); }
+function savePctStr(){ if(!naiveCount) return "0%"; const p=(1-actualCount/naiveCount)*100;
+  return (p>=99.9?"99.9":p.toFixed(1))+"%"; }      // honest: never round up to a misleading flat 100%
+function updateCounters(){
+  document.getElementById("cNaive").textContent=naiveCount;
+  document.getElementById("cActual").textContent=actualCount;
+  document.getElementById("cSave").textContent=savePctStr();
+}
+function logLine(frame, say, phrase){
+  const el=document.getElementById("log");
+  const cls = say? "say":"skip";
+  const w = say? ('🗣 '+phrase) : t('logSilent');
+  el.insertAdjacentHTML("afterbegin", `<div class="l ${cls}"><span class="t">f${String(frame).padStart(3," ")}</span> <span class="w">${w}</span></div>`);
+}
+
+// per-frame visibility: an object is visible from .at; persistent ones stay, the person passes through
+function visibleObjs(f){
+  const out=[];
+  for(const e of SCRIPT){
+    if(f < e.at) continue;
+    if(e.persist){ out.push(e); }
+    else { if(f < e.at + 90) out.push(e); }   // person visible ~3s then passes
+  }
+  return out;
+}
+
+// ★ THE FRUGAL ROUTER, identity-keyed (shared logic with node verifier):
+// every frame -> naive would narrate ALL visible objects (overwhelming);
+// we speak ONLY for objects whose identity we have NOT spoken yet (change/novelty).
+function routerStep(f){
+  const vis = visibleObjs(f);
+  naiveCount += vis.length;                     // naive: re-announces everything, every frame
+  let spokeThisFrame=null, peak=0;
+  for(const e of vis){
+    if(!spokenIds.has(e.id)){                   // NOVEL object -> speak ONCE, bind into memory
+      spokenIds.add(e.id);
+      addFact(e.objId, e.placeId);              // bind using LANGUAGE-INDEPENDENT identity keys
+      actualCount += 1;
+      spokeThisFrame = e;
+      peak = Math.max(peak, e.peak);
+    }
+  }
+  return { vis, spokeThisFrame, peak };
+}
+
+function step(){
+  frame++; walkX += 1.0;
+  const r = routerStep(frame);
+  activeObjs = r.vis;
+  if(r.spokeThisFrame){
+    const e=r.spokeThisFrame; lastSpoke=e;
+    setSurprise(e.peak, t('sLabelChange'));
+    setSpeak(sayStr(e), null, t('speakChange')(objStr(e), placeStr(e), e.objId, e.placeId, r.vis.length));
+    logLine(frame, true, sayStr(e));
+    refreshSelectors(); renderMem();
+  } else {
+    // nothing new -> stay silent; surprise decays
+    setSurprise(Math.max(0, surprise*0.85), surprise>0.3?t('sLabelNotice'):t('sLabelCalm'));
+    if(frame % 40 === 0 && r.vis.length) logLine(frame, false, null);  // sample a few "stayed silent" lines
+  }
+  updateCounters();
+  drawScene();
+  if(frame>=TOTAL_FRAMES){ pause();
+    document.getElementById("count").disabled=false;
+    document.getElementById("audit").disabled = spokenIds.size===0;
+    document.getElementById("genall").disabled = spokenIds.size===0;
+    setSpeak(null, t('walkDone'), t('walkDoneSub')(naiveCount, actualCount, savePctStr()));
+  }
+}
+
+// ───────── scene drawing (first-person-ish: a corridor, objects slide toward viewer) ─────────
+const cv=document.getElementById("scene"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height;
+function drawScene(){
+  ctx.fillStyle="#0d1217"; ctx.fillRect(0,0,W,H);
+  // perspective floor + walls (first-person corridor)
+  const cx=W/2, horizon=H*0.32;
+  ctx.fillStyle="#0f161d"; ctx.beginPath(); ctx.moveTo(0,H); ctx.lineTo(W*0.30,horizon); ctx.lineTo(W*0.70,horizon); ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle="#1c2a36"; ctx.lineWidth=1;
+  for(let i=1;i<6;i++){ const y=horizon+(H-horizon)*(i/6); ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(cx,horizon); ctx.lineTo(cx,H); ctx.strokeStyle="#16222d"; ctx.stroke();
+  // label
+  ctx.fillStyle="#2a3947"; ctx.font="10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('canvasLabel'), cx, H-8);
+
+  // draw each currently-visible object at a position keyed to its place
+  for(const e of activeObjs){ drawObject(e); }
+
+  // top-left HUD: how many visible now
+  ctx.fillStyle="#0b0f14cc"; ctx.fillRect(8,8,150,22);
+  ctx.fillStyle="#8da2b5"; ctx.font="11px sans-serif"; ctx.textAlign="left";
+  ctx.fillText(t('canvasHud')(activeObjs.length), 14, 23);
+}
+function placePos(placeId){
+  // map a place identity to an approximate on-screen anchor (first-person)
+  const cx=W/2;
+  if(placeId==="front-left") return {x:cx-110, y:H*0.58};
+  if(placeId==="table-top-right") return {x:cx+120, y:H*0.50};
+  if(placeId==="front-right") return {x:cx+110, y:H*0.58};
+  if(placeId==="ahead-down") return {x:cx, y:H*0.72};
+  return {x:cx, y:H*0.55};
+}
+function drawObject(e){
+  const {x,y}=placePos(e.placeId);
+  ctx.save(); ctx.textAlign="center";
+  const fresh = (frame - e.at) < 18;           // glow briefly when first announced
+  const col = e.kind==="person" ? "#ff6b6b" : e.kind==="steps" ? "#f4c152" : "#62b8ff";
+  if(fresh){ ctx.shadowColor=col; ctx.shadowBlur=16; }
+  ctx.strokeStyle=col; ctx.fillStyle="#13202b"; ctx.lineWidth=2.4;
+  if(e.kind==="door"){ roundRect(x-26,y-58,52,86,5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x+15,y-12,3,0,6.3); ctx.fill(); }
+  else if(e.kind==="chair"){ roundRect(x-22,y-10,44,12,3); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-20,y-10); ctx.lineTo(x-20,y-46); ctx.lineTo(x+20,y-46); ctx.lineTo(x+20,y-10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-18,y+2); ctx.lineTo(x-18,y+26); ctx.moveTo(x+18,y+2); ctx.lineTo(x+18,y+26); ctx.stroke(); }
+  else if(e.kind==="steps"){ for(let i=0;i<3;i++){ roundRect(x-50+i*8, y-6+i*14, 100-i*16, 11, 2); ctx.fill(); ctx.stroke(); } }
+  else if(e.kind==="person"){ // approaching figure (scale grows as it nears)
+    const p=Math.min(1,(frame-e.at)/60), s=1+p*0.6;
+    ctx.beginPath(); ctx.arc(x, y-44*s, 14*s, 0, 6.3); ctx.fill(); ctx.stroke();
+    roundRect(x-16*s, y-30*s, 32*s, 60*s, 12); ctx.fill(); ctx.stroke(); }
+  else if(e.kind==="cup"){ // a table edge + cup
+    ctx.strokeStyle="#3a4b59"; roundRect(x-70,y+14,150,8,2); ctx.stroke();
+    ctx.strokeStyle=col; roundRect(x-9,y-16,18,26,3); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x+11,y-3,6,-1.3,1.3); ctx.stroke(); }
+  ctx.shadowBlur=0;
+  ctx.fillStyle=col; ctx.font="bold 11px sans-serif"; ctx.fillText(objStr(e)+" · "+placeStr(e), x, y+42);
+  ctx.restore();
+}
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+// ───────── task trigger: thorough on-demand count (best-of-both) ─────────
+document.getElementById("count").onclick=()=>{
+  // the "thorough flash": front-end counts everything currently in view (on user demand only)
+  const n=activeObjs.length;
+  const list = activeObjs.map(e=>`${objStr(e)}(${placeStr(e)})`).join(LANG==='zh'?"、 ":", ") || t('countNone');
+  setSpeak(null, t('countBig'), t('countBody')(n, list));
+};
+
+// ───────── controls ─────────
+function play(){ if(playing) return; playing=true;
+  document.getElementById("play").disabled=true; document.getElementById("pause").disabled=false;
+  document.getElementById("count").disabled=false;
+  timer=setInterval(step, 24); }
+function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true;
+  if(timer){ clearInterval(timer); timer=null; } }
+document.getElementById("play").onclick=play;
+document.getElementById("pause").onclick=pause;
+document.getElementById("reset").onclick=()=>{ pause(); reset();
+  document.getElementById("aA").innerHTML='<em>'+t('aA_resetEm')+'</em>';
+  document.getElementById("fA").innerHTML='<em>'+t('fA_resetEm')+'</em>';
+  document.getElementById("auditA").innerHTML='<em>'+t('auditA_resetEm')+'</em>'; };
+
+// ───────── right panel: ask / forget / audit ─────────
+const $=id=>document.getElementById(id);
+function entriesSeen(){ return [...spokenIds].map(id=>SCRIPT.find(e=>e.id===id)).filter(Boolean); }
+function fillSel(sel, entries){ if(!sel) return;
+  if(!entries.length){ sel.innerHTML=`<option value="">—</option>`; return; }
+  sel.innerHTML = entries.map(e=>`<option value="${e.objId}">${objStr(e)}</option>`).join(""); }
+function refreshSelectors(){ const es=entriesSeen(); fillSel($("aObj"),es); fillSel($("fObj"),es); }
+function renderMem(){
+  const n=spokenIds.size;
+  if(!n){ $("memsize").innerHTML=t('memEmpty')+' <small>'+t('memEmptySmall')+'</small>';
+    $("memnote").innerHTML=t('memEmptyNote'); return; }
+  const kb=(D/1024).toFixed(1);
+  $("memsize").innerHTML=t('memFull')(D, kb, n);
+  $("memnote").innerHTML=t('memFullNote')(n);
+  setDetNote();
+}
+function bar(s){ const w=Math.max(0,Math.min(64,Math.round(s*128))); return `<span class="bar" style="width:${w}px"></span>`; }
+
+// ask: takes an objId identity key; resolves place identity -> display string for the matched entry
+function placeDisp(placeId){ const e=SCRIPT.find(x=>x.placeId===placeId); return e? placeStr(e) : placeId; }
+function askObjId(objId){
+  if(!spokenIds.size){ $("aA").innerHTML='<em>'+t('askObjPrompt')+'</em>'; return; }
+  const e=entryByObjId(objId);
+  const disp = e? objStr(e) : objId;
+  const rec=recallPlace(objId);
+  $("aA").innerHTML = rec.s>0.08
+    ? t('askFound')(disp, placeDisp(rec.place), bar(rec.s), rec.s.toFixed(3))
+    : t('askNotFound')(disp, rec.s.toFixed(3));
+}
+$("aB").onclick=()=>askObjId($("aObj").value);
+$("aCup").onclick=()=>{ if(!spokenIds.size){ $("aA").innerHTML='<em>'+t('askPrompt')+'</em>'; return; }
+  const rec=recallPlace("cup");
+  $("aA").innerHTML = rec.s>0.08 ? t('askCupFound')(placeDisp(rec.place), bar(rec.s), rec.s.toFixed(3))
+    : t('askCupNone'); };
+$("aKey").onclick=()=>{ if(!spokenIds.size){ $("aA").innerHTML='<em>'+t('askPrompt')+'</em>'; return; }
+  // keys weren't in the walk -> honest "don't know" (knows it doesn't know)
+  const rec=recallPlace("key");
+  $("aA").innerHTML = rec.s>0.08 ? t('askKeyFound')(placeDisp(rec.place), bar(rec.s), rec.s.toFixed(3))
+    : t('askKeyNone')(rec.s.toFixed(3)); };
+
+// forget (object removed from scene)
+$("fB").onclick=()=>{ const objId=$("fObj").value; if(!spokenIds.size){ $("fA").innerHTML='<em>'+t('askPrompt')+'</em>'; return; }
+  const e=entryByObjId(objId); if(!e){ $("fA").innerHTML='<em>'+t('fA_noObj')+'</em>'; return; }
+  const before=recallPlace(objId);
+  subFact(e.objId, e.placeId);
+  const after=recallPlace(objId);
+  $("fA").innerHTML=t('forgetDone')(objStr(e), e.objId, e.placeId, after.s.toFixed(3), before.s.toFixed(3));
+  renderMem(); };
+
+// audit determinism
+$("audit").onclick=()=>{
+  const es=entriesSeen();
+  let out=t('auditHeader')+"\n", allsame=true;
+  for(const e of es){ const a=recallPlace(e.objId).s, b=recallPlace(e.objId).s; const same=(a===b); allsame=allsame&&same;
+    out+=t('auditLine')(objStr(e), a.toFixed(6), b.toFixed(6), same)+"\n"; }
+  out+= es.length? t('auditVerdict')(allsame) : t('auditNone');
+  $("auditA").innerHTML=`<div style="white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:#cfe3f5">${out}</div>`;
+};
+$("genall").onclick=()=>{
+  const es=entriesSeen();
+  const lines=[ t('exportTitle'),
+    t('exportGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")), t('exportDevice'),
+    t('exportSpoke')(actualCount, naiveCount),
+    t('exportKept'), ""];
+  es.forEach((e,k)=>{ const r=recallPlace(e.objId); lines.push(t('exportItem')(k+1, objStr(e), placeDisp(r.place), r.s.toFixed(3))); });
+  lines.push("", t('exportFoot'));
+  $("auditA").innerHTML=`<div style="white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:#cfe3f5">${lines.join("\n")}</div>`;
+};
+
+function setDetNote(){
+  const dn=$("detnote"); if(!dn) return;
+  if(!spokenIds.size){ dn.textContent=""; return; }
+  const a=recallPlace("door").s, b=recallPlace("door").s;
+  dn.innerHTML = t('detNote')(a.toFixed(6), b.toFixed(6), a===b);
+}
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  // speak pill: reflect current state
+  if(playing===false && frame>=TOTAL_FRAMES && spokenIds.size){
+    setSpeak(null, t('walkDone'), t('walkDoneSub')(naiveCount, actualCount, savePctStr()));
+  } else if(lastSpoke && spokenIds.has(lastSpoke.id) && playing){
+    const e=lastSpoke;
+    setSpeak(sayStr(e), null, t('speakChange')(objStr(e), placeStr(e), e.objId, e.placeId, activeObjs.length));
+  } else {
+    setSurprise(surprise, surprise>0.6? t('sLabelChange') : (surprise>0.3? t('sLabelNotice') : t('sLabelCalm')));
+    setSpeak(null, t('speakSilentBig'), t('speakSilentSub'));
+  }
+  // labelled surprise text without changing the meter value when not speaking
+  const sl=$("slbl"); if(sl && !(lastSpoke && playing)) sl.textContent = surprise>0.6? t('sLabelChange') : (surprise>0.3? t('sLabelNotice') : t('sLabelCalm'));
+  updateCounters(); refreshSelectors(); renderMem(); drawScene();
+  // reset the static-ish answer panels to their language-correct init/empty text
+  if(!spokenIds.size){
+    $("aA").innerHTML='<em>'+t('askA_init')+'</em>';
+    $("fA").innerHTML='<em>'+t('fA_init')+'</em>';
+    $("auditA").innerHTML='<em>'+t('auditA_init')+'</em>';
+  }
+}
+
+// init
+applyStatic();
+reset();
+$("aA").innerHTML='<em>'+t('askA_init')+'</em>';
+$("fA").innerHTML='<em>'+t('fA_init')+'</em>';
+$("auditA").innerHTML='<em>'+t('auditA_init')+'</em>';
+</script>
+</body>
+</html>

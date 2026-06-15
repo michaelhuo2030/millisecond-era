@@ -10,41 +10,68 @@
          max-width: 760px; margin: 0 auto; padding: 2.4rem 1.2rem 4rem; color: #1a1a1a; background: #fbfbfa; }
   @media (prefers-color-scheme: dark){ body{ color:#e8e8e8; background:#161616 } a{color:#7db0ff} .card{background:#1f1f1f;border-color:#333} }
   h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 .3rem; }
-  .sub { color: #666; margin: 0 0 1.8rem; }
-  .moat { font-size: .92rem; color:#444; border-left: 3px solid #c9c9c9; padding: .2rem 0 .2rem .9rem; margin: 0 0 2rem; }
-  @media (prefers-color-scheme: dark){ .sub,.moat{color:#aaa} }
+  .sub { color: #666; margin: 0 0 1.4rem; }
+  .moat { font-size: .92rem; color:#444; border-left: 3px solid #c9c9c9; padding: .2rem 0 .2rem .9rem; margin: 0 0 1.6rem; }
+  .note { font-size:.86rem; color:#888; margin:0 0 2rem; }
+  @media (prefers-color-scheme: dark){ .sub,.moat{color:#aaa} .note{color:#888} }
+  h2.group { font-size:1.02rem; margin:1.8rem 0 .4rem; color:#555; letter-spacing:.02em; }
+  @media (prefers-color-scheme: dark){ h2.group{color:#bbb} }
   .card { display:block; border:1px solid #e3e3e0; border-radius:12px; padding:1rem 1.1rem; margin:.8rem 0; text-decoration:none; color:inherit; transition:border-color .15s; }
   .card:hover { border-color:#888; }
-  .card h2 { font-size:1.06rem; margin:0 0 .25rem; }
-  .card p { margin:0; color:#555; font-size:.93rem; }
+  .card h3 { font-size:1.04rem; margin:0 0 .25rem; }
+  .card p { margin:0; color:#555; font-size:.92rem; }
   @media (prefers-color-scheme: dark){ .card p{color:#aaa} }
   footer { margin-top:2.4rem; font-size:.85rem; color:#888; }
 </style>
 </head>
 <body>
   <h1>The Other Kind of Machine Vision</h1>
-  <p class="sub">Five browser-runnable demos. Open one and drive it yourself — everything runs on-device, in this tab.</p>
+  <p class="sub">Browser-runnable demos. Open one and drive it yourself — everything runs on-device, in this tab.</p>
   <p class="moat"><strong>The moat is physics, not intelligence.</strong> Not smarter than the cloud and not out-recognizing it — four properties the cloud structurally can't offer: <strong>µW · private · reversible · deterministic.</strong></p>
+  <p class="note">Each demo has an <strong>EN | 中</strong> language toggle (top-right). Companion essay: <a href="../../civilization-thesis.html">the full thesis</a>.</p>
 
+  <h2 class="group">Featured — the five in the thesis</h2>
   <a class="card" href="owned-identity.html">
-    <h2>Owned, reversible identity</h2>
+    <h3>Owned, reversible identity</h3>
     <p>Prove "same person" without exposing the raw biometric, then surgically separate a dangerous family record — with an audit note. (Hassan, Syrian refugee.)</p>
   </a>
   <a class="card" href="dashcam-evidence.html">
-    <h2>Dashcam evidence helper</h2>
+    <h3>Dashcam evidence helper</h3>
     <p>Your car's video flags the moment someone runs a red light, builds a deterministic auditable bundle, and <em>you</em> choose to submit it. On-device, owned, forgettable — not auto-report.</p>
   </a>
   <a class="card" href="home-baby-safety.html">
-    <h2>Home / baby safety</h2>
+    <h3>Home / baby safety</h3>
     <p>Process an existing home camera on-device, flag an anomaly via surprise, keep only a tiny event record — and discard the raw footage. The footage never leaves home.</p>
   </a>
   <a class="card" href="factory-predictive-maintenance.html">
-    <h2>Factory predictive maintenance</h2>
+    <h3>Factory predictive maintenance</h3>
     <p>Per-machine vibration where the alert fires on a change in harmonic structure (a failure precursor), not a fixed threshold. Baselines editable in the field. (Rita, textile plant.)</p>
   </a>
   <a class="card" href="elderly-decline-care.html">
-    <h2>Elderly decline care</h2>
+    <h3>Elderly decline care</h3>
     <p>Change-only watching of a learned gait, flagging the slow drift that precedes a fall — at a power budget that lasts weeks, with no cloud video of the home. (Maria, off-grid.)</p>
+  </a>
+
+  <h2 class="group">More from the eight-lens map</h2>
+  <a class="card" href="daily-life-memory.html">
+    <h3>Daily-life memory</h3>
+    <p>Where are my keys, did I lock the door, did I take my meds — a private wearable memory that recalls exactly, forgets surgically, and stays on your device. (Alex, caregiver.)</p>
+  </a>
+  <a class="card" href="home-safety.html">
+    <h3>Home hazard watch</h3>
+    <p>Gas leak, a stove left on, a stranger at the door — change-triggered, on-device alerts that keep only the event and discard the raw feed. (Auntie Wang, living alone.)</p>
+  </a>
+  <a class="card" href="accessibility-blind-aid.html">
+    <h3>On-device aid for the blind</h3>
+    <p>Spatial memory that reminds you of the step, the door, the cup you set down — only when you should be reminded. Private, µW, always-on. (Fatima, Cairo souk.)</p>
+  </a>
+  <a class="card" href="ecology-poaching-sentinel.html">
+    <h3>Anti-poaching sentinel</h3>
+    <p>Solar acoustic edge node: gunshot / vehicle / unfamiliar snare flagged by change, signatures editable in the field, no cloud round-trip. (Phakamani, Kruger.)</p>
+  </a>
+  <a class="card" href="science-rare-event-microscopy.html">
+    <h3>Rare-event microscopy</h3>
+    <p>Catch the one-in-a-million event under the scope (a circulating tumour cell), deterministic provenance, an editable cell library shareable across labs. (Dr. Chen, pathologist.)</p>
   </a>
 
   <footer>

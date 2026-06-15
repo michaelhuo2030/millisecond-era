@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anti-Poaching Sentinel · solar · on-device · no cloud (Millisecond Era)</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
+          --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC",sans-serif; }
+  header { padding:18px 24px 14px; border-bottom:1px solid var(--line); }
+  .brand { color:var(--mut); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  h1 { margin:6px 0 0; font-size:21px; font-weight:800; } h1 span{ color:var(--acc); }
+  .sub { color:var(--mut); font-size:13px; margin-top:6px; max-width:1120px; }
+  .wrap { display:flex; gap:18px; padding:18px 24px; flex-wrap:wrap; align-items:flex-start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px; }
+  .left { width:430px; } .right{ flex:1; min-width:380px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+  button { background:var(--acc); color:#04121f; border:0; border-radius:9px; padding:9px 14px;
+        font-size:14px; cursor:pointer; font-weight:700; }
+  button.sec { background:#1b2530; border:1px solid var(--line); color:var(--txt); font-weight:600; }
+  button.hot { background:var(--hot); color:#1c0606; } button.warn{ background:var(--warn); color:#1c1300; }
+  button.good { background:var(--good); color:#04140c; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  canvas#bush { width:100%; background:#0c1410; border:1px solid var(--line); border-radius:10px; display:block; }
+  .stat { color:var(--mut); font-size:12px; }
+  .ok{ color:var(--good); } .bad{ color:var(--hot); } .wn{ color:var(--warn); }
+  .meter { height:12px; border-radius:6px; background:#1b2530; overflow:hidden; margin-top:5px; }
+  .meter > i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--good),var(--warn),var(--hot)); transition:width .1s; }
+  .eye { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .pill { font-size:11px; padding:3px 9px; border-radius:11px; border:1px solid var(--line); background:#0b0f14; color:var(--mut); }
+  .pill b{ color:var(--txt); font-weight:700; }
+  .pill.alert{ border-color:var(--hot); color:var(--hot); }
+  .pill.solar{ border-color:var(--good); color:var(--good); }
+  .ev { border:1px solid var(--line); border-radius:11px; padding:11px; margin-bottom:11px; background:#0b0f14; }
+  .ev.flash { border-color:var(--hot); box-shadow:0 0 0 2px rgba(255,107,107,.25); }
+  .ev .top { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
+  .etag { font-weight:800; font-size:14px; letter-spacing:.5px; padding:2px 9px; border-radius:5px; background:linear-gradient(#b3261e,#7a160f); color:#fff; }
+  .etag.amber{ background:linear-gradient(#a9710b,#7a4f08); } .etag.blue{ background:linear-gradient(#1565c0,#0d47a1); } .etag.teal{ background:linear-gradient(#0e7490,#0a4f63); }
+  .etype { color:var(--hot); font-weight:700; } .etime{ color:var(--mut); font-size:12px; margin-left:auto; }
+  .spec { display:flex; gap:6px; margin:6px 0; align-items:flex-end; }
+  .spec canvas{ width:130px; height:48px; border-radius:5px; border:1px solid var(--line); background:#070b0e; }
+  .thumbs { display:flex; gap:6px; margin:6px 0; } .thumbs img{ width:96px; height:64px; border-radius:5px; border:1px solid var(--line); object-fit:cover; }
+  .evbtns { display:flex; gap:7px; margin-top:6px; flex-wrap:wrap; }
+  .report { white-space:pre-wrap; background:#0b0f14; border:1px solid var(--line); border-radius:9px; padding:11px; font:12.5px/1.5 ui-monospace,Menlo,monospace; color:#cfe3f5; margin-top:8px; max-height:260px; overflow:auto; }
+  .moat { background:#0b0f14; border:1px solid var(--good); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:13px; }
+  .moat b{ color:var(--good); }
+  .sig { background:#0b0f14; border:1px solid var(--acc); border-radius:11px; padding:11px 13px; margin-top:12px; font-size:12.5px; }
+  .sig b{ color:var(--acc); }
+  .sig .siglist{ display:flex; gap:6px; margin:7px 0; flex-wrap:wrap; }
+  .sigchip{ font-size:11px; padding:3px 9px; border-radius:11px; border:1px solid var(--line); background:#11161c; color:var(--txt); }
+  .sigchip.dead{ text-decoration:line-through; color:var(--mut); border-style:dashed; }
+  .sigchip.fresh{ border-color:var(--good); color:var(--good); }
+  .honest { background:#141a21; border:1px dashed var(--warn); border-radius:11px;
+        padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
+  .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
+  .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
+</style>
+</head>
+<body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
+<header>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
+</header>
+
+<div class="honest" data-i18n-html="honest"></div>
+
+<div class="wrap">
+  <div class="card left">
+    <div class="row">
+      <button id="play" data-i18n="btnPlay"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
+    </div>
+    <canvas id="bush" width="400" height="430"></canvas>
+    <div class="eye">
+      <span class="pill solar" id="pSolar"></span>
+      <span class="pill" id="pAcou"></span>
+      <span class="pill" id="pTherm"></span>
+    </div>
+    <div class="stat" style="margin-top:10px"><span data-i18n="surpriseLine"></span><span id="slbl" class="ok"></span></div>
+    <div class="meter"><i id="sfill"></i></div>
+    <div class="stat" id="live" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card right">
+    <div class="row">
+      <b style="font-size:15px" data-i18n="panelH"></b>
+      <span class="stat" id="memstat"></span>
+      <button id="genall" class="warn" style="margin-left:auto" disabled data-i18n="btnGenAll"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
+    </div>
+    <div id="evlist"></div>
+    <div id="reportbox"></div>
+    <div id="auditbox"></div>
+
+    <div class="sig">
+      <b data-i18n="sigTitle"></b>
+      <div class="siglist" id="siglist"></div>
+      <div class="stat" id="sigmsg"></div>
+      <div class="evbtns" style="margin-top:8px">
+        <button id="evolve" class="good" disabled data-i18n="btnEvolve"></button>
+        <button id="restoreSig" class="sec" disabled data-i18n="btnRestoreSig"></button>
+      </div>
+    </div>
+
+    <div class="moat" data-i18n-html="moat"></div>
+  </div>
+</div>
+
+<script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Anti-Poaching Sentinel · solar · on-device · no cloud (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 4/N",
+    h1: "Anti-poaching sentinel · one solar sensor guarding 500 km² of off-grid, no-signal wilderness — hear the gunshot on the device, don't wait for the cloud",
+    sub: "A solar acoustic + thermal sensor → <b>an “eye” that hears/sees the normal state of the environment</b> (insects, wind, water, the temperature at night) → <b>a surprise router that wakes only at the moment of an anomaly</b> (an unpredicted change in the environment = µW) → it captures one <b>private, deterministic, auditable, editable</b> <b>threat event</b> (time + threat type + a spectrogram) and alerts the ranger on the spot. <b>No cloud, no round-trip — a few minutes decide whether a rhino lives or dies.</b>",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>Gunshot detection already exists</b> (ShotSpotter mic arrays in cities), and thermal / infrared camera traps are commodities too (all kinds of motion-triggered IR cameras) — “can we detect a single gunshot” is not the missing piece. ② <b>“This sound is a rifle, that hotspot is a vehicle, that group is elephants” is the recognition front-end’s job</b> (acoustic / thermal classifiers = models, boundary law L1) — this demo uses a <b>scripted scenario</b> to show the <b>logic</b>; the eye’s output is simulated, and we do not claim to recognize more accurately. ③ The real gap = <b>solar, autonomous, remote deployment</b> (off-grid wilderness with no power and no signal — you can’t wait for a cloud round-trip) + <b>on-device alerting within minutes</b> + <b>multimodal “change fusion”</b> (sound + heat, reporting “an anomalous change in the environment” rather than a fixed threshold = insects / elephants don’t false-alarm every day) + <b>threat signatures that are field-editable and evolve with the poachers’ tactics</b>. ④ Our moat = <b>solar µW change-driven sensing + a private, deterministic, auditable, editable threat memory</b> (when poachers switch tactics → forget the old gunshot signature on the spot, add a tripwire signature, no retraining) — <b>not “smarter than the cloud.”</b>",
+    btnPlay: "▶ Begin the watch (simulate one night)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    surpriseLine: "Surprise signal (anomaly = an unpredicted change in the environment, not a full recording): ",
+    panelH: "Threat-event ledger (private · editable · forgettable)",
+    btnGenAll: "📄 Generate tonight’s patrol summary (on-device)",
+    btnAudit: "🔒 Verify determinism",
+    sigTitle: "★ Field-editable threat signatures (the moat: poachers evolve, so the signatures must evolve too)",
+    btnEvolve: "🔧 Poachers switch tactics → edit the signature library",
+    btnRestoreSig: "↺ Restore",
+    moat: "<b>The moat, visible in the field:</b> <b>solar · autonomous · remote</b> (off-grid wilderness, no power, no signal, no waiting for a cloud round-trip) · wakes only at the moment of an anomaly (not recording all night = µW) · <b>on-device alerting within minutes</b> (a few minutes decide whether a rhino — or a ranger — lives or dies) · multimodal change-triggering (sound + heat fused, a passing elephant herd does not false-alarm) · <b>threat signatures field-editable, evolving with the poachers’ tactics</b> (forget the old, add the new = vector add/subtract, no retraining, no hauling it back) · events are deterministic, auditable, exactly deletable, and <b>you own it</b>.<br>A cloud solution needs 4G / satellite backhaul + a remote server — out in the wilderness there is no signal, and you can’t spare those minutes. This one doesn’t.<br>Who it liberates: someone like <b>Phakamani</b> (a ranger in the 500 km² Kruger reserve), protecting elephants, rhinos, pangolins — and also protecting regional security (poaching and smuggling fund armed groups); and every ranger who patrols with their own body, but has no eyes or ears to keep watch through the night for them.",
+    // ── dynamic display strings ──
+    solarDay: "Solar: <b>charging in daylight ☀</b>",
+    solarDayB: "charging in daylight ☀",
+    solarNightB: "night · on battery 🔋",
+    acouCalmB: "calm (insects / wind)",
+    thermCalmB: "calm",
+    acouLabel: "Acoustic: ",
+    thermLabel: "Thermal: ",
+    surpCalm: "calm",
+    surpAlarm: "⚠ anomaly! alerted on the spot",
+    surpBenign: "benign change (elephant herd) · no alarm",
+    surpUnarmed: "unrecognized disturbance (signature not loaded)",
+    surpNote: "note",
+    acouGunshot: "⚠ sudden spike (suspected gunshot)",
+    acouVehicle: "low-frequency engine sound ↑",
+    acouHerd: "low-frequency footfalls (benign)",
+    acouSnare: "unfamiliar · quiet disturbance (tripwire?)",
+    thermVehicle: "⚠ new heat source · in motion",
+    thermHerd: "warm bodies · group movement (benign: elephant herd)",
+    thermSnare: "no heat source · disturbance only",
+    liveIntro: "Click “Begin the watch.” Over one scripted night: <b>① a gunshot (acoustic spike) → ② a poacher vehicle approaching (new heat source + motion) → ③ an elephant / rhino herd passing (benign, should NOT alarm) → ④ a tactical switch: an unfamiliar quiet tripwire / branch snap</b> — the router wakes only at that moment and alerts on the spot.",
+    liveDone: '<span class="ok">Tonight’s watch is over.</span> On the right are the captured threat events — you can flag false alarms (exact deletion), generate a patrol summary, verify determinism. <b>The elephant herd did not false-alarm.</b>',
+    liveCapture: (type,time)=>`🔔 <span class="bad">Threat: ${type}</span> · ${time} — <b>alerted the ranger on the spot</b> and stored it in the private event ledger. <b>No cloud, no round-trip.</b>`,
+    liveDeleted: (type,time,cosv)=>`🗑 Flagged <b>${type} · ${time}</b> as a false alarm and <b>exactly deleted it</b> (right-to-be-forgotten = subtraction). Recheck: unbind → cos=${cosv} (dropped to noise = truly deleted clean).`,
+    sigMsgInit: "Did poachers switch from rifles to silent traps? The ranger can, in the field, <b>forget the old gunshot signature and add a new tripwire / branch-snap signature</b> — one line of vector algebra, no need to haul the sentinel back for retraining.",
+    sigMsgEvolved: (dG,dS)=>`✅ The signature library has been updated in the field (no retraining, no hauling back): <b>forget gunshot</b> (cos→${dG} = dropped to noise), <b>add the tripwire signature</b> (cos→${dS} = loaded). Now run it again and scene ④ “unfamiliar tripwire” will trigger an alarm, while the gunshot no longer does. This is one line of vector add/subtract — a cloud model cannot change on the spot like this.`,
+    memEmpty: "M: empty",
+    memFull: (n)=>`M = 1 vector · ${n} events`,
+    evEmpty: 'No events yet. Once the watch begins, anomalies appear here — <b>alerted on the spot, not sent to the cloud</b>.',
+    evRemoved: (type,time)=>`🗑 Deleted (false alarm): ${type} · ${time} — exactly subtracted from M, verifiably deleted clean.`,
+    evThreatTag: "THREAT",
+    evSpecCaption: "↑ spectrogram (generated on-device)<br>raw audio / thermal frames discarded",
+    evSpecAlt: "spectrogram",
+    evBody: "Alert sent on the spot — the ranger can intercept. Only this record is kept (discard-raw).",
+    btnProve: "🔍 Recheck (determinism)",
+    btnMarkFalse: "Flag false alarm → delete",
+    proveOut: (type,cosv)=>`unbind(M, time-key) → threat “${type}” cos=${cosv} ✓ the record is indeed in M, bit-level reproducible (same result every time).`,
+    reportTitle: "====== Tonight’s patrol summary (generated on-device · raw audio / thermal frames never left this device) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repDevice: "Device: solar acoustic + thermal sentinel (on-device processing · no cloud round-trip)",
+    repReserve: "Reserve: Kruger 500 km² · Ranger: Phakamani",
+    repCount: (n)=>`Threat events tonight: ${n}`,
+    repKept: "Kept: event summaries + spectrograms only (raw audio / thermal frames discarded)",
+    repLine: (k,type,time)=>`[${k}] Threat ${type} · time ${time} · evidence: 1 spectrogram (kept on-device) · alerted on the spot`,
+    repNote: "Note: the above are real anomalies detected in the environment; benign activity such as the elephant herd did not trigger an alarm. Whether to dispatch a patrol / notify the anti-poaching command post is the ranger’s call. Raw data is not sent to the cloud, not centralized, and can be deleted at any time.",
+    reportFoot: "This summary is in the ranger’s hands, on the sentinel itself. A cloud solution would wait for the satellite backhaul — out in the wilderness there is no signal, and there is no time to spare.",
+    auditHeader: "Determinism self-check (run the same query twice, compare bit-by-bit):\n",
+    auditLine: (time,type,a,b,ok)=>` ${time} “${type}”: cos ${a} == ${b}  ${ok?"✓":"✗"}\n`,
+    auditPass: "all bits identical ✓ — the threat records cannot be quietly tampered with, auditable",
+    auditFail: "inconsistency detected ✗",
+    auditVerdict: (body)=>`\nVerdict: ${body}`,
+    auditNoEvents: "no events",
+    // canvas captions
+    capEdge: "on-device processing · solar autonomous · no cloud round-trip",
+    capWater: "water-hole",
+    capSentinel: "solar sentinel",
+    capGunSpike: "gunshot spike ↑",
+    capVehicle: "⚠ new heat source · in motion",
+    capHerd: "elephant herd passing (benign · no alarm)",
+    capSnare: "unfamiliar · quiet disturbance (tripwire / branch snap)",
+    // display labels for HV-key threat types (keys stay Chinese in TYPES, never translated)
+    typeGunshot: "gunshot",
+    typeVehicle: "poacher vehicle",
+    typeSnare: "unfamiliar tripwire",
+    typeHerd: "elephant herd",
+    // display labels for signature chips (keys stay English: gunshot/vehicle/snare)
+    sigLabelGunshot: "gunshot signature",
+    sigLabelVehicle: "vehicle heat-source signature",
+    sigLabelSnare: "tripwire / branch-snap signature"
+  },
+  zh: {
+    docTitle: "反盗猎哨兵 · 太阳能·端上·无云 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 4/N",
+    h1: "反盗猎哨兵 · 一块太阳能传感器,守住 500 平方公里没有信号、没有电的荒野 —— 在设备上听见枪声,不等云",
+    sub: "太阳能声学+热成像传感器 → <b>“眼睛”听/看环境的常态</b>(虫鸣/风/水声/夜里的温度)→ <b>惊奇路由器只在异常那一刻醒来</b>(环境里出现预测不到的变化=µW)→ 抓一条 <b>私有·确定·可审计·可编辑</b>的<b>威胁事件</b>(时间+威胁类型+一张声谱图),就地报警给护林员。<b>不上云、不等回程,几分钟决定一头犀牛的生死。</b>",
+    honest: "<b>诚实边界 + 伦理(no-vaporware):</b> ① <b>枪声检测早已存在</b>(城市里的 ShotSpotter 麦克风阵列)、热成像/红外相机陷阱也商品化(各类红外触发相机)——不缺“能不能检测一声枪响”。 ② <b>“这一声是枪、那个热点是车、那群是大象”是识别前端的活</b>(声学/热分类器=模型,边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>逻辑</b>,眼睛输出是模拟的,不声称我们识别更准。 ③ 真正的缺口 = <b>太阳能·自治·远端部署</b>(荒野无电无信号,等不到云回程)+ <b>端上几分钟内报警</b> + <b>多模态“变化融合”</b>(声+热,报“环境里的异常变化”而非固定阈值=虫鸣/大象不天天误报)+ <b>可在现场编辑、随盗猎者战术演化的威胁特征</b>。 ④ 我们的护城河 = <b>太阳能 µW 变化驱动 + 私有·确定·可审计·可编辑的威胁记忆</b>(盗猎者换战术 → 当场忘掉旧枪声特征、加入绊线特征,无需重训)——<b>不是“比云更聪明”</b>。",
+    btnPlay: "▶ 开始值守(模拟一夜)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    surpriseLine: "惊奇信号(异常=环境里预测不到的变化,非录全程):",
+    panelH: "威胁事件台账(私有 · 可编辑 · 可遗忘)",
+    btnGenAll: "📄 生成今夜巡护小结(本机)",
+    btnAudit: "🔒 验确定性",
+    sigTitle: "★ 现场可编辑的威胁特征(护城河:盗猎者会进化,特征也要进化)",
+    btnEvolve: "🔧 盗猎者换战术 → 编辑特征库",
+    btnRestoreSig: "↺ 还原",
+    moat: "<b>现场可见的护城河:</b> <b>太阳能·自治·远端</b>(荒野无电无信号,不等云回程)· 只在异常那一刻醒来(非录全夜=µW)· <b>端上几分钟内报警</b>(几分钟决定一头犀牛/一个护林员的生死)· 多模态变化触发(声+热融合,大象路过不误报)· <b>威胁特征现场可编辑、随盗猎者战术演化</b>(忘旧加新=向量加减,无需重训搬回)· 事件确定可审计、可精确删除、<b>你拥有它</b>。<br>云端方案要 4G/卫星回程 + 远端服务器 —— 荒野里没有信号,也等不起这几分钟。这个不用。<br>解放谁:像 <b>Phakamani</b>(克鲁格 500 km² 保护区的护林员),守护大象/犀牛/穿山甲 —— 也守护区域安全(盗猎走私资助武装团伙);以及每一个用血肉之躯巡护、却没有眼睛和耳朵替他们守夜的护林员。",
+    // ── dynamic display strings ──
+    solarDay: "太阳能: <b>白天充电 ☀</b>",
+    solarDayB: "白天充电 ☀",
+    solarNightB: "夜间·电池供电 🔋",
+    acouCalmB: "常态(虫鸣/风)",
+    thermCalmB: "常态",
+    acouLabel: "声学: ",
+    thermLabel: "热成像: ",
+    surpCalm: "平静",
+    surpAlarm: "⚠ 异常! 已就地报警",
+    surpBenign: "良性变化(象群)· 不报警",
+    surpUnarmed: "未识别的扰动(特征未装载)",
+    surpNote: "留意",
+    acouGunshot: "⚠ 突发尖峰 (疑似枪声)",
+    acouVehicle: "低频引擎声 ↑",
+    acouHerd: "低频踏步(良性)",
+    acouSnare: "陌生·安静扰动 (绊线?)",
+    thermVehicle: "⚠ 新热源·移动中",
+    thermHerd: "暖体·群移动(良性:象群)",
+    thermSnare: "无热源·仅扰动",
+    liveIntro: "点“开始值守”。脚本里一夜会发生:<b>① 枪声(声学突变)→ ② 偷猎车辆靠近(新热源+移动)→ ③ 大象/犀牛群路过(良性,不该报警)→ ④ 切换战术:陌生的安静绊线/树枝断裂</b> —— 路由器只在那一刻醒来,就地报警。",
+    liveDone: '<span class="ok">本夜值守结束。</span> 右侧是抓到的威胁事件 —— 可标记误报(精确删除)、生成巡护小结、验确定性。<b>象群路过没有误报</b>。',
+    liveCapture: (type,time)=>`🔔 <span class="bad">威胁:${type}</span> · ${time} —— 已<b>就地报警</b>给护林员,并存入私有事件台账。<b>不上云、不等回程。</b>`,
+    liveDeleted: (type,time,cosv)=>`🗑 已把 <b>${type} · ${time}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${cosv}(已降到噪声=真删干净)。`,
+    sigMsgInit: "盗猎者从步枪换成了静音陷阱?护林员可在现场<b>忘掉旧的枪声特征、加入新的绊线/树枝断裂特征</b> —— 一行向量代数,无需把哨兵搬回去重训。",
+    sigMsgEvolved: (dG,dS)=>`✅ 特征库已在现场更新(无需重训、无需搬回):<b>忘掉枪声</b>(cos→${dG}=已降到噪声)、<b>加入绊线特征</b>(cos→${dS}=已装载)。现在再跑一遍,第④幕“陌生绊线”就会触发报警,而枪声不再触发。这是一行向量加减,云端模型做不到当场改。`,
+    memEmpty: "M：空",
+    memFull: (n)=>`M = 1 向量 · ${n} 条事件`,
+    evEmpty: '还没有事件。开始值守后,异常会出现在这里 —— <b>就地报警,不上云</b>。',
+    evRemoved: (type,time)=>`🗑 已删除(误报):${type} · ${time} —— 从 M 中精确减去,可复核已删干净。`,
+    evThreatTag: "威胁",
+    evSpecCaption: "↑ 声谱图(本机生成)<br>原始音频/热帧已丢弃",
+    evSpecAlt: "声谱图",
+    evBody: "就地报警已发出 —— 护林员可拦截。仅这条记录被保留(discard-raw)。",
+    btnProve: "🔍 复核(确定性)",
+    btnMarkFalse: "标记误报 → 删除",
+    proveOut: (type,cosv)=>`unbind(M, 时间键) → 威胁「${type}」 cos=${cosv} ✓ 记录确在 M 中,比特级可复核(每次结果一致)。`,
+    reportTitle: "====== 今夜巡护小结(本机生成 · 原始音频/热帧从未离开此设备)======",
+    repGen: (t)=>`生成时间:${t}`,
+    repDevice: "设备:太阳能声学+热成像哨兵(端上处理 · 无云回程)",
+    repReserve: "保护区:克鲁格 500 km² · 护林员:Phakamani",
+    repCount: (n)=>`今夜威胁事件数:${n}`,
+    repKept: "保留内容:仅事件摘要 + 声谱图(原始音频/热帧已丢弃)",
+    repLine: (k,type,time)=>`【${k}】 威胁 ${type} · 时间 ${time} · 证据:1 张声谱图(本机留存) · 已就地报警`,
+    repNote: "说明:以上为环境中检测到的真实异常;象群等良性活动未触发报警。是否调度巡护队/通报反盗猎指挥部由护林员决定。原始数据不上云、不集中、可随时删除。",
+    reportFoot: "这份小结在护林员手里、在哨兵本机上。云端方案要等卫星回程 —— 荒野里没有信号,也等不起。",
+    auditHeader: "确定性自检(同一查询跑两遍,逐位比较):\n",
+    auditLine: (time,type,a,b,ok)=>` ${time} 「${type}」: cos ${a} == ${b}  ${ok?"✓":"✗"}\n`,
+    auditPass: "全部比特一致 ✓ —— 威胁记录不可被悄悄篡改,可复核",
+    auditFail: "出现不一致 ✗",
+    auditVerdict: (body)=>`\n结论:${body}`,
+    auditNoEvents: "无事件",
+    // canvas captions
+    capEdge: "端上处理 · 太阳能自治 · 无云回程",
+    capWater: "水塘",
+    capSentinel: "太阳能哨兵",
+    capGunSpike: "枪声尖峰 ↑",
+    capVehicle: "⚠ 新热源·移动中",
+    capHerd: "象群路过(良性 · 不报警)",
+    capSnare: "陌生·安静扰动(绊线/树枝断裂)",
+    // display labels for HV-key threat types (keys stay Chinese in TYPES, never translated)
+    typeGunshot: "枪声",
+    typeVehicle: "偷猎车辆",
+    typeSnare: "陌生绊线",
+    typeHerd: "大象群",
+    // display labels for signature chips (keys stay English: gunshot/vehicle/snare)
+    sigLabelGunshot: "枪声特征",
+    sigLabelVehicle: "车辆热源特征",
+    sigLabelSnare: "绊线/树枝断裂特征"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── HDC core (pure ±1 VSA, verified lineage — identical to dashcam / home-safety) ─────────
+const D = 8000;
+function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function strSeed(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const _cb=new Map();
+function itemHV(key){ if(_cb.has(key)) return _cb.get(key);
+  const rng=mulberry32(strSeed(key)), v=new Float32Array(D);
+  for(let i=0;i<D;i++) v[i]=rng()<0.5?-1:1; _cb.set(key,v); return v; }
+function bind(a,b){ const o=new Float32Array(D); for(let i=0;i<D;i++) o[i]=a[i]*b[i]; return o; }
+function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
+
+// ── HV-IDENTITY KEYS (language-independent on purpose; display via TYPE_DISP) ──
+// internal threat-type identity keys fed into itemHV / factHV / specCanvas — MUST be byte-identical across languages.
+const TYPE_GUNSHOT = "枪声";
+const TYPE_VEHICLE = "偷猎车辆";
+const TYPE_SNARE   = "陌生绊线";
+const TYPE_HERD    = "大象群";   // benign distractor; display-only, never stored
+const TYPES=[TYPE_GUNSHOT, TYPE_VEHICLE, TYPE_SNARE];   // alarm-worthy threat types (NOT TYPE_HERD — benign)
+// map an internal type key → its localized display label
+function typeDisp(type){
+  if(type===TYPE_GUNSHOT) return t('typeGunshot');
+  if(type===TYPE_VEHICLE) return t('typeVehicle');
+  if(type===TYPE_SNARE)   return t('typeSnare');
+  if(type===TYPE_HERD)    return t('typeHerd');
+  return type;
+}
+// map a signature key (gunshot/vehicle/snare) → localized chip label
+function sigDisp(key){
+  if(key==='gunshot') return t('sigLabelGunshot');
+  if(key==='vehicle') return t('sigLabelVehicle');
+  if(key==='snare')   return t('sigLabelSnare');
+  return key;
+}
+
+// event-record fact = bind(threatType, timeKey); ledger M = Σ facts (real accumulator, exact subtract = forget)
+function factHV(type, tkey){ return bind(itemHV("type:"+type), itemHV("t:"+tkey)); }
+let M = new Float32Array(D);
+function addFact(f){ const h=factHV(f.type,f.tkey); for(let i=0;i<D;i++) M[i]+=h[i]; }
+function subFact(f){ const h=factHV(f.type,f.tkey); for(let i=0;i<D;i++) M[i]-=h[i]; }
+function recallType(tkey){            // unbind time -> recover threat type (deterministic proof it's in M)
+  const probe = bind(M, itemHV("t:"+tkey));
+  let best=null,bs=-2; for(const ty of TYPES){ const s=cos(probe, itemHV("type:"+ty)); if(s>bs){bs=s;best=ty;} }
+  return {type:best, s:bs};
+}
+
+// ───────── editable threat-signature library S = Σ signatureHV (the in-field moat) ─────────
+// each signature is an item-HV; the matcher compares an incoming event's signature against S.
+// forget old (subtract) + add new (add) = poachers evolve, no retraining, no hauling the sentinel back.
+let SIG = new Float32Array(D);
+let sigSet = [];   // [{key, alive}]  — label rendered via sigDisp(key)
+function sigAdd(key){ const h=itemHV("sig:"+key); for(let i=0;i<D;i++) SIG[i]+=h[i]; sigSet.push({key,alive:true}); }
+function sigDrop(key){ const h=itemHV("sig:"+key); for(let i=0;i<D;i++) SIG[i]-=h[i];
+  const e=sigSet.find(s=>s.key===key && s.alive); if(e) e.alive=false; }
+function sigMatch(key){ return cos(SIG, itemHV("sig:"+key)); }   // is this signature currently armed?
+
+// ───────── scene (top-down patch of bush with a water-hole, at night) ─────────
+const cv=document.getElementById("bush"), ctx=cv.getContext("2d");
+const W=cv.width, H=cv.height;
+// scripted timeline (frame-keyed). Each event: window [at, at+dur]; surprise = predicted-vs-observed divergence.
+// benign:true => should NOT alarm (change-of-the-RIGHT-kind test: not just any motion).
+// sigKey => which threat-signature must be ARMED in SIG for this to fire (the editable moat).
+const SCRIPT=[
+  {at:90,  dur:55, kind:"gunshot",  type:TYPE_GUNSHOT, peak:0.95, benign:false, sigKey:"gunshot"},
+  {at:230, dur:90, kind:"vehicle",  type:TYPE_VEHICLE, peak:0.88, benign:false, sigKey:"vehicle"},
+  {at:400, dur:100,kind:"herd",     type:TYPE_HERD,    peak:0.34, benign:true,  sigKey:null},     // benign distractor — learned to ignore
+  {at:560, dur:80, kind:"snare",    type:TYPE_SNARE,   peak:0.83, benign:false, sigKey:"snare"},  // new tactic — only fires AFTER signature edited in
+];
+let t_sec=0, frame=0, playing=false, surprise=0, evidence=[], firedAt=new Set();
+// eye-state (modeled / simulated upstream recognizer outputs) — semantic codes, localized at render
+let solarState="day", acouState="calm", thermState="calm";
+let acouSpike=0, heatX=-60, heatY=0, herdPhase=-1, snarePulse=0, waterRipple=0, gunFlash=0, nightT=0;
+
+function reset(){
+  t_sec=0; frame=0; surprise=0; evidence=[]; firedAt=new Set();
+  acouSpike=0; heatX=-60; herdPhase=-1; snarePulse=0; waterRipple=0; gunFlash=0; nightT=0;
+  solarState="day"; acouState="calm"; thermState="calm";
+  M=new Float32Array(D);
+  // reset signature library to factory state (gunshot + vehicle armed; snare NOT yet known)
+  SIG=new Float32Array(D); sigSet=[];
+  sigAdd("gunshot");
+  sigAdd("vehicle");
+  evolved=false; document.getElementById("evolve").disabled=false; document.getElementById("restoreSig").disabled=true;
+  renderSig();
+  renderEvidence(); updateEye(); drawFrame(); setSurprise(0,"calm");
+}
+
+function setSurprise(v,labelCode){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
+  surpriseLabelCode=labelCode;
+  const l=document.getElementById("slbl"); l.textContent=surpLabel(labelCode); l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
+let surpriseLabelCode="calm";
+function surpLabel(code){
+  if(code==="alarm") return t('surpAlarm');
+  if(code==="benign") return t('surpBenign');
+  if(code==="unarmed") return t('surpUnarmed');
+  if(code==="note") return t('surpNote');
+  return t('surpCalm');
+}
+
+function updateEye(){
+  // solar
+  const pSolar=document.getElementById("pSolar");
+  pSolar.innerHTML="<span>"+(LANG==='zh'?"太阳能: ":"Solar: ")+"</span><b>"+(solarState==="day"?t('solarDayB'):t('solarNightB'))+"</b>";
+  pSolar.className="pill solar";
+  // acoustic
+  const acouTxt = acouState==="calm" ? t('acouCalmB')
+    : acouState==="gunshot" ? t('acouGunshot')
+    : acouState==="vehicle" ? t('acouVehicle')
+    : acouState==="herd"    ? t('acouHerd')
+    : acouState==="snare"   ? t('acouSnare') : t('acouCalmB');
+  const pAcou=document.getElementById("pAcou");
+  pAcou.innerHTML=t('acouLabel')+"<b>"+acouTxt+"</b>";
+  pAcou.className="pill"+(acouState!=="calm"?" alert":"");
+  // thermal
+  const thermTxt = thermState==="calm" ? t('thermCalmB')
+    : thermState==="vehicle" ? t('thermVehicle')
+    : thermState==="herd"    ? t('thermHerd')
+    : thermState==="snare"   ? t('thermSnare') : t('thermCalmB');
+  const pTherm=document.getElementById("pTherm");
+  pTherm.innerHTML=t('thermLabel')+"<b>"+thermTxt+"</b>";
+  pTherm.className="pill"+(thermState!=="calm"?" alert":"");
+}
+
+function activeEvent(){ for(const e of SCRIPT){ if(frame>=e.at && frame<e.at+e.dur) return e; } return null; }
+
+function step(){
+  frame++; t_sec=frame/30; waterRipple+=0.12; nightT+=0.01; if(gunFlash>0) gunFlash-=0.12;
+  // default calm night each frame; the scripted event overrides
+  solarState = frame<60? "day" : "night";
+  acouState="calm"; thermState="calm";
+  acouSpike=0; heatX=-60; herdPhase=-1; snarePulse=0;
+  let s=0, ev=activeEvent(), flagType=null, isBenign=false, evSigKey=null;
+  if(ev){
+    const p=(frame-ev.at)/ev.dur;                 // 0..1 progress through the event window
+    const ramp = Math.min(1, p/0.18);             // quick onset = the un-predicted change
+    s = ev.peak * ramp;
+    flagType = ev.type; isBenign = ev.benign; evSigKey = ev.sigKey;
+    if(ev.kind==="gunshot"){   // acoustic spike against ambient forest noise = predictive residual
+      acouSpike = Math.min(1, ramp*1.1); acouState="gunshot"; if(p<0.25) gunFlash=1; }
+    if(ev.kind==="vehicle"){   // new heat source + motion entering the patch = thermal anomaly
+      heatX = -60 + Math.min(1,p/0.5)*180; heatY = 70; thermState="vehicle"; acouState="vehicle"; }
+    if(ev.kind==="herd"){      // BENIGN: large warm motion, but it's the RIGHT kind of change → learned to ignore
+      herdPhase = p; thermState="herd"; acouState="herd"; }
+    if(ev.kind==="snare"){     // new tactic: a quiet, unfamiliar disturbance signature (tripwire / branch snap)
+      snarePulse = Math.min(1, ramp); acouState="snare"; thermState="snare"; }
+  }
+  // ── surprise ROUTER ──
+  // (a) benign herd: it IS a change, but it matches a learned-benign pattern → suppress to a low "note" level, never alarm.
+  // (b) threat: alarm only if its signature is currently ARMED in the editable library SIG.
+  //     snare fires ONLY after the ranger edits the signature in (poachers evolve → no retraining, in-field edit).
+  let armed = true;
+  if(ev && !isBenign && evSigKey){ armed = sigMatch(evSigKey) > 0.5; }   // signature present in library?
+  const wouldAlarm = ev && !isBenign && s>0.6 && armed;
+  // once-per-event-window (keyed by event onset) = refractory by IDENTITY, can't double-fire mid-window.
+  if(wouldAlarm && !firedAt.has(ev.at) && flagType){ captureEvent(flagType); firedAt.add(ev.at); }
+  // display level: benign caps at "note"; un-armed threat shows as un-recognized murmur (caps at note)
+  let disp = s;
+  if(isBenign) disp = Math.min(s, 0.45);
+  else if(ev && !armed) disp = Math.min(s, 0.5);
+  let lbl = "calm";
+  if(disp>0.6) lbl="alarm";
+  else if(isBenign && disp>0.3) lbl="benign";
+  else if(ev && !isBenign && !armed && disp>0.3) lbl="unarmed";
+  else if(disp>0.3) lbl="note";
+  setSurprise(disp, lbl);
+  updateEye(); drawFrame();
+  if(frame>700){ pause(); document.getElementById("live").innerHTML=t('liveDone'); }
+}
+
+function drawFrame(){
+  // night ground tint
+  ctx.fillStyle = frame<60 ? "#12201a" : "#0c1410"; ctx.fillRect(0,0,W,H);
+  // subtle ground texture (scrub dots)
+  ctx.fillStyle = frame<60 ? "#1a2c22" : "#10180f";
+  const tr=mulberry32(42);
+  for(let i=0;i<60;i++){ const x=tr()*W, y=tr()*H, r=1+tr()*2; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+  // border / patch boundary
+  ctx.strokeStyle="#27402f"; ctx.lineWidth=6; roundRect(16,16,W-32,H-32,16); ctx.stroke();
+  // caption
+  ctx.fillStyle="#2a3947"; ctx.font="10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capEdge'), W/2, H-26);
+
+  drawWaterHole(150, 250);
+  drawBushes();
+  drawSentinel(W-58, 56);                 // the solar sensor "eye"
+
+  // ── scripted overlays ──
+  if(acouSpike>0) drawAcousticSpike(acouSpike);
+  if(heatX>-50)   drawVehicle(heatX, heatY);
+  if(herdPhase>=0) drawHerd(herdPhase);
+  if(snarePulse>0) drawSnare(110, 350, snarePulse);
+  if(gunFlash>0)  { ctx.fillStyle="rgba(255,107,107,"+(gunFlash*0.18)+")"; ctx.fillRect(0,0,W,H); }
+}
+
+function drawSentinel(x,y){
+  ctx.save();
+  // solar panel
+  ctx.fillStyle = frame<60 ? "#2a4a8a" : "#16233f"; ctx.strokeStyle="#3a4b59"; ctx.lineWidth=2;
+  roundRect(x-22,y-12,44,22,3); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle="#0c1410"; ctx.lineWidth=1;
+  for(let gx=-14;gx<=14;gx+=10){ ctx.beginPath(); ctx.moveTo(x+gx,y-12); ctx.lineTo(x+gx,y+10); ctx.stroke(); }
+  // sensor head + listening rings
+  ctx.fillStyle="#1b2530"; ctx.strokeStyle="#46586a"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(x, y+22, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  const live = surprise>0.6;
+  ctx.strokeStyle = live? "rgba(255,107,107,.7)" : "rgba(63,223,143,.35)";
+  for(let k=1;k<=2;k++){ ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x, y+22, 8+k*(7+Math.sin(waterRipple)*1.5), -Math.PI*0.9, -Math.PI*0.1); ctx.stroke(); }
+  ctx.fillStyle = frame<60? "#3fdf8f" : "#8da2b5"; ctx.font="9px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capSentinel'), x, y+44);
+  ctx.restore();
+}
+
+function drawWaterHole(x,y){
+  ctx.save();
+  ctx.fillStyle="#0e2230"; ctx.strokeStyle="#163848"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.ellipse(x,y,52,34,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle="rgba(60,130,160,.4)"; ctx.lineWidth=1;
+  const rr=8+Math.sin(waterRipple)*4;
+  ctx.beginPath(); ctx.ellipse(x,y,rr+14,rr+8,0,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#274050"; ctx.font="10px sans-serif"; ctx.textAlign="center"; ctx.fillText(t('capWater'), x, y+4);
+  ctx.restore();
+}
+
+function drawBushes(){
+  ctx.save();
+  const spots=[[70,90],[330,300],[60,330],[280,140],[200,80]];
+  ctx.fillStyle = frame<60 ? "#1d3326" : "#13211a";
+  for(const [x,y] of spots){
+    for(let i=0;i<5;i++){ const a=i/5*Math.PI*2; ctx.beginPath();
+      ctx.arc(x+Math.cos(a)*9, y+Math.sin(a)*7, 8, 0, Math.PI*2); ctx.fill(); }
+  }
+  ctx.restore();
+}
+
+function drawAcousticSpike(lvl){
+  // a thin red spike crossing the patch (gunshot = sudden acoustic transient)
+  ctx.save();
+  ctx.strokeStyle="rgba(255,107,107,"+(0.5+lvl*0.4)+")"; ctx.lineWidth=2;
+  ctx.beginPath();
+  const baseY=200; let x=30;
+  ctx.moveTo(x, baseY);
+  const rng=mulberry32(7+Math.floor(frame/3));
+  while(x<W-30){ const amp = (Math.abs(x-200)<40)? lvl*70 : (rng()-0.5)*8;
+    ctx.lineTo(x, baseY - amp); x+=8; }
+  ctx.stroke();
+  ctx.fillStyle="#ff6b6b"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capGunSpike'), 200, baseY-72);
+  ctx.restore();
+}
+
+function drawVehicle(x,y){
+  ctx.save();
+  // heat signature halo
+  const g=ctx.createRadialGradient(x,y,4,x,y,30);
+  g.addColorStop(0,"rgba(255,140,60,.85)"); g.addColorStop(1,"rgba(255,140,60,0)");
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
+  // vehicle body
+  ctx.fillStyle="#3a2b1b"; ctx.strokeStyle="#ff6b6b"; ctx.lineWidth=2.5;
+  roundRect(x-16,y-10,32,20,4); ctx.fill(); ctx.stroke();
+  // headlight cones
+  ctx.fillStyle="rgba(255,220,120,.25)";
+  ctx.beginPath(); ctx.moveTo(x+16,y-6); ctx.lineTo(x+44,y-16); ctx.lineTo(x+44,y+4); ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#ff6b6b"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capVehicle'), x, y+26);
+  ctx.restore();
+}
+
+function drawHerd(p){
+  // BENIGN: a group of large warm bodies moving across (big motion, but the RIGHT kind of change)
+  ctx.save();
+  const baseX = 40 + p*260;
+  const herd=[[0,0],[26,14],[-22,18],[10,-16],[40,2]];
+  for(const [dx,dy] of herd){
+    const x=baseX+dx, y=180+dy;
+    const g=ctx.createRadialGradient(x,y,3,x,y,18);
+    g.addColorStop(0,"rgba(120,180,150,.55)"); g.addColorStop(1,"rgba(120,180,150,0)");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,18,0,Math.PI*2); ctx.fill();
+    // elephant-ish body
+    ctx.fillStyle="#5b6e60"; ctx.strokeStyle="#3fdf8f"; ctx.lineWidth=1.5;
+    roundRect(x-13,y-8,26,17,8); ctx.fill(); ctx.stroke();
+  }
+  ctx.fillStyle="#3fdf8f"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capHerd'), baseX+8, 152);
+  ctx.restore();
+}
+
+function drawSnare(x,y,lvl){
+  ctx.save();
+  // a faint tripwire line + a small snapped-branch marker (quiet, unfamiliar disturbance)
+  ctx.strokeStyle="rgba(244,193,82,"+(0.3+lvl*0.5)+")"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(x-30,y+18); ctx.lineTo(x+70,y-10); ctx.stroke(); ctx.setLineDash([]);
+  // disturbance pulse
+  ctx.strokeStyle="rgba(244,193,82,"+(0.6*lvl)+")"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(x+20,y+4, 6+lvl*16, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#f4c152"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+  ctx.fillText(t('capSnare'), x+20, y+34);
+  ctx.restore();
+}
+
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+// ── spectrogram thumbnail: a tiny deterministic spectrogram derived from the threat type + time ──
+// NOTE: 'type' is the internal HV-key (TYPE_*), so the spectrogram is identical across languages.
+function specCanvas(type, tkey){
+  const c=document.createElement("canvas"); c.width=130; c.height=48; const g=c.getContext("2d");
+  g.fillStyle="#070b0e"; g.fillRect(0,0,130,48);
+  const rng=mulberry32(strSeed(type+"|"+tkey));
+  const cols=44, rows=14, cw=130/cols, rh=48/rows;
+  // type shapes the spectro: gunshot=broadband transient burst; vehicle=low-freq bands; snare=sparse high ticks
+  for(let cx=0;cx<cols;cx++){
+    for(let ry=0;ry<rows;ry++){
+      let e=rng()*0.25;
+      const center = cols*0.42;
+      if(type===TYPE_GUNSHOT){ const burst = Math.exp(-Math.pow((cx-center)/4,2)); e += burst*(0.5+rng()*0.5); }
+      else if(type===TYPE_VEHICLE){ if(ry>rows-5){ e += (0.4+rng()*0.4)*Math.max(0,1-Math.abs(cx-center)/22); } }
+      else if(type===TYPE_SNARE){ if(ry<5 && rng()<0.25){ e += 0.5+rng()*0.4; } }
+      const v=Math.min(1,e);
+      const r=Math.floor(20+v*235), gg=Math.floor(20+v*120), b=Math.floor(40+v*40);
+      g.fillStyle=`rgb(${r},${gg},${b})`; g.fillRect(cx*cw, (rows-1-ry)*rh, cw+0.5, rh+0.5);
+    }
+  }
+  g.strokeStyle="#283541"; g.strokeRect(0.5,0.5,129,47);
+  return c.toDataURL("image/png");
+}
+
+function tagClass(type){
+  if(type===TYPE_GUNSHOT) return "";          // red
+  if(type===TYPE_VEHICLE) return "amber";
+  return "blue";                              // TYPE_SNARE
+}
+
+function captureEvent(type){
+  const tkey=Math.floor(t_sec*10)/10;
+  const ev={ type, time:fmtTime(tkey), tkey:String(tkey), spec:specCanvas(type,tkey), removed:false };
+  evidence.push(ev); addFact(ev);
+  renderEvidence();
+  document.getElementById("live").innerHTML=t('liveCapture')(typeDisp(type), ev.time);
+}
+function fmtTime(tk){ const d=new Date(2026,5,12,2,10,Math.floor(tk)); return d.toTimeString().slice(0,8)+"."+String(Math.floor((tk%1)*10)); }
+
+function renderEvidence(){
+  const live=evidence.filter(e=>!e.removed);
+  document.getElementById("memstat").textContent = live.length? t('memFull')(live.length) : t('memEmpty');
+  document.getElementById("genall").disabled = live.length===0;
+  document.getElementById("audit").disabled = live.length===0;
+  const el=document.getElementById("evlist");
+  if(!evidence.length){ el.innerHTML='<div class="stat">'+t('evEmpty')+'</div>'; return; }
+  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">${t('evRemoved')(typeDisp(e.type), e.time)}</span></div>` :
+    `<div class="ev flash"><div class="top"><span class="etag ${tagClass(e.type)}">${t('evThreatTag')}</span> <span class="etype">${typeDisp(e.type)}</span><span class="etime">${e.time}</span></div>
+       <div class="spec"><img src="${e.spec}" alt="${t('evSpecAlt')}" style="width:130px;height:48px;border-radius:5px;border:1px solid var(--line)"><span class="stat">${t('evSpecCaption')}</span></div>
+       <div class="stat">${t('evBody')}</div>
+       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">${t('btnProve')}</button>
+         <button class="hot" onclick="markFalse(${i})">${t('btnMarkFalse')}</button></div>
+       <div class="audit" id="aud${i}"></div></div>`).join("");
+}
+window.proveIn=(i)=>{ const e=evidence[i]; const r=recallType(e.tkey);
+  document.getElementById("aud"+i).textContent = t('proveOut')(typeDisp(r.type), r.s.toFixed(3)); };
+window.markFalse=(i)=>{ const e=evidence[i]; if(e.removed) return; subFact(e); e.removed=true; renderEvidence();
+  const r=recallType(e.tkey);
+  document.getElementById("live").innerHTML=t('liveDeleted')(typeDisp(e.type), e.time, r.s.toFixed(3)); };
+
+// ── editable threat signatures (the in-field moat) ──
+let evolved=false;
+function renderSig(){
+  const el=document.getElementById("siglist");
+  el.innerHTML = sigSet.map(s=> `<span class="sigchip ${s.alive? (s.key==='snare'?'fresh':'') : 'dead'}">${s.alive?'●':'○'} ${sigDisp(s.key)}</span>`).join("");
+}
+document.getElementById("evolve").onclick=()=>{
+  if(evolved) return; evolved=true;
+  // poachers switched from rifle to silent snares → forget the gunshot signature, add the tripwire/branch-snap signature.
+  sigDrop("gunshot");
+  sigAdd("snare");
+  renderSig();
+  const dG=sigMatch("gunshot"), dS=sigMatch("snare");
+  document.getElementById("sigmsg").innerHTML=t('sigMsgEvolved')(dG.toFixed(3), dS.toFixed(3));
+  document.getElementById("restoreSig").disabled=false;
+  document.getElementById("evolve").disabled=true;
+};
+document.getElementById("restoreSig").onclick=()=>{ reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML="";
+  document.getElementById("sigmsg").innerHTML=t('sigMsgInit'); };
+
+document.getElementById("genall").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  const lines=[ t('reportTitle'),
+    t('repGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")),
+    t('repDevice'),
+    t('repReserve'),
+    t('repCount')(live.length), t('repKept'), ""];
+  live.forEach((e,k)=> lines.push(t('repLine')(k+1, typeDisp(e.type), e.time)));
+  lines.push("", t('repNote'));
+  document.getElementById("reportbox").innerHTML = `<div class="report">${lines.join("\n")}</div>
+     <div class="stat" style="margin-top:6px">${t('reportFoot')}</div>`;
+};
+document.getElementById("audit").onclick=()=>{
+  const live=evidence.filter(e=>!e.removed);
+  let out=t('auditHeader');
+  let allsame=true;
+  for(const e of live){ const a=recallType(e.tkey).s, b=recallType(e.tkey).s; const same=(a===b); allsame=allsame&&same;
+    out+=t('auditLine')(e.time, typeDisp(e.type), a.toFixed(6), b.toFixed(6), same); }
+  out+= live.length? t('auditVerdict')(allsame? t('auditPass') : t('auditFail')) : t('auditNoEvents');
+  document.getElementById("auditbox").innerHTML=`<div class="report">${out}</div>`;
+};
+
+// controls
+let timer=null;
+function play(){ if(playing) return; playing=true; document.getElementById("play").disabled=true; document.getElementById("pause").disabled=false;
+  timer=setInterval(step,33); }
+function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
+document.getElementById("play").onclick=play;
+document.getElementById("pause").onclick=pause;
+document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").innerHTML=t('liveIntro'); };
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  // surprise label + eye pills
+  document.getElementById("slbl").textContent = surpLabel(surpriseLabelCode);
+  updateEye();
+  // live line: keep intro unless an event/done has overridden it (re-render intro if still default-ish)
+  // we re-render evidence & signature (which carry localized text), and redraw the canvas
+  renderEvidence(); renderSig();
+  // sig message: only the init message is safely re-localizable without state; evolved message persists as-is
+  if(!evolved){ document.getElementById("sigmsg").innerHTML=t('sigMsgInit'); }
+  drawFrame();
+  // live intro re-localize when the watch hasn't started and nothing captured/deleted
+  if(frame===0 && evidence.length===0){ document.getElementById("live").innerHTML=t('liveIntro'); }
+}
+
+// init
+applyStatic();
+reset();
+document.getElementById("live").innerHTML=t('liveIntro');
+</script>
+</body>
+</html>

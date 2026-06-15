@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en" id="htmlRoot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>家庭/婴儿安全监护 · 在设备上、不上云 (毫秒纪)</title>
+<title>Home / Baby Safety Monitor · on-device, never to the cloud (Millisecond Era)</title>
 <style>
   :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
           --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; }
@@ -47,64 +47,200 @@
         padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
   .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
   .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
 </style>
 </head>
 <body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
 <header>
-  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 2/N</div>
-  <h1>家庭/婴儿安全监护 · <span>用你家已有的摄像头 —— 守护宝宝,却不把宝宝的视频传上云</span></h1>
-  <div class="sub">摄像头画面 → <b>"眼睛"识别宝宝状态</b>(仰睡/俯卧/不动/有陌生人)→ <b>惊奇路由器只在异常那一刻醒来</b>(不是录一整天=µW)→ 抓一条
-  <b>私有·确定·可审计·可删除</b>的<b>事件记录</b>(时间+事件+一张缩略图),<b>原始画面当场丢弃,只留这条记录</b>。全程在你家设备上,宝宝的视频永不离家。</div>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n-html="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
 </header>
 
-<div class="honest">
-  <b>诚实边界 + 伦理(no-vaporware):</b>
-  ① <b>婴儿摄像头 + 生命体征传感器早已商品化</b>(飞利浦/GE/Nanit/Owlet)——不缺"能不能监测"。
-  ② <b>"看出宝宝是俯卧/不动/有陌生人"是识别前端的活</b>(姿态检测=云/模型,边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>逻辑</b>,眼睛输出是模拟的,不声称我们识别更准。
-  ③ 真正的缺口 = <b>端上 + 私有 + 丢弃原始画面(discard-raw) + 报"变化"而非绝对阈值</b>(新生儿体征天生波动大,固定阈值=误报海)+ <b>可遗忘的、你拥有的记忆</b>。
-  ④ 我们的护城河 = <b>µW 变化驱动 + 私有·确定·可审计·可删除的事件记忆</b>(事件类型绑时间进一个向量,误报可精确遗忘,比特级可复核)——<b>不是"比云更聪明"</b>。
-</div>
+<div class="honest" data-i18n-html="honest"></div>
 
 <div class="wrap">
   <div class="card left">
     <div class="row">
-      <button id="play">▶ 开始监护(模拟一夜)</button>
-      <button id="pause" class="sec" disabled>⏸ 暂停</button>
-      <button id="reset" class="sec">重置</button>
+      <button id="play" data-i18n="btnPlay"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
     </div>
     <canvas id="crib" width="400" height="430"></canvas>
     <div class="eye">
-      <span class="pill" id="pState">姿态: <b>仰睡</b></span>
-      <span class="pill" id="pMotion">呼吸/动作: <b>正常</b></span>
-      <span class="pill" id="pPerson">在场: <b>仅宝宝</b></span>
+      <span class="pill" id="pState"></span>
+      <span class="pill" id="pMotion"></span>
+      <span class="pill" id="pPerson"></span>
     </div>
-    <div class="stat" style="margin-top:10px">惊奇信号(异常=预测不到的变化,非录全程):<span id="slbl" class="ok">平静</span></div>
+    <div class="stat" style="margin-top:10px"><span data-i18n="surpriseLine"></span><span id="slbl" class="ok"></span></div>
     <div class="meter"><i id="sfill"></i></div>
-    <div class="stat" id="live" style="margin-top:8px">点"开始监护"。脚本里宝宝会<b>翻成俯卧(SIDS 风险)→ 一段时间不动 → 边缘出现陌生人</b> —— 路由器会在那一刻醒来,只留一条事件记录。</div>
+    <div class="stat" id="live" style="margin-top:8px"></div>
   </div>
 
   <div class="card right">
     <div class="row">
-      <b style="font-size:15px">事件台账(私有 · 可编辑 · 可遗忘)</b>
-      <span class="stat" id="memstat">M：空</span>
-      <button id="genall" class="warn" style="margin-left:auto" disabled>📄 生成夜间小结(本机)</button>
-      <button id="audit" class="sec" disabled>🔒 验确定性</button>
+      <b style="font-size:15px" data-i18n="panelH"></b>
+      <span class="stat" id="memstat"></span>
+      <button id="genall" class="warn" style="margin-left:auto" disabled data-i18n="btnReport"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
     </div>
-    <div id="evlist"><div class="stat">还没有事件。开始监护后,异常会出现在这里(事件类型/时间/一张缩略图)——<b>原始画面已丢弃</b>。</div></div>
+    <div id="evlist"></div>
     <div id="reportbox"></div>
     <div id="auditbox"></div>
 
-    <div class="moat">
-      <b>现场可见的护城河:</b>
-      只在异常那一刻醒来(非录全天=µW)· <b>原始画面当场丢弃,只留事件摘要</b>(隐私护城河)· 事件=确定可审计(每次复核比特一致)·
-      <b>误报可精确删除</b>(被遗忘权=一个减法,云端删不掉、你能删)· 端上私有(宝宝的视频不上云、不集中)· <b>你拥有它</b>。
-      <br>云端婴儿监护会把你宝宝的视频上传到公司服务器 —— 这个不会。
-      <br>解放谁:像<b>Aisha</b>(尼日利亚乡村的助产士)、或任何想守护宝宝、却不愿把宝宝画面交给公司云的父母 —— 全球每年 <b>5000 万+</b> 例分娩发生在医院体系之外。
-    </div>
+    <div class="moat" data-i18n-html="moat"></div>
   </div>
 </div>
 
 <script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Home / Baby Safety Monitor · on-device, never to the cloud (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 2/N",
+    h1: "Home / baby safety monitor · <span>use the camera you already own — watch over your baby without sending the baby's video to the cloud</span>",
+    sub: "Camera frames → <b>an “eye” reads the baby's state</b> (face-up / face-down / not moving / a stranger present) → <b>a surprise router only wakes at the abnormal moment</b> (not recording all day = µW) → it grabs one <b>private · deterministic · auditable · deletable</b> <b>event record</b> (time + event + one thumbnail), and <b>the raw footage is discarded on the spot — only this record stays</b>. Everything runs on your home device; the baby's video never leaves home.",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>Baby cameras + vital-sign sensors are already commodities</b> (Philips / GE / Nanit / Owlet) — “can it monitor” is not the missing piece. ② <b>“Seeing that the baby is face-down / not moving / has a stranger nearby” is the recognition front-end's job</b> (pose detection = cloud / model, boundary law L1) — this demo uses <b>scripted scenarios</b> to show the <b>logic</b>; the eye's output is simulated, and we make <b>no</b> claim to recognize more accurately. ③ The real gap = <b>on-device + private + discard-raw (throw away the original footage) + report “change” rather than an absolute threshold</b> (newborn vitals fluctuate wildly by nature; a fixed threshold = a sea of false alarms) + <b>a forgettable memory that you own</b>. ④ Our moat = <b>µW change-driven + a private · deterministic · auditable · deletable event memory</b> (event type bound to time in one vector; a false alarm can be exactly forgotten; bit-level reproducible) — <b>not</b> “smarter than the cloud.”",
+    pState: (s)=>`Posture: <b>${s}</b>`,
+    pMotion: (s)=>`Breathing / motion: <b>${s}</b>`,
+    pPerson: (s)=>`Present: <b>${s}</b>`,
+    // perception-eye state labels (display only)
+    stFaceUp: "face-up", stProne: "face-down",
+    moNormal: "normal", moStill: "≥20s no rise/fall",
+    peBabyOnly: "baby only", peStranger: "stranger detected",
+    surpriseLine: "Surprise signal (abnormal = an unpredicted change, not recording the whole time): ",
+    slCalm: "calm", slWatch: "note", slAlert: "⚠ abnormal! recorded",
+    liveInit: "Click “Start monitoring”. In the script the baby will <b>roll face-down (SIDS risk) → stay still for a while → a stranger appears at the edge</b> — the router wakes at that moment and keeps only one event record.",
+    liveEnd: '<span class="ok">This monitoring segment ended.</span> On the right are the captured events — you can mark a false alarm (exact delete), generate the night summary, and verify determinism.',
+    btnPlay: "▶ Start monitoring (simulate one night)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    panelH: "Event ledger (private · editable · forgettable)",
+    btnReport: "📄 Generate night summary (on-device)",
+    btnAudit: "🔒 Verify determinism",
+    memEmpty: "M: empty",
+    memFull: (n)=>`M = 1 vector · ${n} event${n===1?"":"s"}`,
+    evInit: "No events yet. After you start monitoring, anomalies will appear here (event type / time / one thumbnail) — <b>the raw footage is already discarded</b>.",
+    evTag: "EVENT",
+    evRemoved: (type,time)=>`🗑 Deleted (false alarm): ${type} · ${time} — subtracted exactly from M, verifiably scrubbed clean.`,
+    evThumbNote: (n)=>`↑ Only these ${n} thumbnail${n===1?"":"s"} are kept; the original video is discarded (discard-raw).`,
+    btnReview: "🔍 Review (determinism)",
+    btnMarkFalse: "Mark false alarm → delete",
+    proveIn: (type,s)=>`unbind(M, time-key) → event “${type}” cos=${s} ✓ the record is indeed in M, bit-level reproducible (same result every time).`,
+    captureLive: (type,time)=>`🔔 <span class="bad">Abnormal: ${type}</span> · ${time} — stored in the private event ledger. <b>The raw footage is discarded; only this record stays.</b>`,
+    markFalseLive: (type,time,s)=>`🗑 Marked <b>${type} · ${time}</b> as a false alarm and <b>deleted it exactly</b> (right to be forgotten = a subtraction). Review: unbind → cos=${s} (dropped to noise = truly scrubbed clean).`,
+    repTitle: "====== Night monitoring summary (generated on-device · the raw video never left this device) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repDevice: "Device: home camera (on-device processing)",
+    repCount: (n)=>`Events tonight: ${n}`,
+    repKept: "Kept: only event summaries + key thumbnails (the raw footage is discarded)",
+    repLine: (k,type,time,n)=>`[${k}] event ${type} · time ${time} · evidence: ${n} thumbnail${n===1?"":"s"} (kept on-device)`,
+    repNote: "Note: the above are only records of real anomalies that happened in your home; whether to share / ask for help is your call. The raw video never goes to the cloud, is never centralized, and can be deleted any time.",
+    repFoot: "This summary is in your hands. Cloud baby monitors upload your baby's video — this one does not.",
+    auditHead: "Determinism self-check (run the same query twice, compare bit-by-bit):\n",
+    auditLine: (time,type,a,b,same)=>` ${time} “${type}”: cos ${a} == ${b}  ${same?"✓":"✗"}\n`,
+    auditNone: "no events",
+    auditVerdict: (allsame)=>`\nVerdict: ${allsame?"all bits identical ✓ — event records cannot be silently tampered with, and are auditable":"inconsistency detected ✗"}`,
+    resetLive: "Reset.",
+    cribLabel: "on-device processing · footage never leaves this device",
+    cribFaceDown: "face down",
+    cribNoBreath: "⚠ no breathing rise/fall",
+    cribStranger: "stranger?",
+    moat: "<b>The moat, visible on the spot:</b> wakes only at the abnormal moment (not recording all day = µW) · <b>raw footage discarded on the spot, only an event summary kept</b> (privacy moat) · events = deterministic & auditable (bit-identical every review) · <b>false alarms exactly deletable</b> (right to be forgotten = a subtraction; the cloud can't delete it, you can) · on-device private (the baby's video never goes to the cloud, never centralized) · <b>you own it</b>.<br>A cloud baby monitor uploads your baby's video to a company's servers — this one does not.<br>Who it liberates: someone like <b>Aisha</b> (a midwife in rural Nigeria), or any parent who wants to watch over their baby without handing the baby's footage to a company cloud — worldwide, <b>50 million+</b> births a year happen outside the hospital system."
+  },
+  zh: {
+    docTitle: "家庭/婴儿安全监护 · 在设备上、不上云 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 2/N",
+    h1: "家庭/婴儿安全监护 · <span>用你家已有的摄像头 —— 守护宝宝,却不把宝宝的视频传上云</span>",
+    sub: "摄像头画面 → <b>“眼睛”识别宝宝状态</b>(仰睡/俯卧/不动/有陌生人)→ <b>惊奇路由器只在异常那一刻醒来</b>(不是录一整天=µW)→ 抓一条 <b>私有·确定·可审计·可删除</b>的<b>事件记录</b>(时间+事件+一张缩略图),<b>原始画面当场丢弃,只留这条记录</b>。全程在你家设备上,宝宝的视频永不离家。",
+    honest: "<b>诚实边界 + 伦理(no-vaporware):</b> ① <b>婴儿摄像头 + 生命体征传感器早已商品化</b>(飞利浦/GE/Nanit/Owlet)——不缺“能不能监测”。 ② <b>“看出宝宝是俯卧/不动/有陌生人”是识别前端的活</b>(姿态检测=云/模型,边界律 L1)——本 demo 用<b>脚本化场景</b>演示<b>逻辑</b>,眼睛输出是模拟的,不声称我们识别更准。 ③ 真正的缺口 = <b>端上 + 私有 + 丢弃原始画面(discard-raw) + 报“变化”而非绝对阈值</b>(新生儿体征天生波动大,固定阈值=误报海)+ <b>可遗忘的、你拥有的记忆</b>。 ④ 我们的护城河 = <b>µW 变化驱动 + 私有·确定·可审计·可删除的事件记忆</b>(事件类型绑时间进一个向量,误报可精确遗忘,比特级可复核)——<b>不是“比云更聪明”</b>。",
+    pState: (s)=>`姿态: <b>${s}</b>`,
+    pMotion: (s)=>`呼吸/动作: <b>${s}</b>`,
+    pPerson: (s)=>`在场: <b>${s}</b>`,
+    stFaceUp: "仰睡", stProne: "俯卧",
+    moNormal: "正常", moStill: "≥20s 无起伏",
+    peBabyOnly: "仅宝宝", peStranger: "检测到陌生人",
+    surpriseLine: "惊奇信号(异常=预测不到的变化,非录全程):",
+    slCalm: "平静", slWatch: "留意", slAlert: "⚠ 异常! 已记录",
+    liveInit: "点“开始监护”。脚本里宝宝会<b>翻成俯卧(SIDS 风险)→ 一段时间不动 → 边缘出现陌生人</b> —— 路由器会在那一刻醒来,只留一条事件记录。",
+    liveEnd: '<span class="ok">本段监护结束。</span> 右侧是抓到的事件 —— 可标记误报(精确删除)、生成夜间小结、验确定性。',
+    btnPlay: "▶ 开始监护(模拟一夜)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    panelH: "事件台账(私有 · 可编辑 · 可遗忘)",
+    btnReport: "📄 生成夜间小结(本机)",
+    btnAudit: "🔒 验确定性",
+    memEmpty: "M：空",
+    memFull: (n)=>`M = 1 向量 · ${n} 条事件`,
+    evInit: "还没有事件。开始监护后,异常会出现在这里(事件类型/时间/一张缩略图)——<b>原始画面已丢弃</b>。",
+    evTag: "事件",
+    evRemoved: (type,time)=>`🗑 已删除(误报):${type} · ${time} —— 从 M 中精确减去,可复核已删干净。`,
+    evThumbNote: (n)=>`↑ 仅这 ${n} 张缩略图被保留,原始视频已丢弃(discard-raw)。`,
+    btnReview: "🔍 复核(确定性)",
+    btnMarkFalse: "标记误报 → 删除",
+    proveIn: (type,s)=>`unbind(M, 时间键) → 事件「${type}」 cos=${s} ✓ 记录确在 M 中,比特级可复核(每次结果一致)。`,
+    captureLive: (type,time)=>`🔔 <span class="bad">异常:${type}</span> · ${time} —— 已存入私有事件台账。<b>原始画面已丢弃,只留这条记录。</b>`,
+    markFalseLive: (type,time,s)=>`🗑 已把 <b>${type} · ${time}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${s}(已降到噪声=真删干净)。`,
+    repTitle: "====== 夜间监护小结(本机生成 · 原始视频从未离开此设备)======",
+    repGen: (t)=>`生成时间:${t}`,
+    repDevice: "设备:家用摄像头(端上处理)",
+    repCount: (n)=>`本夜事件数:${n}`,
+    repKept: "保留内容:仅事件摘要 + 关键缩略图(原始画面已丢弃)",
+    repLine: (k,type,time,n)=>`【${k}】 事件 ${type} · 时间 ${time} · 证据:${n} 张缩略图(本机留存)`,
+    repNote: "说明:以上仅为发生在你家的真实异常的记录;是否分享/求助由你决定。原始视频不上云、不集中、可随时删除。",
+    repFoot: "这份小结在你手里。云端婴儿监护会上传你宝宝的视频 —— 这个不会。",
+    auditHead: "确定性自检(同一查询跑两遍,逐位比较):\n",
+    auditLine: (time,type,a,b,same)=>` ${time} 「${type}」: cos ${a} == ${b}  ${same?"✓":"✗"}\n`,
+    auditNone: "无事件",
+    auditVerdict: (allsame)=>`\n结论:${allsame?"全部比特一致 ✓ —— 事件记录不可被悄悄篡改,可复核":"出现不一致 ✗"}`,
+    resetLive: "已重置。",
+    cribLabel: "端上处理 · 画面不出此设备",
+    cribFaceDown: "脸朝下",
+    cribNoBreath: "⚠ 无呼吸起伏",
+    cribStranger: "陌生人?",
+    moat: "<b>现场可见的护城河:</b> 只在异常那一刻醒来(非录全天=µW)· <b>原始画面当场丢弃,只留事件摘要</b>(隐私护城河)· 事件=确定可审计(每次复核比特一致)· <b>误报可精确删除</b>(被遗忘权=一个减法,云端删不掉、你能删)· 端上私有(宝宝的视频不上云、不集中)· <b>你拥有它</b>。<br>云端婴儿监护会把你宝宝的视频上传到公司服务器 —— 这个不会。<br>解放谁:像<b>Aisha</b>(尼日利亚乡村的助产士)、或任何想守护宝宝、却不愿把宝宝画面交给公司云的父母 —— 全球每年 <b>5000 万+</b> 例分娩发生在医院体系之外。"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── language-independent identity constants (NEVER translated) ─────────
+// These are stable HV keys / state IDs. Display labels live in I18N above and are
+// looked up via the maps below — but the IDs themselves must stay byte-identical
+// across languages so the determinism / recall claim holds.
+const TYPE_PRONE = "PRONE", TYPE_STILL = "STILL", TYPE_STRANGER = "STRANGER";
+const TYPES = [TYPE_PRONE, TYPE_STILL, TYPE_STRANGER];   // <-- HV keys via "type:"+type
+const ST_FACEUP="FACEUP", ST_PRONE="PRONE";              // posture state IDs (display only)
+const MO_NORMAL="NORMAL", MO_STILL="STILL";              // motion state IDs (display only)
+const PE_BABY="BABY", PE_STRANGER="STRANGER";            // presence state IDs (display only)
+// display-label lookups (language-dependent text for the IDs above)
+function typeLabel(id){ return id===TYPE_PRONE? (LANG==='zh'?"俯卧(SIDS风险)":"face-down (SIDS risk)")
+                            : id===TYPE_STILL? (LANG==='zh'?"长时间无动作":"no motion for a long time")
+                            : (LANG==='zh'?"出现陌生人":"a stranger appeared"); }
+function postureLabel(id){ return id===ST_PRONE? t('stProne') : t('stFaceUp'); }
+function motionLabel(id){ return id===MO_STILL? t('moStill') : t('moNormal'); }
+function presenceLabel(id){ return id===PE_STRANGER? t('peStranger') : t('peBabyOnly'); }
+
 // ───────── HDC core (pure ±1 VSA, verified lineage — identical to dashcam demo) ─────────
 const D = 8000;
 function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
@@ -132,41 +268,40 @@ function recallType(tkey){            // unbind time -> recover event type (dete
 const cv=document.getElementById("crib"), ctx=cv.getContext("2d");
 const W=cv.width, H=cv.height;
 const CX=W/2, CY=H/2-10;                       // baby center
-const TYPES=["俯卧(SIDS风险)","长时间无动作","出现陌生人"];
 // scripted timeline (frame-keyed). Each event: window [at, at+dur]; surprise = scene-divergence
 const SCRIPT=[
-  {at:120, dur:70, kind:"prone",   type:"俯卧(SIDS风险)", peak:0.92},
-  {at:330, dur:90, kind:"still",   type:"长时间无动作",   peak:0.80},
-  {at:560, dur:70, kind:"stranger",type:"出现陌生人",     peak:0.97},
+  {at:120, dur:70, kind:"prone",   type:TYPE_PRONE,    peak:0.92},
+  {at:330, dur:90, kind:"still",   type:TYPE_STILL,    peak:0.80},
+  {at:560, dur:70, kind:"stranger",type:TYPE_STRANGER, peak:0.97},
 ];
-let t=0, frame=0, playing=false, surprise=0, lastFlash=-99, evidence=[];
-let babyState="仰睡", motionState="正常", personState="仅宝宝", strangerX=-60, breathPhase=0;
+let t_sim=0, frame=0, playing=false, surprise=0, lastFlash=-99, evidence=[];
+let babyState=ST_FACEUP, motionState=MO_NORMAL, personState=PE_BABY, strangerX=-60, breathPhase=0;
 
 function reset(){
-  t=0; frame=0; surprise=0; lastFlash=-99; evidence=[]; breathPhase=0;
-  babyState="仰睡"; motionState="正常"; personState="仅宝宝"; strangerX=-60;
+  t_sim=0; frame=0; surprise=0; lastFlash=-99; evidence=[]; breathPhase=0;
+  babyState=ST_FACEUP; motionState=MO_NORMAL; personState=PE_BABY; strangerX=-60;
   M=new Float32Array(D);
-  renderEvidence(); updateEye(); drawFrame(); setSurprise(0,"平静");
+  renderEvidence(); updateEye(); drawFrame(); setSurprise(0,t('slCalm'));
 }
 
 function setSurprise(v,label){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
   const l=document.getElementById("slbl"); l.textContent=label; l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
 
 function updateEye(){
-  document.getElementById("pState").innerHTML="姿态: <b>"+babyState+"</b>";
-  document.getElementById("pState").className="pill"+(babyState==="俯卧"?" alert":"");
-  document.getElementById("pMotion").innerHTML="呼吸/动作: <b>"+motionState+"</b>";
-  document.getElementById("pMotion").className="pill"+(motionState!=="正常"?" alert":"");
-  document.getElementById("pPerson").innerHTML="在场: <b>"+personState+"</b>";
-  document.getElementById("pPerson").className="pill"+(personState!=="仅宝宝"?" alert":"");
+  document.getElementById("pState").innerHTML=t('pState')(postureLabel(babyState));
+  document.getElementById("pState").className="pill"+(babyState===ST_PRONE?" alert":"");
+  document.getElementById("pMotion").innerHTML=t('pMotion')(motionLabel(motionState));
+  document.getElementById("pMotion").className="pill"+(motionState!==MO_NORMAL?" alert":"");
+  document.getElementById("pPerson").innerHTML=t('pPerson')(presenceLabel(personState));
+  document.getElementById("pPerson").className="pill"+(personState!==PE_BABY?" alert":"");
 }
 
 function activeEvent(){ for(const e of SCRIPT){ if(frame>=e.at && frame<e.at+e.dur) return e; } return null; }
 
 function step(){
-  frame++; t=frame/30; breathPhase+=0.18;
+  frame++; t_sim=frame/30; breathPhase+=0.18;
   // default calm state each frame; the scripted event overrides
-  babyState="仰睡"; motionState="正常"; personState="仅宝宝"; strangerX=-60;
+  babyState=ST_FACEUP; motionState=MO_NORMAL; personState=PE_BABY; strangerX=-60;
   let s=0, ev=activeEvent(), flagType=null;
   if(ev){
     const p=(frame-ev.at)/ev.dur;                 // 0..1 progress through the event window
@@ -174,15 +309,15 @@ function step(){
     const ramp = Math.min(1, p/0.25);             // quick onset
     s = ev.peak * ramp;
     flagType = ev.type;
-    if(ev.kind==="prone"){ babyState="俯卧"; motionState="正常"; }
-    if(ev.kind==="still"){ babyState="仰睡"; motionState="≥20s 无起伏"; }
-    if(ev.kind==="stranger"){ personState="检测到陌生人"; strangerX=-60 + Math.min(1,p/0.4)*70; }
+    if(ev.kind==="prone"){ babyState=ST_PRONE; motionState=MO_NORMAL; }
+    if(ev.kind==="still"){ babyState=ST_FACEUP; motionState=MO_STILL; }
+    if(ev.kind==="stranger"){ personState=PE_STRANGER; strangerX=-60 + Math.min(1,p/0.4)*70; }
   }
   // surprise router: capture on spike (change-driven, not absolute threshold) with refractory gap
   if(s>0.6 && frame-lastFlash>50 && flagType){ captureEvent(flagType); lastFlash=frame; }
-  setSurprise(s, s>0.6?"⚠ 异常! 已记录":(s>0.3?"留意":"平静"));
+  setSurprise(s, s>0.6?t('slAlert'):(s>0.3?t('slWatch'):t('slCalm')));
   updateEye(); drawFrame();
-  if(frame>700){ pause(); document.getElementById("live").innerHTML='<span class="ok">本段监护结束。</span> 右侧是抓到的事件 —— 可标记误报(精确删除)、生成夜间小结、验确定性。'; }
+  if(frame>700){ pause(); document.getElementById("live").innerHTML=t('liveEnd'); }
 }
 
 function drawFrame(){
@@ -196,7 +331,7 @@ function drawFrame(){
   for(let x=70;x<W-50;x+=40){ ctx.beginPath(); ctx.moveTo(x,28); ctx.lineTo(x,42); ctx.moveTo(x,H-42); ctx.lineTo(x,H-28); ctx.stroke(); }
   // mattress label
   ctx.fillStyle="#2a3947"; ctx.font="10px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("端上处理 · 画面不出此设备", CX, H-54);
+  ctx.fillText(t('cribLabel'), CX, H-54);
   // baby
   drawBaby();
   // stranger at edge
@@ -204,8 +339,8 @@ function drawFrame(){
 }
 
 function drawBaby(){
-  const prone = (babyState==="俯卧");
-  const still = (motionState!=="正常");
+  const prone = (babyState===ST_PRONE);
+  const still = (motionState!==MO_NORMAL);
   // breathing wobble (suppressed when "still")
   const br = still ? 0 : Math.sin(breathPhase)*1.4;
   ctx.save();
@@ -220,7 +355,7 @@ function drawBaby(){
   if(prone){
     // face DOWN: show back of head + hair, no face = SIDS risk visual
     ctx.fillStyle="#5a3b24"; ctx.beginPath(); ctx.arc(CX, CY-46, 18, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle="#ff6b6b"; ctx.font="bold 11px sans-serif"; ctx.fillText("脸朝下", CX, CY-43);
+    ctx.fillStyle="#ff6b6b"; ctx.font="bold 11px sans-serif"; ctx.fillText(t('cribFaceDown'), CX, CY-43);
   } else {
     // face UP: eyes (closed if asleep) + small smile
     ctx.strokeStyle="#5a4632"; ctx.lineWidth=2;
@@ -231,7 +366,7 @@ function drawBaby(){
   if(!still && !prone){ ctx.strokeStyle="rgba(63,223,143,.5)"; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.arc(CX, CY+6, 50+Math.sin(breathPhase)*4, 0, Math.PI*2); ctx.stroke(); }
   if(still){ ctx.fillStyle="#f4c152"; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
-    ctx.fillText("⚠ 无呼吸起伏", CX, CY+58); }
+    ctx.fillText(t('cribNoBreath'), CX, CY+58); }
   ctx.restore();
 }
 
@@ -242,7 +377,7 @@ function drawStranger(x,y){
   // shadowy figure entering from left edge
   roundRect(x-16, y-30, 40, 80, 10); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.fillStyle="#2c2030"; ctx.arc(x+4, y-40, 16, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-  ctx.fillStyle="#ff6b6b"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center"; ctx.fillText("陌生人?", x+4, y+62);
+  ctx.fillStyle="#ff6b6b"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center"; ctx.fillText(t('cribStranger'), x+4, y+62);
   ctx.restore();
 }
 
@@ -252,58 +387,58 @@ function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w
 function snapThumb(){ const tmp=document.createElement("canvas"); tmp.width=96; tmp.height=64;
   tmp.getContext("2d").drawImage(cv,0,0,W,H,0,0,96,64); return tmp.toDataURL("image/jpeg",0.6); }
 
-function tagClass(type){ if(type==="俯卧(SIDS风险)") return ""; if(type==="出现陌生人") return "blue"; return "amber"; }
+function tagClass(type){ if(type===TYPE_PRONE) return ""; if(type===TYPE_STRANGER) return "blue"; return "amber"; }
 
 function captureEvent(type){
-  const tkey=Math.floor(t*10)/10;
+  const tkey=Math.floor(t_sim*10)/10;
   const ev={ type, time:fmtTime(tkey), tkey:String(tkey), thumbs:[snapThumb()], removed:false };
   evidence.push(ev); addFact(ev);
   // grab 1-2 follow-up thumbs over next frames (the tiny clip), then DISCARD raw — only this record kept
   let n=0; const grab=()=>{ if(n<2 && ev.thumbs.length<3){ ev.thumbs.push(snapThumb()); n++; setTimeout(grab,130);} else renderEvidence(); };
   setTimeout(grab,130);
   renderEvidence();
-  document.getElementById("live").innerHTML=`🔔 <span class="bad">异常:${type}</span> · ${ev.time} —— 已存入私有事件台账。<b>原始画面已丢弃,只留这条记录。</b>`;
+  document.getElementById("live").innerHTML=t('captureLive')(typeLabel(type), ev.time);
 }
 function fmtTime(tk){ const d=new Date(2026,5,11,2,14,Math.floor(tk)); return d.toTimeString().slice(0,8)+"."+String(Math.floor((tk%1)*10)); }
 
 function renderEvidence(){
   const live=evidence.filter(e=>!e.removed);
-  document.getElementById("memstat").textContent = live.length? `M = 1 向量 · ${live.length} 条事件` : "M：空";
+  document.getElementById("memstat").textContent = live.length? t('memFull')(live.length) : t('memEmpty');
   document.getElementById("genall").disabled = live.length===0;
   document.getElementById("audit").disabled = live.length===0;
   const el=document.getElementById("evlist");
-  if(!evidence.length){ el.innerHTML='<div class="stat">还没有事件。开始监护后,异常会出现在这里 —— <b>原始画面已丢弃</b>。</div>'; return; }
-  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">🗑 已删除(误报):${e.type} · ${e.time} —— 从 M 中精确减去,可复核已删干净。</span></div>` :
-    `<div class="ev flash"><div class="top"><span class="etag ${tagClass(e.type)}">事件</span> <span class="etype">${e.type}</span><span class="etime">${e.time}</span></div>
+  if(!evidence.length){ el.innerHTML=`<div class="stat">${t('evInit')}</div>`; return; }
+  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">${t('evRemoved')(typeLabel(e.type), e.time)}</span></div>` :
+    `<div class="ev flash"><div class="top"><span class="etag ${tagClass(e.type)}">${t('evTag')}</span> <span class="etype">${typeLabel(e.type)}</span><span class="etime">${e.time}</span></div>
        <div class="thumbs">${e.thumbs.map(t=>`<img src="${t}">`).join("")}</div>
-       <div class="stat">↑ 仅这 ${e.thumbs.length} 张缩略图被保留,原始视频已丢弃(discard-raw)。</div>
-       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">🔍 复核(确定性)</button>
-         <button class="hot" onclick="markFalse(${i})">标记误报 → 删除</button></div>
+       <div class="stat">${t('evThumbNote')(e.thumbs.length)}</div>
+       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">${t('btnReview')}</button>
+         <button class="hot" onclick="markFalse(${i})">${t('btnMarkFalse')}</button></div>
        <div class="audit" id="aud${i}"></div></div>`).join("");
 }
 window.proveIn=(i)=>{ const e=evidence[i]; const r=recallType(e.tkey);
-  document.getElementById("aud"+i).textContent = `unbind(M, 时间键) → 事件「${r.type}」 cos=${r.s.toFixed(3)} ✓ 记录确在 M 中,比特级可复核(每次结果一致)。`; };
+  document.getElementById("aud"+i).textContent = t('proveIn')(typeLabel(r.type), r.s.toFixed(3)); };
 window.markFalse=(i)=>{ const e=evidence[i]; if(e.removed) return; subFact(e); e.removed=true; renderEvidence();
   const r=recallType(e.tkey);
-  document.getElementById("live").innerHTML=`🗑 已把 <b>${e.type} · ${e.time}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${r.s.toFixed(3)}(已降到噪声=真删干净)。`; };
+  document.getElementById("live").innerHTML=t('markFalseLive')(typeLabel(e.type), e.time, r.s.toFixed(3)); };
 
 document.getElementById("genall").onclick=()=>{
   const live=evidence.filter(e=>!e.removed);
-  const lines=["====== 夜间监护小结(本机生成 · 原始视频从未离开此设备)======",
-    `生成时间:${new Date().toLocaleString("zh-CN")}`, `设备:家用摄像头(端上处理)`,
-    `本夜事件数:${live.length}`, `保留内容:仅事件摘要 + 关键缩略图(原始画面已丢弃)`, ""];
-  live.forEach((e,k)=> lines.push(`【${k+1}】 事件 ${e.type} · 时间 ${e.time} · 证据:${e.thumbs.length} 张缩略图(本机留存)`));
-  lines.push("", "说明:以上仅为发生在你家的真实异常的记录;是否分享/求助由你决定。原始视频不上云、不集中、可随时删除。");
+  const lines=[ t('repTitle'),
+    t('repGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")), t('repDevice'),
+    t('repCount')(live.length), t('repKept'), ""];
+  live.forEach((e,k)=> lines.push(t('repLine')(k+1, typeLabel(e.type), e.time, e.thumbs.length)));
+  lines.push("", t('repNote'));
   document.getElementById("reportbox").innerHTML = `<div class="report">${lines.join("\n")}</div>
-     <div class="stat" style="margin-top:6px">这份小结在你手里。云端婴儿监护会上传你宝宝的视频 —— 这个不会。</div>`;
+     <div class="stat" style="margin-top:6px">${t('repFoot')}</div>`;
 };
 document.getElementById("audit").onclick=()=>{
   const live=evidence.filter(e=>!e.removed);
-  let out="确定性自检(同一查询跑两遍,逐位比较):\n";
+  let out=t('auditHead');
   let allsame=true;
   for(const e of live){ const a=recallType(e.tkey).s, b=recallType(e.tkey).s; const same=(a===b); allsame=allsame&&same;
-    out+=` ${e.time} 「${e.type}」: cos ${a.toFixed(6)} == ${b.toFixed(6)}  ${same?"✓":"✗"}\n`; }
-  out+= live.length? `\n结论:${allsame?"全部比特一致 ✓ —— 事件记录不可被悄悄篡改,可复核":"出现不一致 ✗"}` : "无事件";
+    out+=t('auditLine')(e.time, typeLabel(e.type), a.toFixed(6), b.toFixed(6), same); }
+  out+= live.length? t('auditVerdict')(allsame) : t('auditNone');
   document.getElementById("auditbox").innerHTML=`<div class="report">${out}</div>`;
 };
 
@@ -314,8 +449,21 @@ function play(){ if(playing) return; playing=true; document.getElementById("play
 function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
 document.getElementById("play").onclick=play;
 document.getElementById("pause").onclick=pause;
-document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").textContent='已重置。'; };
+document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").textContent=t('resetLive'); };
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  if(!evidence.length){ document.getElementById("live").innerHTML=t('liveInit'); }
+  updateEye();
+  setSurprise(surprise, surprise>0.6?t('slAlert'):(surprise>0.3?t('slWatch'):t('slCalm')));
+  renderEvidence();
+  drawFrame();
+}
+
+// init
+applyStatic();
 reset();
+document.getElementById("live").innerHTML=t('liveInit');
 </script>
 </body>
 </html>

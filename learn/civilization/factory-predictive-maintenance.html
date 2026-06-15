@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en" id="htmlRoot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>工厂预测性维护 · 变化即信号 (毫秒纪)</title>
+<title>Factory Predictive Maintenance · change is the signal (Millisecond Era)</title>
 <style>
   :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
           --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; --cool:#58a6ff; }
@@ -53,95 +53,252 @@
   .legend i{ display:inline-block; width:11px; height:11px; border-radius:2px; vertical-align:middle; margin-right:4px; }
   .cf { border-top:1px dashed var(--line); margin-top:13px; padding-top:12px; }
   .cf h3{ margin:0 0 7px; font-size:14px; } .cf h3 b{ color:var(--cool); }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
 </style>
 </head>
 <body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
 <header>
-  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 2/N</div>
-  <h1>工厂预测性维护 · <span>变化即信号 —— 在轴承坏掉之前，听见它"开始不对劲"</span></h1>
-  <div class="sub">一台织布机/电机有一条<b>振动频谱指纹</b>。一只"眼睛"持续感知 → <b>俭省的惊奇路由器</b>(惊奇 = <b>预测残差</b>，不是绝对幅值)只在<b>偏离学到的基线</b>时报警 →
-  护城河 = <b>私有·确定·可在现场编辑</b>的基线记忆 + <b>反事实 what-if</b>。<b>太阳能边缘自治，没有 IT、没有云订阅。</b></div>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
 </header>
 
-<div class="honest">
-  <b>诚实边界 + 伦理(no-vaporware)：</b>
-  ① <b>工业 IoT 振动监测早已成熟</b>(Emerson AMS、Siemens、SKF) —— 我们<b>不声称</b>比它们"识别更准"，感知/频谱分析是商品。
-  ② 真正的缝隙 = <b>太阳能边缘自治</b>(µW、片上、零云订阅) + <b>变化触发</b>(预测残差，非绝对阈值——绝对阈值在负载变化时狂误报) + <b>现场可编辑基线</b>(换完轴承一键重学，不回厂重训) + <b>反事实 what-if</b>。
-  ③ HDC 记忆这里做的是<b>后端</b>：把已知干净的频谱指纹绑成 <code>bind(机器ID, 指纹)</code>，确定、可逆、可覆盖。把"频谱长什么样"提出来是前端 DSP 的活(FFT=成熟)。
-  ④ <b>本 demo 用脚本化的劣化曲线演示逻辑</b>(轴承谐波缓慢长大)，频谱与残差都是真算出来的，不是预录视频。
-</div>
+<div class="honest" data-i18n-html="honest"></div>
 
 <div class="wrap">
   <!-- LEFT: live spectrum + surprise -->
   <div class="card left">
     <div class="row">
-      <button id="learn" class="good">① 学习基线(机器健康时)</button>
-      <button id="run" disabled>② 运行(让它慢慢劣化)</button>
-      <button id="pause" class="sec" disabled>⏸ 暂停</button>
-      <button id="reset" class="sec">重置</button>
+      <button id="learn" class="good" data-i18n="btnLearn"></button>
+      <button id="run" disabled data-i18n="btnRun"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
     </div>
     <canvas id="spec" width="500" height="270"></canvas>
     <div class="legend">
-      <span><i style="background:#2c3a47"></i>当前频谱</span>
-      <span><i style="background:#3fdf8f"></i>学到的健康基线</span>
-      <span><i style="background:#ff6b6b"></i>轴承谐波(BPFO ~3.2×)长大处</span>
+      <span><i style="background:#2c3a47"></i><span data-i18n="legCur"></span></span>
+      <span><i style="background:#3fdf8f"></i><span data-i18n="legBase"></span></span>
+      <span><i style="background:#ff6b6b"></i><span data-i18n="legFault"></span></span>
     </div>
 
-    <div class="stat" style="margin-top:11px">惊奇信号 = <b>1 − cos(当前指纹, 基线指纹)</b>(预测残差，<b>非</b>绝对幅值)：
-      <span id="slbl" class="ok">未学习基线</span></div>
+    <div class="stat" style="margin-top:11px"><span data-i18n-html="surpriseLine"></span>
+      <span id="slbl" class="ok"></span></div>
     <div class="meter"><i id="sfill"></i></div>
 
     <div class="gauges">
-      <div class="gauge"><div class="k">运行时长</div><div class="v" id="ghrs">0 h</div></div>
-      <div class="gauge"><div class="k">负载</div><div class="v" id="gload">100%</div></div>
-      <div class="gauge"><div class="k">惊奇(残差)</div><div class="v" id="gsurp">—</div></div>
-      <div class="gauge"><div class="k">预估剩余寿命</div><div class="v" id="grul">—</div></div>
+      <div class="gauge"><div class="k" data-i18n="gHrs"></div><div class="v" id="ghrs">0 h</div></div>
+      <div class="gauge"><div class="k" data-i18n="gLoad"></div><div class="v" id="gload">100%</div></div>
+      <div class="gauge"><div class="k" data-i18n="gSurp"></div><div class="v" id="gsurp">—</div></div>
+      <div class="gauge"><div class="k" data-i18n="gRul"></div><div class="v" id="grul">—</div></div>
     </div>
 
     <div class="cf">
-      <h3>④ 反事实 what-if · <b>降低负载 → 劣化变慢</b>(用可编辑模型，不重训)</h3>
+      <h3 data-i18n-html="cfTitle"></h3>
       <div class="row">
-        <span class="stat" style="width:70px">负载</span>
+        <span class="stat" style="width:70px" data-i18n="loadLbl"></span>
         <input id="loadSlider" class="slider" type="range" min="60" max="100" value="100" step="5">
         <span id="loadVal" style="font-weight:800;width:52px;text-align:right">100%</span>
       </div>
-      <div class="stat" id="cfNote">拖动负载 → 重新外推"到失效还有几天"。降载 = 谐波生长斜率按物理缩放，时间线右移；不需要回厂重训模型。</div>
+      <div class="stat" id="cfNote"></div>
     </div>
   </div>
 
   <!-- RIGHT: baseline memory + alerts -->
   <div class="card right">
     <div class="row">
-      <span class="panel-h">基线记忆 + 报警台账</span>
-      <span class="stat" id="memstat" style="margin-left:auto">M：空</span>
+      <span class="panel-h" data-i18n="panelH"></span>
+      <span class="stat" id="memstat" style="margin-left:auto"></span>
     </div>
 
     <div class="alert" id="baseCard">
-      <div class="top"><span class="badge ok" id="baseBadge">基线</span>
-        <b id="baseName">织机 #L-07 · 轴承 NU-308</b><span class="when" id="baseWhen"></span></div>
-      <div class="stat" id="baseTxt">还没学习基线。点"①学习基线"，把这台机器<b>当下健康</b>的频谱指纹存进 HDC 记忆 <code>bind(机器ID, 指纹)</code>。</div>
+      <div class="top"><span class="badge ok" id="baseBadge"></span>
+        <b id="baseName"></b><span class="when" id="baseWhen"></span></div>
+      <div class="stat" id="baseTxt"></div>
     </div>
 
     <div class="row">
-      <button id="replace" class="warn" disabled>③ 轴承已更换 → 重置基线</button>
-      <button id="report" class="sec" disabled>📄 生成工单</button>
-      <button id="audit" class="sec" disabled>🔒 验确定性</button>
+      <button id="replace" class="warn" disabled data-i18n="btnReplace"></button>
+      <button id="report" class="sec" disabled data-i18n="btnReport"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
     </div>
 
-    <div id="alertlist"><div class="stat">运行后，当残差越过阈值会在这里生成报警(劣化中 / 预估失效)。</div></div>
+    <div id="alertlist"></div>
     <div id="reportbox"></div>
     <div id="auditbox"></div>
 
-    <div class="moat">
-      <b>现场可见的护城河：</b>
-      太阳能边缘自治(µW、无 IT、无云订阅) · <b>变化触发</b>(预测残差，绝对阈值会在负载变化时狂误报) ·
-      <b>现场可编辑基线</b>(换完轴承一键重学，不回厂) · 端上私有(频谱不上云) · <b>反事实 what-if</b>(降载看时间线右移，零重训)。
-      <br>解放谁：Rita —— 印度一家中型纺织厂的厂长(150 台织机，停机一天约 $2,000)；以及车间里的工人(机器突然爆裂会伤人)。全球 10 亿+ 工厂工人。
-    </div>
+    <div class="moat" data-i18n-html="moat"></div>
   </div>
 </div>
 
 <script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Factory Predictive Maintenance · change is the signal (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · factory",
+    h1: "Factory predictive maintenance · change is the signal — hear a bearing “start to go wrong” before it breaks",
+    sub: "A loom/motor has a <b>vibration-spectrum fingerprint</b>. An “eye” senses it continuously → a <b>frugal surprise router</b> (surprise = <b>predictive residual</b>, not absolute amplitude) alerts only when it <b>deviates from the learned baseline</b> → the moat = a <b>private, deterministic, field-editable</b> baseline memory + a <b>counterfactual what-if</b>. <b>Solar edge-autonomous: no IT, no cloud subscription.</b>",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>Industrial-IoT vibration monitoring is already mature</b> (Emerson AMS, Siemens, SKF) — we do <b>not</b> claim to “recognize more accurately”; sensing/spectral analysis is a commodity. ② The real gap = <b>solar edge autonomy</b> (µW, on-device, zero cloud subscription) + <b>change-triggering</b> (predictive residual, not an absolute threshold — absolute thresholds false-alarm wildly under load changes) + <b>field-editable baselines</b> (re-learn with one click after a bearing swap, no trip back to the factory) + <b>counterfactual what-if</b>. ③ What HDC memory does here is the <b>back-end</b>: bind a known-clean spectral fingerprint as <code>bind(machineID, fingerprint)</code> — deterministic, reversible, overwritable. Extracting “what the spectrum looks like” is the front-end DSP’s job (FFT = mature). ④ <b>This demo scripts the degradation curve to show the logic</b> (the bearing harmonic grows slowly); the spectrum and residual are really computed, not a pre-recorded video.",
+    legCur: "current spectrum",
+    legBase: "learned healthy baseline",
+    legFault: "where the bearing harmonic (BPFO ~3.2×) grows",
+    surpriseLine: "Surprise = <b>1 − cos(current fingerprint, baseline fingerprint)</b> (predictive residual, <b>not</b> absolute amplitude):",
+    gHrs: "operating hours", gLoad: "load", gSurp: "surprise (residual)", gRul: "est. remaining life",
+    cfTitle: "④ Counterfactual what-if · <b>lower the load → slower degradation</b> (using the editable model, no retraining)",
+    loadLbl: "load",
+    panelH: "Baseline memory + alert ledger",
+    btnLearn: "① Learn baseline (while healthy)",
+    btnRun: "② Run (let it degrade slowly)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    btnReplace: "③ Bearing replaced → reset baseline",
+    btnReport: "📄 Generate work order",
+    btnAudit: "🔒 Verify determinism",
+    baseName: "Loom #L-07 · bearing NU-308",
+    machineDisp: "Loom #L-07 / NU-308",
+    memEmpty: "M: empty",
+    memFull: (id)=>`M = 1 vector · ${id}`,
+    badgeBase: "baseline",
+    badgeLearned: "✓ baseline learned",
+    baseTxtInit: "No baseline learned yet. Click “① Learn baseline” to store this machine’s <b>currently healthy</b> spectral fingerprint into HDC memory <code>bind(machineID, fingerprint)</code>.",
+    baseWhen: (h)=>`@ ${h} h`,
+    baseWhenRelearn: (h)=>`@ ${h} h (re-learned after bearing swap)`,
+    baseTxtLearned: (D)=>`Stored the <b>healthy spectral fingerprint</b> into HDC memory <code>M = bind(machineID, fingerprint)</code> (D=${D.toLocaleString()}, deterministic · overwritable). Surprise is now the <b>predictive residual</b> between the current fingerprint and this baseline — not whoever has the biggest amplitude.`,
+    baseTxtReplaced: (s)=>`🔧 <b>Bearing replaced</b> → <b>re-learn the baseline in the field</b>: subtract/overwrite to set M to the post-repair healthy fingerprint (<b>no factory trip, no retraining</b>). The residual drops straight back to <b class="ok">${s}</b> (≈ baseline noise). Editable on-site memory.`,
+    alertInit: "After you run it, alerts appear here when the residual crosses the threshold (degrading / est. failure).",
+    surpUnlearned: "no baseline learned",
+    surpAlert: "⚠ residual over threshold — bearing degrading",
+    surpWarn: "note: residual rising",
+    surpHealthy: "healthy (residual ≈ baseline noise)",
+    chartX: "frequency (× run-speed harmonic)",
+    chartFault: "bearing harmonic BPFO↑",
+    rul2y: ">2 yr", rulDays: (d)=>`~${d} days`, rulHrs: (h)=>`~${h} h`,
+    failNow: "✗ failure threshold reached (end of demo)",
+    estimating: "estimating",
+    alertBadge: "bearing degrading",
+    alertTitle: (bin)=>`BPFO harmonic (order ${bin}) growing abnormally`,
+    alertWhen: (h)=>`@ ${h} h`,
+    alertBody: (s,th,dtxt)=>`Trigger: <b>predictive residual</b> 1−cos = <b class="bad">${s}</b> crossed threshold ${th} (<b>not</b> an absolute-amplitude threshold). Est. failure: <b class="bad">${dtxt}</b>. Recommendation: schedule replacement of bearing NU-308.`,
+    cfNoteInit: "Drag the load → re-extrapolate “days to failure.” Lowering load = the harmonic’s growth slope scales by physics, the timeline shifts right; no factory retraining needed.",
+    cfNotePre: (load)=>`After lowering load, the degradation slope scales by load^2.5. First “Run” so the bearing starts to degrade, then lower the load to see the timeline shift right.`,
+    cfNoteLive: (load,now,full,gain)=>`🔮 Counterfactual: load ${load}% → est. failure in <b class="ok">~${now} days</b>; vs ~${full} days at 100% full load = <b class="ok">${gain} more days</b> of scheduling room. All extrapolated from the editable model, <b>no retraining</b>.`,
+    reportTitle: "====== Predictive-maintenance work order (draft, generated on the solar edge node) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repMachine: (id)=>`Machine: ${id}`,
+    repBaseAt: (h)=>`Baseline learned at: @ ${h} h`,
+    repTrigger: (s,th)=>`Trigger: predictive residual 1−cos = ${s} > threshold ${th} (change-triggered, not absolute amplitude)`,
+    repAnomaly: (bin)=>`Anomaly: bearing outer-race harmonic BPFO (order ${bin}) growing steadily`,
+    repLoad: (l)=>`Current load: ${l}%`,
+    repRul: (txt)=>`Est. remaining life: ${txt}`,
+    repAction: "Recommended action: schedule replacement of bearing NU-308; temporary load reduction can buy time (see counterfactual)",
+    repNote1: "Note: this work order is generated locally on the (solar-powered) shop-floor edge node; the spectrum never goes to the cloud;",
+    repNote2: "whether to dispatch/shut down is Rita's (the plant manager's) call — no automatic shutdown.",
+    reportFoot: "This work order is in your hands, kept on-device. Dispatch only if you choose — no automatic shutdown.",
+    auditOut: (a,b,same,bitsame,verdict)=>`Determinism self-check (run the same query twice, compare bit-by-bit):
+  surprise (residual)  ${a} == ${b}   ${same?"✓":"✗"}
+  unbind(M, machineID) → baseline fingerprint  bit-identical  ${bitsame?"✓":"✗"}
+
+Verdict: ${verdict}`,
+    auditPass: "all bits identical ✓ — the same spectrum yields the same residual every time, the baseline is exactly recoverable from M, auditable and reproducible.",
+    auditFail: "inconsistency detected ✗",
+    moat: "<b>The moat, visible on the shop floor:</b> solar edge autonomy (µW, no IT, no cloud subscription) · <b>change-triggering</b> (predictive residual; absolute thresholds false-alarm wildly under load change) · <b>field-editable baseline</b> (re-learn with one click after a bearing swap, no factory trip) · on-device private (the spectrum never goes to the cloud) · <b>counterfactual what-if</b> (lower load, watch the timeline shift right, zero retraining).<br>Who it liberates: Rita — plant manager of a mid-size textile factory in India (150 looms, ~$2,000/day of downtime); and the workers on the floor (a machine that bursts suddenly can injure people). 1 billion+ factory workers worldwide.",
+    machineMemH: "loom"
+  },
+  zh: {
+    docTitle: "工厂预测性维护 · 变化即信号 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · factory",
+    h1: "工厂预测性维护 · 变化即信号 —— 在轴承坏掉之前，听见它“开始不对劲”",
+    sub: "一台织布机/电机有一条<b>振动频谱指纹</b>。一只“眼睛”持续感知 → <b>俭省的惊奇路由器</b>(惊奇 = <b>预测残差</b>，不是绝对幅值)只在<b>偏离学到的基线</b>时报警 → 护城河 = <b>私有·确定·可在现场编辑</b>的基线记忆 + <b>反事实 what-if</b>。<b>太阳能边缘自治，没有 IT、没有云订阅。</b>",
+    honest: "<b>诚实边界 + 伦理(no-vaporware)：</b> ① <b>工业 IoT 振动监测早已成熟</b>(Emerson AMS、Siemens、SKF) —— 我们<b>不声称</b>比它们“识别更准”，感知/频谱分析是商品。 ② 真正的缝隙 = <b>太阳能边缘自治</b>(µW、片上、零云订阅) + <b>变化触发</b>(预测残差，非绝对阈值——绝对阈值在负载变化时狂误报) + <b>现场可编辑基线</b>(换完轴承一键重学，不回厂重训) + <b>反事实 what-if</b>。 ③ HDC 记忆这里做的是<b>后端</b>：把已知干净的频谱指纹绑成 <code>bind(机器ID, 指纹)</code>，确定、可逆、可覆盖。把“频谱长什么样”提出来是前端 DSP 的活(FFT=成熟)。 ④ <b>本 demo 用脚本化的劣化曲线演示逻辑</b>(轴承谐波缓慢长大)，频谱与残差都是真算出来的，不是预录视频。",
+    legCur: "当前频谱",
+    legBase: "学到的健康基线",
+    legFault: "轴承谐波(BPFO ~3.2×)长大处",
+    surpriseLine: "惊奇信号 = <b>1 − cos(当前指纹, 基线指纹)</b>(预测残差，<b>非</b>绝对幅值)：",
+    gHrs: "运行时长", gLoad: "负载", gSurp: "惊奇(残差)", gRul: "预估剩余寿命",
+    cfTitle: "④ 反事实 what-if · <b>降低负载 → 劣化变慢</b>(用可编辑模型，不重训)",
+    loadLbl: "负载",
+    panelH: "基线记忆 + 报警台账",
+    btnLearn: "① 学习基线(机器健康时)",
+    btnRun: "② 运行(让它慢慢劣化)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    btnReplace: "③ 轴承已更换 → 重置基线",
+    btnReport: "📄 生成工单",
+    btnAudit: "🔒 验确定性",
+    baseName: "织机 #L-07 · 轴承 NU-308",
+    machineDisp: "织机 #L-07 / NU-308",
+    memEmpty: "M：空",
+    memFull: (id)=>`M = 1 向量 · ${id}`,
+    badgeBase: "基线",
+    badgeLearned: "✓ 基线已学",
+    baseTxtInit: "还没学习基线。点“①学习基线”，把这台机器<b>当下健康</b>的频谱指纹存进 HDC 记忆 <code>bind(机器ID, 指纹)</code>。",
+    baseWhen: (h)=>`@ ${h} h`,
+    baseWhenRelearn: (h)=>`@ ${h} h (换轴承后重学)`,
+    baseTxtLearned: (D)=>`已把<b>健康频谱指纹</b>绑进 HDC 记忆 <code>M = bind(机器ID, 指纹)</code>(D=${D.toLocaleString()}，确定·可覆盖)。现在惊奇 = 当前指纹与这条基线的 <b>预测残差</b>，不是看谁幅值大。`,
+    baseTxtReplaced: (s)=>`🔧 <b>轴承已更换</b> → 现场<b>重学基线</b>：用减法/覆盖把 M 改成换后健康指纹(<b>不回厂、不重训</b>)。残差立刻掉回 <b class="ok">${s}</b>(≈基线噪声)。可编辑的在场记忆。`,
+    alertInit: "运行后，当残差越过阈值会在这里生成报警(劣化中 / 预估失效)。",
+    surpUnlearned: "未学习基线",
+    surpAlert: "⚠ 残差超阈值 —— 轴承劣化中",
+    surpWarn: "注意：残差上升中",
+    surpHealthy: "健康(残差≈基线噪声)",
+    chartX: "频率(× 转速谐波)",
+    chartFault: "轴承谐波 BPFO↑",
+    rul2y: ">2 年", rulDays: (d)=>`~${d} 天`, rulHrs: (h)=>`~${h} 时`,
+    failNow: "✗ 已达失效阈值(演示终点)",
+    estimating: "估算中",
+    alertBadge: "轴承劣化中",
+    alertTitle: (bin)=>`BPFO 谐波(第 ${bin} 阶)异常增长`,
+    alertWhen: (h)=>`@ ${h} h`,
+    alertBody: (s,th,dtxt)=>`触发方式：<b>预测残差</b> 1−cos = <b class="bad">${s}</b> 越过阈值 ${th}(<b>非</b>绝对幅值阈值)。预估失效：<b class="bad">${dtxt}</b> 后。建议：排期更换轴承 NU-308。`,
+    cfNoteInit: "拖动负载 → 重新外推“到失效还有几天”。降载 = 谐波生长斜率按物理缩放，时间线右移；不需要回厂重训模型。",
+    cfNotePre: (load)=>`降载后劣化斜率按 load^2.5 缩放。先“运行”让轴承开始劣化，再降载即可看时间线右移。`,
+    cfNoteLive: (load,now,full,gain)=>`🔮 反事实：负载 ${load}% → 预估失效 <b class="ok">~${now} 天</b>后；对比 100% 满载的 ~${full} 天 = <b class="ok">多争取 ${gain} 天</b>排期窗口。全靠可编辑模型外推，<b>不重训</b>。`,
+    reportTitle: "====== 预测性维护工单(草稿，太阳能边缘节点本机生成)======",
+    repGen: (t)=>`生成时间：${t}`,
+    repMachine: (id)=>`机器：${id}`,
+    repBaseAt: (h)=>`基线学习时刻：@ ${h} h`,
+    repTrigger: (s,th)=>`触发：预测残差 1−cos = ${s} > 阈值 ${th} (变化触发，非绝对幅值)`,
+    repAnomaly: (bin)=>`异常：轴承外圈谐波 BPFO(第 ${bin} 阶) 持续增长`,
+    repLoad: (l)=>`当前负载：${l}%`,
+    repRul: (txt)=>`预估剩余寿命：${txt}`,
+    repAction: "建议动作：排期更换轴承 NU-308；可临时降载延缓(见反事实)",
+    repNote1: "说明：本工单在车间边缘节点(太阳能供电)本地生成，频谱不上云；",
+    repNote2: "是否派工/停机由 Rita(厂长)决定 —— 无自动停机。",
+    reportFoot: "这份工单在你手里，本机留存。要派才派 —— 没有自动停机。",
+    auditOut: (a,b,same,bitsame,verdict)=>`确定性自检(同一查询跑两遍，逐位比较)：
+  surprise(残差)  ${a} == ${b}   ${same?"✓":"✗"}
+  unbind(M,机器ID)→基线指纹  逐位一致  ${bitsame?"✓":"✗"}
+
+结论：${verdict}`,
+    auditPass: "全部比特一致 ✓ —— 同一频谱每次得到同一残差，基线可从 M 精确还原，可审计复核。",
+    auditFail: "出现不一致 ✗",
+    moat: "<b>现场可见的护城河：</b>太阳能边缘自治(µW、无 IT、无云订阅) · <b>变化触发</b>(预测残差，绝对阈值会在负载变化时狂误报) · <b>现场可编辑基线</b>(换完轴承一键重学，不回厂) · 端上私有(频谱不上云) · <b>反事实 what-if</b>(降载看时间线右移，零重训)。<br>解放谁：Rita —— 印度一家中型纺织厂的厂长(150 台织机，停机一天约 $2,000)；以及车间里的工人(机器突然爆裂会伤人)。全球 10 亿+ 工厂工人。",
+    machineMemH: "织机"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
 // ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
 const D = 8000;
 function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
@@ -156,26 +313,19 @@ function cos(a,b){ let d=0,na=0,nb=0; for(let i=0;i<D;i++){ d+=a[i]*b[i]; na+=a[
   return d/(Math.sqrt(na)*Math.sqrt(nb)+1e-9); }
 
 // ── encode a spectrum (NBINS magnitudes) into one HV ──
-// deterministic. Magnitude → a GRADED level HV (thermometer scheme): we keep an
-// anchor HV at level 0 and one at level NLEV; level k flips the first k/NLEV bits
-// from the lo-anchor to the hi-anchor. Adjacent levels share most bits, so cosine
-// distance moves SMOOTHLY & MONOTONICALLY as a peak grows (no quantization jitter).
-// fact = bind(binHV, levelHV(mag)); spectrum HV = Σ facts (bundle), then sign() → ±1.
 const NBINS = 24, NLEV = 64;
 const _LO = itemHV("levanchor:lo"), _HI = itemHV("levanchor:hi");
 const _levCache = new Map();
 function levelHV(mag){
-  const q = Math.round(Math.max(0,Math.min(1,mag))*NLEV);   // 0..NLEV
+  const q = Math.round(Math.max(0,Math.min(1,mag))*NLEV);
   if(_levCache.has(q)) return _levCache.get(q);
-  // deterministically pick which bit-indices have "flipped" to HI by level q:
-  // use a fixed permutation (seeded) so flips are nested -> monotone correlation.
-  const order = itemHV("levperm");                            // ±1; rank by its value+index gives stable order
+  const order = itemHV("levperm");
   const idx = Array.from({length:D}, (_,i)=>i)
     .sort((a,b)=> (order[a]!==order[b]? order[a]-order[b] : a-b));
   const nHi = Math.round(D * q / NLEV);
   const v = new Float32Array(D);
   for(let i=0;i<D;i++) v[i]=_LO[i];
-  for(let i=0;i<nHi;i++) v[idx[i]]=_HI[idx[i]];               // flip first nHi positions to HI
+  for(let i=0;i<nHi;i++) v[idx[i]]=_HI[idx[i]];
   _levCache.set(q, v); return v;
 }
 function encodeSpectrum(spec){
@@ -185,62 +335,55 @@ function encodeSpectrum(spec){
     for(let i=0;i<D;i++) acc[i]+=f[i];
   }
   const hv=new Float32Array(D);
-  for(let i=0;i<D;i++) hv[i]= acc[i]>=0 ? 1 : -1;   // sign() → clean ±1 fingerprint
+  for(let i=0;i<D;i++) hv[i]= acc[i]>=0 ? 1 : -1;
   return hv;
 }
-// machine memory: M = bind(machineID, baselineFingerprint)  (deterministic, overwritable)
-const MACHINE_ID = "织机#L-07/NU-308";
-let M = null;            // stored machine-bound baseline HV
-let baselineSpec = null; // raw baseline (display only)
+// machine memory: M = bind(machineID, baselineFingerprint).  NOTE: MACHINE_ID is an
+// internal HV key — language-independent on purpose, so the vectors never change.
+const MACHINE_ID = "machine#L-07/NU-308";
+let M = null;
+let baselineSpec = null;
 function storeBaseline(spec){
   baselineSpec = spec.slice();
   const fp = encodeSpectrum(spec);
-  M = bind(itemHV("machine:"+MACHINE_ID), fp);   // bind machine id ⊗ fingerprint
+  M = bind(itemHV("machine:"+MACHINE_ID), fp);
 }
-function recallBaselineFP(){                       // unbind machine id → baseline fingerprint
+function recallBaselineFP(){
   return bind(M, itemHV("machine:"+MACHINE_ID));
 }
-function surpriseOf(spec){                          // 1 - cos(current, recalled baseline)
+function surpriseOf(spec){
   if(!M) return 0;
   const cur = encodeSpectrum(spec);
   return 1 - cos(cur, recallBaselineFP());
 }
 
-// ───────── physical model: vibration spectrum of a loom motor bearing ─────────
-// base harmonics (1× run speed + a couple structural peaks) + a growing bearing fault peak (BPFO ≈ 3.2×)
+// ───────── physical model ─────────
 const BASE_PEAKS = [ {bin:2,amp:0.62}, {bin:5,amp:0.40}, {bin:9,amp:0.30}, {bin:14,amp:0.22} ];
-const FAULT_BIN  = 7;     // bearing outer-race fault harmonic location
-// residual thresholds (calibrated to the encoder's real scale — see node verification).
-// One growing peak among many stable bins is a modest fraction of the bundled fingerprint,
-// so the residual scale is small; the POINT is it rises smoothly & monotonically with the fault.
+const FAULT_BIN  = 7;
 const ALERT_TH = 0.06, WARN_TH = 0.025;
 let opHours=0, degr=0, loadPct=100, running=false, learned=false, alerted=false;
 let surprise=0, timer=null, alerts=[], baselineLearnedAt=null;
 
-// degradation growth per "operating hour" tick, scaled by load^2.5 (heat/stress non-linear)
 function growthRate(){ const L=loadPct/100; return 0.0019 * Math.pow(L,2.5); }
 
 function currentSpectrum(forDegr){
   const dg = (forDegr===undefined)? degr : forDegr;
   const spec=new Float32Array(NBINS);
-  // structural noise floor (deterministic per bin so baseline/current are comparable)
   for(let b=0;b<NBINS;b++) spec[b]=0.05 + 0.03*Math.abs(Math.sin(b*1.7+0.3));
   for(const p of BASE_PEAKS){ spec[p.bin]=Math.max(spec[p.bin], p.amp + 0.015*Math.sin(opHours*0.3+p.bin)); }
-  // growing bearing fault peak + its sidebands
   const fault = Math.min(0.95, dg);
   spec[FAULT_BIN]   = Math.max(spec[FAULT_BIN],   fault);
   spec[FAULT_BIN-1] = Math.max(spec[FAULT_BIN-1], fault*0.45);
   spec[FAULT_BIN+1] = Math.max(spec[FAULT_BIN+1], fault*0.45);
-  spec[FAULT_BIN+7] = Math.max(spec[FAULT_BIN+7], fault*0.30); // 2nd harmonic of fault
+  spec[FAULT_BIN+7] = Math.max(spec[FAULT_BIN+7], fault*0.30);
   return spec;
 }
 
-// ───────── RUL estimate from current surprise & growth (counterfactual-aware) ─────────
 function estimateRUL(atLoad){
   if(degr<=0.02) return null;
   const L=(atLoad===undefined?loadPct:atLoad)/100;
-  const rate = 0.0019*Math.pow(L,2.5);          // degr units per op-hour
-  const remaining = Math.max(0, 0.92 - degr);   // failure threshold ~0.92
+  const rate = 0.0019*Math.pow(L,2.5);
+  const remaining = Math.max(0, 0.92 - degr);
   const hrs = rate>1e-9 ? remaining/rate : Infinity;
   const days = hrs/24;
   return {hrs, days};
@@ -253,23 +396,20 @@ function plotX(b){ return PADL + (CW-PADL-PADR)*(b/(NBINS-1)); }
 function plotY(v){ return CH-PADB - (CH-PADB-PADT)*Math.min(1,v); }
 function drawChart(){
   ctx.fillStyle="#11161c"; ctx.fillRect(0,0,CW,CH);
-  // grid + axes
   ctx.strokeStyle="#212c36"; ctx.lineWidth=1; ctx.fillStyle="#6f8499"; ctx.font="10px sans-serif";
   ctx.textAlign="right"; ctx.textBaseline="middle";
   for(let g=0;g<=4;g++){ const y=PADT+(CH-PADB-PADT)*g/4; const v=(1-g/4).toFixed(2);
     ctx.beginPath(); ctx.moveTo(PADL,y); ctx.lineTo(CW-PADR,y); ctx.stroke();
     ctx.fillText(v, PADL-5, y); }
   ctx.textAlign="center"; ctx.textBaseline="top";
-  ctx.fillText("频率(× 转速谐波)", (PADL+CW-PADR)/2, CH-13);
+  ctx.fillText(t('chartX'), (PADL+CW-PADR)/2, CH-13);
   const spec=currentSpectrum();
   const bw=(CW-PADL-PADR)/NBINS*0.66;
-  // baseline outline (green)
   if(baselineSpec){
     ctx.strokeStyle="#3fdf8f"; ctx.lineWidth=2; ctx.beginPath();
     for(let b=0;b<NBINS;b++){ const x=plotX(b), y=plotY(baselineSpec[b]); b?ctx.lineTo(x,y):ctx.moveTo(x,y); }
     ctx.stroke();
   }
-  // current spectrum bars
   for(let b=0;b<NBINS;b++){
     const x=plotX(b), y=plotY(spec[b]);
     const isFault = (b===FAULT_BIN || b===FAULT_BIN-1 || b===FAULT_BIN+1 || b===FAULT_BIN+7);
@@ -277,11 +417,10 @@ function drawChart(){
     ctx.fillStyle = (isFault && grew>0.05) ? "#ff6b6b" : "#2c3a47";
     ctx.fillRect(x-bw/2, y, bw, (CH-PADB)-y);
   }
-  // fault label
   if(degr>0.12){
     const x=plotX(FAULT_BIN), y=plotY(currentSpectrum()[FAULT_BIN]);
     ctx.fillStyle="#ff6b6b"; ctx.font="10px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="bottom";
-    ctx.fillText("轴承谐波 BPFO↑", x, y-3);
+    ctx.fillText(t('chartFault'), x, y-3);
   }
 }
 
@@ -289,23 +428,23 @@ function drawChart(){
 const $=id=>document.getElementById(id);
 function setSurprise(v){
   surprise=v;
-  // meter fills proportionally; the ALERT threshold sits at ~62% of the bar
   let pct=Math.min(100, Math.round(v/(ALERT_TH/0.62)*100));
   $("sfill").style.width=pct+"%";
   const l=$("slbl");
-  if(!learned){ l.textContent="未学习基线"; l.className="ok"; }
-  else if(v>ALERT_TH){ l.textContent="⚠ 残差超阈值 —— 轴承劣化中"; l.className="bad"; }
-  else if(v>WARN_TH){ l.textContent="注意：残差上升中"; l.className="wn"; }
-  else { l.textContent="健康(残差≈基线噪声)"; l.className="ok"; }
+  if(!learned){ l.textContent=t('surpUnlearned'); l.className="ok"; }
+  else if(v>ALERT_TH){ l.textContent=t('surpAlert'); l.className="bad"; }
+  else if(v>WARN_TH){ l.textContent=t('surpWarn'); l.className="wn"; }
+  else { l.textContent=t('surpHealthy'); l.className="ok"; }
   $("gsurp").textContent = learned ? v.toFixed(3) : "—";
   $("gsurp").className = "v "+(v>ALERT_TH?"bad":(v>WARN_TH?"wn":"ok"));
 }
+function machineDisp(){ return t('machineDisp'); }
 function refreshMem(){
-  $("memstat").textContent = M ? `M = 1 向量 · ${MACHINE_ID}` : "M：空";
+  $("memstat").textContent = M ? t('memFull')(machineDisp()) : t('memEmpty');
 }
 function refreshRUL(){
   const r=estimateRUL();
-  $("grul").textContent = r ? (r.days>900?">2 年":(r.days>=1? `~${r.days.toFixed(0)} 天`:`~${r.hrs.toFixed(0)} 时`)) : "—";
+  $("grul").textContent = r ? (r.days>900? t('rul2y') : (r.days>=1? t('rulDays')(r.days.toFixed(0)) : t('rulHrs')(r.hrs.toFixed(0)))) : "—";
   $("grul").className = "v "+(r && r.days<30 ? "bad" : (r && r.days<90 ? "wn":"ok"));
 }
 
@@ -317,7 +456,6 @@ function tick(){
   setSurprise(s);
   $("ghrs").textContent = opHours.toLocaleString()+" h";
   drawChart(); refreshRUL();
-  // change-triggered alert: only when residual crosses threshold (NOT an absolute level)
   if(learned && s>ALERT_TH && !alerted){ raiseAlert(s); alerted=true; }
   if(degr>=0.92){ pause(); failNow(); }
   if(opHours>2600){ pause(); }
@@ -326,38 +464,35 @@ function tick(){
 function raiseAlert(s){
   const r=estimateRUL();
   const ev={ id:alerts.length+1, hours:opHours, surprise:s, degr:degr,
-    days: r? r.days : null, when:new Date().toLocaleString("zh-CN"), faultBin:FAULT_BIN };
+    days: r? r.days : null, faultBin:FAULT_BIN };
   alerts.push(ev); renderAlerts();
   $("report").disabled=false; $("audit").disabled=false;
 }
 function failNow(){
-  $("slbl").textContent="✗ 已达失效阈值(演示终点)"; $("slbl").className="bad";
+  $("slbl").textContent=t('failNow'); $("slbl").className="bad";
 }
 
 function renderAlerts(){
   const el=$("alertlist");
-  if(!alerts.length){ el.innerHTML='<div class="stat">运行后，当残差越过阈值会在这里生成报警。</div>'; return; }
+  if(!alerts.length){ el.innerHTML='<div class="stat">'+t('alertInit')+'</div>'; return; }
   el.innerHTML = alerts.map(a=>{
-    const dtxt = a.days==null? "估算中" : (a.days>=1? `~${a.days.toFixed(0)} 天`:`~${(a.days*24).toFixed(0)} 时`);
-    return `<div class="alert fire"><div class="top"><span class="badge">轴承劣化中</span>
-      <b>BPFO 谐波(第 ${a.faultBin} 阶)异常增长</b><span class="when">@ ${a.hours.toLocaleString()} h</span></div>
-      <div class="stat">触发方式：<b>预测残差</b> 1−cos = <b class="bad">${a.surprise.toFixed(3)}</b> 越过阈值 ${ALERT_TH}(<b>非</b>绝对幅值阈值)。
-        预估失效：<b class="bad">${dtxt}</b> 后。建议：排期更换轴承 NU-308。</div>
+    const dtxt = a.days==null? t('estimating') : (a.days>=1? t('rulDays')(a.days.toFixed(0)) : t('rulHrs')((a.days*24).toFixed(0)));
+    return `<div class="alert fire"><div class="top"><span class="badge">${t('alertBadge')}</span>
+      <b>${t('alertTitle')(a.faultBin)}</b><span class="when">${t('alertWhen')(a.hours.toLocaleString())}</span></div>
+      <div class="stat">${t('alertBody')(a.surprise.toFixed(3), ALERT_TH, dtxt)}</div>
       <div class="audit" id="aud${a.id}"></div></div>`; }).join("");
 }
 
 // ── controls ──
 $("learn").onclick=()=>{
-  // capture HEALTHY signature at current (early) state
-  degr = Math.max(degr, 0.0); // baseline at healthy
+  degr = Math.max(degr, 0.0);
   const spec=currentSpectrum();
   storeBaseline(spec);
   learned=true; baselineLearnedAt=opHours;
   $("run").disabled=false; $("replace").disabled=false;
-  $("baseBadge").textContent="✓ 基线已学"; $("baseBadge").className="badge ok";
-  $("baseWhen").textContent="@ "+opHours+" h";
-  $("baseTxt").innerHTML=`已把<b>健康频谱指纹</b>绑进 HDC 记忆 <code>M = bind(机器ID, 指纹)</code>(D=${D.toLocaleString()}，确定·可覆盖)。
-    现在惊奇 = 当前指纹与这条基线的 <b>预测残差</b>，不是看谁幅值大。`;
+  $("baseBadge").textContent=t('badgeLearned'); $("baseBadge").className="badge ok";
+  $("baseWhen").textContent=t('baseWhen')(opHours);
+  $("baseTxt").innerHTML=t('baseTxtLearned')(D);
   setSurprise(surpriseOf(spec)); refreshMem(); drawChart();
 };
 $("run").onclick=()=>{ if(running||!learned) return; running=true;
@@ -368,16 +503,13 @@ function pause(){ running=false; $("pause").disabled=true; if(timer){clearInterv
 $("pause").onclick=pause;
 
 $("replace").onclick=()=>{
-  // bearing physically replaced → degradation resets → re-learn the post-repair HEALTHY signature
   pause();
   degr=0; alerted=false;
   const spec=currentSpectrum();
-  storeBaseline(spec);                          // OVERWRITE stored baseline HV in-field, no retraining
+  storeBaseline(spec);
   const s=surpriseOf(spec); setSurprise(s);
-  $("baseWhen").textContent="@ "+opHours+" h (换轴承后重学)";
-  $("baseTxt").innerHTML=`🔧 <b>轴承已更换</b> → 现场<b>重学基线</b>：用减法/覆盖把 M 改成换后健康指纹(<b>不回厂、不重训</b>)。
-    残差立刻掉回 <b class="ok">${s.toFixed(3)}</b>(≈基线噪声)。可编辑的在场记忆。`;
-  // close out alerts as resolved
+  $("baseWhen").textContent=t('baseWhenRelearn')(opHours);
+  $("baseTxt").innerHTML=t('baseTxtReplaced')(s.toFixed(3));
   if(alerts.length){ alerts.forEach(a=>a.resolved=true); }
   alerts=[]; renderAlerts(); $("report").disabled=true; $("audit").disabled=true;
   drawChart(); refreshMem(); refreshRUL();
@@ -387,48 +519,44 @@ $("replace").onclick=()=>{
 // counterfactual load slider
 $("loadSlider").oninput=()=>{
   loadPct=+$("loadSlider").value; $("loadVal").textContent=loadPct+"%"; $("gload").textContent=loadPct+"%";
-  const now=estimateRUL(loadPct), full=estimateRUL(100);
-  if(now && full){
-    const gain = now.days - full.days;
-    $("cfNote").innerHTML = degr<=0.02
-      ? `降载后劣化斜率按 load^2.5 缩放。先"运行"让轴承开始劣化，再降载即可看时间线右移。`
-      : `🔮 反事实：负载 ${loadPct}% → 预估失效 <b class="ok">~${now.days.toFixed(0)} 天</b>后；
-         对比 100% 满载的 ~${full.days.toFixed(0)} 天 = <b class="ok">多争取 ${gain>0?gain.toFixed(0):0} 天</b>排期窗口。
-         全靠可编辑模型外推，<b>不重训</b>。`;
-  }
+  updateCfNote();
   refreshRUL();
 };
+function updateCfNote(){
+  const now=estimateRUL(loadPct), full=estimateRUL(100);
+  if(degr<=0.02 || !now || !full){
+    $("cfNote").innerHTML = t('cfNotePre')(loadPct);
+  } else {
+    const gain = Math.max(0, now.days - full.days);
+    $("cfNote").innerHTML = t('cfNoteLive')(loadPct, now.days.toFixed(0), full.days.toFixed(0), gain.toFixed(0));
+  }
+}
 
 $("report").onclick=()=>{
   const a=alerts[0]; const r=estimateRUL();
-  const lines=["====== 预测性维护工单(草稿，太阳能边缘节点本机生成)======",
-    `生成时间：${new Date().toLocaleString("zh-CN")}`,
-    `机器：${MACHINE_ID}`,
-    `基线学习时刻：@ ${baselineLearnedAt} h`,
-    `触发：预测残差 1−cos = ${a?a.surprise.toFixed(3):"—"} > 阈值 ${ALERT_TH} (变化触发，非绝对幅值)`,
-    `异常：轴承外圈谐波 BPFO(第 ${FAULT_BIN} 阶) 持续增长`,
-    `当前负载：${loadPct}%`,
-    `预估剩余寿命：${r? (r.days>=1? "~"+r.days.toFixed(0)+" 天":"~"+r.hrs.toFixed(0)+" 时") : "—"}`,
-    `建议动作：排期更换轴承 NU-308；可临时降载延缓(见反事实)`,
+  const lines=[ t('reportTitle'),
+    t('repGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")),
+    t('repMachine')(machineDisp()),
+    t('repBaseAt')(baselineLearnedAt),
+    t('repTrigger')(a?a.surprise.toFixed(3):"—", ALERT_TH),
+    t('repAnomaly')(FAULT_BIN),
+    t('repLoad')(loadPct),
+    t('repRul')(r? (r.days>=1? t('rulDays')(r.days.toFixed(0)) : t('rulHrs')(r.hrs.toFixed(0))) : "—"),
+    t('repAction'),
     "",
-    "说明：本工单在车间边缘节点(太阳能供电)本地生成，频谱不上云；",
-    "是否派工/停机由 Rita(厂长)决定 —— 无自动停机。"];
+    t('repNote1'),
+    t('repNote2') ];
   $("reportbox").innerHTML=`<div class="report">${lines.join("\n")}</div>
-    <div class="stat" style="margin-top:6px">这份工单在你手里，本机留存。要派才派 —— 没有自动停机。</div>`;
+    <div class="stat" style="margin-top:6px">${t('reportFoot')}</div>`;
 };
 $("audit").onclick=()=>{
-  // determinism: re-encode current spectrum & re-query baseline twice; bit-compare cos
   const spec=currentSpectrum();
   const a=surpriseOf(spec), b=surpriseOf(spec);
   const same=(a===b);
-  // also prove the baseline is recoverable from M (unbind)
   const fp1=recallBaselineFP(), fp2=recallBaselineFP();
   let bitsame=true; for(let i=0;i<D;i++){ if(fp1[i]!==fp2[i]){ bitsame=false; break; } }
-  const out=`确定性自检(同一查询跑两遍，逐位比较)：
-  surprise(残差)  ${a.toFixed(6)} == ${b.toFixed(6)}   ${same?"✓":"✗"}
-  unbind(M,机器ID)→基线指纹  逐位一致  ${bitsame?"✓":"✗"}
-
-结论：${same&&bitsame?"全部比特一致 ✓ —— 同一频谱每次得到同一残差，基线可从 M 精确还原，可审计复核。":"出现不一致 ✗"}`;
+  const verdict = same&&bitsame ? t('auditPass') : t('auditFail');
+  const out=t('auditOut')(a.toFixed(6), b.toFixed(6), same, bitsame, verdict);
   $("auditbox").innerHTML=`<div class="report">${out}</div>`;
 };
 
@@ -441,13 +569,34 @@ $("reset").onclick=()=>{
   $("run").disabled=true; $("pause").disabled=true; $("learn").disabled=false; $("replace").disabled=true;
   $("report").disabled=true; $("audit").disabled=true;
   $("reportbox").innerHTML=""; $("auditbox").innerHTML="";
-  $("baseBadge").textContent="基线"; $("baseBadge").className="badge ok"; $("baseWhen").textContent="";
-  $("baseTxt").innerHTML='还没学习基线。点"①学习基线"，把这台机器<b>当下健康</b>的频谱指纹存进 HDC 记忆 <code>bind(机器ID, 指纹)</code>。';
-  $("cfNote").innerHTML='拖动负载 → 重新外推"到失效还有几天"。降载 = 谐波生长斜率按物理缩放，时间线右移；不需要回厂重训模型。';
+  $("baseBadge").textContent=t('badgeBase'); $("baseBadge").className="badge ok"; $("baseWhen").textContent="";
+  $("baseTxt").innerHTML=t('baseTxtInit');
+  $("baseName").textContent=t('baseName');
+  updateCfNote();
   renderAlerts(); refreshMem(); setSurprise(0); drawChart(); refreshRUL();
 };
 
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  $("baseName").textContent=t('baseName');
+  if(!learned){
+    $("baseBadge").textContent=t('badgeBase'); $("baseBadge").className="badge ok";
+    $("baseTxt").innerHTML=t('baseTxtInit');
+  } else {
+    $("baseBadge").textContent=t('badgeLearned'); $("baseBadge").className="badge ok";
+    if($("baseTxt").dataset.state==='replaced'){ /* keep numeric, re-render below */ }
+    $("baseTxt").innerHTML=t('baseTxtLearned')(D);
+  }
+  setSurprise(surprise);
+  refreshMem(); refreshRUL(); renderAlerts(); updateCfNote(); drawChart();
+}
+
 // init
+applyStatic();
+$("baseName").textContent=t('baseName');
+$("baseBadge").textContent=t('badgeBase');
+$("baseTxt").innerHTML=t('baseTxtInit');
+updateCfNote();
 refreshMem(); setSurprise(0); drawChart(); refreshRUL();
 </script>
 </body>

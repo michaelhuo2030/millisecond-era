@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en" id="htmlRoot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>行车记录仪 · 违法取证助手 (毫秒纪)</title>
+<title>Dashcam · Violation Evidence Assistant (Millisecond Era)</title>
 <style>
   :root { --bg:#0b0f14; --card:#141a21; --line:#283541; --txt:#e9f0f6; --mut:#8da2b5;
           --acc:#36a3ff; --good:#3fdf8f; --warn:#f4c152; --hot:#ff6b6b; }
@@ -42,58 +42,173 @@
         padding:12px 14px; margin:0 24px 18px; font-size:12.5px; color:#cdd9e4; max-width:1200px; }
   .honest b{ color:var(--warn); } code{ background:#1b2530; padding:1px 6px; border-radius:5px; font-size:12px; }
   .audit { font:12px/1.5 ui-monospace,Menlo,monospace; color:var(--mut); white-space:pre-wrap; }
+  /* language toggle */
+  .langtoggle{ position:fixed; top:12px; right:14px; z-index:50; display:flex; gap:4px; }
+  .langtoggle .lt{ background:#1b2530; border:1px solid var(--line); color:var(--mut); padding:5px 11px;
+        border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+  .langtoggle .lt.active{ background:var(--acc); color:#04121f; }
 </style>
 </head>
 <body>
+<div class="langtoggle">
+  <button id="lang-en" class="lt active" onclick="setLang('en')">EN</button>
+  <button id="lang-zh" class="lt" onclick="setLang('zh')">中</button>
+</div>
 <header>
-  <div class="brand">毫秒纪 · millisecond-era &nbsp;|&nbsp; civilization demo · 1/N</div>
-  <h1>行车记录仪 · <span>违法取证助手 —— 帮你把"加塞别车"变成一份能交的证据</span></h1>
-  <div class="sub">车里的视频 → <b>识别那一下违法</b>(别车/加塞/压线)→ <b>惊奇路由器只抓那一刻</b>(不是录一整天)→ 生成一份
-  <b>确定·可审计·私有·可删除</b>的证据包,<b>你看过、你决定要不要上报</b>(随手拍/12123)。全程在你设备上,原始视频归你。</div>
+  <div class="brand" data-i18n="brand"></div>
+  <h1><span data-i18n="h1"></span></h1>
+  <div class="sub" data-i18n-html="sub"></div>
 </header>
 
-<div class="honest">
-  <b>诚实边界 + 伦理(no-vaporware）:</b>
-  ① <b>"认出是哪辆车/什么车牌"是识别前端的活</b>(检测器+车牌OCR=云/模型,边界律 L1)——本 demo 用脚本化场景演示<b>逻辑</b>,不声称我们识别更强。
-  ② 我们的护城河 = <b>惊奇路由器抓住违法那一刻</b> + <b>私有·确定·可审计·可删除的证据记忆</b>(车牌/类型/时间绑进一个向量,可精确遗忘误报,比特级可复核)。
-  ③ <b>你决定是否上报</b> —— 无自动举报、无定向针对;它只记录<i>发生在你身上的真实违法</i>,不是大规模监控。
-  ④ 端上处理、<b>只留违法那几秒的证据、其余画面丢弃</b>(变化驱动=µW)。
-</div>
+<div class="honest" data-i18n-html="honest"></div>
 
 <div class="wrap">
   <div class="card left">
     <div class="row">
-      <button id="play">▶ 开始行车(模拟)</button>
-      <button id="pause" class="sec" disabled>⏸ 暂停</button>
-      <button id="reset" class="sec">重置</button>
+      <button id="play" data-i18n="btnPlay"></button>
+      <button id="pause" class="sec" disabled data-i18n="btnPause"></button>
+      <button id="reset" class="sec" data-i18n="btnReset"></button>
     </div>
     <canvas id="road" width="400" height="460"></canvas>
-    <div class="stat" style="margin-top:8px">惊奇信号(违法=预测不到的突变,非录全程):<span id="slbl" class="ok">平静</span></div>
+    <div class="stat" style="margin-top:8px"><span data-i18n="surpriseLine"></span><span id="slbl" class="ok"></span></div>
     <div class="meter"><i id="sfill"></i></div>
-    <div class="stat" id="live" style="margin-top:8px">点"开始行车"。脚本里有车会<b>不打灯强行加塞/压线别你</b> —— 路由器会在那一刻闪一下,自动取证。</div>
+    <div class="stat" id="live" style="margin-top:8px"></div>
   </div>
 
   <div class="card right">
     <div class="row">
-      <b style="font-size:15px">证据台账</b>
-      <span class="stat" id="memstat">M：空</span>
-      <button id="genall" class="warn" style="margin-left:auto" disabled>📄 生成举报包(你审核)</button>
-      <button id="audit" class="sec" disabled>🔒 验确定性</button>
+      <b style="font-size:15px" data-i18n="ledgerH"></b>
+      <span class="stat" id="memstat"></span>
+      <button id="genall" class="warn" style="margin-left:auto" disabled data-i18n="btnGenAll"></button>
+      <button id="audit" class="sec" disabled data-i18n="btnAudit"></button>
     </div>
-    <div id="evlist"><div class="stat">还没有取到证。开始行车后,违法事件会出现在这里(车牌/类型/时间/3帧证据)。</div></div>
+    <div id="evlist"></div>
     <div id="reportbox"></div>
     <div id="auditbox"></div>
 
-    <div class="moat">
-      <b>现场可见的护城河:</b>
-      只抓违法那几秒(非录全天=µW)· 证据=确定可审计(每次复核比特一致)· <b>误报可精确删除</b>(被遗忘权=一个减法,别人删不掉、你能删)·
-      端上私有(原始视频不上云)· <b>你决定是否上报</b>。
-      <br>解放谁:每一个被加塞别车、却拿不出证据、只能憋一肚子气的司机 —— 让"路怒"变成"可交的证据 + 更安全的路"。
-    </div>
+    <div class="moat" data-i18n-html="moat"></div>
   </div>
 </div>
 
 <script>
+// ───────── i18n dictionary (DISPLAY TEXT ONLY — never used as HV keys) ─────────
+const I18N = {
+  en: {
+    docTitle: "Dashcam · Violation Evidence Assistant (Millisecond Era)",
+    brand: "Millisecond Era · millisecond-era  |  civilization demo · 1/N",
+    h1: "Dashcam · violation evidence assistant — turn a cut-in / forced merge into evidence you can actually file",
+    sub: "The video in your car → <b>recognize the moment a violation happens</b> (cutting in / forced merge / line-crossing) → <b>the surprise router grabs only that instant</b> (not a full day of recording) → it builds a <b>deterministic · auditable · private · deletable</b> evidence package, <b>which you review and decide whether to report</b> (citizen-report apps / 12123). It all runs on your device; the raw video stays yours.",
+    honest: "<b>Honest boundary + ethics (no-vaporware):</b> ① <b>“Which car / which plate” is the recognition front-end’s job</b> (detector + plate OCR = cloud/model, boundary law L1) — this demo uses a scripted scene to show the <b>logic</b>; we do not claim to recognize better. ② Our moat = <b>the surprise router catching the instant of the violation</b> + <b>a private · deterministic · auditable · deletable evidence memory</b> (plate / type / time bound into one vector; false positives can be exactly forgotten; bit-level reproducible). ③ <b>You decide whether to report</b> — no automatic reporting, no targeting anyone; it only records <i>real violations that happened to you</i>, this is not mass surveillance. ④ On-device processing — <b>it keeps only the few seconds of evidence around the violation and discards the rest of the footage</b> (change-driven = µW).",
+    btnPlay: "▶ Start driving (sim)",
+    btnPause: "⏸ Pause",
+    btnReset: "Reset",
+    surpriseLine: "Surprise signal (a violation = an unpredicted sudden change, not full-time recording): ",
+    liveInit: "Click “Start driving.” In the script a car will <b>force its way in / cross the line without signaling</b> — the router flashes at that instant and auto-captures the evidence.",
+    ledgerH: "Evidence ledger",
+    btnGenAll: "📄 Generate report package (you review)",
+    btnAudit: "🔒 Verify determinism",
+    evlistInit: "No evidence captured yet. Once you start driving, violations appear here (plate / type / time / 3 evidence frames).",
+    memEmpty: "M: empty",
+    memFull: (n)=>`M = 1 vector · ${n} evidence record(s)`,
+    sCalm: "calm",
+    sCaution: "caution",
+    sViolation: "⚠ violation! evidence captured",
+    driveEnd: '<span class="ok">This drive segment is over.</span> The captured evidence is on the right — you can flag false positives (exact delete), generate a report package, or verify determinism.',
+    captured: (type,plate,time)=>`📸 <span class="bad">Violation captured: ${type}</span> · plate ${plate} · ${time} — saved to your private evidence ledger.`,
+    laneMiddle: "middle lane",
+    myCar: "ME",
+    evRemoved: (plate,type)=>`🗑 Deleted (false positive): ${plate} · ${type} — exactly subtracted from M; you can verify it is fully erased.`,
+    btnProve: "🔍 Verify (determinism)",
+    btnMarkFalse: "Flag false positive → delete",
+    proveOut: (type,s)=>`unbind(M, plate⊗time) → type “${type}” cos=${s} ✓ the evidence really is in M, bit-level reproducible (same result every time).`,
+    markFalseOut: (plate,s)=>`🗑 Flagged <b>${plate}</b> as a false positive and <b>exactly deleted</b> it (right to be forgotten = a subtraction). Verify: unbind → cos=${s} (dropped to noise = truly erased).`,
+    reportHead: "====== Traffic-violation report package (draft; you review before deciding whether to submit) ======",
+    repGen: (t)=>`Generated: ${t}`,
+    repSource: "Source: my own dashcam (generated on-device, raw video stays local)",
+    repReporter: "Reporter: (your info, filled in at submission)",
+    repCount: (n)=>`Evidence count: ${n}`,
+    repItem: (k,plate,type,time,lane)=>`[${k}] plate ${plate} · violation type ${type} · time ${time} · location ${lane} (GPS attached at submission) · evidence: 3 key frames (kept on-device)`,
+    repNote: "Note: the above is evidence of real violations that occurred in front of me; whether to submit it to a citizen-report app / 12123 is my own decision.",
+    reportFoot: "This draft + 3 evidence frames are in your hands. Submit only if you choose — no automatic reporting.",
+    auditHead: "Determinism self-check (run the same query twice, compare bit-by-bit):",
+    auditLine: (plate,a,b,same)=>` ${plate}: cos ${a} == ${b}  ${same?"✓":"✗"}`,
+    auditVerdict: (all)=>`\nVerdict: ${all?"all bits identical ✓ — evidence cannot be silently tampered with, courtroom-grade reproducible":"inconsistency detected ✗"}`,
+    auditNoEv: "no evidence",
+    resetMsg: "Reset.",
+    moat: "<b>The moat, visible in the field:</b> grabs only the few seconds of the violation (not all-day recording = µW) · evidence = deterministic + auditable (bit-identical on every recheck) · <b>false positives can be exactly deleted</b> (right to be forgotten = one subtraction; others can’t delete it, you can) · on-device private (raw video never goes to the cloud) · <b>you decide whether to report</b>.<br>Who it liberates: every driver who got cut off or forced over, couldn’t produce evidence, and just had to swallow the anger — turning “road rage” into “filable evidence + a safer road.”",
+    typeCutIn: "Illegal lane change / cut-in",
+    typeSolidLine: "Crossing a solid line to change lanes",
+    typeUnsafeDist: "Failure to keep a safe distance"
+  },
+  zh: {
+    docTitle: "行车记录仪 · 违法取证助手 (毫秒纪)",
+    brand: "毫秒纪 · millisecond-era  |  civilization demo · 1/N",
+    h1: "行车记录仪 · 违法取证助手 —— 帮你把“加塞别车”变成一份能交的证据",
+    sub: "车里的视频 → <b>识别那一下违法</b>(别车/加塞/压线)→ <b>惊奇路由器只抓那一刻</b>(不是录一整天)→ 生成一份 <b>确定·可审计·私有·可删除</b>的证据包,<b>你看过、你决定要不要上报</b>(随手拍/12123)。全程在你设备上,原始视频归你。",
+    honest: "<b>诚实边界 + 伦理(no-vaporware):</b> ① <b>“认出是哪辆车/什么车牌”是识别前端的活</b>(检测器+车牌OCR=云/模型,边界律 L1)——本 demo 用脚本化场景演示<b>逻辑</b>,不声称我们识别更强。 ② 我们的护城河 = <b>惊奇路由器抓住违法那一刻</b> + <b>私有·确定·可审计·可删除的证据记忆</b>(车牌/类型/时间绑进一个向量,可精确遗忘误报,比特级可复核)。 ③ <b>你决定是否上报</b> —— 无自动举报、无定向针对;它只记录<i>发生在你身上的真实违法</i>,不是大规模监控。 ④ 端上处理、<b>只留违法那几秒的证据、其余画面丢弃</b>(变化驱动=µW)。",
+    btnPlay: "▶ 开始行车(模拟)",
+    btnPause: "⏸ 暂停",
+    btnReset: "重置",
+    surpriseLine: "惊奇信号(违法=预测不到的突变,非录全程):",
+    liveInit: "点“开始行车”。脚本里有车会<b>不打灯强行加塞/压线别你</b> —— 路由器会在那一刻闪一下,自动取证。",
+    ledgerH: "证据台账",
+    btnGenAll: "📄 生成举报包(你审核)",
+    btnAudit: "🔒 验确定性",
+    evlistInit: "还没有取到证。开始行车后,违法事件会出现在这里(车牌/类型/时间/3帧证据)。",
+    memEmpty: "M：空",
+    memFull: (n)=>`M = 1 向量 · ${n} 条证据`,
+    sCalm: "平静",
+    sCaution: "注意",
+    sViolation: "⚠ 违法! 已取证",
+    driveEnd: '<span class="ok">本段行车结束。</span> 右侧是抓到的证据 —— 可标记误报(精确删除)、生成举报包、验确定性。',
+    captured: (type,plate,time)=>`📸 <span class="bad">抓到违法:${type}</span> · 车牌 ${plate} · ${time} —— 已存入私有证据台账。`,
+    laneMiddle: "中间车道",
+    myCar: "我",
+    evRemoved: (plate,type)=>`🗑 已删除(误报):${plate} · ${type} —— 从 M 中精确减去,可复核已删干净。`,
+    btnProve: "🔍 复核(确定性)",
+    btnMarkFalse: "标记误报 → 删除",
+    proveOut: (type,s)=>`unbind(M, 车牌⊗时间) → 类型「${type}」 cos=${s} ✓ 证据确在 M 中,比特级可复核(每次结果一致)。`,
+    markFalseOut: (plate,s)=>`🗑 已把 <b>${plate}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${s}(已降到噪声=真删干净)。`,
+    reportHead: "====== 交通违法举报包(草稿,你审核后再决定是否提交)======",
+    repGen: (t)=>`生成时间:${t}`,
+    repSource: "来源:本人行车记录仪(端上生成,原始视频留本机)",
+    repReporter: "举报人:(你的信息,提交时自填)",
+    repCount: (n)=>`证据条数:${n}`,
+    repItem: (k,plate,type,time,lane)=>`【${k}】 车牌 ${plate} · 违法类型 ${type} · 时间 ${time} · 位置 ${lane}(GPS 提交时附) · 证据:3 帧关键画面(本机留存)`,
+    repNote: "说明:以上为针对发生在本人车前的真实违法的取证;是否提交至「随手拍/12123」由本人决定。",
+    reportFoot: "这份草稿 + 3 帧证据在你手里。要交才交 —— 没有自动上报。",
+    auditHead: "确定性自检(同一查询跑两遍,逐位比较):",
+    auditLine: (plate,a,b,same)=>` ${plate}: cos ${a} == ${b}  ${same?"✓":"✗"}`,
+    auditVerdict: (all)=>`\n结论:${all?"全部比特一致 ✓ —— 证据不可被悄悄篡改,可法庭级复核":"出现不一致 ✗"}`,
+    auditNoEv: "无证据",
+    resetMsg: "已重置。",
+    moat: "<b>现场可见的护城河:</b> 只抓违法那几秒(非录全天=µW)· 证据=确定可审计(每次复核比特一致)· <b>误报可精确删除</b>(被遗忘权=一个减法,别人删不掉、你能删)· 端上私有(原始视频不上云)· <b>你决定是否上报</b>。<br>解放谁:每一个被加塞别车、却拿不出证据、只能憋一肚子气的司机 —— 让“路怒”变成“可交的证据 + 更安全的路”。",
+    typeCutIn: "违法变道/加塞",
+    typeSolidLine: "压实线变道",
+    typeUnsafeDist: "未保持安全距离"
+  }
+};
+let LANG = (function(){ try{ return localStorage.getItem('msEraLang') || ((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en'); }catch(e){ return 'en'; } })();
+function t(k){ return I18N[LANG][k]; }
+function applyStatic(){
+  document.getElementById('htmlRoot').lang = LANG;
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18n]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=I18N[LANG][el.dataset.i18nHtml]; if(typeof v==='string') el.innerHTML=v; });
+}
+function setLang(l){
+  if(l!==LANG){ LANG=l; try{ localStorage.setItem('msEraLang',l); }catch(e){} }
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-zh').classList.toggle('active', l==='zh');
+  applyStatic(); repaintDynamic();
+}
+
+// ───────── violation type IDs (language-independent HV keys) + display labels ─────────
+// TYPE_IDS are byte-identical across languages on purpose — they are bound into HV memory.
+const TYPE_IDS = ["cut_in","solid_line","unsafe_dist"];
+const TYPE_LABEL_KEY = { cut_in:"typeCutIn", solid_line:"typeSolidLine", unsafe_dist:"typeUnsafeDist" };
+function typeLabel(id){ return t(TYPE_LABEL_KEY[id]); }
+
 // ───────── HDC core (pure ±1 VSA, verified lineage) ─────────
 const D = 8000;
 function mulberry32(a){ return function(){ a|=0;a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a);
@@ -113,7 +228,7 @@ function addFact(f){ const h=factHV(f.plate,f.tkey,f.type); for(let i=0;i<D;i++)
 function subFact(f){ const h=factHV(f.plate,f.tkey,f.type); for(let i=0;i<D;i++) M[i]-=h[i]; }
 function recallType(plate, tkey){            // unbind plate+time -> recover violation type (deterministic proof it's in M)
   const probe = bind(bind(M, itemHV("plate:"+plate)), itemHV("t:"+tkey));
-  let best=null,bs=-2; for(const ty of TYPES){ const s=cos(probe, itemHV("type:"+ty)); if(s>bs){bs=s;best=ty;} }
+  let best=null,bs=-2; for(const ty of TYPE_IDS){ const s=cos(probe, itemHV("type:"+ty)); if(s>bs){bs=s;best=ty;} }
   return {type:best, s:bs};
 }
 
@@ -121,29 +236,30 @@ function recallType(plate, tkey){            // unbind plate+time -> recover vio
 const cv=document.getElementById("road"), ctx=cv.getContext("2d");
 const W=cv.width, H=cv.height, LANES=[100,200,300];   // x-centers of 3 lanes
 const MY_LANE=1, MY_Y=H-90;
-const TYPES=["违法变道/加塞","压实线变道","未保持安全距离"];
-let cars=[], t=0, frame=0, playing=false, road_y=0, surprise=0, lastFlash=-99, evidence=[], plateCnt=0;
+let cars=[], simT=0, frame=0, playing=false, road_y=0, surprise=0, lastFlash=-99, evidence=[], plateCnt=0;
+// PLATE_PREFIX is language-independent identity data (part of the generated plate HV key) — NOT translated.
 const PLATE_PREFIX=["沪A","沪B","苏E","浙A","沪C"];
 
 function plateFor(seed){ const r=mulberry32(seed+777); const p=PLATE_PREFIX[Math.floor(r()*PLATE_PREFIX.length)];
   let s=""; const ch="ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"; for(let i=0;i<5;i++) s+=ch[Math.floor(r()*ch.length)]; return p+"·"+s; }
 
 function reset(){
-  cars=[]; t=0; frame=0; road_y=0; surprise=0; lastFlash=-99; evidence=[]; plateCnt=0;
+  cars=[]; simT=0; frame=0; road_y=0; surprise=0; lastFlash=-99; evidence=[]; plateCnt=0;
   M=new Float32Array(D);
   // ambient traffic
   for(let i=0;i<4;i++) cars.push({lane:Math.floor(Math.random()*3), y:Math.random()*H, vy:0.4+Math.random()*0.6, x:LANES[0], col:"#5b6b7a", id:1000+i, cutting:null});
-  // scripted violators (the cut-in / 加塞别车 events): sit just AHEAD of me, merge into my lane w/o signal
-  cars.push({lane:2, y:MY_Y-58, vy:0.0, x:LANES[2], col:"#e74c3c", id:1, cutting:{at:140, fromLane:2, toLane:1, type:"违法变道/加塞", signal:false}, done:false});
-  cars.push({lane:0, y:MY_Y-52, vy:0.0, x:LANES[0], col:"#e67e22", id:2, cutting:{at:430, fromLane:0, toLane:1, type:"压实线变道", signal:false}, done:false});
-  renderEvidence(); drawFrame(); setSurprise(0,"平静");
+  // scripted violators (the cut-in events): sit just AHEAD of me, merge into my lane w/o signal
+  cars.push({lane:2, y:MY_Y-58, vy:0.0, x:LANES[2], col:"#e74c3c", id:1, cutting:{at:140, fromLane:2, toLane:1, type:"cut_in", signal:false}, done:false});
+  cars.push({lane:0, y:MY_Y-52, vy:0.0, x:LANES[0], col:"#e67e22", id:2, cutting:{at:430, fromLane:0, toLane:1, type:"solid_line", signal:false}, done:false});
+  renderEvidence(); drawFrame(); setSurprise(0,t('sCalm'));
+  document.getElementById("live").innerHTML=t('liveInit');
 }
 
 function setSurprise(v,label){ surprise=v; document.getElementById("sfill").style.width=Math.min(100,v*100)+"%";
   const l=document.getElementById("slbl"); l.textContent=label; l.className = v>0.6?"bad":(v>0.3?"wn":"ok"); }
 
 function step(){
-  frame++; t=frame/30; road_y=(road_y+2)%40;
+  frame++; simT=frame/30; road_y=(road_y+2)%40;
   let maxSurprise=0, flagged=null;
   for(const c of cars){
     // ambient relative motion
@@ -169,9 +285,9 @@ function step(){
   }
   // surprise router: flash on spike (predictive-residual style: the cut-in is unpredicted) with refractory gap
   if(maxSurprise>0.6 && frame-lastFlash>40 && flagged){ captureEvidence(flagged); lastFlash=frame; }
-  setSurprise(maxSurprise, maxSurprise>0.6?"⚠ 违法! 已取证":(maxSurprise>0.3?"注意":"平静"));
+  setSurprise(maxSurprise, maxSurprise>0.6?t('sViolation'):(maxSurprise>0.3?t('sCaution'):t('sCalm')));
   drawFrame();
-  if(frame>620){ pause(); document.getElementById("live").innerHTML='<span class="ok">本段行车结束。</span> 右侧是抓到的证据 —— 可标记误报(精确删除)、生成举报包、验确定性。'; }
+  if(frame>620){ pause(); document.getElementById("live").innerHTML=t('driveEnd'); }
 }
 
 function drawFrame(){
@@ -191,7 +307,7 @@ function drawCar(x,y,col,danger,me){
   ctx.fillStyle=col; ctx.strokeStyle=danger?"#ff6b6b":(me?"#9fd0ff":"#0008"); ctx.lineWidth=danger?3:1.5;
   roundRect(x-17,y-28,34,56,7); ctx.fill(); ctx.stroke();
   ctx.fillStyle="rgba(180,210,255,.5)"; roundRect(x-13,y-20,26,16,3); ctx.fill();
-  if(me){ ctx.fillStyle="#9fd0ff"; ctx.font="9px sans-serif"; ctx.textAlign="center"; ctx.fillText("我",x,y+5); }
+  if(me){ ctx.fillStyle="#9fd0ff"; ctx.font="9px sans-serif"; ctx.textAlign="center"; ctx.fillText(t('myCar'),x,y+5); }
 }
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
   ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
@@ -200,11 +316,11 @@ function snapThumb(){ const tmp=document.createElement("canvas"); tmp.width=96; 
   tmp.getContext("2d").drawImage(cv,0,0,W,H,0,0,96,60); return tmp.toDataURL("image/jpeg",0.6); }
 
 function captureEvidence(c){
-  const cut=c.cutting; const plate=plateFor(c.id*31+7); const tkey=Math.floor(t*10)/10;
+  const cut=c.cutting; const plate=plateFor(c.id*31+7); const tkey=Math.floor(simT*10)/10;
   const thumbs=[snapThumb()];
   // a couple more frames for the "clip"
   setTimeout(()=>{ if(playing){} },0);
-  const ev={ plate, type:cut.type, time:fmtTime(tkey), tkey:String(tkey), lane:"中间车道", thumbs, removed:false };
+  const ev={ plate, type:cut.type, time:fmtTime(tkey), tkey:String(tkey), lane:"middle", thumbs, removed:false };
   // capture 2 more thumbs over next frames
   ev._needThumbs=2;
   evidence.push(ev); addFact(ev);
@@ -212,49 +328,56 @@ function captureEvidence(c){
   let n=0; const grab=()=>{ if(n<2 && ev.thumbs.length<3){ ev.thumbs.push(snapThumb()); n++; setTimeout(grab,120);} else renderEvidence(); };
   setTimeout(grab,120);
   renderEvidence();
-  document.getElementById("live").innerHTML=`📸 <span class="bad">抓到违法:${cut.type}</span> · 车牌 ${plate} · ${ev.time} —— 已存入私有证据台账。`;
+  document.getElementById("live").innerHTML=t('captured')(typeLabel(cut.type), plate, ev.time);
 }
 function fmtTime(tk){ const d=new Date(2026,5,11,8,30,Math.floor(tk)); return d.toTimeString().slice(0,8)+"."+String(Math.floor((tk%1)*10)); }
 
 function renderEvidence(){
   const live=evidence.filter(e=>!e.removed);
-  document.getElementById("memstat").textContent = live.length? `M = 1 向量 · ${live.length} 条证据` : "M：空";
+  document.getElementById("memstat").textContent = live.length? t('memFull')(live.length) : t('memEmpty');
   document.getElementById("genall").disabled = live.length===0;
   document.getElementById("audit").disabled = live.length===0;
   const el=document.getElementById("evlist");
-  if(!evidence.length){ el.innerHTML='<div class="stat">还没有取到证。开始行车后,违法事件会出现在这里。</div>'; return; }
-  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">🗑 已删除(误报):${e.plate} · ${e.type} —— 从 M 中精确减去,可复核已删干净。</span></div>` :
-    `<div class="ev flash"><div class="top"><span class="plate">${e.plate}</span> <span class="vtype">${e.type}</span><span class="vtime">${e.time}</span></div>
+  if(!evidence.length){ el.innerHTML='<div class="stat">'+t('evlistInit')+'</div>'; return; }
+  el.innerHTML = evidence.map((e,i)=> e.removed? `<div class="ev"><span class="stat">${t('evRemoved')(e.plate, typeLabel(e.type))}</span></div>` :
+    `<div class="ev flash"><div class="top"><span class="plate">${e.plate}</span> <span class="vtype">${typeLabel(e.type)}</span><span class="vtime">${e.time}</span></div>
        <div class="thumbs">${e.thumbs.map(t=>`<img src="${t}">`).join("")}</div>
-       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">🔍 复核(确定性)</button>
-         <button class="hot" onclick="markFalse(${i})">标记误报 → 删除</button></div>
+       <div class="evbtns"><button class="sec" onclick="proveIn(${i})">${t('btnProve')}</button>
+         <button class="hot" onclick="markFalse(${i})">${t('btnMarkFalse')}</button></div>
        <div class="audit" id="aud${i}"></div></div>`).join("");
 }
 window.proveIn=(i)=>{ const e=evidence[i]; const r=recallType(e.plate, e.tkey);
-  document.getElementById("aud"+i).textContent = `unbind(M, 车牌⊗时间) → 类型「${r.type}」 cos=${r.s.toFixed(3)} ✓ 证据确在 M 中,比特级可复核(每次结果一致)。`; };
+  document.getElementById("aud"+i).textContent = t('proveOut')(typeLabel(r.type), r.s.toFixed(3)); };
 window.markFalse=(i)=>{ const e=evidence[i]; if(e.removed) return; subFact(e); e.removed=true; renderEvidence();
   const r=recallType(e.plate, e.tkey);
-  document.getElementById("live").innerHTML=`🗑 已把 <b>${e.plate}</b> 标为误报并<b>精确删除</b>(被遗忘权=减法)。复核:unbind → cos=${r.s.toFixed(3)}(已降到噪声=真删干净)。`; };
+  document.getElementById("live").innerHTML=t('markFalseOut')(e.plate, r.s.toFixed(3)); };
 
 document.getElementById("genall").onclick=()=>{
   const live=evidence.filter(e=>!e.removed);
-  const lines=["====== 交通违法举报包(草稿,你审核后再决定是否提交)======",
-    `生成时间:${new Date().toLocaleString("zh-CN")}`, `来源:本人行车记录仪(端上生成,原始视频留本机)`,
-    `举报人:(你的信息,提交时自填)`, `证据条数:${live.length}`, ""];
-  live.forEach((e,k)=> lines.push(`【${k+1}】 车牌 ${e.plate} · 违法类型 ${e.type} · 时间 ${e.time} · 位置 ${e.lane}(GPS 提交时附) · 证据:3 帧关键画面(本机留存)`));
-  lines.push("", "说明:以上为针对发生在本人车前的真实违法的取证;是否提交至「随手拍/12123」由本人决定。");
+  const lines=[ t('reportHead'),
+    t('repGen')(new Date().toLocaleString(LANG==='zh'?"zh-CN":"en-US")), t('repSource'),
+    t('repReporter'), t('repCount')(live.length), ""];
+  live.forEach((e,k)=> lines.push(t('repItem')(k+1, e.plate, typeLabel(e.type), e.time, t('laneMiddle'))));
+  lines.push("", t('repNote'));
   document.getElementById("reportbox").innerHTML = `<div class="report">${lines.join("\n")}</div>
-     <div class="stat" style="margin-top:6px">这份草稿 + 3 帧证据在你手里。要交才交 —— 没有自动上报。</div>`;
+     <div class="stat" style="margin-top:6px">${t('reportFoot')}</div>`;
 };
 document.getElementById("audit").onclick=()=>{
   const live=evidence.filter(e=>!e.removed);
-  let out="确定性自检(同一查询跑两遍,逐位比较):\n";
+  let out=t('auditHead')+"\n";
   let allsame=true;
   for(const e of live){ const a=recallType(e.plate,e.tkey).s, b=recallType(e.plate,e.tkey).s; const same=(a===b); allsame=allsame&&same;
-    out+=` ${e.plate}: cos ${a.toFixed(6)} == ${b.toFixed(6)}  ${same?"✓":"✗"}\n`; }
-  out+= live.length? `\n结论:${allsame?"全部比特一致 ✓ —— 证据不可被悄悄篡改,可法庭级复核":"出现不一致 ✗"}` : "无证据";
+    out+=t('auditLine')(e.plate, a.toFixed(6), b.toFixed(6), same)+"\n"; }
+  out+= live.length? t('auditVerdict')(allsame) : t('auditNoEv');
   document.getElementById("auditbox").innerHTML=`<div class="report">${out}</div>`;
 };
+
+// repaint all dynamic text in the current language, preserving demo state
+function repaintDynamic(){
+  setSurprise(surprise, surprise>0.6?t('sViolation'):(surprise>0.3?t('sCaution'):t('sCalm')));
+  renderEvidence();
+  // re-render the live line only if it is still the default prompt (don't clobber a fresh capture/end message)
+}
 
 // controls
 let timer=null;
@@ -263,7 +386,10 @@ function play(){ if(playing) return; playing=true; document.getElementById("play
 function pause(){ playing=false; document.getElementById("play").disabled=false; document.getElementById("pause").disabled=true; if(timer){clearInterval(timer);timer=null;} }
 document.getElementById("play").onclick=play;
 document.getElementById("pause").onclick=pause;
-document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").textContent='已重置。'; };
+document.getElementById("reset").onclick=()=>{ pause(); reset(); document.getElementById("reportbox").innerHTML=""; document.getElementById("auditbox").innerHTML=""; document.getElementById("live").textContent=t('resetMsg'); };
+
+// init
+applyStatic();
 reset();
 </script>
 </body>

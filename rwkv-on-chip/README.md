@@ -1,6 +1,6 @@
-# RWKV-on-our-chip — 灵魂伴侣引擎
+# RWKV-on-our-chip — 芯片的最佳拍档
 
-> **一句话**：[RWKV](https://github.com/BlinkDL/RWKV-LM) 是离我们这颗三值存算一体芯片**最近的灵魂伴侣引擎**——因为它没有 KV cache，也就没有那堵把所有 AI 设备卡死的**内存带宽墙**。这个 folder 是我们把这件事**真跑了一遍**之后的硬账。
+> **一句话**：[RWKV](https://github.com/BlinkDL/RWKV-LM) 是我们这颗三值存算一体芯片**最佳的引擎拍档**——因为它没有 KV cache，也就没有那堵把所有 AI 设备卡死的**内存带宽墙**。这个 folder 是我们把这件事**真跑了一遍**之后的硬账。
 
 > **TL;DR (English)** — [RWKV-7](https://arxiv.org/abs/2503.14456) is the LLM architecture that fits our ternary compute-in-memory chip best: a pure RNN with **no KV-cache → no memory-bandwidth wall**. We ran four "gates" to check whether a *ternary* RWKV is actually buildable, and all four came back green at small (proof-of-concept) scale. The chip itself is **not taped out** — but our own ternary MAC RTL already runs functionally correct on real FPGA silicon (xc7z010, bit-exact over 4096 outputs; see [`../fpga/`](../fpga/)). This is a *defensible build*, not a free ride. Every figure below is labelled with how much you should trust it (see "How to read this" right under here).
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 1. 为什么 RWKV 是我们的灵魂伴侣
+## 1. 为什么 RWKV 是我们芯片的最佳拍档
 
 先把镜头拉远一点。今天所有的大模型，本质上都在跟同一堵墙搏斗——**内存带宽墙**。Transformer 每吐一个字，都要把一份越来越长的 KV cache 从内存搬进算力单元再搬出来；上下文越长，搬得越多，单流速度就越慢、越费电。这堵墙不是工程没做好，是**架构自带**的。
 

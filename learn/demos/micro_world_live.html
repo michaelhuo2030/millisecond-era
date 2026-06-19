@@ -33,7 +33,7 @@
 <body>
 <div class="wrap">
   <h1><span class="lang-en">MICRO-WORLD · A living world run by HDC agents (live · tunable)</span><span class="lang-zh">MICRO-WORLD · 一个用 HDC 智能体跑的活世界（实时·可调参数）</span></h1>
-  <div class="sub"><span class="lang-en">Each dot = one AI agent, its color = its <b>culture</b> (a hyperdimensional vector). Nobody orders them into groups — they just look for food, move, chat with whoever's nearby, have offspring (who inherit culture), grow old and die. Watch <b>culture and geography emerge together</b>: from a soup of random colors → colored "tribes" growing up on the food patches.</span><span class="lang-zh">每个点 = 一个 AI 智能体，颜色 = 它的<b>文化</b>（一个超维向量）。没人下令分组——它们只是找食物、移动、跟旁边的人聊天、生后代（继承文化）、变老死去。看<b>文化和地理一起涌现</b>：从一锅随机颜色 → 食物斑块上长出一个个有颜色的"部落"。</span></div>
+  <div class="sub"><span class="lang-en">Each dot = one AI agent, its color = its <b>culture</b> (a hyperdimensional vector). Nobody orders them into groups — they just look for food, move, chat with whoever's nearby, have offspring (who inherit culture), grow old and die. Watch <b>culture and geography emerge together</b>: from a soup of random colors → colored "tribes" growing up on the food patches.</span><span class="lang-zh">每个点 = 一个 AI 智能体，颜色 = 它的<b>文化</b>（一个超维向量）。没人下令它们分组——它们只是找食物、四处移动、跟旁边的人聊天、生下后代（继承文化）、慢慢变老死去。看<b>文化和地理一起涌现</b>：从一锅随机的颜色 → 食物斑块上长出一个个有颜色的"部落"。</span></div>
 
   <div class="main">
     <div class="stage">
@@ -47,7 +47,7 @@
         <div class="stat"><span><span class="lang-en">Random pair similarity</span><span class="lang-zh">随机两人相似</span></span><b id="s_rs">0%</b></div>
         <div class="stat" style="border:none;margin-top:6px"><span><span class="lang-en">Cultural-geography signal</span><span class="lang-zh">文化地理信号</span> <span class="note">(<span class="lang-en">neighbors − random</span><span class="lang-zh">邻居−随机</span>)</span></span></div>
         <div class="big" id="s_geo">+0pp</div>
-        <div class="note" id="s_msg"><span class="lang-en">Random start: everyone has a different culture.</span><span class="lang-zh">随机起点：人人不同文化。</span></div>
+        <div class="note" id="s_msg"><span class="lang-en">Random start: everyone has a different culture.</span><span class="lang-zh">随机起点：每个智能体的文化都不一样。</span></div>
         <div class="stat" style="border:none;margin-top:6px"><span><span class="lang-en">Speed</span><span class="lang-zh">速度</span></span><b id="s_fps">— <span class="lang-en">steps/s</span><span class="lang-zh">步/秒</span></b></div>
       </div>
 
@@ -76,7 +76,7 @@
       </div>
     </div>
   </div>
-  <p class="note" style="margin-top:14px"><span class="tag"><span class="lang-en">What is this</span><span class="lang-zh">这是什么</span></span><span class="lang-en">An HDC-agent micro-world running purely in the browser — the power of speed lets you watch an entire "history of civilization coming together" in seconds. The chip's job: scale up N, the grid, and the culture dimension each by orders of magnitude, and run real-world scale on battery power. — A playable demo for students.</span><span class="lang-zh">纯浏览器里跑的 HDC 智能体微世界——速度的力量让你几秒看完一部"文明聚合史"。芯片的活：把 N、网格、文化维度各放大数量级，在电池功耗下跑真世界尺度。 — 给学生的可玩 demo。</span></p>
+  <p class="note" style="margin-top:14px"><span class="tag"><span class="lang-en">What is this</span><span class="lang-zh">这是什么</span></span><span class="lang-en">An HDC-agent micro-world running purely in the browser — the power of speed lets you watch an entire "history of civilization coming together" in seconds. The chip's job: scale up N, the grid, and the culture dimension each by orders of magnitude, and run real-world scale on battery power. — A playable demo for students.</span><span class="lang-zh">纯在浏览器里跑的 HDC 智能体微世界——速度的力量，让你几秒看完一部"文明聚合史"。芯片要干的活：把 N、网格、文化维度各放大好几个数量级，在电池功耗下跑出真实世界的尺度。 — 给学生玩的 demo。</span></p>
 </div>
 
 <script>
@@ -174,9 +174,9 @@ function loop(){
   document.getElementById('s_geo').textContent='+'+(geo*100|0)+'pp';
   const msg=document.getElementById('s_msg');
   if(m.pop===0) msg.textContent=L('Extinct — too little food or too short a lifespan; try reset / adjusting.','灭绝了 — 食物太少或寿命太短，试试重置/调参。');
-  else if(geo>0.12) msg.textContent=L('✓ Cultural regions emerged! Same-patch cultures cluster, cross-patch ones drift apart = cultural geography.','✓ 文化区域涌现了！同斑块文化聚合、跨斑块漂开 = 文化地理。');
+  else if(geo>0.12) msg.textContent=L('✓ Cultural regions emerged! Same-patch cultures cluster, cross-patch ones drift apart = cultural geography.','✓ 文化区域涌现了！同一斑块的文化抱团、跨斑块的渐渐分化 = 文化地理。');
   else if(geo>0.05) msg.textContent=L('Cultural regions are forming…','文化区域正在形成…');
-  else msg.textContent=L('Still mixing (try lowering mobility, raising transmission).','还在混匀（降低流动性、提高传播试试）。');
+  else msg.textContent=L('Still mixing (try lowering mobility, raising transmission).','还在混成一锅（试试调低流动性、调高传播）。');
   const now=performance.now();
   if(now-lastT>500){document.getElementById('s_fps').textContent=(stepsSince/((now-lastT)/1000)|0)+L(' steps/s',' 步/秒');lastT=now;stepsSince=0;}
   requestAnimationFrame(loop);

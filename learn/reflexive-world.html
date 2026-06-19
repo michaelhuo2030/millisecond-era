@@ -48,7 +48,7 @@
   <!-- PANEL 2 -->
   <div class="card">
     <h2><span class="lang-en">(2) The reflexivity trap: correlation will fool you</span><span class="lang-zh">② 反身性陷阱:看相关性会骗你</span></h2>
-    <p class="why"><span class="lang-en">An intervention that "only acts in a crisis" (a bailout / discipline / market rescue). In the data it is <b>positively correlated</b> with "bad things" (because it deliberately steps in during crises), so it looks harmful — but the truth lies in the counterfactual. The smaller the scale and the more you are an insider, the stronger the reflexive kickback.</span><span class="lang-zh">一个"危机时才出手"的干预(救助/管教/救市)。它在数据上和"坏事"<b>正相关</b>(因为它专挑危机出手),看起来有害——但真相要看反事实。尺度越小、你越是局内人,反身反弹越强。</span></p>
+    <p class="why"><span class="lang-en">An intervention that "only acts in a crisis" (a bailout / discipline / market rescue). In the data it is <b>positively correlated</b> with "bad things" (because it deliberately steps in during crises), so it looks harmful — but the truth lies in the counterfactual. The smaller the scale and the more you are an insider, the stronger the reflexive kickback.</span><span class="lang-zh">一个"危机时才出手"的干预(救助/管教/救市)。它在数据上和"坏事"<b>正相关</b>(因为它专挑危机出手),看起来有害——但真相要看反事实。尺度越小、你越是局内人,反身反弹就越强。</span></p>
     <div class="row"><label><span class="lang-en">Scale</span><span class="lang-zh">尺度</span></label>
       <span class="seg" id="p2scale">
         <button data-s="household" class="on"><span class="lang-en">Household (house rules)</span><span class="lang-zh">家庭(家规)</span></button><button data-s="firm"><span class="lang-en">Firm (KPI)</span><span class="lang-zh">公司(KPI)</span></button><button data-s="macro"><span class="lang-en">Macro (market rescue)</span><span class="lang-zh">宏观(救市)</span></button>
@@ -65,7 +65,7 @@
   <!-- PANEL 3 -->
   <div class="card">
     <h2><span class="lang-en">(3) The counterfactual you can never run (parallel worlds)</span><span class="lang-zh">③ 你永远跑不了的那个反事实(平行世界)</span></h2>
-    <p class="why"><span class="lang-en">The same intervention, run with the same luck (common random numbers) across N parallel worlds, "with vs without". Look at the <b>distribution</b> of the effect, not a single number. The "one timeline you actually lived" is highlighted — reality only gives you one line.</span><span class="lang-zh">同一个干预,用相同的运气(common random numbers)跑 N 个平行世界的「有 vs 无」。看效果的<b>分布</b>,而不是一个数。高亮"你实际只活了的那一条"——现实只给你一条线。</span></p>
+    <p class="why"><span class="lang-en">The same intervention, run with the same luck (common random numbers) across N parallel worlds, "with vs without". Look at the <b>distribution</b> of the effect, not a single number. The "one timeline you actually lived" is highlighted — reality only gives you one line.</span><span class="lang-zh">同一个干预,用相同的运气(common random numbers)跑 N 个平行世界的「有 vs 无」。看效果的<b>分布</b>,而不是一个数。高亮"你实际只活过的那一条"——现实只给你一条线。</span></p>
     <div class="row"><label><span class="lang-en">Scale</span><span class="lang-zh">尺度</span></label>
       <span class="seg" id="p3scale">
         <button data-s="household" class="on"><span class="lang-en">Household</span><span class="lang-zh">家庭</span></button><button data-s="firm"><span class="lang-en">Firm</span><span class="lang-zh">公司</span></button><button data-s="macro"><span class="lang-en">Macro</span><span class="lang-zh">宏观</span></button>
@@ -201,11 +201,11 @@ function renderP3(){
   // the one world you actually live
   const rng=mulberry32(7); const liveIdx=Math.floor(rng()*N); const lv=eff[liveIdx];
   const lx=X0+((lv-lo)/span)*W; x.strokeStyle='#58a6ff';x.lineWidth=2;x.beginPath();x.moveTo(lx,20);x.lineTo(lx,Y0);x.stroke();x.lineWidth=1;
-  x.fillStyle='#58a6ff';x.font='12px sans-serif';x.fillText(L('← the one timeline you actually lived','← 你实际只活了的那一条'),Math.min(lx+4,c.width-180),52);
+  x.fillStyle='#58a6ff';x.font='12px sans-serif';x.fillText(L('← the one timeline you actually lived','← 你实际只活过的那一条'),Math.min(lx+4,c.width-180),52);
   x.fillStyle='#8b949e';x.font='12px sans-serif';x.fillText(L('Distribution of each intervention effect (welfare: with − without) across ','每个干预效果(福利:有 − 无)在 ')+N+L(' parallel worlds',' 个平行世界里的分布'),X0,16);
   p3v.innerHTML=L(
     `True mean effect <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · spread (luck) ±${sd.toFixed(2)} · in <b>${(helped*100).toFixed(0)}%</b> of worlds it helps. You only drew the single line <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> — ${Math.abs(lv-mean)>sd?'<span class="warnc">far from the mean; relying on your one line alone you would badly misjudge the true effect.</span>':'by chance close to the mean, but you could not have known that in advance.'} ${p3s==='household'?'Household scale: spread is relatively largest and you are most the insider → one life cannot teach you the truth → rely on principles.':p3s==='macro'?'Macro scale: the law of large numbers averages it out, the mean effect is far clearer.':''}`,
-    `真实平均效应 <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · 散布(运气)±${sd.toFixed(2)} · <b>${(helped*100).toFixed(0)}%</b> 的世界里它有帮助。 你实际只抽到 <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> 这一条——${Math.abs(lv-mean)>sd?'<span class="warnc">离平均很远,光凭你这一条你会严重误判真实效应。</span>':'凑巧接近平均,但你事先并不知道。'} ${p3s==='household'?'家庭尺度:散布相对最大、你最是局内人 → 一条命教不了你真相 → 靠原则。':p3s==='macro'?'宏观尺度:大数定律抹平,平均效应清楚得多。':''}`);
+    `真实平均效应 <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · 散布(运气)±${sd.toFixed(2)} · <b>${(helped*100).toFixed(0)}%</b> 的世界里它有帮助。 你实际只抽到 <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> 这一条——${Math.abs(lv-mean)>sd?'<span class="warnc">离平均很远,光凭这一条,你会严重误判真实效应。</span>':'凑巧接近平均,但你事先并不知道。'} ${p3s==='household'?'家庭尺度:散布相对最大、你又最是局内人 → 一条命教不会你真相 → 只能靠原则。':p3s==='macro'?'宏观尺度:大数定律一抹平,平均效应就清楚多了。':''}`);
 }
 p3run.onclick=()=>{p3ran=true;renderP3();};
 

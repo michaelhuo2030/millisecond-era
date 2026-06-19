@@ -14,11 +14,11 @@ button{background:#262838;color:var(--ink);border:1px solid #33354a;border-radiu
 .tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#241f12;color:var(--hot);font-size:11px}
 </style></head><body><div class="wrap">
 <h1><span class="lang-en">1000 Futures · Parallel Possible Worlds</span><span class="lang-zh">1000 个未来 · 平行可能世界</span> <span class="tag">Tier 7</span></h1>
-<div class="sub"><span class="lang-en">Starting from one point, every step branches into several "what ifs." A slow AI can only write one continuation at a time; here, in a single second, <b>thousands of parallel futures</b> unfold — watch the tree of possibilities explode open.</span><span class="lang-zh">从一个起点出发，每一步都分叉出多个"如果"。慢速 AI 一次只能写一个续写；这里同一秒里展开了<b>成千上万个平行的未来</b>，看可能性之树爆开。</span></div>
+<div class="sub"><span class="lang-en">Starting from one point, every step branches into several "what ifs." A slow AI can only write one continuation at a time; here, in a single second, <b>thousands of parallel futures</b> unfold — watch the tree of possibilities explode open.</span><span class="lang-zh">从一个起点出发，每一步都分叉出多个"如果"。慢速 AI 一次只能往下写一条；这里同一秒里展开了<b>成千上万个平行的未来</b>，看可能性之树爆开。</span></div>
 <div class="main">
   <div class="stage"><canvas id="cv" width="640" height="520"></canvas></div>
   <div class="side">
-    <div class="panel"><div class="big" id="leaves">0</div><div style="color:var(--dim);font-size:12px"><span class="lang-en">futures explored</span><span class="lang-zh">个被探索的未来</span></div>
+    <div class="panel"><div class="big" id="leaves">0</div><div style="color:var(--dim);font-size:12px"><span class="lang-en">futures explored</span><span class="lang-zh">个已探索的未来</span></div>
       <div class="stat" style="margin-top:6px"><span><span class="lang-en">Exploration depth</span><span class="lang-zh">探索深度</span></span><b id="depth">0</b> <span class="lang-en">steps</span><span class="lang-zh">步</span></div>
       <div class="stat"><span><span class="lang-en">Speed</span><span class="lang-zh">速度</span></span><b id="rate">0/s</b></div>
       <div class="stat"><span><span class="lang-en">vs. slow AI</span><span class="lang-zh">对比 慢速AI</span></span><b><span class="lang-en">1 continuation / 2s</span><span class="lang-zh">1 个续写/2秒</span></b></div></div>

@@ -1,6 +1,6 @@
 # 如何复现（方法即护城河 · doers not talkers）
 
-四道闸的脚本都在这里，CSV 在 [`../results/`](../results/)。**这些是小规模 PoC——目的是亮出趋势 + 让你能自己跑一遍，不是发表级 scaling law。** 全部 CPU 可跑（我们就是在一台 mac 上跑的）。
+四道闸的脚本都在这里，CSV 在 [`../results/`](https://github.com/michaelhuo2030/millisecond-era/tree/main/rwkv-on-chip/results)。**这些是小规模 PoC——目的是亮出趋势 + 让你能自己跑一遍，不是发表级 scaling law。** 全部 CPU 可跑（我们就是在一台 mac 上跑的）。
 
 ## 依赖
 ```bash
@@ -37,6 +37,6 @@ python3 rwkv_legit_test.py    # 需先下官方 checkpoint（见下）
 - 训练实验 ≤1.66M 参数、~1MB 语料、1200 步、多为单 seed → **PoC 趋势，不是发表级 scaling law**。
 - 忠实 DPLR-class RWKV-7（含 r_k bonus），但**不是**官方完整 cell；A/B 受控，结论是相对趋势。
 - 闸 4（WKV 数据通路的硅上 RTL）+ 真规模验证（>1.66M、多 seed）还没做——是公开的 TODO。
-- 芯片为**综合 + 仿真 + 设计**阶段，未流片；适配账（[`../sizing.py`](../sizing.py)）是算术估算。
+- 芯片为**综合 + 仿真 + 设计**阶段，未流片；适配账（[`../sizing.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/sizing.py)）是算术估算。
 
 发现任何越界声明，开 issue，我们当场改。

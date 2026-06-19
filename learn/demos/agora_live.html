@@ -119,4 +119,5 @@ document.getElementById('exp').addEventListener('click',()=>{
   const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='agora-conversations.md';document.body.appendChild(a);a.click();a.remove();});
 init();requestAnimationFrame(loop);
-</script></body></html>
+</script>  <script src="../../site-nav.js"></script>
+</body></html>

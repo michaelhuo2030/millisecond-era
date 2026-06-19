@@ -112,7 +112,7 @@ SupCon with a confused vocabulary actively degrades performance. SupCon with a c
 
 ### Interactive Demo
 
-See [demo.html](demo.html) for a browser-based visualization of all results.
+See [demo.html](https://michaelhuo2030.github.io/millisecond-era/hdc/applications/sign-language/demo.html) for a browser-based visualization of all results.
 
 ### About This Research
 
@@ -120,7 +120,7 @@ Independent research by [Michael Huo](https://github.com/michaelhuo2030), Shangh
 
 Focus: Hyperdimensional Computing (HDC/VSA) for private, on-device perception — sign language recognition as a testbed for the core thesis: **deterministic, reversible, private memory algebra as an alternative to black-box neural networks**.
 
-Related work in this repository: [HDC Laws Registry](../HDC-LAWS-REGISTRY.md) · [Weapons Arsenal](../HDC-WEAPONS-ARSENAL.md)
+Related work in this repository: [HDC Laws Registry] · [Weapons Arsenal]
 
 ---
 

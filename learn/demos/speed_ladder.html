@@ -41,4 +41,5 @@ function tick(){const now=performance.now(),dt=(now-last)/1000;last=now;
  ROWS.forEach((r,i)=>{counts[i]+=r.spd*dt; if(counts[i]>1e9)counts[i]=0; document.getElementById('c'+i).textContent=Math.floor(counts[i]).toLocaleString();});
  requestAnimationFrame(tick);}
 requestAnimationFrame(tick);
-</script></body></html>
+</script>  <script src="../../site-nav.js"></script>
+</body></html>

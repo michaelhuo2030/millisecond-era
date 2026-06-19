@@ -112,4 +112,5 @@ function doUnbind(){if(!C){doBind();}const rec=bind(C,B);draw('hvC',rec);setbar(
 function doBundle(){M=bundle(X,Y,Z);draw('hvM',M);setbar('simMX','simMXn',sim(M,X));setbar('simMR','simMRn',sim(M,R));document.getElementById('bundleNote').textContent='成员 X 与 M 明显相似(在记忆里);陌生 R 与 M≈0(不在)。一条向量就装下了一个集合。';}
 document.querySelectorAll('.g').forEach(function(el){el.addEventListener('click',function(){var s=document.getElementById('d-'+el.getAttribute('data-k'));if(!s)return;document.getElementById('popT').textContent=el.textContent;document.getElementById('popB').innerHTML=s.innerHTML;document.getElementById('pop').classList.add('show');});});
 reroll();draw('hvA',A);draw('hvB',B);
-</script></body></html>
+</script>  <script src="../site-nav.js"></script>
+</body></html>

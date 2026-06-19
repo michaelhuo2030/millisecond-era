@@ -63,4 +63,5 @@ document.getElementById('reset').addEventListener('click',init);
 document.getElementById('play').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸暂停':'▶播放';});
 cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)/cell|0,y=(e.clientY-r.top)/cell|0;seed(x,y,Math.random()<0.5?1:2);});
 init();requestAnimationFrame(loop);
-</script></body></html>
+</script>  <script src="../../site-nav.js"></script>
+</body></html>

@@ -3,6 +3,13 @@
 > **The Missing Hardware Layer of DeepSeek's Full Stack**
 > *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~$1,400 out of pocket*
 
+### 🎮 想直接上手玩 / Just want to play?
+
+**👉 打开可玩首页 / Open the playable home → https://michaelhuo2030.github.io/millisecond-era/**
+
+> 文中所有 demo 链接都已指向**线上可玩页面**（点开就在你浏览器里直接跑，零下载、零联网）。
+> ⚠️ 注意：在 GitHub 仓库页面里直接点 `.html` 文件，只会看到一堆源代码 —— **要玩，请走上面这个网址。**
+
 ---
 
 > **✅ 2026-06 — current v1 design (supersedes BOTH boxes below)**
@@ -54,26 +61,26 @@
 > 🏎️ **New — [Speed Trial](https://michaelhuo2030.github.io/millisecond-era/learn/speed-trial.html): click and run our speed proofs in your own browser.** WebGPU HDC retrieval (89× numpy, on *your* GPU) · a 50→184k tok/s ladder on one Mac · a world that forms while one AI says a word — each badged **✓measured / ◇real-sim / ?projected**, proof separated from roadmap.
 
 > 📚 **New — learn the substrate from the ground up (interactive, for-dummies):**
-> - 🧱 [`learn/reram-cim-101.html`](learn/reram-cim-101.html) — ReRAM-CIM from "what is a bit" → device physics → materials + papers → storage family → "how big a ternary model can it hold."
-> - 👀 [`learn/reram-cim-visual.html`](learn/reram-cim-visual.html) — **see it move**: ternary cell, multi-level (MLC) physics, crossbar array, a live MAC computation (current summing down the columns), macro floorplan/efficiency, 2D/2.5D/3D packaging, yield, and how an LLM's layers map onto macros.
-> - 🧠 [`learn/hdc-101.html`](learn/hdc-101.html) — Hyperdimensional Computing from zero (bind/bundle/permute you can click), why it fits ReRAM, and the hub linking all HDC repos ([hdc-neon](https://github.com/michaelhuo2030/hdc-neon), [torchhd](https://github.com/michaelhuo2030/torchhd)).
-> - ⚙️ [`learn/reram-cim-calculator.html`](learn/reram-cim-calculator.html) — capacity → max ternary model + speed tier.
-> - ⚡ [`learn/demos/`](learn/demos/index.html) — **"what speed unlocks" gallery**: 7 pure-browser civilization-speed simulations (slow-vs-fast, society sim, 1000 futures, sub-ms reflex — zero download) **plus a real WebGPU demo** (`webgpu-real.html`) that runs a tiny real model (SmolLM2-135M / Qwen-0.5B) on *your* GPU and shows *your* real tok/s. Clearly labeled which is simulated vs really running.
+> - 🧱 [`learn/reram-cim-101.html`](https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-101.html) — ReRAM-CIM from "what is a bit" → device physics → materials + papers → storage family → "how big a ternary model can it hold."
+> - 👀 [`learn/reram-cim-visual.html`](https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-visual.html) — **see it move**: ternary cell, multi-level (MLC) physics, crossbar array, a live MAC computation (current summing down the columns), macro floorplan/efficiency, 2D/2.5D/3D packaging, yield, and how an LLM's layers map onto macros.
+> - 🧠 [`learn/hdc-101.html`](https://michaelhuo2030.github.io/millisecond-era/learn/hdc-101.html) — Hyperdimensional Computing from zero (bind/bundle/permute you can click), why it fits ReRAM, and the hub linking all HDC repos ([hdc-neon](https://github.com/michaelhuo2030/hdc-neon), [torchhd](https://github.com/michaelhuo2030/torchhd)).
+> - ⚙️ [`learn/reram-cim-calculator.html`](https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-calculator.html) — capacity → max ternary model + speed tier.
+> - ⚡ [`learn/demos/`](https://michaelhuo2030.github.io/millisecond-era/learn/demos/index.html) — **"what speed unlocks" gallery**: 7 pure-browser civilization-speed simulations (slow-vs-fast, society sim, 1000 futures, sub-ms reflex — zero download) **plus a real WebGPU demo** (`webgpu-real.html`) that runs a tiny real model (SmolLM2-135M / Qwen-0.5B) on *your* GPU and shows *your* real tok/s. Clearly labeled which is simulated vs really running.
 >
 > The honest record of one outsider learning the bottom layer with AI as a co-pilot.
-> - 🌍 [`learn/real-world-speed-proof.html`](learn/real-world-speed-proof.html) — **this speed is real, others already shipped it**: Taalas HC1 publishes ~16,960 tok/s/user (Llama-3.1-8B) by hardcoding the model into silicon (try their live demo [chatjimmy.ai](https://chatjimmy.ai)). Same principle as ours (weights resident on-chip → no streaming), different tradeoffs — we bet on cheap 28nm + reprogrammable ReRAM + ternary/HDC + edge + open.
-> - 🪞 [`learn/reflexive-world.html`](learn/reflexive-world.html) — **the counterfactual you can never run**: an interactive reasoning tool for irreversible decisions — ① how much information is even recoverable here (oracle → pure noise), ② why correlation lies when you're an insider acting on the system (the reflexivity trap, at family / team / macro scales), ③ the *distribution* of "what-ifs" you only ever sample once. Abstract scales only — it teaches the **shape** of counterfactual reasoning and explicitly **cannot judge any real history or person**.
-> - 🩻 [`learn/voice-xray.html`](learn/voice-xray.html) — **what a speech model already knows about how you feel**: ① live in-browser voice gauges (pitch/energy/flow via Web Audio API — your mic audio never leaves the page), ② the **brain-floor map** — measured layer-by-layer probe of what lives where (pitch & energy shallow → who's speaking middle → emotion & words deep; one forward pass = seven percepts, no extra model), ③ the three hammers (freeze-dry emotion onto a µW chip near-losslessly · one hour of voice → a queryable 10 KB memory · it sees through performed emotion) and a 7-ruler scorecard locked before the tests. All numbers measured on public datasets (RAVDESS/ESD), speaker-independent; emotion read-out reported (too big for a web page), gauges run live.
+> - 🌍 [`learn/real-world-speed-proof.html`](https://michaelhuo2030.github.io/millisecond-era/learn/real-world-speed-proof.html) — **this speed is real, others already shipped it**: Taalas HC1 publishes ~16,960 tok/s/user (Llama-3.1-8B) by hardcoding the model into silicon (try their live demo [chatjimmy.ai](https://chatjimmy.ai)). Same principle as ours (weights resident on-chip → no streaming), different tradeoffs — we bet on cheap 28nm + reprogrammable ReRAM + ternary/HDC + edge + open.
+> - 🪞 [`learn/reflexive-world.html`](https://michaelhuo2030.github.io/millisecond-era/learn/reflexive-world.html) — **the counterfactual you can never run**: an interactive reasoning tool for irreversible decisions — ① how much information is even recoverable here (oracle → pure noise), ② why correlation lies when you're an insider acting on the system (the reflexivity trap, at family / team / macro scales), ③ the *distribution* of "what-ifs" you only ever sample once. Abstract scales only — it teaches the **shape** of counterfactual reasoning and explicitly **cannot judge any real history or person**.
+> - 🩻 [`learn/voice-xray.html`](https://michaelhuo2030.github.io/millisecond-era/learn/voice-xray.html) — **what a speech model already knows about how you feel**: ① live in-browser voice gauges (pitch/energy/flow via Web Audio API — your mic audio never leaves the page), ② the **brain-floor map** — measured layer-by-layer probe of what lives where (pitch & energy shallow → who's speaking middle → emotion & words deep; one forward pass = seven percepts, no extra model), ③ the three hammers (freeze-dry emotion onto a µW chip near-losslessly · one hour of voice → a queryable 10 KB memory · it sees through performed emotion) and a 7-ruler scorecard locked before the tests. All numbers measured on public datasets (RAVDESS/ESD), speaker-independent; emotion read-out reported (too big for a web page), gauges run live.
 
 > 🔬 **New (2026-06-13) — [our own ternary MAC ran *correct on real silicon*](fpga/SILICON-MEASURED-2026-06-13.md).** Plain-language: the thing we could only prove *in simulation* is now proven *on a real chip* (xc7z010) — the hardest de-risk evidence there is. Register-read PASS: on-chip checksum == golden **bit-exact** over 4096 outputs · **II=1** (data feed sustained) · **0 DSP** (multiplier-free) · 136 MHz post-route. *(ASIC not taped out; product tok/s stays projected — measured vs projected kept strictly separate.)*
 
-> 🧬 **New — [`rwkv-on-chip/`](rwkv-on-chip/) — RWKV is the LLM architecture that fits our ternary chip best** (a pure RNN: no KV-cache → no memory-bandwidth wall). *(The chip is a general ternary-inference substrate — it runs ternary models broadly; RWKV is simply the closest-fit case we studied, not the only thing it runs.)* Four "gates" run at PoC scale — ternary-QAT recovers 94% of what post-hoc ternary destroys; the ternary penalty shrinks ×11 → −85% with model size; int8 recurrent state is free — plus a reproducible [`sizing.py`](rwkv-on-chip/sizing.py) "RWKV-7 model-zoo × chip" fit table. Every figure is labelled in plain language with how much to trust it — measured / estimate / design-target / third-party; a 1 GB die fits ~0.4–3B, a 3 GB die up to ~9B.
+> 🧬 **New — [`rwkv-on-chip/`](rwkv-on-chip/) — RWKV is the LLM architecture that fits our ternary chip best** (a pure RNN: no KV-cache → no memory-bandwidth wall). *(The chip is a general ternary-inference substrate — it runs ternary models broadly; RWKV is simply the closest-fit case we studied, not the only thing it runs.)* Four "gates" run at PoC scale — ternary-QAT recovers 94% of what post-hoc ternary destroys; the ternary penalty shrinks ×11 → −85% with model size; int8 recurrent state is free — plus a reproducible [`sizing.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/sizing.py) "RWKV-7 model-zoo × chip" fit table. Every figure is labelled in plain language with how much to trust it — measured / estimate / design-target / third-party; a 1 GB die fits ~0.4–3B, a 3 GB die up to ~9B.
 
 > 🔬 **Research notes · data · tools (published from the lab, verdicts kept honest):**
 > - [`docs/NORTH-STAR.md`](docs/NORTH-STAR.md) — the trillion-fold-future vision (physics-grounded).
 > - [`docs/MAC-SPEED-CEILING-MEASURED.md`](docs/MAC-SPEED-CEILING-MEASURED.md) — measured Mac LLM speed ceiling + ternary-accel curve + the on-chip-vs-DRAM bandwidth law (CONFIRM).
 > - [`data/neurosim_sweep_data/`](data/neurosim_sweep_data/) — NeuroSim V1.3 ARM64 sweeps (45+ points) + replication patches (numbers are the corrected envelopes).
-> - [`scripts/hdc_experiment_kit.py`](scripts/hdc_experiment_kit.py) — the executable rigor kit (laws → runtime gates: held-out split, lift+bootstrap CI, auto-VOID).
+> - [`scripts/hdc_experiment_kit.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/scripts/hdc_experiment_kit.py) — the executable rigor kit (laws → runtime gates: held-out split, lift+bootstrap CI, auto-VOID).
 > - [`docs/HDC-theory-foundations-thomas-dasgupta-rosing-2021.md`](docs/HDC-theory-foundations-thomas-dasgupta-rosing-2021.md) — HDC theory reading notes.
 > - Foundational HDC library lives in its own repo: **[hdc-ops](https://github.com/michaelhuo2030/hdc-ops)**.
 
@@ -132,7 +139,7 @@ Three killer applications:
 **In-between gestures return proportional similarity scores, not hard labels.** An ambiguous gesture between "hello" and "thank you" returns `sim(hello)=0.42, sim(thank you)=0.40` — the system tells you *how much* it matches each class, not just a forced winner.
 
 See [`docs/hdc-gesture-applications.md`](docs/hdc-gesture-applications.md) for full analysis and numbers.  
-Demo (runnable on any Mac): [`scripts/signlang_demo.py`](scripts/signlang_demo.py) — `python3 scripts/signlang_demo.py`
+Demo (runnable on any Mac): [`scripts/signlang_demo.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/scripts/signlang_demo.py) — `python3 scripts/signlang_demo.py`
 
 Deep dive — 8 benchmark tests + architecture innovations + tokamak plasma control: [`docs/article-hdc-silicon-hippocampus.md`](docs/article-hdc-silicon-hippocampus.md)
 

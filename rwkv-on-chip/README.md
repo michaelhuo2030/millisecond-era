@@ -57,11 +57,11 @@ RWKV 不一样。它是个**纯 RNN**：一个**恒定大小的状态**沿着时
 
 问题很直接：**RWKV 是好引擎，但它能不能塞进我们这颗「三值」芯片？** 三值（−1 / 0 / +1）权重是我们整个物理护城河的地基；如果 RWKV 一三值化就变傻，那这条路就断了。所以我们一道一道闸去验。
 
-> 下面每张表都是**我们自己实测**的，原始脚本和 CSV 都在 [`results/`](results/) 和 [`reproduce/`](reproduce/) 里，你可以改了假设自己重跑。
+> 下面每张表都是**我们自己实测**的，原始脚本和 CSV 都在 [`results/`](https://github.com/michaelhuo2030/millisecond-era/tree/main/rwkv-on-chip/results) 和 [`reproduce/`](reproduce/) 里，你可以改了假设自己重跑。
 
 ### 闸 1 — 三值能不能活？（量化生存性）
 
-byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2 个随机种子。原始数据：[`results/qat_lm_ce.csv`](results/qat_lm_ce.csv)
+byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2 个随机种子。原始数据：[`results/qat_lm_ce.csv`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/results/qat_lm_ce.csv)
 
 | 条件 | bits/byte | Δ vs fp32 | 判决 |
 |---|---|---|---|
@@ -75,7 +75,7 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 
 ### 闸 2 — 越大会不会越无损？（规模化）
 
-三值 QAT 相对 fp32 的差距（gap），沿参数阶梯；RWKV 标准 head_size = 64；1MB 语料；每档 1 个随机种子。原始数据：[`results/qat_scale_ce.csv`](results/qat_scale_ce.csv)
+三值 QAT 相对 fp32 的差距（gap），沿参数阶梯；RWKV 标准 head_size = 64；1MB 语料；每档 1 个随机种子。原始数据：[`results/qat_scale_ce.csv`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/results/qat_scale_ce.csv)
 
 | 参数量 | fp32 | 三值 QAT | gap |
 |---|---|---|---|
@@ -87,7 +87,7 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 
 ### 闸 3 — 递归状态压低了会不会漂移？（状态精度）
 
-部署配置，推理时把状态 S 每步重量化，沿序列长度测 CE 相对 fp32-state 的 gap；1 个随机种子。原始数据：[`results/state_prec.csv`](results/state_prec.csv)
+部署配置，推理时把状态 S 每步重量化，沿序列长度测 CE 相对 fp32-state 的 gap；1 个随机种子。原始数据：[`results/state_prec.csv`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/results/state_prec.csv)
 
 | 状态精度 | T=64 | T=512 | 漂移 T64→T512 | 判决 |
 |---|---|---|---|---|
@@ -99,7 +99,7 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 
 ### 闸 — HDC 正面对撞（它和我们另一半的关系）
 
-机制 × 负载 × 5 个随机种子。原始数据：[`results/capacity_fidelity.csv`](results/capacity_fidelity.csv) · [`results/_kit_rwkv_wkv_vs_hdc_memory.json`](results/_kit_rwkv_wkv_vs_hdc_memory.json)
+机制 × 负载 × 5 个随机种子。原始数据：[`results/capacity_fidelity.csv`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/results/capacity_fidelity.csv) · [`results/_kit_rwkv_wkv_vs_hdc_memory.json`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/results/_kit_rwkv_wkv_vs_hdc_memory.json)
 
 - ✅ **可逆性 ＝ HDC 的干净胜场（护城河）**：删一条记忆，HDC 的 remove-gap = **0.00**（减法 ＝ 完全重建，精确、可交换）；RWKV 的 delta-state remove-gap = **0.116**（路径纠缠，删不干净）。
 - 🐘 **真正的大象（比「谁容量大」更重要）＝ 容量 ↔ 可编辑性的根本权衡**：delta-rule 用「主动消干扰」换容量，代价是状态路径纠缠、删不干净；HDC 朴素求和放弃容量、换来精确可逆。**两端互补——不是竞品，是两层记忆。**
@@ -111,7 +111,7 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 
 ## 3. 我们这颗片，能跑多大？（适配账）
 
-> ⚠️ 这一整节都是**算术估算**＋**设计目标**（芯片容量还没流片）。计算脚本是 [`sizing.py`](sizing.py)，改了假设你自己重跑。
+> ⚠️ 这一整节都是**算术估算**＋**设计目标**（芯片容量还没流片）。计算脚本是 [`sizing.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/sizing.py)，改了假设你自己重跑。
 
 账怎么算的（全部摊开）：三值权重 ≈ **0.2 GB / 每 10 亿参数**（1.58 bit/参数，来自 [BitNet b1.58](https://arxiv.org/abs/2402.17764)）；但 RWKV 词表 65536，**embedding + head（2·V·C）不能三值化**＝一笔藏起来的「大词表税」，按 int8 算；递归状态 int8、batch=1 时只有几 MB，可忽略。
 
@@ -154,7 +154,7 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 
 这条线我们会自己趟完。但好东西就该开源、就该被更多人接力。
 
-- **全部可复现**：四闸的脚本和 CSV 都在 [`results/`](results/) 和 [`reproduce/`](reproduce/)，适配账在 [`sizing.py`](sizing.py)，改了假设你自己重跑。**方法即护城河。**
+- **全部可复现**：四闸的脚本和 CSV 都在 [`results/`](https://github.com/michaelhuo2030/millisecond-era/tree/main/rwkv-on-chip/results) 和 [`reproduce/`](reproduce/)，适配账在 [`sizing.py`](https://github.com/michaelhuo2030/millisecond-era/blob/main/rwkv-on-chip/sizing.py)，改了假设你自己重跑。**方法即护城河。**
 - 想看 RWKV 这套引擎到底能干多少模态（视觉 / 语音 / 时序 / 嵌入……，全部第三方、逐条带可点出处），看 [**`CAPABILITY-MAP.md`**](CAPABILITY-MAP.md)。
 - 如果你也相信「该把够用的智能，私有地、低成本地，交到云够不到的人手里」——尤其是做 RWKV / 端侧 / 存算一体的同路人——**来一起搞。** 我们要的是**真实的项目、真实的伙伴**，不是又一篇 PPT。
 

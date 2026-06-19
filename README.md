@@ -3,22 +3,22 @@
 > **The Missing Hardware Layer of DeepSeek's Full Stack**
 > *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~$1,400 out of pocket*
 
-## 🔥 New — measured on real silicon: our ternary LLM at **13,674 tok/s** on a **¥205 FPGA**
+## 🔥 New — measured on real silicon: a ternary LLM generating text on a ¥205 FPGA at **~13,671 tok/s**
 
 <video src="https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm.mp4" poster="https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm-poster.jpg" controls muted width="720"></video>
 
-[![Watch the demo — our ternary LLM at 13,674 tok/s on a ¥205 FPGA](assets/demo-ternary-llm-poster.jpg)](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)
+[![Watch the demo — a ternary LLM at ~13,671 tok/s on a ¥205 FPGA](assets/demo-ternary-llm-poster.jpg)](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)
 
 ▶ **[Play it inline on the site](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)** · or [download the clip](https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm.mp4) *(40 s)*
 
-**What's running in the video — measured on FPGA silicon, not a projection:**
+**What's running in the video — measured on real FPGA silicon, not a projection:**
 
-- **Throughput:** **13,674 tok/s** single-stream — 29,648 tokens in 2.168 s, 0.073 ms/token (measured live over UART)
-- **Hardware:** EBAZ4205 FPGA (Zynq XC7Z010) — a **~¥205** board · programmable-logic fabric @ 25 MHz
-- **Weights:** ternary **{−1, 0, +1}** (3-bit) · 4 KB weight MIF · no multiplier
-- **Model:** **558K parameters** · byte-level (vocab V=256) · **D=64, 8 layers, 8 heads**
-- **Same RTL also runs:** sensor→language (multimodal) and music (ABC notation)
-- **Honest boundary:** this is a *tiny* model — it proves **speed**, not output quality (the text is gibberish on purpose). It runs on an **FPGA**, not yet the final ReRAM-CIM chip (not taped out). The point: the full ternary-LLM datapath runs end-to-end, bit-exact, and fast on cheap real silicon.
+- **Throughput:** **~13,671 tokens/second** on the chip — verified **three independent ways** (the chip's own token counter vs the board's wall clock over 0.5 / 1.0 / 2.0 s, all ~13,676) and matching theory (50 MHz ÷ 3,656 cycles/token = 13,675). ~68,000 tokens streamed in ~5 s, 99.95% contiguous.
+- **Hardware:** **EBAZ4205** — a salvaged Bitcoin-miner board (Zynq xc7z010), **~¥205**.
+- **Weights:** ternary **{−1, 0, +1}** — a multiply-free datapath.
+- **On-chip model:** a *tiny* proof-of-concept — **~5K ternary params, D=16, 2 layers, 32-token vocab, 8-token context**. *(The fluent paragraphs in the demo's "simulation" panel are a larger **558K software** model with bit-identical math — clearly labeled, **not** the chip.)*
+- **First** time our ternary RTL runs the **full autoregressive generation loop on real hardware** (before this: synthesis + co-simulation + register readback only).
+- **Honest boundary:** a tiny PoC → the text is fragmentary **by design**; the headline is **speed + real-silicon + ternary**, not language quality. It runs on an **FPGA**, not the final ReRAM-CIM ASIC (not taped out).
 
 ---
 

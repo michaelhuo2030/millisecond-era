@@ -24,12 +24,13 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;
         text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
-  .card:hover{transform:translateY(-3px);border-color:var(--acc)}
+  a.card:hover{transform:translateY(-3px);border-color:var(--acc)}
   .card h3{margin:8px 0 4px;font-size:19px}
   .num{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:6px 0 2px}
   .num.meas{color:var(--good)} .num.sim{color:var(--sim)} .num.proj{color:var(--proj)}
   .card p{color:#bcc6d2;font-size:14px;margin:6px 0 14px;flex:1}
-  .go{font-size:13px;font-weight:700;color:var(--acc)}
+  .go{font-size:13px;font-weight:700;color:var(--acc);text-decoration:none}
+  .go-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:auto}
   table{width:100%;border-collapse:collapse;margin-top:6px;font-size:14px}
   th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
   th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1px}
@@ -72,13 +73,19 @@
     <p><span class="lang-en">Measured on the same M4 Mac: <b>50</b> (the ChatGPT feel) → <b>147</b> (local Qwen-0.5B) → <b>14,166</b> → <b>184,320</b> tok/s. See the "speed ↔ capability" trade-off clearly — fast isn't for show, it unlocks different kinds of work.</span><span class="lang-zh">同一台 M4 Mac 上实测:<b>50</b>(ChatGPT 体感)→ <b>147</b>(本地 Qwen-0.5B)→ <b>14,166</b> → <b>184,320</b> tok/s。看清"速度↔能力"的取舍——快不是炫,是解锁不同的活。</span></p>
     <span class="go"><span class="lang-en">▶ Watch the counter race at real speed →</span><span class="lang-zh">▶ 看计数器按真实速度狂飙 →</span></span>
   </a>
-  <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/micro_world_live.html" target="_blank" rel="noopener">
+  <!-- FIX: was <a class="card" href="micro_world_live..."> with nested <a> to reflex.html inside
+       Nested <a> is invalid HTML — browser breaks the outer card and floats paragraph outside.
+       Now a <div> card with two explicit go-links. -->
+  <div class="card">
     <span class="badge b-sim"><span class="lang-en">◇ real simulation</span><span class="lang-zh">◇ 真实模拟</span></span>
     <div class="num sim"><span class="lang-en">8,000 steps/s</span><span class="lang-zh">8,000 步/秒</span></div>
     <h3><span class="lang-en">Speed unlocks worlds</span><span class="lang-zh">速度解锁世界</span></h3>
-    <p><span class="lang-en">Driven by real HDC algebra (bind/bundle/match): at <b>8000 steps/s</b> a society grows its own culture and geography. Companion <a href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/reflex.html" target="_blank" style="color:var(--sim)">reflex demo</a>: 400 agents, <b>~25k decisions/s</b>, sub-millisecond reactions (≈500× faster than slow AI). In the time a single AI says one word, a whole world has already taken shape.</span><span class="lang-zh">由真 HDC 代数(bind/bundle/match)驱动:<b>8000 步/秒</b>下,一个社会自己涌现出文化与地理。配套的 <a href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/reflex.html" target="_blank" style="color:var(--sim)">反射 demo</a>:400 个体、<b>~2.5 万决策/秒</b>、亚毫秒反应(≈比慢 AI 快 500×)。在一个 AI 说出一个词的时间里,一整个世界已经成形。</span></p>
-    <span class="go"><span class="lang-en">▶ Watch a world grow in seconds →</span><span class="lang-zh">▶ 看一个世界在几秒里长出来 →</span></span>
-  </a>
+    <p><span class="lang-en">Using HDC binary culture vectors + Hamming similarity: at <b>8,000 steps/s</b> a society of 400 agents grows its own culture and geography. Sub-millisecond reactions (≈500× faster than slow AI). In the time a single AI says one word, a whole world has already taken shape. Two demos to try:</span><span class="lang-zh">用 HDC 二值文化向量 + Hamming 相似度驱动:<b>8,000 步/秒</b>下 400 个体自己涌现出文化与地理。亚毫秒反应(≈比慢 AI 快 500×)。一个 AI 说出一个词的时间里,一整个世界已经成形。两个 demo 可点:</span></p>
+    <div class="go-row">
+      <a class="go" href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/micro_world_live.html" target="_blank" rel="noopener"><span class="lang-en">▶ Micro-world (culture emergence) →</span><span class="lang-zh">▶ 微世界(文化涌现) →</span></a>
+      <a class="go" href="https://michaelhuo2030.github.io/millisecond-era/learn/demos/reflex.html" target="_blank" rel="noopener"><span class="lang-en">▶ Reflex demo (~25k decisions/s) →</span><span class="lang-zh">▶ 反射 demo (~2.5万决策/秒) →</span></a>
+    </div>
+  </div>
 </div>
 
 <h2><span class="lang-en">Supporting evidence</span><span class="lang-zh">佐证 · supporting evidence</span></h2>
@@ -87,14 +94,14 @@
     <span class="badge b-meas"><span class="lang-en">✓ measured by others</span><span class="lang-zh">✓ 他人实测</span></span> <span class="badge b-proj"><span class="lang-en">? not our chip</span><span class="lang-zh">? 非我们的芯片</span></span>
     <div class="num meas">16,960 tok/s</div>
     <h3><span class="lang-en">Not wishful thinking: someone already built it</span><span class="lang-zh">这不是空想:有人已经做出来了</span></h3>
-    <p><span class="lang-en">Third party <b>Taalas</b> burned weights into silicon and publicly measured Llama-8B at <b>16,960 tok/s</b> (vs the H200's 230 tok/s). This proves the "<b>weights are silicon</b>" speed thesis is real — which makes our ReRAM-CIM route (target 1–5k tok/s) credible.</span><span class="lang-zh">第三方 <b>Taalas</b> 把权重烧进硅,公开实测 Llama-8B <b>16,960 tok/s</b>(对比 H200 的 230 tok/s)。这证明"<b>权重即硅</b>"的速度论是真的——我们的 ReRAM-CIM 路线(目标 1–5k tok/s)因此可信。</span></p>
+    <p><span class="lang-en">Third party <b>Taalas</b> burned weights into silicon and publicly measured Llama-8B at <b>16,960 tok/s</b> (vs the H200's 230 tok/s). This proves the "<b>weights are silicon</b>" speed thesis is real — which makes our ReRAM-CIM route (target <b>2–5k tok/s</b>) credible.</span><span class="lang-zh">第三方 <b>Taalas</b> 把权重烧进硅,公开实测 Llama-8B <b>16,960 tok/s</b>(对比 H200 的 230 tok/s)。这证明"<b>权重即硅</b>"的速度论是真的——我们的 ReRAM-CIM 路线(目标 <b>2–5k tok/s</b>)因此可信。</span></p>
     <span class="go"><span class="lang-en">▶ See the third-party measurement →</span><span class="lang-zh">▶ 看第三方实测 →</span></span>
   </a>
   <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-calculator.html" target="_blank" rel="noopener">
     <span class="badge b-proj"><span class="lang-en">? projected</span><span class="lang-zh">? 推算</span></span>
     <div class="num proj">GB → tok/s</div>
     <h3><span class="lang-en">Capacity ↔ speed calculator</span><span class="lang-zh">容量↔速度计算器</span></h3>
-    <p><span class="lang-en">Given chip size / precision / process node, estimate which model fits and the expected throughput. Grounds "speed" in the reality of silicon (e.g. ~1 GB → 4B ternary (our v1) → 1–5k tok/s projected).</span><span class="lang-zh">给定芯片大小/精度/工艺,推算装得下哪个模型、吞吐大概多少。把"速度"落回硅片的现实(例:~1 GB → 4B 三元(我们的 v1)→ 1–5k tok/s 推算)。</span></p>
+    <p><span class="lang-en">Given chip size / precision / process node, estimate which model fits and the expected throughput. Grounds "speed" in the reality of silicon (e.g. ~1 GB → 4B ternary (our v1) → 2–5k tok/s projected).</span><span class="lang-zh">给定芯片大小/精度/工艺,推算装得下哪个模型、吞吐大概多少。把"速度"落回硅片的现实(例:~1 GB → 4B 三元(我们的 v1)→ 2–5k tok/s 推算)。</span></p>
     <span class="go"><span class="lang-en">▶ Tweak the parameters yourself →</span><span class="lang-zh">▶ 自己调参数 →</span></span>
   </a>
   <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/hdc-101.html" target="_blank" rel="noopener">
@@ -113,9 +120,9 @@
   <tr><td><span class="lang-en">WebGPU HDC retrieval (your GPU)</span><span class="lang-zh">WebGPU HDC 检索(你的 GPU)</span></td><td><b><span class="lang-en">~4 ms/query @ 200k · 89× numpy</span><span class="lang-zh">~4 ms/查询 @ 20 万 · 89× numpy</span></b></td><td class="meas"><span class="lang-en">✓ measured (bit-identical)</span><span class="lang-zh">✓ 实测(比特一致)</span></td></tr>
   <tr><td><span class="lang-en">Local small-model throughput (M4 Mac)</span><span class="lang-zh">本地小模型吞吐(M4 Mac)</span></td><td><b>147 → 184,320 tok/s</b></td><td class="meas"><span class="lang-en">✓ measured</span><span class="lang-zh">✓ 实测</span></td></tr>
   <tr><td><span class="lang-en">FPGA ternary MAC synthesis</span><span class="lang-zh">FPGA 三值 MAC 综合</span></td><td><b>0 DSP · 194 MHz</b><span class="lang-en"> (real synthesis)</span><span class="lang-zh">(真综合)</span></td><td class="meas"><span class="lang-en">✓ measured</span><span class="lang-zh">✓ 实测</span></td></tr>
-  <tr><td><span class="lang-en">HDC society/reflex simulation</span><span class="lang-zh">HDC 社会/反射模拟</span></td><td><b><span class="lang-en">8,000 steps/s · 25k decisions/s</span><span class="lang-zh">8,000 步/秒 · 2.5万决策/秒</span></b></td><td class="sim"><span class="lang-en">◇ real HDC algebra</span><span class="lang-zh">◇ 真实 HDC 代数</span></td></tr>
+  <tr><td><span class="lang-en">HDC society/reflex simulation</span><span class="lang-zh">HDC 社会/反射模拟</span></td><td><b><span class="lang-en">8,000 steps/s · 25k decisions/s</span><span class="lang-zh">8,000 步/秒 · 2.5万决策/秒</span></b></td><td class="sim"><span class="lang-en">◇ real HDC binary vectors</span><span class="lang-zh">◇ 真实 HDC 二值向量</span></td></tr>
   <tr><td><span class="lang-en">Third-party "weights are silicon" (Taalas)</span><span class="lang-zh">第三方"权重即硅"(Taalas)</span></td><td><b>16,960 tok/s</b><span class="lang-en"> (Llama-8B)</span><span class="lang-zh">(Llama-8B)</span></td><td class="meas"><span class="lang-en">✓ publicly measured by others</span><span class="lang-zh">✓ 他人公开实测</span></td></tr>
-  <tr><td><span class="lang-en">Our ternary-CIM chip throughput</span><span class="lang-zh">我们的三值-CIM 芯片吞吐</span></td><td><b>1–4k tok/s</b><span class="lang-en"> (design target)</span><span class="lang-zh">(设计目标)</span></td><td class="proj"><span class="lang-en">? projected (not taped out)</span><span class="lang-zh">? 推算(未流片)</span></td></tr>
+  <tr><td><span class="lang-en">Our ternary-CIM chip throughput</span><span class="lang-zh">我们的三值-CIM 芯片吞吐</span></td><td><b>2–5k tok/s</b><span class="lang-en"> (design target)</span><span class="lang-zh">(设计目标)</span></td><td class="proj"><span class="lang-en">? projected (not taped out)</span><span class="lang-zh">? 推算(未流片)</span></td></tr>
   <tr><td><span class="lang-en">"~100× more once on-chip"</span><span class="lang-zh">"上芯片再 ~100×"</span></td><td><b><span class="lang-en">~µs scale @ any D</span><span class="lang-zh">~µs 级 @ 任意 D</span></b></td><td class="proj"><span class="lang-en">? projected</span><span class="lang-zh">? 推算</span></td></tr>
 </table>
 <div class="small" style="margin-top:10px"><span class="lang-en">Principle: keep <b>what we can run for you</b> separate from <b>what's still on the way</b>. The former builds trust, the latter is the roadmap. Reputation compounds; honesty compounds faster.</span><span class="lang-zh">原则:把<b>能跑给你看的</b>和<b>还在路上的</b>分开。前者建立信任,后者是路线图。声誉复利,诚实复利更快。</span></div>

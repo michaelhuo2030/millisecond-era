@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>极速梯子 · 真·浏览器里跑 micro→small(看 tok/s ∝ 1/参数)</title>
+<title>Speed Ladder · Really running micro→small in your browser (watch tok/s ∝ 1/params) / 极速梯子 · 真·浏览器里跑 micro→small(看 tok/s ∝ 1/参数)</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--blue:#7aa9ff}
 *{box-sizing:border-box}
@@ -26,33 +26,34 @@ button.go.stop{background:#4d2424;border-color:#6a3535}
 .ladder{color:var(--dim);font-size:13.5px;margin-top:10px}.ladder b{color:var(--hot)}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}td,th{padding:4px 8px;border-bottom:1px solid #20212c;text-align:right}td:first-child,th:first-child{text-align:left}th{color:var(--dim)}
 </style></head><body><div class="wrap">
-<div class="topnav"><a href="index.html">← 速度↔文明 画廊</a><a href="webgpu-real.html">🔥 真·WebGPU(更大模型)</a><a href="speed_ladder.html">⚡ 速度阶梯</a></div>
-<h1>极速梯子 ⚡ micro → small,真·浏览器里跑</h1>
+<div class="topnav"><a href="index.html"><span class="lang-en">← Speed↔Civilization gallery</span><span class="lang-zh">← 速度↔文明 画廊</span></a><a href="webgpu-real.html"><span class="lang-en">🔥 Real WebGPU (bigger model)</span><span class="lang-zh">🔥 真·WebGPU(更大模型)</span></a><a href="speed_ladder.html"><span class="lang-en">⚡ Speed ladder</span><span class="lang-zh">⚡ 速度阶梯</span></a></div>
+<h1><span class="lang-en">Speed Ladder ⚡ micro → small, really running in your browser</span><span class="lang-zh">极速梯子 ⚡ micro → small,真·浏览器里跑</span></h1>
 
 <div class="real">
-✅ <b>这是真前向,不是模拟,也不用下载。</b> 一个字符级 Transformer(llama2.c 架构)在你浏览器里<b>真算每一个 token</b>,权重当场随机生成。<br>
-⚠️ 权重是随机的 → <b>输出是乱码</b>。这一页秀的是<b>速度</b>:看模型越小、吐字越快——<b>tok/s ∝ 1/参数</b> 当场上演。想看真·有意义的英文输出 → 去 <a href="webgpu-real.html" style="color:var(--ok)">🔥 WebGPU(135M–1B)</a>。
+<span class="lang-en">✅ <b>This is a real forward pass, not a simulation, and no download.</b> A character-level Transformer (llama2.c architecture) <b>really computes every token</b> in your browser, with weights generated randomly on the spot.<br>
+⚠️ The weights are random → <b>the output is gibberish</b>. What this page shows off is <b>speed</b>: see how the smaller the model, the faster it spits tokens—<b>tok/s ∝ 1/params</b> playing out live. Want real, meaningful English output → go to <a href="webgpu-real.html" style="color:var(--ok)">🔥 WebGPU (135M–1B)</a>.</span><span class="lang-zh">✅ <b>这是真前向,不是模拟,也不用下载。</b> 一个字符级 Transformer(llama2.c 架构)在你浏览器里<b>真算每一个 token</b>,权重当场随机生成。<br>
+⚠️ 权重是随机的 → <b>输出是乱码</b>。这一页秀的是<b>速度</b>:看模型越小、吐字越快——<b>tok/s ∝ 1/参数</b> 当场上演。想看真·有意义的英文输出 → 去 <a href="webgpu-real.html" style="color:var(--ok)">🔥 WebGPU(135M–1B)</a>。</span>
 </div>
 
 <div class="card">
-<div class="note">选一个尺寸(越小越快):</div>
+<div class="note"><span class="lang-en">Pick a size (smaller = faster):</span><span class="lang-zh">选一个尺寸(越小越快):</span></div>
 <div class="seg" id="sizes"></div>
 <div class="btnrow">
-<button class="go" id="run">▶ 跑(连续生成)</button>
-<button class="go" id="bench">⏱ 测峰值速度(3 秒)</button>
+<button class="go" id="run"></button>
+<button class="go" id="bench"></button>
 <span class="note" id="cfg"></span>
 </div>
 <div class="stats">
-<div><span class="kpi" id="tps">—</span> <small>tok/s · 真·你的浏览器</small></div>
-<div class="sub">峰值 <b id="peak">—</b> · 已生成 <b id="count">0</b> token</div>
+<div><span class="kpi" id="tps">—</span> <small><span class="lang-en">tok/s · real · your browser</span><span class="lang-zh">tok/s · 真·你的浏览器</span></small></div>
+<div class="sub"><span class="lang-en">peak <b id="peak">—</b> · generated <b id="count">0</b> tokens</span><span class="lang-zh">峰值 <b id="peak">—</b> · 已生成 <b id="count">0</b> token</span></div>
 </div>
-<div class="out" id="out">(选尺寸,点"跑")</div>
-<div class="ladder">📍 对照<a href="speed_ladder.html" style="color:var(--hot)">速度阶梯</a>:micro 这种几千参的能冲到 Tier 7–8(几万 t/s),但越快越空(吐乱码)。芯片的活 = 把<b>又快又有用</b>的模型推上去。</div>
+<div class="out" id="out"></div>
+<div class="ladder"><span class="lang-en">📍 Compare with the <a href="speed_ladder.html" style="color:var(--hot)">speed ladder</a>: a few-thousand-param model like micro can hit Tier 7–8 (tens of thousands of t/s), but the faster, the emptier (spitting gibberish). The chip's job = push the <b>fast-and-useful</b> models up there.</span><span class="lang-zh">📍 对照<a href="speed_ladder.html" style="color:var(--hot)">速度阶梯</a>:micro 这种几千参的能冲到 Tier 7–8(几万 t/s),但越快越空(吐乱码)。芯片的活 = 把<b>又快又有用</b>的模型推上去。</span></div>
 </div>
 
 <div class="card">
-<div class="note"><b>梯子(参数量随尺寸涨,速度随之掉)：</b></div>
-<table><thead><tr><th>尺寸</th><th>dim/层/头</th><th>参数量</th><th>每token MAC(约)</th></tr></thead><tbody id="tbl"></tbody></table>
+<div class="note"><span class="lang-en"><b>The ladder (params rise with size, speed falls with it):</b></span><span class="lang-zh"><b>梯子(参数量随尺寸涨,速度随之掉)：</b></span></div>
+<table><thead><tr><th><span class="lang-en">Size</span><span class="lang-zh">尺寸</span></th><th><span class="lang-en">dim/layers/heads</span><span class="lang-zh">dim/层/头</span></th><th><span class="lang-en">Params</span><span class="lang-zh">参数量</span></th><th><span class="lang-en">MAC/token (approx)</span><span class="lang-zh">每token MAC(约)</span></th></tr></thead><tbody id="tbl"></tbody></table>
 </div>
 
 <script>
@@ -135,9 +136,19 @@ const idToChar = id => String.fromCharCode(32 + (id % 95)); // printable ASCII
 // ---- UI / run loop ----
 let model=null, curCfg=CONFIGS[0], running=false, sr=rng(7);
 const $=id=>document.getElementById(id);
+// bilingual label helpers (read global EN/中 toggle from <html data-lang>)
+const isZh=()=>document.documentElement.dataset.lang==='zh';
+const T={
+  runStart:()=>isZh()?"▶ 跑(连续生成)":"▶ Run (continuous generation)",
+  runStop:()=>isZh()?"⏹ 停":"⏹ Stop",
+  bench:()=>isZh()?"⏱ 测峰值速度(3 秒)":"⏱ Measure peak speed (3 sec)",
+  outIdle:()=>isZh()?"(选尺寸,点“跑”)":"(pick a size, click “Run”)",
+  cfg:c=>isZh()?`${c.name}: dim ${c.dim} · ${c.layers} 层 · ${c.heads} 头 · ${fmt(paramCount(c))} 参`
+               :`${c.name}: dim ${c.dim} · ${c.layers} layers · ${c.heads} heads · ${fmt(paramCount(c))} params`
+};
 function selectCfg(c){ curCfg=c; model=buildModel(c);
   document.querySelectorAll('#sizes button').forEach(b=>b.classList.toggle('on',b.dataset.n===c.name));
-  $("cfg").textContent = `${c.name}: dim ${c.dim} · ${c.layers} 层 · ${c.heads} 头 · ${fmt(paramCount(c))} 参`;
+  $("cfg").textContent = T.cfg(c);
   $("peak").textContent="—"; }
 CONFIGS.forEach(c=>{ const b=document.createElement('button'); b.dataset.n=c.name; b.textContent=`${c.name}(${fmt(paramCount(c))})`; b.onclick=()=>{ if(running)return; selectCfg(c); }; $("sizes").appendChild(b); });
 // table
@@ -147,7 +158,7 @@ selectCfg(CONFIGS[0]);
 let peak=0;
 async function loop(durMs){
   if(running){ running=false; return; }
-  running=true; $("run").textContent="⏹ 停"; $("run").classList.add("stop");
+  running=true; $("run").textContent=T.runStop(); $("run").classList.add("stop");
   let pos=0, tok=Math.floor(sr()*VOCAB), n=0, txt="", peakLocal=0;
   const t0=performance.now(); let last=t0, lastN=0;
   const tEnd = durMs ? t0+durMs : Infinity;
@@ -167,16 +178,28 @@ async function loop(durMs){
     $("tps").textContent=Math.round(n/((now-t0)/1000)).toLocaleString();
     $("count").textContent=n.toLocaleString();
     if(peakLocal>peak){peak=peakLocal;} $("peak").textContent=Math.round(peak).toLocaleString()+" tok/s";
+    $("out").dataset.dirty="1";
     $("out").textContent=txt.slice(-1200);
     $("out").scrollTop=$("out").scrollHeight;
     await new Promise(r=>requestAnimationFrame(r));
   }
-  running=false; $("run").textContent="▶ 跑(连续生成)"; $("run").classList.remove("stop");
+  running=false; $("run").textContent=T.runStart(); $("run").classList.remove("stop");
   const dt=(performance.now()-t0)/1000;
   $("tps").textContent=Math.round(n/dt).toLocaleString();
 }
 $("run").onclick=()=>loop(0);
 $("bench").onclick=()=>{ if(running){running=false;return;} peak=0; loop(3000); };
+
+// render bilingual UI labels for current language; re-render when global toggle fires
+function renderLabels(){
+  if(!running) $("run").textContent=T.runStart();
+  $("bench").textContent=T.bench();
+  if(curCfg) $("cfg").textContent=T.cfg(curCfg);
+  // only set the idle placeholder if nothing has been generated yet
+  const o=$("out"); if(!o.dataset.dirty) o.textContent=T.outIdle();
+}
+renderLabels();
+window.addEventListener('mse:lang', renderLabels);
 </script>
 </div>  <script src="../../site-nav.js"></script>
 </body></html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>思想的传播 · 两个想法争夺一个社会</title>
+<title>The Spread of Ideas · Two ideas fight over a society</title>
 <style>
 :root{--bg:#06070d;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC",sans-serif}
@@ -13,22 +13,22 @@ canvas{display:block;border-radius:12px;cursor:crosshair;image-rendering:pixelat
 button{background:#262838;color:var(--ink);border:1px solid #33354a;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px;margin-right:6px}
 .tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#241f12;color:var(--hot);font-size:11px}
 </style></head><body><div class="wrap">
-<h1>思想的传播 · 两个想法争夺一个社会 <span class="tag">Tier 8</span></h1>
-<div class="sub">蓝、红两个想法各从一处出发，沿邻居一传十、十传百。慢速世界要几代人；这里同一秒就看完整场争夺——<b>点画布可以播下新的想法种子</b>。</div>
+<h1><span class="lang-en">The Spread of Ideas · Two ideas fight over a society</span><span class="lang-zh">思想的传播 · 两个想法争夺一个社会</span> <span class="tag">Tier 8</span></h1>
+<div class="sub"><span class="lang-en">A blue idea and a red idea each start from one spot and spread neighbor to neighbor — one tells ten, ten tell a hundred. In the slow world this takes generations; here you watch the whole battle play out in a single second — <b>click the canvas to plant new seeds of an idea</b>.</span><span class="lang-zh">蓝、红两个想法各从一处出发，沿邻居一传十、十传百。慢速世界要几代人；这里同一秒就看完整场争夺——<b>点画布可以播下新的想法种子</b>。</span></div>
 <div class="main">
   <div class="stage"><canvas id="cv" width="500" height="500"></canvas></div>
   <div class="side">
-    <div class="panel"><div style="color:var(--dim);font-size:12px">采纳比例</div>
+    <div class="panel"><div style="color:var(--dim);font-size:12px"><span class="lang-en">Adoption share</span><span class="lang-zh">采纳比例</span></div>
       <div class="bar" id="bar"><i id="bblue" style="background:#5aa9ff;width:50%"></i><i id="bred" style="background:#ff6b6b;width:50%"></i></div>
-      <div class="stat"><span>🔵 想法A</span><b id="pblue">—</b></div>
-      <div class="stat"><span>🔴 想法B</span><b id="pred">—</b></div>
-      <div class="stat"><span>未决</span><b id="pgrey">—</b></div>
-      <div class="stat"><span>已传播代数</span><b id="gen">0</b></div></div>
+      <div class="stat"><span>🔵 <span class="lang-en">Idea A</span><span class="lang-zh">想法A</span></span><b id="pblue">—</b></div>
+      <div class="stat"><span>🔴 <span class="lang-en">Idea B</span><span class="lang-zh">想法B</span></span><b id="pred">—</b></div>
+      <div class="stat"><span><span class="lang-en">Undecided</span><span class="lang-zh">未决</span></span><b id="pgrey">—</b></div>
+      <div class="stat"><span><span class="lang-en">Generations spread</span><span class="lang-zh">已传播代数</span></span><b id="gen">0</b></div></div>
     <div class="panel">
-      <button id="reset">↺ 重置</button><button id="play">⏸暂停</button>
-      <div class="row"><label>传播速度 <span id="vsp">3</span> 代/帧</label><input id="sp" type="range" min="1" max="12" value="3"></div>
-      <div class="row"><label>说服力 <span id="vp">55</span>%</label><input id="p" type="range" min="20" max="95" value="55"></div>
-      <div style="color:var(--dim);font-size:12px">这是社会学的"投票者模型"：每个人偶尔被邻居说服。速度让你把一场需要几代人的思想战，在几秒里看完结局——还能反复重播、改参数。</div>
+      <button id="reset">↺ <span class="lang-en">Reset</span><span class="lang-zh">重置</span></button><button id="play">⏸<span class="lang-en">Pause</span><span class="lang-zh">暂停</span></button>
+      <div class="row"><label><span class="lang-en">Spread speed</span><span class="lang-zh">传播速度</span> <span id="vsp">3</span> <span class="lang-en">gens/frame</span><span class="lang-zh">代/帧</span></label><input id="sp" type="range" min="1" max="12" value="3"></div>
+      <div class="row"><label><span class="lang-en">Persuasiveness</span><span class="lang-zh">说服力</span> <span id="vp">55</span>%</label><input id="p" type="range" min="20" max="95" value="55"></div>
+      <div style="color:var(--dim);font-size:12px"><span class="lang-en">This is sociology's "voter model": each person is occasionally persuaded by a neighbor. Speed lets you watch the ending of an ideological war that would take generations — in just a few seconds — and replay it again and again with different settings.</span><span class="lang-zh">这是社会学的"投票者模型"：每个人偶尔被邻居说服。速度让你把一场需要几代人的思想战，在几秒里看完结局——还能反复重播、改参数。</span></div>
     </div>
   </div>
 </div></div><script>
@@ -60,7 +60,12 @@ function loop(){if(running)for(let k=0;k<P.sp;k++)stepGen();draw();stats();reque
 function bind(id,key,f){const e=document.getElementById(id),l=document.getElementById('v'+id);e.addEventListener('input',()=>{P[key]=f(+e.value);if(l)l.textContent=e.value;});}
 bind('sp','sp',v=>v);bind('p','p',v=>{document.getElementById('vp').textContent=v;return v/100;});
 document.getElementById('reset').addEventListener('click',init);
-document.getElementById('play').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸暂停':'▶播放';});
+function L(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
+const playBtn=document.getElementById('play');
+function renderPlayBtn(){playBtn.textContent=running?'⏸'+L('Pause','暂停'):'▶'+L('Play','播放');}
+playBtn.addEventListener('click',()=>{running=!running;renderPlayBtn();});
+window.addEventListener('mse:lang',renderPlayBtn);
+renderPlayBtn();
 cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)/cell|0,y=(e.clientY-r.top)/cell|0;seed(x,y,Math.random()<0.5?1:2);});
 init();requestAnimationFrame(loop);
 </script>  <script src="../../site-nav.js"></script>

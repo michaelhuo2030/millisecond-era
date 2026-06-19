@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>看得见的 ReRAM-CIM · 交互图解</title>
+<title>ReRAM-CIM You Can See · Interactive Visual Guide</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff;--vio:#caa9ff;--grey:#5a5d72}
 *{box-sizing:border-box}
@@ -32,34 +32,34 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 .pop .body{max-width:820px;font-size:15px;line-height:1.75}.defsrc{display:none}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#vs0">⓪ CIM vs 传统</a><a href="#tern">①三元权重</a><a href="#mlc">①·多电平怎么实现</a><a href="#xbar">②crossbar 阵列</a><a href="#mac">③一次计算</a><a href="#macro">④有用的占多少</a><a href="#readout">④·读出 ADC vs 灵敏放大器</a><a href="#chip">⑤整片芯片 2D/2.5D/3D</a><a href="#yield">⑥良率</a><a href="#llm">⑦LLM 怎么存怎么算</a>
+<a href="#vs0"><span class="lang-en">⓪ CIM vs Traditional</span><span class="lang-zh">⓪ CIM vs 传统</span></a><a href="#tern"><span class="lang-en">① Ternary Weight</span><span class="lang-zh">①三元权重</span></a><a href="#mlc"><span class="lang-en">①· Multi-Level Cells</span><span class="lang-zh">①·多电平怎么实现</span></a><a href="#xbar"><span class="lang-en">② Crossbar Array</span><span class="lang-zh">②crossbar 阵列</span></a><a href="#mac"><span class="lang-en">③ One Computation</span><span class="lang-zh">③一次计算</span></a><a href="#macro"><span class="lang-en">④ Useful Area</span><span class="lang-zh">④有用的占多少</span></a><a href="#readout"><span class="lang-en">④· Readout: ADC vs Sense-Amp</span><span class="lang-zh">④·读出 ADC vs 灵敏放大器</span></a><a href="#chip"><span class="lang-en">⑤ Whole Chip 2D/2.5D/3D</span><span class="lang-zh">⑤整片芯片 2D/2.5D/3D</span></a><a href="#yield"><span class="lang-en">⑥ Yield</span><span class="lang-zh">⑥良率</span></a><a href="#llm"><span class="lang-en">⑦ How an LLM Is Stored &amp; Computed</span><span class="lang-zh">⑦LLM 怎么存怎么算</span></a>
 </div></div>
 <div class="wrap">
-<div class="topnav"><a href="reram-cim-101.html">← 回科普 101</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
-<h1>看得见的 ReRAM-CIM 👀</h1>
-<div class="tagline">全部能点、能拖、能跑。先点一下,再读字。配合 <a href="reram-cim-101.html" style="color:var(--blue)">101 科普</a> 看最好。</div>
-<div class="card" style="border:1px solid #2a3550"><b>📖 术语小词典(看到不懂的词,点一下看人话)</b>
+<div class="topnav"><a href="reram-cim-101.html"><span class="lang-en">← Back to 101 Primer</span><span class="lang-zh">← 回科普 101</span></a><a href="reram-cim-calculator.html"><span class="lang-en">⚙️ Capacity Calculator</span><span class="lang-zh">⚙️ 容量计算器</span></a></div>
+<h1><span class="lang-en">ReRAM-CIM You Can See 👀</span><span class="lang-zh">看得见的 ReRAM-CIM 👀</span></h1>
+<div class="tagline"><span class="lang-en">Everything is clickable, draggable, runnable. Click first, then read. Best paired with the <a href="reram-cim-101.html" style="color:var(--blue)">101 primer</a>.</span><span class="lang-zh">全部能点、能拖、能跑。先点一下,再读字。配合 <a href="reram-cim-101.html" style="color:var(--blue)">101 科普</a> 看最好。</span></div>
+<div class="card" style="border:1px solid #2a3550"><b><span class="lang-en">📖 Mini glossary (see a word you don't know? click it for plain language)</span><span class="lang-zh">📖 术语小词典(看到不懂的词,点一下看人话)</span></b>
 <div style="margin-top:8px;line-height:2.2">
-<span class="t" data-k="adc">ADC 转换器</span> <span class="t" data-k="macro">macro 存算宏</span> <span class="t" data-k="cell">cell 存储单元</span> <span class="t" data-k="wl">wordline/bitline 横竖线</span> <span class="t" data-k="mac">MAC 乘加</span> <span class="t" data-k="kirch">基尔霍夫定律</span> <span class="t" data-k="die">die 裸片</span> <span class="t" data-k="chiplet">chiplet 芯粒</span> <span class="t" data-k="interposer">interposer 转接板</span> <span class="t" data-k="tsv">TSV 硅通孔</span> <span class="t" data-k="d25">2.5D / 3D</span> <span class="t" data-k="yield">yield 良率</span> <span class="t" data-k="redun">冗余修复</span> <span class="t" data-k="transformer">transformer 层</span>
+<span class="t" data-k="adc"><span class="lang-en">ADC converter</span><span class="lang-zh">ADC 转换器</span></span> <span class="t" data-k="macro"><span class="lang-en">macro (compute-in-memory block)</span><span class="lang-zh">macro 存算宏</span></span> <span class="t" data-k="cell"><span class="lang-en">cell (storage unit)</span><span class="lang-zh">cell 存储单元</span></span> <span class="t" data-k="wl"><span class="lang-en">wordline/bitline (rows & columns)</span><span class="lang-zh">wordline/bitline 横竖线</span></span> <span class="t" data-k="mac"><span class="lang-en">MAC (multiply-accumulate)</span><span class="lang-zh">MAC 乘加</span></span> <span class="t" data-k="kirch"><span class="lang-en">Kirchhoff's law</span><span class="lang-zh">基尔霍夫定律</span></span> <span class="t" data-k="die"><span class="lang-en">die (bare chip)</span><span class="lang-zh">die 裸片</span></span> <span class="t" data-k="chiplet"><span class="lang-en">chiplet</span><span class="lang-zh">chiplet 芯粒</span></span> <span class="t" data-k="interposer"><span class="lang-en">interposer</span><span class="lang-zh">interposer 转接板</span></span> <span class="t" data-k="tsv"><span class="lang-en">TSV (through-silicon via)</span><span class="lang-zh">TSV 硅通孔</span></span> <span class="t" data-k="d25"><span class="lang-en">2.5D / 3D</span><span class="lang-zh">2.5D / 3D</span></span> <span class="t" data-k="yield"><span class="lang-en">yield</span><span class="lang-zh">yield 良率</span></span> <span class="t" data-k="redun"><span class="lang-en">redundancy repair</span><span class="lang-zh">冗余修复</span></span> <span class="t" data-k="transformer"><span class="lang-en">transformer layer</span><span class="lang-zh">transformer 层</span></span>
 </div></div>
 
 <!-- ⓪ CIM vs traditional -->
-<h2 id="vs0">⓪ CIM 和传统电脑,差在哪?(先看这个大局)</h2>
-<p>这是整件事的"为什么"。<b>传统电脑:权重存在内存里,要算就得把它们一趟趟搬到计算单元,算完再搬回——搬运又慢又费电(这叫<span class="t" data-k="memwall">内存墙</span>)。CIM:权重不动,在原地算掉。</b> 点一下,看两边同时跑:</p>
+<h2 id="vs0"><span class="lang-en">⓪ CIM vs a traditional computer — what's the difference? (see the big picture first)</span><span class="lang-zh">⓪ CIM 和传统电脑,差在哪?(先看这个大局)</span></h2>
+<p><span class="lang-en">This is the "why" behind the whole thing. <b>Traditional computer: weights live in memory, and to compute you must haul them trip after trip to the compute unit, then haul the results back — moving data is slow and power-hungry (this is the <span class="t" data-k="memwall">memory wall</span>). CIM: the weights don't move; they're computed in place.</b> Click to watch both run side by side:</span><span class="lang-zh">这是整件事的"为什么"。<b>传统电脑:权重存在内存里,要算就得把它们一趟趟搬到计算单元,算完再搬回——搬运又慢又费电(这叫<span class="t" data-k="memwall">内存墙</span>)。CIM:权重不动,在原地算掉。</b> 点一下,看两边同时跑:</span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center"><button onclick="runVS()" id="vsBtn">▶ 跑一次推理(两边同时)</button><button class="sec" onclick="drawVS()">↺ 重置</button></div>
-<div style="font-size:13px;color:var(--bad);margin:4px 0">传统(冯·诺依曼):权重在内存↔计算单元之间反复搬</div>
+<div class="ctl" style="justify-content:center"><button onclick="runVS()" id="vsBtn"><span class="lang-en">▶ Run one inference (both at once)</span><span class="lang-zh">▶ 跑一次推理(两边同时)</span></button><button class="sec" onclick="drawVS()"><span class="lang-en">↺ Reset</span><span class="lang-zh">↺ 重置</span></button></div>
+<div style="font-size:13px;color:var(--bad);margin:4px 0"><span class="lang-en">Traditional (von Neumann): weights shuttle back and forth between memory ↔ compute unit</span><span class="lang-zh">传统(冯·诺依曼):权重在内存↔计算单元之间反复搬</span></div>
 <svg id="tradSvg" viewBox="0 0 400 140" width="400"></svg>
-<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span>搬运次数 <b class="r" id="tMoves">0</b></span><span>能耗 <b class="r" id="tEnergy">0</b></span><span>用时 <b class="r" id="tTime">0</b></span></div>
-<div style="font-size:13px;color:var(--ok);margin:10px 0 4px">CIM 存内计算:权重常驻,原地算</div>
+<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span><span class="lang-en">Moves</span><span class="lang-zh">搬运次数</span> <b class="r" id="tMoves">0</b></span><span><span class="lang-en">Energy</span><span class="lang-zh">能耗</span> <b class="r" id="tEnergy">0</b></span><span><span class="lang-en">Time</span><span class="lang-zh">用时</span> <b class="r" id="tTime">0</b></span></div>
+<div style="font-size:13px;color:var(--ok);margin:10px 0 4px"><span class="lang-en">CIM compute-in-memory: weights stay resident, computed in place</span><span class="lang-zh">CIM 存内计算:权重常驻,原地算</span></div>
 <svg id="cimSvg" viewBox="0 0 400 140" width="400"></svg>
-<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span>搬运次数 <b class="g" id="cMoves">0</b></span><span>能耗 <b class="g" id="cEnergy">0</b></span><span>用时 <b class="g" id="cTime">0</b></span></div>
+<div class="row" style="justify-content:center;gap:18px;font-size:13px"><span><span class="lang-en">Moves</span><span class="lang-zh">搬运次数</span> <b class="g" id="cMoves">0</b></span><span><span class="lang-en">Energy</span><span class="lang-zh">能耗</span> <b class="g" id="cEnergy">0</b></span><span><span class="lang-en">Time</span><span class="lang-zh">用时</span> <b class="g" id="cTime">0</b></span></div>
 <div class="note" id="vsNote" style="margin-top:10px"></div>
 </div>
 
 <!-- ① ternary weight -->
-<h2 id="tern">① 一个三元权重长什么样?</h2>
-<p>普通模型的权重是个小数(要 16 位存)。我们的<b>三元权重只有三种值:−1 / 0 / +1</b>。<b>关键:我们不靠"一个 cell 调三档"</b>(多电平 cell 难读又会飘,见下一节)——而是用<b>两个普通的"开/关"二态 cell:一个放"+列"、一个放"−列"</b>,用它俩的<b>差</b>摆出 −1 / 0 / +1(SPIKA 差分列方案,= 真芯片走的路)。<b>点下面切换看:</b></p>
+<h2 id="tern"><span class="lang-en">① What does a single ternary weight look like?</span><span class="lang-zh">① 一个三元权重长什么样?</span></h2>
+<p><span class="lang-en">An ordinary model's weight is a fractional number (needs 16 bits to store). Our <b>ternary weight has only three values: −1 / 0 / +1</b>. <b>Key point: we don't rely on "tuning one cell to three levels"</b> (multi-level cells are hard to read and tend to drift — see the next section) — instead we use <b>two ordinary "on/off" binary cells: one for the "+ column", one for the "− column"</b>, and use their <b>difference</b> to set −1 / 0 / +1 (the SPIKA differential-column scheme, = the path real chips take). <b>Click below to toggle:</b></span><span class="lang-zh">普通模型的权重是个小数(要 16 位存)。我们的<b>三元权重只有三种值:−1 / 0 / +1</b>。<b>关键:我们不靠"一个 cell 调三档"</b>(多电平 cell 难读又会飘,见下一节)——而是用<b>两个普通的"开/关"二态 cell:一个放"+列"、一个放"−列"</b>,用它俩的<b>差</b>摆出 −1 / 0 / +1(SPIKA 差分列方案,= 真芯片走的路)。<b>点下面切换看:</b></span></p>
 <div class="card" style="text-align:center">
 <svg id="ternSvg" viewBox="0 0 240 200" width="240"></svg>
 <div id="ternLbl" style="font-size:18px;font-weight:700"></div>
@@ -67,51 +67,51 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 </div>
 
 <!-- ①· MLC physical -->
-<h2 id="mlc">①· 为什么我们<b>不</b>让一个 cell 存多档(MLC)?</h2>
-<p>另一条路是让<b>一个 cell</b> 存 2/3/4…8 个不同的值(多电平 MLC):靠把导电丝写成不同"粗细"得到不同电阻挡位。<b>但挡位越多、间隔越窄,ReRAM 一飘就读错</b>——这正是我们<b>不走多电平、而用上一节"两个二态 cell 差分"</b>的原因(二态 cell 最好读、最稳)。<b>拖滑块看挡位怎么被挤窄、为什么连 3 档我们都不赌:</b></p>
+<h2 id="mlc"><span class="lang-en">①· Why do we <b>not</b> let one cell store multiple levels (MLC)?</span><span class="lang-zh">①· 为什么我们<b>不</b>让一个 cell 存多档(MLC)?</span></h2>
+<p><span class="lang-en">Another path is to make <b>one cell</b> store 2/3/4…8 different values (multi-level, MLC): by writing the conductive filament to different "thicknesses" to get different resistance levels. <b>But the more levels and the narrower the gaps, the more a single ReRAM drift causes a misread</b> — which is exactly why we <b>avoid multi-level and instead use the previous section's "two binary cells, differential"</b> (binary cells are the easiest to read and the most stable). <b>Drag the slider to see how the levels get squeezed, and why we won't even gamble on 3 levels:</b></span><span class="lang-zh">另一条路是让<b>一个 cell</b> 存 2/3/4…8 个不同的值(多电平 MLC):靠把导电丝写成不同"粗细"得到不同电阻挡位。<b>但挡位越多、间隔越窄,ReRAM 一飘就读错</b>——这正是我们<b>不走多电平、而用上一节"两个二态 cell 差分"</b>的原因(二态 cell 最好读、最稳)。<b>拖滑块看挡位怎么被挤窄、为什么连 3 档我们都不赌:</b></span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-想分 <input type="range" id="mlcN" min="2" max="8" value="3" oninput="drawMLC()"> <span class="kpi" id="mlcNLbl"></span> 档
+<span class="lang-en">Split into</span><span class="lang-zh">想分</span> <input type="range" id="mlcN" min="2" max="8" value="3" oninput="drawMLC()"> <span class="kpi" id="mlcNLbl"></span> <span class="lang-en">levels</span><span class="lang-zh">档</span>
 <span class="note">= <span id="mlcBit"></span> bit/cell</span>
 </div>
 <svg id="mlcSvg" viewBox="0 0 400 270" width="400"></svg>
 <div class="note" id="mlcNote"></div>
-<div class="legend" style="justify-content:center"><span><i style="background:#8ee59a"></i>挡位清晰可分</span><span><i style="background:#ff8aa0"></i>挡位太挤·会读错</span></div>
+<div class="legend" style="justify-content:center"><span><i style="background:#8ee59a"></i><span class="lang-en">levels clearly separable</span><span class="lang-zh">挡位清晰可分</span></span><span><i style="background:#ff8aa0"></i><span class="lang-en">levels too crowded · misreads</span><span class="lang-zh">挡位太挤·会读错</span></span></div>
 </div>
 
 <!-- ② crossbar -->
-<h2 id="xbar">② 一群 cell 排成 crossbar 阵列</h2>
-<p>把横线(行/wordline)和竖线(列/bitline)交叉成网格,<b>每个交叉点放一个三元 cell</b>。这就是 crossbar。<b>点任意 cell 循环 −1/0/+1;</b>换个尺寸看它怎么变大:</p>
+<h2 id="xbar"><span class="lang-en">② A bunch of cells arranged into a crossbar array</span><span class="lang-zh">② 一群 cell 排成 crossbar 阵列</span></h2>
+<p><span class="lang-en">Cross horizontal lines (rows / wordlines) and vertical lines (columns / bitlines) into a grid, and <b>place one ternary cell at each crossing point</b>. That's a crossbar. <b>Click any cell to cycle −1/0/+1;</b> switch sizes to see how it scales up:</span><span class="lang-zh">把横线(行/wordline)和竖线(列/bitline)交叉成网格,<b>每个交叉点放一个三元 cell</b>。这就是 crossbar。<b>点任意 cell 循环 −1/0/+1;</b>换个尺寸看它怎么变大:</span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
 <span class="seg" id="xsize"><button data-n="4" class="on">4×4</button><button data-n="8">8×8</button><button data-n="16">16×16</button></span>
-<button class="sec" onclick="randXbar()">🎲 随机填</button>
+<button class="sec" onclick="randXbar()"><span class="lang-en">🎲 Random fill</span><span class="lang-zh">🎲 随机填</span></button>
 </div>
 <svg id="xbarSvg" viewBox="0 0 360 360" width="360"></svg>
-<div class="legend" style="justify-content:center"><span><i style="background:#8ee59a"></i>+1 导通</span><span><i style="background:#3a3d55"></i>0 断开</span><span><i style="background:#ff8aa0"></i>−1 反向</span></div>
-<div class="note">横线=输入进来的方向,竖线=电流汇总出去的方向。一个 16×16 就是 256 个权重。真芯片一个 macro 是几百万个。</div>
+<div class="legend" style="justify-content:center"><span><i style="background:#8ee59a"></i><span class="lang-en">+1 conducting</span><span class="lang-zh">+1 导通</span></span><span><i style="background:#3a3d55"></i><span class="lang-en">0 open</span><span class="lang-zh">0 断开</span></span><span><i style="background:#ff8aa0"></i><span class="lang-en">−1 reverse</span><span class="lang-zh">−1 反向</span></span></div>
+<div class="note"><span class="lang-en">Horizontal lines = the direction inputs come in; vertical lines = the direction current sums out. A 16×16 is 256 weights. One real-chip macro is a few million.</span><span class="lang-zh">横线=输入进来的方向,竖线=电流汇总出去的方向。一个 16×16 就是 256 个权重。真芯片一个 macro 是几百万个。</span></div>
 </div>
 
 <!-- ③ one computation -->
-<h2 id="mac">③ 做一次计算时,里面发生了什么?(核心!)</h2>
-<p>这是 CIM 的魔法。<b>左边按行给输入</b>(点亮 = 输入 1),<b>按"▶ 跑一次计算"</b>:电压沿每行流进去,每个 cell 把"输入×权重"变成电流,<b>同一列的电流在竖线上自动相加</b>(基尔霍夫定律)→ 底下就是这一列的输出。一整个矩阵乘法,用物理一瞬间算完。</p>
+<h2 id="mac"><span class="lang-en">③ When one computation runs, what happens inside? (the core!)</span><span class="lang-zh">③ 做一次计算时,里面发生了什么?(核心!)</span></h2>
+<p><span class="lang-en">This is CIM's magic. <b>Feed inputs by row on the left</b> (lit = input 1), <b>press "▶ Run one computation"</b>: voltage flows in along each row, each cell turns "input × weight" into current, and <b>currents in the same column add up automatically on the bitline</b> (Kirchhoff's law) → the bottom is that column's output. A whole matrix multiply, done in an instant by physics.</span><span class="lang-zh">这是 CIM 的魔法。<b>左边按行给输入</b>(点亮 = 输入 1),<b>按"▶ 跑一次计算"</b>:电压沿每行流进去,每个 cell 把"输入×权重"变成电流,<b>同一列的电流在竖线上自动相加</b>(基尔霍夫定律)→ 底下就是这一列的输出。一整个矩阵乘法,用物理一瞬间算完。</span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-<button onclick="runMac()" id="macBtn">▶ 跑一次计算</button>
-<button class="sec" onclick="randMac()">🎲 换一组权重/输入</button>
+<button onclick="runMac()" id="macBtn"><span class="lang-en">▶ Run one computation</span><span class="lang-zh">▶ 跑一次计算</span></button>
+<button class="sec" onclick="randMac()"><span class="lang-en">🎲 New weights/inputs</span><span class="lang-zh">🎲 换一组权重/输入</span></button>
 <span class="note" id="macStatus"></span>
 </div>
 <svg id="macSvg" viewBox="0 0 420 360" width="420"></svg>
-<div class="legend" style="justify-content:center"><span><i style="background:#7aa9ff"></i>输入电压(行)</span><span><i style="background:#8ee59a"></i>+电流</span><span><i style="background:#ff8aa0"></i>−电流</span><span>底部 = 列求和输出 y</span></div>
-<div class="note">普通芯片:要把权重一个个搬到计算单元,逐个乘加。CIM:权重不动,<b>一列同时算完</b> —— 这就是它快和省电的根。</div>
+<div class="legend" style="justify-content:center"><span><i style="background:#7aa9ff"></i><span class="lang-en">input voltage (rows)</span><span class="lang-zh">输入电压(行)</span></span><span><i style="background:#8ee59a"></i><span class="lang-en">+ current</span><span class="lang-zh">+电流</span></span><span><i style="background:#ff8aa0"></i><span class="lang-en">− current</span><span class="lang-zh">−电流</span></span><span><span class="lang-en">bottom = column-sum output y</span><span class="lang-zh">底部 = 列求和输出 y</span></span></div>
+<div class="note"><span class="lang-en">Ordinary chip: weights must be hauled to the compute unit one by one and multiply-accumulated one at a time. CIM: weights don't move, <b>a whole column computes at once</b> — that's the root of its speed and power savings.</span><span class="lang-zh">普通芯片:要把权重一个个搬到计算单元,逐个乘加。CIM:权重不动,<b>一列同时算完</b> —— 这就是它快和省电的根。</span></div>
 </div>
 
 <!-- ④ macro floorplan / efficiency -->
-<h2 id="macro">④ 一个 macro 里,真正存权重的占多少?</h2>
-<p>这是"理论密度"和"实际能放"差很多的原因。中间方块才是存权重的 cell 阵列;<b>四周一圈是 ADC、驱动、译码、读出</b>——它们不存权重,却占掉大片面积和功耗。<b>拖滑块看"有用面积"怎么被吃掉:</b></p>
+<h2 id="macro"><span class="lang-en">④ Inside one macro, how much actually stores weights?</span><span class="lang-zh">④ 一个 macro 里,真正存权重的占多少?</span></h2>
+<p><span class="lang-en">This is why "theoretical density" and "what you can actually fit" differ so much. Only the center square is the weight-storing cell array; <b>the surrounding ring is ADCs, drivers, decoders, readout</b> — they store no weights, yet eat up a big chunk of area and power. <b>Drag the slider to see how the "useful area" gets eaten:</b></span><span class="lang-zh">这是"理论密度"和"实际能放"差很多的原因。中间方块才是存权重的 cell 阵列;<b>四周一圈是 ADC、驱动、译码、读出</b>——它们不存权重,却占掉大片面积和功耗。<b>拖滑块看"有用面积"怎么被吃掉:</b></span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-外围(ADC等)占比 <input type="range" id="effR" min="20" max="85" value="60" oninput="drawMacro()">
+<span class="lang-en">Periphery (ADC etc.) share</span><span class="lang-zh">外围(ADC等)占比</span> <input type="range" id="effR" min="20" max="85" value="60" oninput="drawMacro()">
 <span class="kpi" id="effLbl"></span>
 </div>
 <svg id="macroSvg" viewBox="0 0 360 280" width="360"></svg>
@@ -119,84 +119,104 @@ b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}
 </div>
 
 <!-- ④· readout: ADC vs sense-amp -->
-<h2 id="readout">④· 读出方式:为什么"低精度"能把 ADC 拆掉?</h2>
-<p>澄清:<b>算账的是阵列物理(电流自动相加),ADC 只是"读数器"</b>——把那条模拟电流量成数字。<b>拖滑块看:要读的精度越高,读数器越大越费电,有用面积被它吃掉;低到 1-bit,它缩成一个小小的"灵敏放大器"。</b></p>
+<h2 id="readout"><span class="lang-en">④· Readout method: why can "low precision" remove the ADC?</span><span class="lang-zh">④· 读出方式:为什么"低精度"能把 ADC 拆掉?</span></h2>
+<p><span class="lang-en">To be clear: <b>the array physics does the math (currents add up automatically); the ADC is just a "meter"</b> — it measures that analog current into a digital number. <b>Drag the slider: the higher the readout precision, the bigger and more power-hungry the meter, and the more useful area it eats; down at 1-bit, it shrinks to a tiny "sense amplifier".</b></span><span class="lang-zh">澄清:<b>算账的是阵列物理(电流自动相加),ADC 只是"读数器"</b>——把那条模拟电流量成数字。<b>拖滑块看:要读的精度越高,读数器越大越费电,有用面积被它吃掉;低到 1-bit,它缩成一个小小的"灵敏放大器"。</b></span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center">读出精度 <input type="range" id="roB" min="1" max="8" value="1" oninput="drawReadout()"> <span class="kpi" id="roBLbl"></span> bit <span class="note">(默认 1-bit = 我们的无-ADC 路线)</span></div>
+<div class="ctl" style="justify-content:center"><span class="lang-en">Readout precision</span><span class="lang-zh">读出精度</span> <input type="range" id="roB" min="1" max="8" value="1" oninput="drawReadout()"> <span class="kpi" id="roBLbl"></span> bit <span class="note"><span class="lang-en">(default 1-bit = our no-ADC route)</span><span class="lang-zh">(默认 1-bit = 我们的无-ADC 路线)</span></span></div>
 <svg id="roSvg" viewBox="0 0 400 250" width="400"></svg>
-<div class="row" style="justify-content:center;gap:16px;font-size:13px"><span>读出方式 <b class="y" id="roName"></b></span><span>要比的阈值线 <b class="y" id="roThr"></b></span></div>
-<div class="row" style="justify-content:center;gap:16px;font-size:13px"><span>有用 cell 面积 <b class="g" id="roEff"></b></span><span>读出能耗 <b class="r" id="roEn"></b></span></div>
+<div class="row" style="justify-content:center;gap:16px;font-size:13px"><span><span class="lang-en">Readout method</span><span class="lang-zh">读出方式</span> <b class="y" id="roName"></b></span><span><span class="lang-en">Threshold lines to compare</span><span class="lang-zh">要比的阈值线</span> <b class="y" id="roThr"></b></span></div>
+<div class="row" style="justify-content:center;gap:16px;font-size:13px"><span><span class="lang-en">Useful cell area</span><span class="lang-zh">有用 cell 面积</span> <b class="g" id="roEff"></b></span><span><span class="lang-en">Readout energy</span><span class="lang-zh">读出能耗</span> <b class="r" id="roEn"></b></span></div>
 <div class="note" id="roNote"></div>
-<div class="callout" style="text-align:left"><b>还有第三条路:全数字 CIM。</b> 干脆不要模拟读出——把乘加直接放数字电路做(<span class="t" data-k="digcim">全数字 CIM</span>,如亿铸的 ReRAM 方案、台积电的数字 SRAM-CIM)。牺牲一点模拟极致能效,换<b>彻底没有 ADC + 更鲁棒</b>。对三元/二值这种低精度,"模拟+1bit灵敏放大器" vs "全数字" 谁更划算,是个真问题,正好问行家。</div>
+<div class="callout" style="text-align:left"><span class="lang-en"><b>There's a third path too: all-digital CIM.</b> Just skip analog readout — put the multiply-accumulate directly into digital circuits (<span class="t" data-k="digcim">all-digital CIM</span>, like Yizhu's ReRAM scheme, or TSMC's digital SRAM-CIM). You give up a bit of analog's peak energy efficiency in exchange for <b>no ADC at all + more robustness</b>. For low precision like ternary/binary, which is more worthwhile — "analog + 1-bit sense amp" vs "all-digital" — is a real question, and a great one to ask an expert.</span><span class="lang-zh"><b>还有第三条路:全数字 CIM。</b> 干脆不要模拟读出——把乘加直接放数字电路做(<span class="t" data-k="digcim">全数字 CIM</span>,如亿铸的 ReRAM 方案、台积电的数字 SRAM-CIM)。牺牲一点模拟极致能效,换<b>彻底没有 ADC + 更鲁棒</b>。对三元/二值这种低精度,"模拟+1bit灵敏放大器" vs "全数字" 谁更划算,是个真问题,正好问行家。</span></div>
 </div>
 
 <!-- ⑤ whole chip: tiling + 2D/2.5D/3D + area -->
-<h2 id="chip">⑤ 整片芯片:一个大的,还是拼好几个?</h2>
-<p>一个 macro 不够大,要<b>拼很多个</b>。怎么拼有三种封装方式,芯片面积也有讲究。<b>切换看:</b></p>
+<h2 id="chip"><span class="lang-en">⑤ The whole chip: one big one, or several tiled together?</span><span class="lang-zh">⑤ 整片芯片:一个大的,还是拼好几个?</span></h2>
+<p><span class="lang-en">One macro isn't big enough — you <b>tile many together</b>. There are three packaging ways to tile them, and chip area matters too. <b>Switch to see:</b></span><span class="lang-zh">一个 macro 不够大,要<b>拼很多个</b>。怎么拼有三种封装方式,芯片面积也有讲究。<b>切换看:</b></span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-<span class="seg" id="pack"><button data-p="2d">平面 2D</button><button data-p="2.5d" class="on">2.5D organic（我们的路）</button><button data-p="3d">3D 堆叠（已弃）</button></span>
+<span class="seg" id="pack"><button data-p="2d"><span class="lang-en">Planar 2D</span><span class="lang-zh">平面 2D</span></button><button data-p="2.5d" class="on"><span class="lang-en">2.5D organic (our path)</span><span class="lang-zh">2.5D organic（我们的路）</span></button><button data-p="3d"><span class="lang-en">3D stacked (dropped)</span><span class="lang-zh">3D 堆叠（已弃）</span></button></span>
 </div>
 <div class="ctl" style="justify-content:center">
-芯片面积 <span class="seg" id="area"><button data-a="280">280</button><button data-a="380" class="on">380</button><button data-a="450">450 mm²</button></span>
+<span class="lang-en">Chip area</span><span class="lang-zh">芯片面积</span> <span class="seg" id="area"><button data-a="280">280</button><button data-a="380" class="on">380</button><button data-a="450">450 mm²</button></span>
 </div>
 <svg id="chipSvg" viewBox="0 0 400 300" width="400"></svg>
 <div class="note" id="chipNote"></div>
 </div>
 
 <!-- ⑥ yield -->
-<h2 id="yield">⑥ 良率:面积越大,坏的概率越高</h2>
-<p>芯片造出来会有随机缺陷。<b>面积越大,一片里中招的概率越高,能用的(良品)越少 → 成本飙升。</b>这就是"400mm² 没人做过"的现实顾虑之一。<b>拖缺陷率、开冗余修复看变化:</b></p>
+<h2 id="yield"><span class="lang-en">⑥ Yield: the bigger the area, the higher the chance of defects</span><span class="lang-zh">⑥ 良率:面积越大,坏的概率越高</span></h2>
+<p><span class="lang-en">Manufactured chips have random defects. <b>The bigger the area, the higher the chance a given chip gets hit, the fewer usable (good) ones → cost soars.</b> This is one of the real-world worries behind "nobody has made a 400mm² one". <b>Drag the defect rate, toggle redundancy repair, and watch it change:</b></span><span class="lang-zh">芯片造出来会有随机缺陷。<b>面积越大,一片里中招的概率越高,能用的(良品)越少 → 成本飙升。</b>这就是"400mm² 没人做过"的现实顾虑之一。<b>拖缺陷率、开冗余修复看变化:</b></span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-缺陷密度 <input type="range" id="defR" min="0" max="30" value="8" oninput="drawYield()">
-<label class="note"><input type="checkbox" id="redun" onchange="drawYield()"> 开冗余修复</label>
-<button class="sec" onclick="reseedYield()">🎲 重投一片</button>
+<span class="lang-en">Defect density</span><span class="lang-zh">缺陷密度</span> <input type="range" id="defR" min="0" max="30" value="8" oninput="drawYield()">
+<label class="note"><input type="checkbox" id="redun" onchange="drawYield()"> <span class="lang-en">Enable redundancy repair</span><span class="lang-zh">开冗余修复</span></label>
+<button class="sec" onclick="reseedYield()"><span class="lang-en">🎲 Re-roll a wafer</span><span class="lang-zh">🎲 重投一片</span></button>
 </div>
 <svg id="yieldSvg" viewBox="0 0 360 280" width="360"></svg>
 <div class="note" id="yieldNote"></div>
 </div>
 
 <!-- ⑦ LLM layers -->
-<h2 id="llm">⑦ 一个 LLM 长什么样?在芯片里怎么存怎么算?</h2>
-<p>LLM 是<b>一摞 transformer 层</b>叠起来,每层就是几个大权重矩阵。一个字(token)从下往上<b>穿过每一层</b>,每穿一层 = 在那层的权重矩阵上做一次大矩阵乘(就是 ③ 那种计算)。<b>拖层数/尺寸,看它需要多少 macro 来存:</b></p>
+<h2 id="llm"><span class="lang-en">⑦ What does an LLM look like? How is it stored and computed in a chip?</span><span class="lang-zh">⑦ 一个 LLM 长什么样?在芯片里怎么存怎么算?</span></h2>
+<p><span class="lang-en">An LLM is <b>a stack of transformer layers</b>, each layer being a few big weight matrices. One token <b>passes through each layer</b> from bottom to top; passing one layer = doing one big matrix multiply on that layer's weight matrix (exactly the kind of computation in ③). <b>Drag the layer count / size to see how many macros it needs to store:</b></span><span class="lang-zh">LLM 是<b>一摞 transformer 层</b>叠起来,每层就是几个大权重矩阵。一个字(token)从下往上<b>穿过每一层</b>,每穿一层 = 在那层的权重矩阵上做一次大矩阵乘(就是 ③ 那种计算)。<b>拖层数/尺寸,看它需要多少 macro 来存:</b></span></p>
 <div class="card" style="text-align:center">
 <div class="ctl" style="justify-content:center">
-层数 <input type="range" id="llmL" min="4" max="48" value="12" oninput="drawLLM()"><span class="kpi" id="llmLLbl"></span>
-&nbsp; 每层宽度 <input type="range" id="llmD" min="256" max="4096" step="256" value="1024" oninput="drawLLM()"><span class="kpi" id="llmDLbl"></span>
+<span class="lang-en">Layers</span><span class="lang-zh">层数</span> <input type="range" id="llmL" min="4" max="48" value="12" oninput="drawLLM()"><span class="kpi" id="llmLLbl"></span>
+&nbsp; <span class="lang-en">Width per layer</span><span class="lang-zh">每层宽度</span> <input type="range" id="llmD" min="256" max="4096" step="256" value="1024" oninput="drawLLM()"><span class="kpi" id="llmDLbl"></span>
 </div>
-<div class="ctl" style="justify-content:center"><button onclick="flowToken()" id="flowBtn">▶ 让一个字穿过所有层</button></div>
+<div class="ctl" style="justify-content:center"><button onclick="flowToken()" id="flowBtn"><span class="lang-en">▶ Send one token through all layers</span><span class="lang-zh">▶ 让一个字穿过所有层</span></button></div>
 <svg id="llmSvg" viewBox="0 0 420 320" width="420"></svg>
 <div class="note" id="llmNote"></div>
 </div>
 
-<div class="foot">看得见的 ReRAM-CIM · millisecond-era · 毫秒纪 · 2026-06-01 · 图为示意,帮助理解机理;精确数字以公开论文为准。</div>
+<div class="foot"><span class="lang-en">ReRAM-CIM You Can See · millisecond-era · 2026-06-01 · Figures are illustrative, to aid understanding of the mechanism; for exact numbers, defer to published papers.</span><span class="lang-zh">看得见的 ReRAM-CIM · millisecond-era · 毫秒纪 · 2026-06-01 · 图为示意,帮助理解机理;精确数字以公开论文为准。</span></div>
 </div>
 
-<div class="defsrc" id="d-adc"><b>ADC = 模数转换器（Analog-to-Digital Converter）</b>：CIM 在阵列里算出来的是连续的“模拟电流”（有大有小），但电脑只认数字 0/1。ADC 就是那个“把模拟电流量一量、报成一个数字”的小电路。麻烦在于：它又大又费电——一个 CIM 芯片里，ADC 常常吃掉一大半的面积和功耗。要测的电流挡位越多（多电平），ADC 就要越精密越大。所以它是“理论密度高、实际放不下那么多”的头号原因。</div>
-<div class="defsrc" id="d-macro"><b>macro（存算宏）</b>：一块“能自己干活的小积木”——里面是一片 cell 阵列 + 配套的 ADC/驱动/译码。一个 macro 大约能存 16 Mb 权重。真芯片是把很多个 macro 拼起来用。</div>
-<div class="defsrc" id="d-cell"><b>cell（存储单元）</b>：存 1 个权重的最小零件。ReRAM 的 cell = 1 个晶体管 + 1 个电阻开关，靠调电阻丝粗细存 −1/0/+1。</div>
-<div class="defsrc" id="d-wl"><b>wordline / bitline（横线 / 竖线）</b>：crossbar 阵列里的金属导线。横线（wordline）从左边把输入电压送进每一行；竖线（bitline）在底部把一整列的电流收集起来相加。交叉点放一个 cell。</div>
-<div class="defsrc" id="d-mac"><b>MAC = 乘加（Multiply-Accumulate）</b>：神经网络最基本的动作——把输入乘以权重，再把一堆乘积加起来。一次矩阵乘法就是几百万次 MAC。CIM 用一列电流自动相加，一瞬间做完一整列的 MAC。</div>
-<div class="defsrc" id="d-kirch"><b>基尔霍夫电流定律</b>：一句中学物理——汇到同一根导线上的电流会自动相加。CIM 借这条定律，让一整列 cell 的电流在竖线上自己加起来，不用任何指令，就完成了“求和”。</div>
-<div class="defsrc" id="d-die"><b>die（裸片）</b>：从一整片晶圆上切下来的一小块芯片，就是“一颗芯片的本体”。面积常用 mm²（平方毫米）算，比如 280/380/450 mm²。</div>
-<div class="defsrc" id="d-chiplet"><b>chiplet（芯粒）</b>：把一颗大芯片拆成几块小的来造，每块叫一个 chiplet。小块良率高、更便宜，再拼到一起用。AMD/苹果的大芯片都这么干。</div>
-<div class="defsrc" id="d-interposer"><b>interposer（转接板）</b>：2.5D 封装里那块“底板”——几个 chiplet 并排坐在它上面，它负责把彼此用极密的线连通。像把几块积木粘到同一块底座上。</div>
-<div class="defsrc" id="d-tsv"><b>TSV = 硅通孔（Through-Silicon Via）</b>：在芯片上垂直打的微小通孔，让上下叠起来的几层芯片能直接连通。3D 堆叠就靠它上下传信号。</div>
-<div class="defsrc" id="d-d25"><b>2.5D vs 3D</b>：都是“拼很多芯片”的封装。<b>2.5D</b>=几块芯片<b>并排</b>坐在转接板上（平铺）；<b>3D</b>=几层芯片<b>垂直叠</b>起来用 TSV 上下连。3D 同样面积密度最高，但热量难散、良率更难，所以“大面积 3D”至今很少有人做。</div>
-<div class="defsrc" id="d-yield"><b>yield（良率）</b>：造出来的芯片里“合格能用”的比例。晶圆上有随机缺陷，<b>芯片面积越大、单片里 macro 越多，整片全好的概率越低</b>，良率越低 → 成本越高。这是“大芯片”的天然代价。</div>
-<div class="defsrc" id="d-redun"><b>冗余修复（redundancy）</b>：多造一些备用的行/列/macro，造好后用好的去顶替坏的。能把一部分本来报废的芯片救回来，提升良率。</div>
-<div class="defsrc" id="d-transformer"><b>transformer 层</b>：现代 LLM 的基本积木，一摞同样结构的层叠起来。每层主要就是几个大权重矩阵（注意力 + 前馈）。一个字从下往上穿过每一层，每层做一次大矩阵乘（=一堆 MAC）。层数越多、矩阵越大，模型越强也越大。</div>
+<div class="defsrc" id="d-adc"><span class="lang-en"><b>ADC = Analog-to-Digital Converter</b>: what CIM computes inside the array is a continuous "analog current" (larger or smaller), but a computer only understands digits 0/1. The ADC is the small circuit that "measures the analog current and reports a number". The trouble: it's big and power-hungry — in a CIM chip, the ADCs often eat up more than half the area and power. The more current levels you need to measure (multi-level), the more precise and larger the ADC must be. So it is the number-one reason that "theoretical density is high but you can't actually fit that much".</span><span class="lang-zh"><b>ADC = 模数转换器（Analog-to-Digital Converter）</b>：CIM 在阵列里算出来的是连续的“模拟电流”（有大有小），但电脑只认数字 0/1。ADC 就是那个“把模拟电流量一量、报成一个数字”的小电路。麻烦在于：它又大又费电——一个 CIM 芯片里，ADC 常常吃掉一大半的面积和功耗。要测的电流挡位越多（多电平），ADC 就要越精密越大。所以它是“理论密度高、实际放不下那么多”的头号原因。</span></div>
+<div class="defsrc" id="d-macro"><span class="lang-en"><b>macro (compute-in-memory block)</b>: a "small building block that does work on its own" — inside is a cell array + supporting ADC/drivers/decoder. One macro stores roughly 16 Mb of weights. A real chip tiles many macros together.</span><span class="lang-zh"><b>macro（存算宏）</b>：一块“能自己干活的小积木”——里面是一片 cell 阵列 + 配套的 ADC/驱动/译码。一个 macro 大约能存 16 Mb 权重。真芯片是把很多个 macro 拼起来用。</span></div>
+<div class="defsrc" id="d-cell"><span class="lang-en"><b>cell (storage unit)</b>: the smallest part that stores 1 weight. A ReRAM cell = 1 transistor + 1 resistive switch, storing −1/0/+1 by tuning the thickness of the resistive filament.</span><span class="lang-zh"><b>cell（存储单元）</b>：存 1 个权重的最小零件。ReRAM 的 cell = 1 个晶体管 + 1 个电阻开关，靠调电阻丝粗细存 −1/0/+1。</span></div>
+<div class="defsrc" id="d-wl"><span class="lang-en"><b>wordline / bitline (rows / columns)</b>: the metal wires in a crossbar array. The horizontal line (wordline) feeds input voltage into each row from the left; the vertical line (bitline) collects and adds up a whole column's current at the bottom. A cell sits at each crossing.</span><span class="lang-zh"><b>wordline / bitline（横线 / 竖线）</b>：crossbar 阵列里的金属导线。横线（wordline）从左边把输入电压送进每一行；竖线（bitline）在底部把一整列的电流收集起来相加。交叉点放一个 cell。</span></div>
+<div class="defsrc" id="d-mac"><span class="lang-en"><b>MAC = Multiply-Accumulate</b>: the most basic action in a neural network — multiply inputs by weights, then add up a pile of products. One matrix multiply is millions of MACs. CIM adds a column of currents automatically, finishing a whole column's MACs in an instant.</span><span class="lang-zh"><b>MAC = 乘加（Multiply-Accumulate）</b>：神经网络最基本的动作——把输入乘以权重，再把一堆乘积加起来。一次矩阵乘法就是几百万次 MAC。CIM 用一列电流自动相加，一瞬间做完一整列的 MAC。</span></div>
+<div class="defsrc" id="d-kirch"><span class="lang-en"><b>Kirchhoff's current law</b>: a line of middle-school physics — currents flowing into the same wire add up automatically. CIM borrows this law to let a whole column of cells' currents add themselves up on the bitline, with no instruction, completing the "sum".</span><span class="lang-zh"><b>基尔霍夫电流定律</b>：一句中学物理——汇到同一根导线上的电流会自动相加。CIM 借这条定律，让一整列 cell 的电流在竖线上自己加起来，不用任何指令，就完成了“求和”。</span></div>
+<div class="defsrc" id="d-die"><span class="lang-en"><b>die (bare chip)</b>: a small piece cut from a whole wafer — the "body of one chip". Area is usually measured in mm² (square millimeters), e.g. 280/380/450 mm².</span><span class="lang-zh"><b>die（裸片）</b>：从一整片晶圆上切下来的一小块芯片，就是“一颗芯片的本体”。面积常用 mm²（平方毫米）算，比如 280/380/450 mm²。</span></div>
+<div class="defsrc" id="d-chiplet"><span class="lang-en"><b>chiplet</b>: splitting one big chip into several smaller pieces to manufacture, each piece called a chiplet. Small pieces have higher yield and are cheaper, then are tiled together for use. AMD/Apple's big chips all do this.</span><span class="lang-zh"><b>chiplet（芯粒）</b>：把一颗大芯片拆成几块小的来造，每块叫一个 chiplet。小块良率高、更便宜，再拼到一起用。AMD/苹果的大芯片都这么干。</span></div>
+<div class="defsrc" id="d-interposer"><span class="lang-en"><b>interposer</b>: the "base board" in 2.5D packaging — several chiplets sit side by side on it, and it connects them with extremely dense wiring. Like gluing several blocks onto the same base.</span><span class="lang-zh"><b>interposer（转接板）</b>：2.5D 封装里那块“底板”——几个 chiplet 并排坐在它上面，它负责把彼此用极密的线连通。像把几块积木粘到同一块底座上。</span></div>
+<div class="defsrc" id="d-tsv"><span class="lang-en"><b>TSV = Through-Silicon Via</b>: a tiny vertical hole drilled through the chip, letting several stacked chip layers connect directly. 3D stacking relies on it to pass signals up and down.</span><span class="lang-zh"><b>TSV = 硅通孔（Through-Silicon Via）</b>：在芯片上垂直打的微小通孔，让上下叠起来的几层芯片能直接连通。3D 堆叠就靠它上下传信号。</span></div>
+<div class="defsrc" id="d-d25"><span class="lang-en"><b>2.5D vs 3D</b>: both are "tile many chips" packaging. <b>2.5D</b> = several chips <b>side by side</b> on an interposer (laid flat); <b>3D</b> = several chip layers <b>stacked vertically</b>, connected up and down by TSVs. 3D has the highest density for the same area, but heat is hard to dissipate and yield is harder, so "large-area 3D" is still rarely done.</span><span class="lang-zh"><b>2.5D vs 3D</b>：都是“拼很多芯片”的封装。<b>2.5D</b>=几块芯片<b>并排</b>坐在转接板上（平铺）；<b>3D</b>=几层芯片<b>垂直叠</b>起来用 TSV 上下连。3D 同样面积密度最高，但热量难散、良率更难，所以“大面积 3D”至今很少有人做。</span></div>
+<div class="defsrc" id="d-yield"><span class="lang-en"><b>yield</b>: the fraction of manufactured chips that are "good and usable". Wafers have random defects, and <b>the bigger the chip area and the more macros per chip, the lower the probability the whole chip is good</b>, so yield drops → cost rises. This is the natural price of "big chips".</span><span class="lang-zh"><b>yield（良率）</b>：造出来的芯片里“合格能用”的比例。晶圆上有随机缺陷，<b>芯片面积越大、单片里 macro 越多，整片全好的概率越低</b>，良率越低 → 成本越高。这是“大芯片”的天然代价。</span></div>
+<div class="defsrc" id="d-redun"><span class="lang-en"><b>redundancy repair</b>: build some spare rows/columns/macros, then use the good ones to replace the bad ones after manufacturing. It rescues some chips that would otherwise be scrapped, raising yield.</span><span class="lang-zh"><b>冗余修复（redundancy）</b>：多造一些备用的行/列/macro，造好后用好的去顶替坏的。能把一部分本来报废的芯片救回来，提升良率。</span></div>
+<div class="defsrc" id="d-transformer"><span class="lang-en"><b>transformer layer</b>: the basic building block of a modern LLM, a stack of identically structured layers. Each layer is mainly a few big weight matrices (attention + feed-forward). A token passes through each layer from bottom to top, doing one big matrix multiply per layer (= a pile of MACs). The more layers and the bigger the matrices, the stronger — and bigger — the model.</span><span class="lang-zh"><b>transformer 层</b>：现代 LLM 的基本积木，一摞同样结构的层叠起来。每层主要就是几个大权重矩阵（注意力 + 前馈）。一个字从下往上穿过每一层，每层做一次大矩阵乘（=一堆 MAC）。层数越多、矩阵越大，模型越强也越大。</span></div>
 
-<div class="defsrc" id="d-digcim"><b>全数字 CIM</b>：另一条避开 ADC 的路线——不在“模拟电流域”算，而是把乘加放到数字电路里做（数字 SRAM-CIM、全数字 ReRAM-CIM）。好处：完全不需要模拟 ADC，结果可复现、更鲁棒、易移植。代价：失去模拟存内计算那种极致的每瓦能效。对二值/三值这种低精度，全数字往往很划算；代表有亿铸（全数字 ReRAM-CIM）、台积电的数字 SRAM-CIM。</div>
-<div class="defsrc" id="d-memwall"><b>内存墙（memory wall）</b>：现代芯片算得飞快，但数据要从内存搬到计算单元，这段“搬运”又慢又费电，成了真正的瓶颈。大模型推理时要反复搬几个 GB 的权重，大量时间和电力耗在搬运上，而不是计算上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
+<div class="defsrc" id="d-digcim"><span class="lang-en"><b>all-digital CIM</b>: another route that avoids the ADC — instead of computing in the "analog current domain", put the multiply-accumulate into digital circuits (digital SRAM-CIM, all-digital ReRAM-CIM). Upside: no analog ADC needed at all; results are reproducible, more robust, easier to port. Cost: you lose the extreme per-watt energy efficiency of analog compute-in-memory. For low precision like binary/ternary, all-digital is often very worthwhile; examples include Yizhu (all-digital ReRAM-CIM) and TSMC's digital SRAM-CIM.</span><span class="lang-zh"><b>全数字 CIM</b>：另一条避开 ADC 的路线——不在“模拟电流域”算，而是把乘加放到数字电路里做（数字 SRAM-CIM、全数字 ReRAM-CIM）。好处：完全不需要模拟 ADC，结果可复现、更鲁棒、易移植。代价：失去模拟存内计算那种极致的每瓦能效。对二值/三值这种低精度，全数字往往很划算；代表有亿铸（全数字 ReRAM-CIM）、台积电的数字 SRAM-CIM。</span></div>
+<div class="defsrc" id="d-memwall"><span class="lang-en"><b>memory wall</b>: modern chips compute blazingly fast, but data must be hauled from memory to the compute unit, and that "hauling" is slow and power-hungry — it has become the real bottleneck. During large-model inference, several GB of weights are hauled back and forth repeatedly, and most of the time and power is spent on moving, not computing. The whole point of CIM is: don't move the weights, compute in place, and the wall disappears.</span><span class="lang-zh"><b>内存墙（memory wall）</b>：现代芯片算得飞快，但数据要从内存搬到计算单元，这段“搬运”又慢又费电，成了真正的瓶颈。大模型推理时要反复搬几个 GB 的权重，大量时间和电力耗在搬运上，而不是计算上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</span></div>
 <div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>
 <script>
-document.querySelectorAll('.t').forEach(function(el){el.addEventListener('click',function(){
- var src=document.getElementById('d-'+el.getAttribute('data-k'));if(!src)return;
- document.getElementById('popT').textContent=el.textContent;
+// pick only the active-language text from an element that may hold .lang-en/.lang-zh spans
+function mseActiveText(node){
+ var lang=document.documentElement.dataset.lang==='zh'?'zh':'en';
+ var pick=node.querySelector('.lang-'+lang);
+ return pick?pick.textContent:node.textContent;
+}
+var msePopKey=null; // remembers which glossary entry the popup is showing
+function mseShowPop(k){
+ var trig=document.querySelector('.t[data-k="'+k+'"]');
+ var src=document.getElementById('d-'+k);if(!src)return;
+ msePopKey=k;
+ document.getElementById('popT').textContent=trig?mseActiveText(trig):k;
  document.getElementById('popB').innerHTML=src.innerHTML;
- document.getElementById('pop').classList.add('show');});});
+ document.getElementById('pop').classList.add('show');
+}
+document.querySelectorAll('.t').forEach(function(el){el.addEventListener('click',function(){
+ mseShowPop(el.getAttribute('data-k'));});});
+// re-render the open popup's title when language toggles (body uses CSS spans, auto-handled)
+window.addEventListener('mse:lang',function(){
+ var pop=document.getElementById('pop');
+ if(msePopKey&&pop&&pop.classList.contains('show')){
+   var trig=document.querySelector('.t[data-k="'+msePopKey+'"]');
+   if(trig)document.getElementById('popT').textContent=mseActiveText(trig);
+ }
+});
 </script>
 
 
@@ -206,30 +226,32 @@ function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAt
 function clear(s){while(s.firstChild)s.removeChild(s.firstChild);}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const COL={1:'#8ee59a',0:'#3a3d55','-1':'#ff8aa0'};
+// bilingual helper for JS-generated text: LX(en,zh) returns the active-language string
+function LX(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
 
 // ===== ① ternary cell =====
 let ternState=1; // 权重值；由"+列/−列两个二态cell的差"表示
 function drawTern(){
  const s=document.getElementById('ternSvg');clear(s);
  // 两个二态 cell：左=+列、右=−列。每个只有"开(有丝)/关(无丝)"两态。
- const cells=[{cx:65,lab:'+列 cell',on:ternState>0,c:'#8ee59a'},
-              {cx:175,lab:'−列 cell',on:ternState<0,c:'#ff8aa0'}];
+ const cells=[{cx:65,lab:LX('+col cell','+列 cell'),on:ternState>0,c:'#8ee59a'},
+              {cx:175,lab:LX('−col cell','−列 cell'),on:ternState<0,c:'#ff8aa0'}];
  cells.forEach(co=>{
    s.appendChild(el('rect',{x:co.cx-30,y:24,width:60,height:11,rx:3,fill:'#7aa9ff'}));   // top electrode
    s.appendChild(el('rect',{x:co.cx-30,y:112,width:60,height:11,rx:3,fill:'#ffd36b'}));  // bottom electrode
    s.appendChild(el('rect',{x:co.cx-30,y:35,width:60,height:77,fill:'#23283a'}));         // oxide
    if(co.on) s.appendChild(el('rect',{x:co.cx-5,y:35,width:10,height:77,fill:co.c,rx:2})); // 二态:开才有丝
-   s.appendChild(el('text',{x:co.cx,y:140,fill:co.on?co.c:'#5a5d72','text-anchor':'middle','font-size':12})).textContent=co.lab+(co.on?'·开':'·关');
+   s.appendChild(el('text',{x:co.cx,y:140,fill:co.on?co.c:'#5a5d72','text-anchor':'middle','font-size':12})).textContent=co.lab+(co.on?LX('·on','·开'):LX('·off','·关'));
  });
  s.appendChild(el('text',{x:120,y:78,fill:'#8a8ca6','text-anchor':'middle','font-size':22})).textContent='−';
- s.appendChild(el('text',{x:120,y:18,fill:'#caa9ff','text-anchor':'middle','font-size':11})).textContent='共享计数器：+列 − −列';
+ s.appendChild(el('text',{x:120,y:18,fill:'#caa9ff','text-anchor':'middle','font-size':11})).textContent=LX('shared counter: +col − −col','共享计数器：+列 − −列');
  const hit=el('rect',{x:10,y:6,width:220,height:150,fill:'transparent',style:'cursor:pointer'});
  hit.addEventListener('click',()=>{ternState=ternState===1?0:ternState===0?-1:1;drawTern();});
  s.appendChild(hit);
  const W={'1':'+1','0':'0','-1':'−1'};
- const expl={'1':'+列开、−列关 → (1)−(0) = +1','0':'两个都关 → (0)−(0) = 0','-1':'+列关、−列开 → (0)−(1) = −1'};
- document.getElementById('ternLbl').innerHTML='权重 = <span style="color:'+(COL[ternState])+'">'+W[ternState]+'</span>';
- document.getElementById('ternNote').textContent='两个"开/关"二态 cell 摆出三元:'+expl[ternState]+'。读出 = 共享计数器数 +列 click 减 −列 click,无 ADC、天然做减法。一个三元值 ≈ 1.58 bit。(不是"一个 cell 调三档"——那种多电平 cell 难读又会飘,下一节。)';
+ const expl={'1':LX('+col on, −col off → (1)−(0) = +1','+列开、−列关 → (1)−(0) = +1'),'0':LX('both off → (0)−(0) = 0','两个都关 → (0)−(0) = 0'),'-1':LX('+col off, −col on → (0)−(1) = −1','+列关、−列开 → (0)−(1) = −1')};
+ document.getElementById('ternLbl').innerHTML=LX('weight','权重')+' = <span style="color:'+(COL[ternState])+'">'+W[ternState]+'</span>';
+ document.getElementById('ternNote').textContent=LX('Two "on/off" binary cells set a ternary value: ','两个"开/关"二态 cell 摆出三元:')+expl[ternState]+LX('. Readout = shared counter counts +col clicks minus −col clicks: no ADC, subtraction for free. One ternary value ≈ 1.58 bit. (Not "tuning one cell to three levels" — those multi-level cells are hard to read and drift, see next section.)','。读出 = 共享计数器数 +列 click 减 −列 click,无 ADC、天然做减法。一个三元值 ≈ 1.58 bit。(不是"一个 cell 调三档"——那种多电平 cell 难读又会飘,下一节。)');
 }
 
 // ===== ② crossbar =====
@@ -278,13 +300,13 @@ function drawMac(partial){
    const t=el('text',{x:x,y:y+2,fill:'#ffd36b','text-anchor':'middle','font-size':15,'font-weight':700,id:'myt'+j});
    t.textContent=(partial?'?':yj);s.appendChild(t);
  }
- s.appendChild(el('text',{x:34,y:24,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent='输入';
+ s.appendChild(el('text',{x:34,y:24,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent=LX('input','输入');
  s.appendChild(el('text',{x:g.pad+(mN-1)*g.step+55,y:g.top+(mN-1)*g.step+58,fill:'#ffd36b','font-size':12})).textContent='=y';
 }
 async function runMac(){
  if(macRunning)return;macRunning=true;document.getElementById('macBtn').disabled=true;
  drawMac(true);const g=macGeo();const s=document.getElementById('macSvg');
- document.getElementById('macStatus').textContent='电流沿列汇总中…';
+ document.getElementById('macStatus').textContent=LX('Currents summing along columns…','电流沿列汇总中…');
  for(let j=0;j<mN;j++){
    let sum=0;
    for(let i=0;i<mN;i++){
@@ -301,7 +323,7 @@ async function runMac(){
    }
    document.getElementById('myt'+j).textContent=sum;
  }
- document.getElementById('macStatus').textContent='完成：每一列同时把 输入×权重 加了起来 = 输出向量 y。';
+ document.getElementById('macStatus').textContent=LX('Done: every column added input×weight at once = output vector y.','完成：每一列同时把 输入×权重 加了起来 = 输出向量 y。');
  macRunning=false;document.getElementById('macBtn').disabled=false;
 }
 
@@ -309,23 +331,23 @@ async function runMac(){
 function drawMacro(){
  const s=document.getElementById('macroSvg');clear(s);
  const periph=+document.getElementById('effR').value, cellFrac=1-periph/100;
- document.getElementById('effLbl').textContent='有用 cell 仅 '+Math.round(cellFrac*100)+'%';
+ document.getElementById('effLbl').textContent=LX('useful cells only '+Math.round(cellFrac*100)+'%','有用 cell 仅 '+Math.round(cellFrac*100)+'%');
  // outer macro
  s.appendChild(el('rect',{x:10,y:10,width:340,height:260,rx:8,fill:'#181a28',stroke:'#33354a'}));
  // peripheral blocks (ADC bottom, drivers left, decoder top)
  s.appendChild(el('rect',{x:10,y:200,width:340,height:70,rx:6,fill:'#3a2030',stroke:'#5a3040'}));
- s.appendChild(el('text',{x:180,y:240,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent='读出外围（高精度=ADC 最吃面积；我们走无-ADC 计数器）';
+ s.appendChild(el('text',{x:180,y:240,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent=LX('readout periphery (high precision = ADC eats most area; we use no-ADC counters)','读出外围（高精度=ADC 最吃面积；我们走无-ADC 计数器）');
  s.appendChild(el('rect',{x:10,y:10,width:60,height:190,rx:6,fill:'#2a2438',stroke:'#443a5a'}));
- s.appendChild(el('text',{x:40,y:110,fill:'#caa9ff','text-anchor':'middle','font-size':11,transform:'rotate(-90 40 110)'})).textContent='行驱动';
+ s.appendChild(el('text',{x:40,y:110,fill:'#caa9ff','text-anchor':'middle','font-size':11,transform:'rotate(-90 40 110)'})).textContent=LX('row drivers','行驱动');
  s.appendChild(el('rect',{x:70,y:10,width:280,height:34,rx:6,fill:'#23303a',stroke:'#33454f'}));
- s.appendChild(el('text',{x:210,y:32,fill:'#7aa9ff','text-anchor':'middle','font-size':11})).textContent='列译码 / 读出';
+ s.appendChild(el('text',{x:210,y:32,fill:'#7aa9ff','text-anchor':'middle','font-size':11})).textContent=LX('column decode / readout','列译码 / 读出');
  // the actual cell array, sized by cellFrac (area-proportional, anchored)
  const maxW=280,maxH=156, scale=Math.sqrt(cellFrac);
  const w=maxW*scale,h=maxH*scale, cx=70+(maxW)/2, cy=44+(maxH)/2;
  s.appendChild(el('rect',{x:cx-w/2,y:cy-h/2,width:w,height:h,rx:5,fill:'#163a22',stroke:'#2f7a45','stroke-width':2}));
- s.appendChild(el('text',{x:cx,y:cy,fill:'#8ee59a','text-anchor':'middle','font-size':13,'font-weight':700})).textContent='存权重的 cell 阵列';
- s.appendChild(el('text',{x:cx,y:cy+18,fill:'#8ee59a','text-anchor':'middle','font-size':11})).textContent=Math.round(cellFrac*100)+'% 面积';
- document.getElementById('macroNote').innerHTML='理论密度按整块算，但只有<b style="color:#8ee59a">中间这块</b>真正存权重。外围吃掉 '+periph+'% → 实际能放的远低于理论。多电平 ADC 越精密，外围越大。';
+ s.appendChild(el('text',{x:cx,y:cy,fill:'#8ee59a','text-anchor':'middle','font-size':13,'font-weight':700})).textContent=LX('weight-storing cell array','存权重的 cell 阵列');
+ s.appendChild(el('text',{x:cx,y:cy+18,fill:'#8ee59a','text-anchor':'middle','font-size':11})).textContent=Math.round(cellFrac*100)+LX('% area','% 面积');
+ document.getElementById('macroNote').innerHTML=LX('Theoretical density counts the whole block, but only <b style="color:#8ee59a">this center piece</b> actually stores weights. The periphery eats '+periph+'% → what you can really fit is far below theory. The more precise the multi-level ADC, the bigger the periphery.','理论密度按整块算，但只有<b style="color:#8ee59a">中间这块</b>真正存权重。外围吃掉 '+periph+'% → 实际能放的远低于理论。多电平 ADC 越精密，外围越大。');
 }
 
 // ===== ④· readout ADC vs sense-amp =====
@@ -333,36 +355,36 @@ function drawReadout(){
  const bits=+document.getElementById('roB').value;
  const thr=Math.pow(2,bits)-1, readoutUnits=4*Math.pow(2,bits-1), eff=100/(100+readoutUnits), enRel=readoutUnits/4;
  document.getElementById('roBLbl').textContent=bits;
- const name=bits===1?'1-bit 灵敏放大器（一个比较器）':bits<=3?bits+'-bit 低精度读出':bits+'-bit 高精度 ADC';
+ const name=bits===1?LX('1-bit sense amp (a single comparator)','1-bit 灵敏放大器（一个比较器）'):bits<=3?LX(bits+'-bit low-precision readout',bits+'-bit 低精度读出'):LX(bits+'-bit high-precision ADC',bits+'-bit 高精度 ADC');
  document.getElementById('roName').textContent=name;
- document.getElementById('roThr').textContent=thr+' 条';
+ document.getElementById('roThr').textContent=thr+LX(' lines',' 条');
  document.getElementById('roEff').textContent=Math.round(eff*100)+'%';
  document.getElementById('roEn').textContent=enRel.toFixed(0)+'×';
  const s=document.getElementById('roSvg');clear(s);
  // left: current axis + thresholds + needle
  const ax=70,top=30,H=180;
  s.appendChild(el('line',{x1:ax,y1:top,x2:ax,y2:top+H,stroke:'#5a5d72','stroke-width':2}));
- s.appendChild(el('text',{x:ax,y:20,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent='电流大';
- s.appendChild(el('text',{x:ax,y:top+H+14,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent='电流小';
+ s.appendChild(el('text',{x:ax,y:20,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent=LX('high current','电流大');
+ s.appendChild(el('text',{x:ax,y:top+H+14,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent=LX('low current','电流小');
  const drawN=Math.min(thr,28);
  for(let k=1;k<=drawN;k++){const y=top+H*k/(drawN+1);s.appendChild(el('line',{x1:ax-12,y1:y,x2:ax+12,y2:y,stroke:bits<=3?'#8ee59a':'#ff8aa0','stroke-width':1}));}
- if(thr>drawN)s.appendChild(el('text',{x:ax,y:top+H+28,fill:'#ff8aa0','text-anchor':'middle','font-size':10})).textContent='…共 '+thr+' 条阈值线';
+ if(thr>drawN)s.appendChild(el('text',{x:ax,y:top+H+28,fill:'#ff8aa0','text-anchor':'middle','font-size':10})).textContent=LX('… '+thr+' threshold lines total','…共 '+thr+' 条阈值线');
  const ny=top+H*0.40;
  s.appendChild(el('circle',{cx:ax,cy:ny,r:7,fill:'#ffd36b'}));
- s.appendChild(el('text',{x:ax+16,y:ny+4,fill:'#ffd36b','font-size':11,'text-anchor':'start'})).textContent='← 测得电流';
- s.appendChild(el('text',{x:ax,y:top+H+(thr>drawN?42:28),fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent=bits===1?'问：大于阈值吗？是/否':'问：落在哪一挡？';
+ s.appendChild(el('text',{x:ax+16,y:ny+4,fill:'#ffd36b','font-size':11,'text-anchor':'start'})).textContent=LX('← measured current','← 测得电流');
+ s.appendChild(el('text',{x:ax,y:top+H+(thr>drawN?42:28),fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent=bits===1?LX('Q: above threshold? yes/no','问：大于阈值吗？是/否'):LX('Q: which level does it fall in?','问：落在哪一挡？');
  // right: macro cells vs readout
  const rx=232,rw=146,ry=32,rH=180,readH=rH*(1-eff),cellH=rH*eff;
  s.appendChild(el('rect',{x:rx,y:ry,width:rw,height:readH,fill:'#3a2030',stroke:'#7a3040'}));
- s.appendChild(el('text',{x:rx+rw/2,y:ry+Math.min(readH/2+4,readH-4),fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent=bits<=2?'读出(小)':'ADC 读出';
+ s.appendChild(el('text',{x:rx+rw/2,y:ry+Math.min(readH/2+4,readH-4),fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent=bits<=2?LX('readout (small)','读出(小)'):LX('ADC readout','ADC 读出');
  s.appendChild(el('rect',{x:rx,y:ry+readH,width:rw,height:cellH,fill:'#163a22',stroke:'#2f7a45'}));
- s.appendChild(el('text',{x:rx+rw/2,y:ry+readH+cellH/2,fill:'#8ee59a','text-anchor':'middle','font-size':13,'font-weight':700})).textContent='存权重 '+Math.round(eff*100)+'%';
- s.appendChild(el('text',{x:rx+rw/2,y:ry-6,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent='一个 macro 的面积';
+ s.appendChild(el('text',{x:rx+rw/2,y:ry+readH+cellH/2,fill:'#8ee59a','text-anchor':'middle','font-size':13,'font-weight':700})).textContent=LX('weights ','存权重 ')+Math.round(eff*100)+'%';
+ s.appendChild(el('text',{x:rx+rw/2,y:ry-6,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent=LX('area of one macro','一个 macro 的面积');
  let msg;
- if(bits===1)msg='只问一个是/否 → 一个比较器,几乎不占地不耗电,有用面积最大。三元只多一两条阈值线,仍极省。';
- else if(bits<=3)msg='低精度:几条阈值线、几个比较器,读出还很小,有用面积高。';
- else msg='高精度:要分 '+thr+' 条阈值线、反复比较才知道"到底多大" → 读出又大又费电,把有用面积吃掉一大半。这就是高精度 CIM 的墙。';
- document.getElementById('roNote').innerHTML=msg+' <span class="note">（面积/能耗为示意,说明趋势）</span>';
+ if(bits===1)msg=LX('Just one yes/no question → one comparator, almost no area or power, maximum useful area. Ternary adds only one or two threshold lines, still extremely cheap.','只问一个是/否 → 一个比较器,几乎不占地不耗电,有用面积最大。三元只多一两条阈值线,仍极省。');
+ else if(bits<=3)msg=LX('Low precision: a few threshold lines, a few comparators, readout still small, useful area high.','低精度:几条阈值线、几个比较器,读出还很小,有用面积高。');
+ else msg=LX('High precision: you must split '+thr+' threshold lines and compare repeatedly to know "exactly how big" → readout grows big and power-hungry, eating up more than half the useful area. This is the wall of high-precision CIM.','高精度:要分 '+thr+' 条阈值线、反复比较才知道"到底多大" → 读出又大又费电,把有用面积吃掉一大半。这就是高精度 CIM 的墙。');
+ document.getElementById('roNote').innerHTML=msg+' <span class="note">'+LX('(area/energy illustrative, showing the trend)','（面积/能耗为示意,说明趋势）')+'</span>';
 }
 
 // ===== ⑤ chip packaging =====
@@ -373,9 +395,9 @@ function drawChip(){
  // macros count scales ~ with area; use area/ (efficiency*macro footprint) rough
  const perDie=Math.round(chipArea/3.0); // illustrative macros per die layer
  let layers=1,dies=1,label='';
- if(packMode==='2d'){layers=1;dies=1;label='一块 die 上平铺很多 macro';}
- if(packMode==='2.5d'){layers=1;dies=4;label='✅ 我们的路:多个小 die 并排坐在便宜的 organic 转接板上(2.5D)，按 die 扩容';}
- if(packMode==='3d'){layers=4;dies=1;label='⛔ 已弃:垂直叠+TSV，密度最高，但 in-place CIM 只在 die 间搬激活、organic 带宽已足够→3D 的垂直 TB/s 买不到收益，且小团队拿不到产能、最难散热';}
+ if(packMode==='2d'){layers=1;dies=1;label=LX('Many macros laid flat on one die','一块 die 上平铺很多 macro');}
+ if(packMode==='2.5d'){layers=1;dies=4;label=LX('✅ Our path: many small dies sitting side by side on a cheap organic interposer (2.5D), scaling by adding dies','✅ 我们的路:多个小 die 并排坐在便宜的 organic 转接板上(2.5D)，按 die 扩容');}
+ if(packMode==='3d'){layers=4;dies=1;label=LX('⛔ Dropped: vertical stack + TSV, highest density, but in-place CIM only moves activations between dies and organic bandwidth is already enough → 3D vertical TB/s buys no benefit, plus a small team can\'t get the capacity and heat is hardest to dissipate','⛔ 已弃:垂直叠+TSV，密度最高，但 in-place CIM 只在 die 间搬激活、organic 带宽已足够→3D 的垂直 TB/s 买不到收益，且小团队拿不到产能、最难散热');}
  // draw
  if(packMode==='2.5d'){
    for(let d=0;d<dies;d++){const x=20+d*92;
@@ -383,20 +405,20 @@ function drawChip(){
      tile(s,x+6,66,68,148,Math.round(perDie/4));
      s.appendChild(el('text',{x:x+40,y:240,fill:'#7aa9ff','text-anchor':'middle','font-size':11})).textContent='chiplet '+(d+1);}
    s.appendChild(el('rect',{x:14,y:230,width:372,height:14,rx:3,fill:'#2a2438'}));
-   s.appendChild(el('text',{x:200,y:262,fill:'#caa9ff','text-anchor':'middle','font-size':12})).textContent='↑ interposer 转接板（2.5D）';
+   s.appendChild(el('text',{x:200,y:262,fill:'#caa9ff','text-anchor':'middle','font-size':12})).textContent=LX('↑ interposer (2.5D)','↑ interposer 转接板（2.5D）');
  } else if(packMode==='3d'){
    for(let L=layers-1;L>=0;L--){const off=L*14,x=70+off,y=40+off;
      s.appendChild(el('rect',{x:x,y:y,width:220,height:150,rx:6,fill:'#13202e',stroke:'#3a5170','fill-opacity':0.92}));
      tile(s,x+8,y+8,204,134,Math.round(perDie/2));}
    for(let L=0;L<layers;L++){s.appendChild(el('line',{x1:90,y1:48+L*14,x2:90,y2:60+L*14,stroke:'#ffd36b','stroke-width':2}));}
-   s.appendChild(el('text',{x:200,y:262,fill:'#8ee59a','text-anchor':'middle','font-size':12})).textContent='4 层垂直叠（3D，TSV 上下贯通）';
+   s.appendChild(el('text',{x:200,y:262,fill:'#8ee59a','text-anchor':'middle','font-size':12})).textContent=LX('4 layers stacked vertically (3D, TSV through top-to-bottom)','4 层垂直叠（3D，TSV 上下贯通）');
  } else {
    s.appendChild(el('rect',{x:40,y:40,width:320,height:200,rx:8,fill:'#13202e',stroke:'#3a5170'}));
    tile(s,48,48,304,184,perDie);
-   s.appendChild(el('text',{x:200,y:262,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent='单 die 平面铺满 macro（2D）';
+   s.appendChild(el('text',{x:200,y:262,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent=LX('single die fully tiled with macros (2D)','单 die 平面铺满 macro（2D）');
  }
  const totalMacros=perDie*layers*dies;
- document.getElementById('chipNote').innerHTML=label+'。<br>'+chipArea+' mm² · '+packMode.toUpperCase()+' ≈ <b class="y">'+totalMacros+'</b> 个 macro × 16 Mb ≈ <b class="y">'+(totalMacros*macroMb/8/1024).toFixed(1)+' GB</b> 等效三元容量（示意）。<b>我们走 2.5D organic 按 die 扩容</b>;3D 容量虽最大但对"只搬激活"的 in-place CIM 买不到收益,已弃。';
+ document.getElementById('chipNote').innerHTML=label+LX('.<br>','。<br>')+chipArea+' mm² · '+packMode.toUpperCase()+' ≈ <b class="y">'+totalMacros+'</b>'+LX(' macros × 16 Mb ≈ <b class="y">',' 个 macro × 16 Mb ≈ <b class="y">')+(totalMacros*macroMb/8/1024).toFixed(1)+LX(' GB</b> equivalent ternary capacity (illustrative). <b>We take 2.5D organic, scaling by adding dies</b>; 3D has the largest capacity but buys no benefit for "move-activations-only" in-place CIM, so it\'s dropped.',' GB</b> 等效三元容量（示意）。<b>我们走 2.5D organic 按 die 扩容</b>;3D 容量虽最大但对"只搬激活"的 in-place CIM 买不到收益,已弃。');
 }
 function tile(s,x,y,w,h,n){const cols=Math.ceil(Math.sqrt(n*w/h)),rows=Math.ceil(n/cols);const cw=w/cols,ch=h/rows;let k=0;
  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){if(k++>=n)break;s.appendChild(el('rect',{x:x+c*cw+1,y:y+r*ch+1,width:cw-2,height:ch-2,rx:1.5,fill:'#163a22',stroke:'#2f7a45','stroke-width':0.6}));}}
@@ -416,27 +438,27 @@ function drawYield(){
    s.appendChild(el('rect',{x:x+1,y:y+1,width:step-2,height:step-2,rx:2,fill:fill,stroke:stroke}));
  }
  const yieldPct=Math.round(good/(N*N)*100);
- document.getElementById('yieldNote').innerHTML='良品 macro <b class="g">'+good+'</b> / '+(N*N)+'（良率 '+yieldPct+'%）· 坏 <b class="r">'+dead+'</b>'+(redun?' · 冗余修好 <b class="y">'+repaired+'</b>':'')+'。缺陷率一样时，<b>面积越大 macro 越多，整片全好的概率越低</b> → 大芯片良率天然吃亏，冗余能救一部分。';
+ document.getElementById('yieldNote').innerHTML=LX('Good macros <b class="g">'+good+'</b> / '+(N*N)+' (yield '+yieldPct+'%) · bad <b class="r">'+dead+'</b>'+(redun?' · repaired by redundancy <b class="y">'+repaired+'</b>':'')+'. At the same defect rate, <b>the bigger the area and the more macros, the lower the probability the whole chip is good</b> → big chips are naturally penalized on yield; redundancy rescues some.','良品 macro <b class="g">'+good+'</b> / '+(N*N)+'（良率 '+yieldPct+'%）· 坏 <b class="r">'+dead+'</b>'+(redun?' · 冗余修好 <b class="y">'+repaired+'</b>':'')+'。缺陷率一样时，<b>面积越大 macro 越多，整片全好的概率越低</b> → 大芯片良率天然吃亏，冗余能救一部分。');
 }
 
 // ===== ⑦ LLM =====
 function drawLLM(){
  const L=+document.getElementById('llmL').value, D=+document.getElementById('llmD').value;
- document.getElementById('llmLLbl').textContent=L+' 层';
- document.getElementById('llmDLbl').textContent=D+' 宽';
+ document.getElementById('llmLLbl').textContent=LX(L+' layers',L+' 层');
+ document.getElementById('llmDLbl').textContent=LX(D+' wide',D+' 宽');
  const s=document.getElementById('llmSvg');clear(s);
  const showL=Math.min(L,12);const x0=150,w=120,top=20,gap=Math.min(22,(280)/showL),h=gap-4;
  for(let k=0;k<showL;k++){const y=top+k*gap;
    s.appendChild(el('rect',{x:x0,y:y,width:w,height:h,rx:4,fill:'#1a2336',stroke:'#3a5170',id:'ly'+k}));
-   s.appendChild(el('text',{x:x0+w+8,y:y+h-3,fill:'#8a8ca6','font-size':10})).textContent='层 '+(showL-k)+' · 权重矩阵 '+D+'×'+D;
+   s.appendChild(el('text',{x:x0+w+8,y:y+h-3,fill:'#8a8ca6','font-size':10})).textContent=LX('layer '+(showL-k)+' · weight matrix '+D+'×'+D,'层 '+(showL-k)+' · 权重矩阵 '+D+'×'+D);
  }
- if(L>showL)s.appendChild(el('text',{x:x0+w/2,y:top+showL*gap+12,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent='…共 '+L+' 层';
+ if(L>showL)s.appendChild(el('text',{x:x0+w/2,y:top+showL*gap+12,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent=LX('… '+L+' layers total','…共 '+L+' 层');
  s.appendChild(el('circle',{cx:x0+w/2,cy:top+showL*gap+30,r:9,fill:'#ffd36b',id:'tok'}));
- s.appendChild(el('text',{x:x0+w/2,y:top+showL*gap+34,fill:'#06070d','text-anchor':'middle','font-size':10,'font-weight':700})).textContent='字';
+ s.appendChild(el('text',{x:x0+w/2,y:top+showL*gap+34,fill:'#06070d','text-anchor':'middle','font-size':10,'font-weight':700})).textContent=LX('tok','字');
  // params + macros
  const params=L*12*D*D; // ~12 D^2 per transformer layer
  const bits=params*2; const macros=Math.ceil(bits/(16e6));
- document.getElementById('llmNote').innerHTML='≈ <b class="y">'+(params/1e6).toFixed(0)+'M</b> 参数 → 三元(2bit)需 <b class="y">'+(bits/8/1e6).toFixed(1)+' MB</b> → 约 <b class="y">'+macros.toLocaleString()+'</b> 个 16Mb macro 来存。一个字穿过每一层，每层做一次 ③ 那样的矩阵乘。';
+ document.getElementById('llmNote').innerHTML=LX('≈ <b class="y">'+(params/1e6).toFixed(0)+'M</b> params → ternary (2bit) needs <b class="y">'+(bits/8/1e6).toFixed(1)+' MB</b> → about <b class="y">'+macros.toLocaleString()+'</b> 16Mb macros to store. One token passes through each layer, doing one matrix multiply like ③ per layer.','≈ <b class="y">'+(params/1e6).toFixed(0)+'M</b> 参数 → 三元(2bit)需 <b class="y">'+(bits/8/1e6).toFixed(1)+' MB</b> → 约 <b class="y">'+macros.toLocaleString()+'</b> 个 16Mb macro 来存。一个字穿过每一层，每层做一次 ③ 那样的矩阵乘。');
 }
 async function flowToken(){
  const b=document.getElementById('flowBtn');b.disabled=true;
@@ -456,20 +478,20 @@ let vsRunning=false;
 function vsScene(){
  const t=document.getElementById('tradSvg');clear(t);
  t.appendChild(el('rect',{x:14,y:30,width:120,height:80,rx:8,fill:'#3a2030',stroke:'#7a3040'}));
- t.appendChild(el('text',{x:74,y:24,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent='内存（权重住这）';
+ t.appendChild(el('text',{x:74,y:24,fill:'#ff8aa0','text-anchor':'middle','font-size':12})).textContent=LX('memory (weights live here)','内存（权重住这）');
  for(let i=0;i<6;i++)t.appendChild(el('circle',{cx:34+(i%3)*34,cy:52+Math.floor(i/3)*30,r:7,fill:'#ff8aa0'}));
  t.appendChild(el('rect',{x:266,y:30,width:120,height:80,rx:8,fill:'#23303a',stroke:'#33454f'}));
- t.appendChild(el('text',{x:326,y:24,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent='计算单元（CPU/GPU）';
+ t.appendChild(el('text',{x:326,y:24,fill:'#7aa9ff','text-anchor':'middle','font-size':12})).textContent=LX('compute unit (CPU/GPU)','计算单元（CPU/GPU）');
  t.appendChild(el('line',{x1:134,y1:70,x2:266,y2:70,stroke:'#5a5d72','stroke-width':2,'stroke-dasharray':'4 4'}));
- t.appendChild(el('text',{x:200,y:64,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent='总线（来回搬）';
+ t.appendChild(el('text',{x:200,y:64,fill:'#8a8ca6','text-anchor':'middle','font-size':10})).textContent=LX('bus (hauls back and forth)','总线（来回搬）');
  const c=document.getElementById('cimSvg');clear(c);
  c.appendChild(el('rect',{x:80,y:30,width:240,height:80,rx:8,fill:'#163a22',stroke:'#2f7a45'}));
- c.appendChild(el('text',{x:200,y:24,fill:'#8ee59a','text-anchor':'middle','font-size':12})).textContent='存算一体阵列（权重常驻·原地算）';
+ c.appendChild(el('text',{x:200,y:24,fill:'#8ee59a','text-anchor':'middle','font-size':12})).textContent=LX('compute-in-memory array (weights resident · computed in place)','存算一体阵列（权重常驻·原地算）');
  for(let i=0;i<6;i++)c.appendChild(el('circle',{cx:120+(i%3)*40,cy:55+Math.floor(i/3)*30,r:7,fill:'#8ee59a'}));
  c.appendChild(el('line',{x1:14,y1:70,x2:80,y2:70,stroke:'#7aa9ff','stroke-width':2}));
- c.appendChild(el('text',{x:40,y:64,fill:'#7aa9ff','text-anchor':'middle','font-size':10})).textContent='输入';
+ c.appendChild(el('text',{x:40,y:64,fill:'#7aa9ff','text-anchor':'middle','font-size':10})).textContent=LX('input','输入');
  c.appendChild(el('line',{x1:320,y1:70,x2:386,y2:70,stroke:'#ffd36b','stroke-width':2}));
- c.appendChild(el('text',{x:358,y:64,fill:'#ffd36b','text-anchor':'middle','font-size':10})).textContent='输出';
+ c.appendChild(el('text',{x:358,y:64,fill:'#ffd36b','text-anchor':'middle','font-size':10})).textContent=LX('output','输出');
 }
 function drawVS(){vsScene();['tMoves','tEnergy','tTime','cMoves','cEnergy','cTime'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('vsNote').textContent='';}
 function mvDot(svg,x1,y1,x2,y2,color,dur){return new Promise(res=>{const d=el('circle',{cx:x1,cy:y1,r:6,fill:color});svg.appendChild(d);const t0=performance.now();function st(t){const k=Math.min(1,(t-t0)/dur);d.setAttribute('cx',x1+(x2-x1)*k);d.setAttribute('cy',y1+(y2-y1)*k);if(k<1)requestAnimationFrame(st);else{d.remove();res();}}requestAnimationFrame(st);});}
@@ -482,7 +504,7 @@ async function runVS(){
  const trad=(async()=>{for(let k=0;k<6;k++){await mvDot(t,134,70,266,70,'#ff8aa0',330);tM++;tE+=10;tT+=2;upd();await mvDot(t,266,70,134,70,'#ffd36b',330);tM++;tE+=6;tT+=2;upd();}})();
  const cim=(async()=>{await mvDot(c,14,70,80,70,'#7aa9ff',280);cM=1;cE+=2;cT+=1;upd();const box=c.querySelector('rect');box.setAttribute('fill','#1f5a30');await sleep(220);box.setAttribute('fill','#163a22');cE+=3;upd();await mvDot(c,320,70,386,70,'#8ee59a',280);cM=2;cT+=1;upd();})();
  await Promise.all([trad,cim]);
- document.getElementById('vsNote').innerHTML='传统:搬了 <b class="r">'+tM+'</b> 趟、能耗 <b class="r">'+tE+'</b>、用时 <b class="r">'+tT+'</b>;CIM:搬 <b class="g">'+cM+'</b> 次、能耗 <b class="g">'+cE+'</b>、用时 <b class="g">'+cT+'</b>。同一次推理,<b>CIM 几乎不搬运</b> → 省下约 <b class="y">'+Math.round(tE/cE)+'×</b> 能耗和大半时间。模型越大、权重越多,搬运差距越夸张。';
+ document.getElementById('vsNote').innerHTML=LX('Traditional: hauled <b class="r">'+tM+'</b> trips, energy <b class="r">'+tE+'</b>, time <b class="r">'+tT+'</b>; CIM: moved <b class="g">'+cM+'</b> times, energy <b class="g">'+cE+'</b>, time <b class="g">'+cT+'</b>. For the same inference, <b>CIM barely moves anything</b> → saving about <b class="y">'+Math.round(tE/cE)+'×</b> energy and most of the time. The bigger the model and the more weights, the more extreme the hauling gap.','传统:搬了 <b class="r">'+tM+'</b> 趟、能耗 <b class="r">'+tE+'</b>、用时 <b class="r">'+tT+'</b>;CIM:搬 <b class="g">'+cM+'</b> 次、能耗 <b class="g">'+cE+'</b>、用时 <b class="g">'+cT+'</b>。同一次推理,<b>CIM 几乎不搬运</b> → 省下约 <b class="y">'+Math.round(tE/cE)+'×</b> 能耗和大半时间。模型越大、权重越多,搬运差距越夸张。');
  vsRunning=false;document.getElementById('vsBtn').disabled=false;
 }
 
@@ -501,12 +523,12 @@ function drawMLC(){
  const frac=N>1?mlcPick/(N-1):0;                 // 0..1 thickness
  const fw=4+frac*40;
  if(frac>0)s.appendChild(el('rect',{x:75-fw/2,y:42,width:fw,height:156,fill:'#8ee59a',rx:2}));
- s.appendChild(el('text',{x:75,y:228,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent='丝越粗→电阻越小';
+ s.appendChild(el('text',{x:75,y:228,fill:'#8a8ca6','text-anchor':'middle','font-size':11})).textContent=LX('thicker filament → lower resistance','丝越粗→电阻越小');
  // right: resistance axis with N bands
  const axX=210,top=42,H=156,spread=22;            // physical read-noise spread (px)
  s.appendChild(el('line',{x1:axX,y1:top,x2:axX,y2:top+H,stroke:'#444a63','stroke-width':2}));
- s.appendChild(el('text',{x:axX-6,y:top-6,fill:'#8a8ca6','text-anchor':'end','font-size':11})).textContent='高阻';
- s.appendChild(el('text',{x:axX-6,y:top+H+12,fill:'#8a8ca6','text-anchor':'end','font-size':11})).textContent='低阻';
+ s.appendChild(el('text',{x:axX-6,y:top-6,fill:'#8a8ca6','text-anchor':'end','font-size':11})).textContent=LX('high R','高阻');
+ s.appendChild(el('text',{x:axX-6,y:top+H+12,fill:'#8a8ca6','text-anchor':'end','font-size':11})).textContent=LX('low R','低阻');
  const spacing=N>1?H/(N-1):H;const crowded=spacing<2*spread;
  for(let k=0;k<N;k++){const y=top+ (N>1? (H*k/(N-1)) : H/2);
    const col=crowded?'#ff8aa0':'#8ee59a';
@@ -514,13 +536,13 @@ function drawMLC(){
    s.appendChild(el('line',{x1:axX+6,y1:y,x2:axX+156,y2:y,stroke:col,'stroke-width':2}));
    const dot=el('circle',{cx:axX,cy:y,r:k===mlcPick?7:5,fill:k===mlcPick?'#ffd36b':col,stroke:'#06070d',style:'cursor:pointer'});
    dot.addEventListener('click',()=>{mlcPick=k;drawMLC();});s.appendChild(dot);
-   s.appendChild(el('text',{x:axX+162,y:y+4,fill:col,'font-size':11})).textContent='挡 '+(k+1);
+   s.appendChild(el('text',{x:axX+162,y:y+4,fill:col,'font-size':11})).textContent=LX('lvl '+(k+1),'挡 '+(k+1));
  }
  let msg;
- if(N<=3)msg='✅ '+N+' 档:间隔还宽,但仍会随器件老化/温度漂移。'+(N===3?' ←【就算只要 3 档,我们也不赌单 cell——改用两个二态 cell 差分:更稳、读出更简单、无 ADC】':'');
- else if(!crowded)msg='⚠️ '+N+' 档:还分得开,但每档间隔变窄了,良率开始打折。';
- else msg='❌ '+N+' 档:间隔 < 噪声宽度 → 相邻档重叠(红)→ 读的时候会认错档。这就是高档位 MLC 量产难、ReRAM 飘一下就错的根源。';
- document.getElementById('mlcNote').innerHTML=msg+'<br><span class="note">点右边的挡位圆点,左边的丝就长到那个粗细。</span>';
+ if(N<=3)msg=LX('✅ '+N+' levels: gaps are still wide, but they still drift with device aging/temperature.','✅ '+N+' 档:间隔还宽,但仍会随器件老化/温度漂移。')+(N===3?LX(' ←[Even for just 3 levels, we don\'t gamble on a single cell — we use two binary cells differential: more stable, simpler readout, no ADC]',' ←【就算只要 3 档,我们也不赌单 cell——改用两个二态 cell 差分:更稳、读出更简单、无 ADC】'):'');
+ else if(!crowded)msg=LX('⚠️ '+N+' levels: still separable, but each gap is narrower, and yield starts to suffer.','⚠️ '+N+' 档:还分得开,但每档间隔变窄了,良率开始打折。');
+ else msg=LX('❌ '+N+' levels: gap < noise width → adjacent levels overlap (red) → misreads on readout. This is the root of why high-level MLC is hard to mass-produce and why a single ReRAM drift causes errors.','❌ '+N+' 档:间隔 < 噪声宽度 → 相邻档重叠(红)→ 读的时候会认错档。这就是高档位 MLC 量产难、ReRAM 飘一下就错的根源。');
+ document.getElementById('mlcNote').innerHTML=msg+'<br><span class="note">'+LX('Click a level dot on the right, and the filament on the left grows to that thickness.','点右边的挡位圆点,左边的丝就长到那个粗细。')+'</span>';
 }
 
 // ===== init + wiring =====
@@ -537,5 +559,23 @@ document.querySelectorAll('#area button').forEach(b=>b.addEventListener('click',
 drawChip();
 reseedYield();
 drawLLM();
+
+// re-render all JS-generated labels when the global EN/中 toggle fires.
+// each redraw reads current state/sliders, so this preserves interaction state
+// (weights, inputs, picked levels, package mode, wafer seed are all module-level).
+window.addEventListener('mse:lang',function(){
+ try{
+   vsScene();          // re-label ⓪ diagrams without wiping the run counters
+   drawTern();         // ①
+   drawMLC();          // ①·
+   drawXbar();         // ② (no text inside, but harmless + future-proof)
+   drawMac();          // ③ (re-labels "input"/"=y"); transient status left as-is
+   drawMacro();        // ④
+   drawReadout();      // ④·
+   drawChip();         // ⑤
+   drawYield();        // ⑥ (re-uses existing wafer seed, does not re-roll)
+   drawLLM();          // ⑦
+ }catch(e){}
+});
 </script>  <script src="../site-nav.js"></script>
 </body></html>

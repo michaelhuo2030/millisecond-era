@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>速度阶梯 · 从 50 到 18 万 t/s（以及代价）</title>
+<title>Speed Ladder · From 50 to 180k t/s (and the cost) / 速度阶梯 · 从 50 到 18 万 t/s（以及代价）</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a}
 body{margin:0;background:radial-gradient(1000px 500px at 50% -10%,#15172a,#06070d);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC",sans-serif}
@@ -14,28 +14,32 @@ body{margin:0;background:radial-gradient(1000px 500px at 50% -10%,#15172a,#06070
 .note{color:var(--dim);font-size:13px;margin-top:22px;border-top:1px solid #20212c;padding-top:14px}
 b.hot{color:var(--hot)}.tag{font-size:11px;background:#241f12;color:var(--hot);padding:1px 6px;border-radius:5px}
 </style></head><body><div class="wrap">
-<h1>速度阶梯 ⚡ <span class="tag">50 → 18 万 t/s</span></h1>
-<div class="lead">右边每个数字都是<b class="hot">实测</b>的：同一台 Mac，模型越小，token 吐得越快——但<b>能力也越弱</b>。下面的计数器按各自<b>真实速度</b>实时狂飙，你能直观看到 3700 倍的差距。关键不是"谁最快"，是<b class="hot">速度和能力的取舍</b>，以及芯片要把"有用的那端"推多快。</div>
+<h1><span class="lang-en">Speed Ladder</span><span class="lang-zh">速度阶梯</span> ⚡ <span class="tag">50 → 180k t/s</span></h1>
+<div class="lead"><span class="lang-en">Every number on the right is <b class="hot">measured</b>: same Mac, the smaller the model, the faster it spits out tokens——but <b>the weaker it gets too</b>. The counters below race in real time at each model's <b>real speed</b>, so you can see the 3,700× gap with your own eyes. The point isn't "who's fastest," it's <b class="hot">the trade-off between speed and capability</b>——and how fast the chip has to push the "useful end."</span><span class="lang-zh">右边每个数字都是<b class="hot">实测</b>的：同一台 Mac，模型越小，token 吐得越快——但<b>能力也越弱</b>。下面的计数器按各自<b>真实速度</b>实时狂飙，你能直观看到 3700 倍的差距。关键不是"谁最快"，是<b class="hot">速度和能力的取舍</b>，以及芯片要把"有用的那端"推多快。</span></div>
 <div id="rows"></div>
 <div class="note">
-<b>读法：</b>越往下越快，但模型越小、越"空"。<b>50 t/s</b> 的能聊天能推理；<b>18 万 t/s</b> 的几乎是个空壳，只会吐字、没有真本事。<br>
+<span class="lang-en"><b>How to read this:</b> the further down, the faster——but the smaller and "emptier" the model. The <b>50 t/s</b> one can chat and reason; the <b>180k t/s</b> one is almost a hollow shell, just spitting characters with no real skill.<br>
+Our <b style="color:var(--ok)">Qwen0.5B (147 t/s)</b> is the smallest point on this line that is "<b>both real and useful</b>"——it can give genuine opinions (that's it speaking inside agora_real.html).<br>
+<b class="hot">The chip's mission</b>: using <b>ternary-at-training-time + on-chip residency</b>, push a <b>useful</b> model like 0.5B into the high-speed zone on the right (~thousands of t/s) at low power——real and fast at once.<br>
+Links: talos-mac/FRONTIER.md (bare-metal frontier) · agora_real.html (147 t/s real opinions) · part-b-demand-mapping (the eight-tier speed ladder).</span><span class="lang-zh"><b>读法：</b>越往下越快，但模型越小、越"空"。<b>50 t/s</b> 的能聊天能推理；<b>18 万 t/s</b> 的几乎是个空壳，只会吐字、没有真本事。<br>
 我们的 <b style="color:var(--ok)">Qwen0.5B（147 t/s）</b>是这条线上"<b>又真又有用</b>"的最小点——能给真观点（agora_real.html 里就是它在说话）。<br>
 <b class="hot">芯片的使命</b>：用<b>训练时三值 + 片上常驻</b>，把 0.5B 这种<b>有用</b>的模型推到右边的高速区（~数千 t/s）、还低功耗——既真、又快。<br>
-连接：talos-mac/FRONTIER.md（裸金属前沿）· agora_real.html（147 t/s 真观点）· part-b-demand-mapping（八级速度阶梯）。
+连接：talos-mac/FRONTIER.md（裸金属前沿）· agora_real.html（147 t/s 真观点）· part-b-demand-mapping（八级速度阶梯）。</span>
 </div></div><script>
 const ROWS=[
- {name:"ChatGPT / 人类阅读",cap:"能聊天、能推理、能写长文——但慢",spd:50,unit:"真有用，慢"},
- {name:"Qwen0.5B 本机真生成",cap:"能聊、能给真观点（agora_real.html 就是它）",spd:147,unit:"又真又有用 ⭐",ok:1},
- {name:"stories260K 裸金属",cap:"会写连贯小故事，但不能对话/推理",spd:14166,unit:"会写字，没脑子"},
- {name:"micro 8.4k 裸金属",cap:"几乎是空模型，只会吐字、毫无能力",spd:184320,unit:"纯吞吐，空壳"},
- {name:"芯片目标：0.5B 三值片上",cap:"有用模型 + 高速 + 低功耗（投影/目标）",spd:3000,unit:"既真又快(目标)",chip:1},
+ {name:"ChatGPT / 人类阅读",name_en:"ChatGPT / human reading",cap:"能聊天、能推理、能写长文——但慢",cap_en:"Can chat, reason, write long form——but slow",spd:50,unit:"真有用，慢",unit_en:"truly useful, slow"},
+ {name:"Qwen0.5B 本机真生成",name_en:"Qwen0.5B real on-device generation",cap:"能聊、能给真观点（agora_real.html 就是它）",cap_en:"Can chat, gives real opinions (it's the one in agora_real.html)",spd:147,unit:"又真又有用 ⭐",unit_en:"real and useful ⭐",ok:1},
+ {name:"stories260K 裸金属",name_en:"stories260K bare metal",cap:"会写连贯小故事，但不能对话/推理",cap_en:"Writes coherent little stories, but can't chat/reason",spd:14166,unit:"会写字，没脑子",unit_en:"writes words, no brain"},
+ {name:"micro 8.4k 裸金属",name_en:"micro 8.4k bare metal",cap:"几乎是空模型，只会吐字、毫无能力",cap_en:"Almost an empty model, just spits characters, no ability",spd:184320,unit:"纯吞吐，空壳",unit_en:"pure throughput, hollow"},
+ {name:"芯片目标：0.5B 三值片上",name_en:"Chip target: 0.5B ternary on-chip",cap:"有用模型 + 高速 + 低功耗（投影/目标）",cap_en:"Useful model + high speed + low power (projected/target)",spd:3000,unit:"既真又快(目标)",unit_en:"real and fast (target)",chip:1},
 ];
 const maxlog=Math.log10(184320);
 let rowsEl=document.getElementById('rows'),counts=ROWS.map(()=>0);
+function bi(zh,en){return `<span class="lang-en">${en}</span><span class="lang-zh">${zh}</span>`;}
 ROWS.forEach((r,i)=>{const d=document.createElement('div');d.className='row'+(r.chip?' chip':'');
- d.innerHTML=`<div><div class="name">${r.name}</div><div class="cap">${r.cap}</div></div>
+ d.innerHTML=`<div><div class="name">${bi(r.name,r.name_en)}</div><div class="cap">${bi(r.cap,r.cap_en)}</div></div>
  <div class="barwrap"><div class="bar" style="width:${(Math.log10(r.spd)/maxlog*100)}%"></div><div class="spd">${r.spd.toLocaleString()} t/s</div></div>
- <div class="count"><span id="c${i}">0</span><br><small>${r.unit}</small></div>`;rowsEl.appendChild(d);});
+ <div class="count"><span id="c${i}">0</span><br><small>${bi(r.unit,r.unit_en)}</small></div>`;rowsEl.appendChild(d);});
 let last=performance.now();
 function tick(){const now=performance.now(),dt=(now-last)/1000;last=now;
  ROWS.forEach((r,i)=>{counts[i]+=r.spd*dt; if(counts[i]>1e9)counts[i]=0; document.getElementById('c'+i).textContent=Math.floor(counts[i]).toLocaleString();});

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>反身的世界 · The Reflexive World</title>
+<title>The Reflexive World · 反身的世界</title>
 <style>
   :root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--mut:#8b949e;--acc:#58a6ff;--good:#3fb950;--bad:#f85149;--warn:#d29922}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,Segoe UI,Roboto,"PingFang SC",sans-serif}
@@ -27,65 +27,71 @@
 </head>
 <body>
 <header>
-  <h1>反身的世界 · The Reflexive World</h1>
-  <div class="sub">三个互动:① 这里有多少信息可挖? ② 反身性陷阱(看相关性会骗你) ③ 你永远跑不了的那个反事实(平行世界)。</div>
+  <h1><span class="lang-en">The Reflexive World</span><span class="lang-zh">反身的世界</span> · <span class="lang-en">反身的世界</span><span class="lang-zh">The Reflexive World</span></h1>
+  <div class="sub"><span class="lang-en">Three interactives: (1) How much information is actually here to dig out? (2) The reflexivity trap (correlation will fool you). (3) The counterfactual you can never run (parallel worlds).</span><span class="lang-zh">三个互动:① 这里有多少信息可挖? ② 反身性陷阱(看相关性会骗你) ③ 你永远跑不了的那个反事实(平行世界)。</span></div>
 </header>
 <div class="honest">
-  <b>诚实边界</b>:这是一个<b>抽象</b>玩具世界,只用来演示「反事实/反身性」推理的<b>形状</b>。它<b>不能、也不试图评判任何真实历史或真实的人</b>(家庭/公司/政策都是抽象档位)。在仿真里我们能跑两个分支;现实里你只有一条线——这恰恰是要点。
+  <span class="lang-en"><b>Honest boundary</b>: this is an <b>abstract</b> toy world, used only to demonstrate the <b>shape</b> of "counterfactual / reflexivity" reasoning. It <b>cannot, and does not try to, judge any real history or any real person</b> (family / firm / policy are all abstract settings). In simulation we can run two branches; in reality you only have one timeline — and that is precisely the point.</span><span class="lang-zh"><b>诚实边界</b>:这是一个<b>抽象</b>玩具世界,只用来演示「反事实/反身性」推理的<b>形状</b>。它<b>不能、也不试图评判任何真实历史或真实的人</b>(家庭/公司/政策都是抽象档位)。在仿真里我们能跑两个分支;现实里你只有一条线——这恰恰是要点。</span>
 </div>
 <div class="wrap">
 
   <!-- PANEL 1 -->
   <div class="card">
-    <h2>① 这里到底有多少信息可挖?</h2>
-    <p class="why">从"上帝视角(全可知)"到"纯噪声(谁也没辙)"。拖动旋钮看「可恢复 | 模型知道但难挖 | 纯噪声」如何切分,以及在这个信息量下谁赢(RAG检索 / 线性模型 / HDC结构化)。</p>
-    <div class="row"><label>数据多少 (data)</label><input id="p1data" type="range" min="0" max="100" value="70"><span id="p1dataV" class="mut"></span></div>
-    <div class="row"><label>噪声/有效程度 (noise)</label><input id="p1noise" type="range" min="0" max="100" value="40"><span id="p1noiseV" class="mut"></span></div>
+    <h2><span class="lang-en">(1) How much information is actually here to dig out?</span><span class="lang-zh">① 这里到底有多少信息可挖?</span></h2>
+    <p class="why"><span class="lang-en">From "god's-eye view (fully knowable)" to "pure noise (nobody can do anything)". Drag the knobs to see how it splits into "recoverable | the model knows but it's hard to mine | pure noise", and who wins at this amount of information (RAG retrieval / linear model / structured HDC).</span><span class="lang-zh">从"上帝视角(全可知)"到"纯噪声(谁也没辙)"。拖动旋钮看「可恢复 | 模型知道但难挖 | 纯噪声」如何切分,以及在这个信息量下谁赢(RAG检索 / 线性模型 / HDC结构化)。</span></p>
+    <div class="row"><label><span class="lang-en">How much data (data)</span><span class="lang-zh">数据多少 (data)</span></label><input id="p1data" type="range" min="0" max="100" value="70"><span id="p1dataV" class="mut"></span></div>
+    <div class="row"><label><span class="lang-en">Noise / signal level (noise)</span><span class="lang-zh">噪声/有效程度 (noise)</span></label><input id="p1noise" type="range" min="0" max="100" value="40"><span id="p1noiseV" class="mut"></span></div>
     <canvas id="p1canvas" width="900" height="120"></canvas>
     <div class="verdict" id="p1v"></div>
   </div>
 
   <!-- PANEL 2 -->
   <div class="card">
-    <h2>② 反身性陷阱:看相关性会骗你</h2>
-    <p class="why">一个"危机时才出手"的干预(救助/管教/救市)。它在数据上和"坏事"<b>正相关</b>(因为它专挑危机出手),看起来有害——但真相要看反事实。尺度越小、你越是局内人,反身反弹越强。</p>
-    <div class="row"><label>尺度</label>
+    <h2><span class="lang-en">(2) The reflexivity trap: correlation will fool you</span><span class="lang-zh">② 反身性陷阱:看相关性会骗你</span></h2>
+    <p class="why"><span class="lang-en">An intervention that "only acts in a crisis" (a bailout / discipline / market rescue). In the data it is <b>positively correlated</b> with "bad things" (because it deliberately steps in during crises), so it looks harmful — but the truth lies in the counterfactual. The smaller the scale and the more you are an insider, the stronger the reflexive kickback.</span><span class="lang-zh">一个"危机时才出手"的干预(救助/管教/救市)。它在数据上和"坏事"<b>正相关</b>(因为它专挑危机出手),看起来有害——但真相要看反事实。尺度越小、你越是局内人,反身反弹越强。</span></p>
+    <div class="row"><label><span class="lang-en">Scale</span><span class="lang-zh">尺度</span></label>
       <span class="seg" id="p2scale">
-        <button data-s="household" class="on">家庭(家规)</button><button data-s="firm">公司(KPI)</button><button data-s="macro">宏观(救市)</button>
+        <button data-s="household" class="on"><span class="lang-en">Household (house rules)</span><span class="lang-zh">家庭(家规)</span></button><button data-s="firm"><span class="lang-en">Firm (KPI)</span><span class="lang-zh">公司(KPI)</span></button><button data-s="macro"><span class="lang-en">Macro (market rescue)</span><span class="lang-zh">宏观(救市)</span></button>
       </span>
     </div>
     <div class="row">
-      <button id="p2corr">① 看数据相关性</button>
-      <button id="p2cf" class="act">② 做实验(反事实:跑有/无两个分支)</button>
+      <button id="p2corr"><span class="lang-en">(1) Look at the data correlation</span><span class="lang-zh">① 看数据相关性</span></button>
+      <button id="p2cf" class="act"><span class="lang-en">(2) Run the experiment (counterfactual: run with/without, two branches)</span><span class="lang-zh">② 做实验(反事实:跑有/无两个分支)</span></button>
     </div>
     <canvas id="p2canvas" width="900" height="200"></canvas>
-    <div class="verdict" id="p2v">点上面的按钮。</div>
+    <div class="verdict" id="p2v"><span class="lang-en">Click a button above.</span><span class="lang-zh">点上面的按钮。</span></div>
   </div>
 
   <!-- PANEL 3 -->
   <div class="card">
-    <h2>③ 你永远跑不了的那个反事实(平行世界)</h2>
-    <p class="why">同一个干预,用相同的运气(common random numbers)跑 N 个平行世界的「有 vs 无」。看效果的<b>分布</b>,而不是一个数。高亮"你实际只活了的那一条"——现实只给你一条线。</p>
-    <div class="row"><label>尺度</label>
+    <h2><span class="lang-en">(3) The counterfactual you can never run (parallel worlds)</span><span class="lang-zh">③ 你永远跑不了的那个反事实(平行世界)</span></h2>
+    <p class="why"><span class="lang-en">The same intervention, run with the same luck (common random numbers) across N parallel worlds, "with vs without". Look at the <b>distribution</b> of the effect, not a single number. The "one timeline you actually lived" is highlighted — reality only gives you one line.</span><span class="lang-zh">同一个干预,用相同的运气(common random numbers)跑 N 个平行世界的「有 vs 无」。看效果的<b>分布</b>,而不是一个数。高亮"你实际只活了的那一条"——现实只给你一条线。</span></p>
+    <div class="row"><label><span class="lang-en">Scale</span><span class="lang-zh">尺度</span></label>
       <span class="seg" id="p3scale">
-        <button data-s="household" class="on">家庭</button><button data-s="firm">公司</button><button data-s="macro">宏观</button>
+        <button data-s="household" class="on"><span class="lang-en">Household</span><span class="lang-zh">家庭</span></button><button data-s="firm"><span class="lang-en">Firm</span><span class="lang-zh">公司</span></button><button data-s="macro"><span class="lang-en">Macro</span><span class="lang-zh">宏观</span></button>
       </span>
-      <button id="p3run" class="act">跑 300 个平行世界</button>
+      <button id="p3run" class="act"><span class="lang-en">Run 300 parallel worlds</span><span class="lang-zh">跑 300 个平行世界</span></button>
     </div>
     <canvas id="p3canvas" width="900" height="220"></canvas>
-    <div class="verdict" id="p3v">点"跑平行世界"。</div>
+    <div class="verdict" id="p3v"><span class="lang-en">Click "Run parallel worlds".</span><span class="lang-zh">点"跑平行世界"。</span></div>
   </div>
 
   <div class="card" style="border-style:dashed">
-    <h2>一句话</h2>
-    <p style="margin:4px 0">在<b>沙漠里挖井</b>的人最勤奋,也最穷——先看哪里有水(①)。
+    <h2><span class="lang-en">In one line</span><span class="lang-zh">一句话</span></h2>
+    <p style="margin:4px 0"><span class="lang-en">The person <b>digging wells in the desert</b> is the most diligent and also the poorest — first look at where the water is (1).
+    When <b>you yourself are also playing cards at the table</b>, replaying correlation alone leads to the opposite conclusion — you must run small, reversible experiments (2).
+    Reality gives you only <b>one line</b>, you cannot run the parallel worlds — so the smaller and more irreversible it is, the more you must rely on <b>principles (priors)</b>, not on "what happened to me" (3).</span><span class="lang-zh">在<b>沙漠里挖井</b>的人最勤奋,也最穷——先看哪里有水(①)。
     你<b>自己也在桌上打牌</b>时,光复盘相关性会得出反的结论——必须做小而可逆的实验(②)。
-    现实只给你<b>一条线</b>,平行世界你跑不了——所以越是小、越不可逆,越要靠<b>原则(先验)</b>,而不是"我身上发生了什么"(③)。</p>
-    <p class="mut" style="font-size:12px;margin:8px 0 0">背后的可复现实验:<code>counterfactual_worlds.py</code> · <code>principle_vs_data.py</code> · <code>endogenous_manipulation.py</code> · 方法论 <code>11-INFORMATION-RECON-METHODOLOGY.md</code></p>
+    现实只给你<b>一条线</b>,平行世界你跑不了——所以越是小、越不可逆,越要靠<b>原则(先验)</b>,而不是"我身上发生了什么"(③)。</span></p>
+    <p class="mut" style="font-size:12px;margin:8px 0 0"><span class="lang-en">Reproducible experiments behind this:</span><span class="lang-zh">背后的可复现实验:</span> <code>counterfactual_worlds.py</code> · <code>principle_vs_data.py</code> · <code>endogenous_manipulation.py</code> · <span class="lang-en">methodology</span><span class="lang-zh">方法论</span> <code>11-INFORMATION-RECON-METHODOLOGY.md</code></p>
   </div>
 </div>
 
 <script>
+// ───────── language helper (drives JS-generated bilingual text) ─────────
+function isZH(){return document.documentElement.dataset.lang==='zh';}
+function L(en,zh){return isZH()?zh:en;}
+
 // ───────── deterministic PRNG (mulberry32) ─────────
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function gauss(rng){let u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
@@ -94,23 +100,25 @@ function gauss(rng){let u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return M
 const SC={household:{a:.80,freq:.05,mag:2.2,reflex:.95},firm:{a:.85,freq:.14,mag:1.1,reflex:.55},macro:{a:.90,freq:.42,mag:.55,reflex:.20}};
 function drawP1(){
   const data=+p1data.value/100, noise=+p1noise.value/100;
-  p1dataV.textContent=(data<.2?'极少(一次性/数据荒)':data<.55?'中等':'很多(数据富)');
-  p1noiseV.textContent=(noise<.3?'低噪声(接近可知)':noise<.7?'中等':'高噪声(接近纯噪声地板)');
+  p1dataV.textContent=(data<.2?L('very little (one-shot / data-scarce)','极少(一次性/数据荒)'):data<.55?L('medium','中等'):L('a lot (data-rich)','很多(数据富)'));
+  p1noiseV.textContent=(noise<.3?L('low noise (near knowable)','低噪声(接近可知)'):noise<.7?L('medium','中等'):L('high noise (near the pure-noise floor)','高噪声(接近纯噪声地板)'));
   // oracle ceiling falls with noise; recoverable rises with data & falls with noise
   const oracle=0.5+0.42*(1-noise);                       // 上限
   const recoverable=Math.max(0,(oracle-0.5)*(0.45+0.55*data)); // 我们能挖到的
   const hard=Math.max(0,(oracle-0.5)-recoverable);       // 模型知道但难挖
   const noiseShare=1-oracle;                              // 纯噪声(到1.0)
   // who wins: data-rich→linear; data-poor→HDC; RAG≈chance always
-  const winner = data<0.35? 'HDC(结构化先验)' : 'Linear(线性模型)';
+  const winner = data<0.35? L('HDC (structured prior)','HDC(结构化先验)') : L('Linear (linear model)','Linear(线性模型)');
   const c=p1canvas,x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);
-  const W=c.width-40,X0=20,Y=30,H=44; const seg=[[recoverable,'#3fb950','可恢复(我们能挖到)'],[hard,'#d29922','模型知道但难挖'],[noiseShare,'#f85149','纯噪声·谁也没辙']];
+  const W=c.width-40,X0=20,Y=30,H=44; const seg=[[recoverable,'#3fb950',L('recoverable (we can mine it)','可恢复(我们能挖到)')],[hard,'#d29922',L('model knows but hard to mine','模型知道但难挖')],[noiseShare,'#f85149',L('pure noise · nobody can','纯噪声·谁也没辙')]];
   // baseline chance block (0..0.5) shown faint
-  let px=X0; x.fillStyle='#21262d';x.fillRect(X0,Y,W*0.5,H);x.fillStyle='#6e7681';x.font='12px sans-serif';x.fillText('瞎猜地板 0.50',X0+8,Y+H+16);
+  let px=X0; x.fillStyle='#21262d';x.fillRect(X0,Y,W*0.5,H);x.fillStyle='#6e7681';x.font='12px sans-serif';x.fillText(L('guessing floor 0.50','瞎猜地板 0.50'),X0+8,Y+H+16);
   px=X0+W*0.5;
   for(const[v,col,lab] of seg){const w=W*v;x.fillStyle=col;x.fillRect(px,Y,w,H);if(w>50){x.fillStyle='#0b0f14';x.font='12px sans-serif';x.fillText(lab,px+6,Y+27);}px+=w;}
-  x.fillStyle='#8b949e';x.font='12px sans-serif';x.fillText('← 从瞎猜(0.5) 到 完美(1.0) 的差距如何切分 →',X0,18);
-  p1v.innerHTML=`上限(上帝视角)≈ <b class="acc">${oracle.toFixed(2)}</b> · 可恢复 <b class="good">${recoverable.toFixed(2)}</b> · 难挖 <b class="warnc">${hard.toFixed(2)}</b> · 纯噪声 <b class="bad">${noiseShare.toFixed(2)}</b> &nbsp;|&nbsp; 这一格谁赢:<b class="big">${winner}</b>。${data<0.35?'数据荒→结构化先验(HDC)赢。':'数据富→线性够用,HDC不加分。'} RAG(纯检索)≈瞎猜。`;
+  x.fillStyle='#8b949e';x.font='12px sans-serif';x.fillText(L('← how the gap from guessing (0.5) to perfect (1.0) splits →','← 从瞎猜(0.5) 到 完美(1.0) 的差距如何切分 →'),X0,18);
+  p1v.innerHTML=L(
+    `Ceiling (god's-eye) ≈ <b class="acc">${oracle.toFixed(2)}</b> · recoverable <b class="good">${recoverable.toFixed(2)}</b> · hard to mine <b class="warnc">${hard.toFixed(2)}</b> · pure noise <b class="bad">${noiseShare.toFixed(2)}</b> &nbsp;|&nbsp; who wins this cell: <b class="big">${winner}</b>. ${data<0.35?'Data-scarce → structured prior (HDC) wins.':'Data-rich → linear is enough, HDC adds nothing.'} RAG (pure retrieval) ≈ guessing.`,
+    `上限(上帝视角)≈ <b class="acc">${oracle.toFixed(2)}</b> · 可恢复 <b class="good">${recoverable.toFixed(2)}</b> · 难挖 <b class="warnc">${hard.toFixed(2)}</b> · 纯噪声 <b class="bad">${noiseShare.toFixed(2)}</b> &nbsp;|&nbsp; 这一格谁赢:<b class="big">${winner}</b>。${data<0.35?'数据荒→结构化先验(HDC)赢。':'数据富→线性够用,HDC不加分。'} RAG(纯检索)≈瞎猜。`);
 }
 [p1data,p1noise].forEach(e=>e.addEventListener('input',drawP1));
 
@@ -145,31 +153,38 @@ function runPair(seed, sc, T=400){
 }
 
 // ───────── PANEL 2: reflexivity trap ─────────
-let p2s='household';
-document.querySelectorAll('#p2scale button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#p2scale button').forEach(x=>x.classList.remove('on'));b.classList.add('on');p2s=b.dataset.s;p2v.textContent='点上面的按钮。';clearC(p2canvas);});
+let p2s='household', p2last=null;
+document.querySelectorAll('#p2scale button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#p2scale button').forEach(x=>x.classList.remove('on'));b.classList.add('on');p2s=b.dataset.s;p2last=null;p2v.innerHTML=L('Click a button above.','点上面的按钮。');clearC(p2canvas);});
 function clearC(c){const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);}
-p2corr.onclick=()=>{
+function renderP2corr(){
   const r=runPair(42,SC[p2s]);
   const c=p2canvas,x=c.getContext('2d');clearC(c);
   x.fillStyle='#f85149';x.fillRect(60,40,Math.max(8,r.corr*600),40);
-  x.fillStyle='#e6edf3';x.font='13px sans-serif';x.fillText('数据上:干预 与 坏事(风险)的相关性 = '+r.corr.toFixed(2),60,30);
-  p2v.innerHTML=`<span class="bad">⚠ 只看相关性的结论:相关性 ${r.corr.toFixed(2)} > 0 → "干预和坏事一起出现 → 干预有害 → 该停掉它"。</span> 这正是陷阱——它在危机时出手,当然和危机同框。`;
-};
-p2cf.onclick=()=>{
+  x.fillStyle='#e6edf3';x.font='13px sans-serif';x.fillText(L('In data: correlation of intervention with bad outcomes (risk) = ','数据上:干预 与 坏事(风险)的相关性 = ')+r.corr.toFixed(2),60,30);
+  p2v.innerHTML=L(
+    `<span class="bad">⚠ Correlation-only conclusion: correlation ${r.corr.toFixed(2)} > 0 → "the intervention shows up together with bad things → it is harmful → stop it".</span> This is exactly the trap — it acts during crises, so of course it appears in the same frame as crises.`,
+    `<span class="bad">⚠ 只看相关性的结论:相关性 ${r.corr.toFixed(2)} > 0 → "干预和坏事一起出现 → 干预有害 → 该停掉它"。</span> 这正是陷阱——它在危机时出手,当然和危机同框。`);
+}
+function renderP2cf(){
   const r=runPair(42,SC[p2s]);
   const c=p2canvas,x=c.getContext('2d');clearC(c);
   const help=r.effect>0;
-  x.fillStyle='#8b949e';x.font='13px sans-serif';x.fillText('反事实:相同运气下,跑"有干预"和"无干预"两个分支,比较福利',60,24);
+  x.fillStyle='#8b949e';x.font='13px sans-serif';x.fillText(L('Counterfactual: under the same luck, run "with intervention" and "without intervention" branches and compare welfare','反事实:相同运气下,跑"有干预"和"无干预"两个分支,比较福利'),60,24);
   x.fillStyle=help?'#3fb950':'#f85149';x.fillRect(60,50,Math.max(8,Math.abs(r.effect)*120),36);
-  x.fillStyle='#e6edf3';x.fillText('真实因果效应 = '+(r.effect>0?'+':'')+r.effect.toFixed(2)+(help?'  (其实有帮助!)':'  (其实有害)'),60,110);
+  x.fillStyle='#e6edf3';x.fillText(L('True causal effect = ','真实因果效应 = ')+(r.effect>0?'+':'')+r.effect.toFixed(2)+(help?L('  (actually helps!)','  (其实有帮助!)'):L('  (actually harmful)','  (其实有害)')),60,110);
   const flip=(r.corr>0 && help);
-  p2v.innerHTML=`真实效应 <b class="${help?'good':'bad'}">${r.effect>0?'+':''}${r.effect.toFixed(2)}</b> → 干预其实<b>${help?'有帮助':'有害'}</b>。 ${flip?'<span class="warnc"><b>符号翻转!</b>相关性说"有害",反事实说"有帮助"。在'+(p2s==='household'?'家庭/局内人':p2s==='firm'?'公司':'宏观')+'尺度,你看相关性会亲手砍掉救命的东西。</span>':''} ${p2s==='household'?'(尺度越小、你越是局内人,反身反弹越强,甚至可能真的反噬——切到不同尺度看。)':''}`;
-};
+  const scaleName=L(p2s==='household'?'household / insider':p2s==='firm'?'firm':'macro', p2s==='household'?'家庭/局内人':p2s==='firm'?'公司':'宏观');
+  p2v.innerHTML=L(
+    `True effect <b class="${help?'good':'bad'}">${r.effect>0?'+':''}${r.effect.toFixed(2)}</b> → the intervention actually <b>${help?'helps':'is harmful'}</b>. ${flip?'<span class="warnc"><b>Sign flip!</b> Correlation says "harmful", the counterfactual says "helps". At the '+scaleName+' scale, reading correlation would make you cut the very thing that saves lives.</span>':''} ${p2s==='household'?'(The smaller the scale and the more you are an insider, the stronger the reflexive kickback — it may even genuinely backfire. Switch scales to see.)':''}`,
+    `真实效应 <b class="${help?'good':'bad'}">${r.effect>0?'+':''}${r.effect.toFixed(2)}</b> → 干预其实<b>${help?'有帮助':'有害'}</b>。 ${flip?'<span class="warnc"><b>符号翻转!</b>相关性说"有害",反事实说"有帮助"。在'+scaleName+'尺度,你看相关性会亲手砍掉救命的东西。</span>':''} ${p2s==='household'?'(尺度越小、你越是局内人,反身反弹越强,甚至可能真的反噬——切到不同尺度看。)':''}`);
+}
+p2corr.onclick=()=>{p2last='corr';renderP2corr();};
+p2cf.onclick=()=>{p2last='cf';renderP2cf();};
 
 // ───────── PANEL 3: parallel worlds ─────────
-let p3s='household';
+let p3s='household', p3ran=false;
 document.querySelectorAll('#p3scale button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#p3scale button').forEach(x=>x.classList.remove('on'));b.classList.add('on');p3s=b.dataset.s;});
-p3run.onclick=()=>{
+function renderP3(){
   const N=300, sc=SC[p3s], eff=[];
   for(let w=0;w<N;w++) eff.push(runPair(1000+w, sc).effect);
   const mean=eff.reduce((a,b)=>a+b,0)/N, helped=eff.filter(e=>e>0).length/N;
@@ -182,16 +197,26 @@ p3run.onclick=()=>{
   // zero line
   const zx=X0+( (0-lo)/span )*W;
   for(let i=0;i<B;i++){const h=bins[i]/mx*Hh;const bx=X0+i*W/B;const center=lo+(i+0.5)/B*span;x.fillStyle=center>0?'#3fb950':'#f85149';x.fillRect(bx,Y0-h,W/B-1,h);}
-  if(zx>X0&&zx<X0+W){x.strokeStyle='#8b949e';x.beginPath();x.moveTo(zx,20);x.lineTo(zx,Y0);x.stroke();x.fillStyle='#8b949e';x.font='11px sans-serif';x.fillText('0(无效果)',zx+3,32);}
+  if(zx>X0&&zx<X0+W){x.strokeStyle='#8b949e';x.beginPath();x.moveTo(zx,20);x.lineTo(zx,Y0);x.stroke();x.fillStyle='#8b949e';x.font='11px sans-serif';x.fillText(L('0 (no effect)','0(无效果)'),zx+3,32);}
   // the one world you actually live
   const rng=mulberry32(7); const liveIdx=Math.floor(rng()*N); const lv=eff[liveIdx];
   const lx=X0+((lv-lo)/span)*W; x.strokeStyle='#58a6ff';x.lineWidth=2;x.beginPath();x.moveTo(lx,20);x.lineTo(lx,Y0);x.stroke();x.lineWidth=1;
-  x.fillStyle='#58a6ff';x.font='12px sans-serif';x.fillText('← 你实际只活了的那一条',Math.min(lx+4,c.width-180),52);
-  x.fillStyle='#8b949e';x.font='12px sans-serif';x.fillText('每个干预效果(福利:有 − 无)在 '+N+' 个平行世界里的分布',X0,16);
-  p3v.innerHTML=`真实平均效应 <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · 散布(运气)±${sd.toFixed(2)} · <b>${(helped*100).toFixed(0)}%</b> 的世界里它有帮助。 你实际只抽到 <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> 这一条——${Math.abs(lv-mean)>sd?'<span class="warnc">离平均很远,光凭你这一条你会严重误判真实效应。</span>':'凑巧接近平均,但你事先并不知道。'} ${p3s==='household'?'家庭尺度:散布相对最大、你最是局内人 → 一条命教不了你真相 → 靠原则。':p3s==='macro'?'宏观尺度:大数定律抹平,平均效应清楚得多。':''}`;
-};
+  x.fillStyle='#58a6ff';x.font='12px sans-serif';x.fillText(L('← the one timeline you actually lived','← 你实际只活了的那一条'),Math.min(lx+4,c.width-180),52);
+  x.fillStyle='#8b949e';x.font='12px sans-serif';x.fillText(L('Distribution of each intervention effect (welfare: with − without) across ','每个干预效果(福利:有 − 无)在 ')+N+L(' parallel worlds',' 个平行世界里的分布'),X0,16);
+  p3v.innerHTML=L(
+    `True mean effect <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · spread (luck) ±${sd.toFixed(2)} · in <b>${(helped*100).toFixed(0)}%</b> of worlds it helps. You only drew the single line <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> — ${Math.abs(lv-mean)>sd?'<span class="warnc">far from the mean; relying on your one line alone you would badly misjudge the true effect.</span>':'by chance close to the mean, but you could not have known that in advance.'} ${p3s==='household'?'Household scale: spread is relatively largest and you are most the insider → one life cannot teach you the truth → rely on principles.':p3s==='macro'?'Macro scale: the law of large numbers averages it out, the mean effect is far clearer.':''}`,
+    `真实平均效应 <b class="${mean>0?'good':'bad'}">${mean>0?'+':''}${mean.toFixed(2)}</b> · 散布(运气)±${sd.toFixed(2)} · <b>${(helped*100).toFixed(0)}%</b> 的世界里它有帮助。 你实际只抽到 <b class="acc">${(lv>0?'+':'')+lv.toFixed(2)}</b> 这一条——${Math.abs(lv-mean)>sd?'<span class="warnc">离平均很远,光凭你这一条你会严重误判真实效应。</span>':'凑巧接近平均,但你事先并不知道。'} ${p3s==='household'?'家庭尺度:散布相对最大、你最是局内人 → 一条命教不了你真相 → 靠原则。':p3s==='macro'?'宏观尺度:大数定律抹平,平均效应清楚得多。':''}`);
+}
+p3run.onclick=()=>{p3ran=true;renderP3();};
 
 drawP1();
+
+// ───────── re-render JS-generated text on global language toggle ─────────
+window.addEventListener('mse:lang',()=>{
+  drawP1();
+  if(p2last==='corr') renderP2corr(); else if(p2last==='cf') renderP2cf();
+  if(p3ran) renderP3();
+});
 </script>
   <script src="../site-nav.js"></script>
 </body>

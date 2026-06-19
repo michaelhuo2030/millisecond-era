@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MICRO-WORLD · HDC 智能体文明涌现（实时）</title>
+<title>MICRO-WORLD · HDC Agent Civilization Emergence (live)</title>
 <style>
   :root{ --bg:#0b0b12; --panel:#15161f; --ink:#e8e8ef; --dim:#8b8ca0; --accent:#7ad17a; }
   *{box-sizing:border-box}
@@ -32,8 +32,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>MICRO-WORLD · 一个用 HDC 智能体跑的活世界（实时·可调参数）</h1>
-  <div class="sub">每个点 = 一个 AI 智能体，颜色 = 它的<b>文化</b>（一个超维向量）。没人下令分组——它们只是找食物、移动、跟旁边的人聊天、生后代（继承文化）、变老死去。看<b>文化和地理一起涌现</b>：从一锅随机颜色 → 食物斑块上长出一个个有颜色的"部落"。</div>
+  <h1><span class="lang-en">MICRO-WORLD · A living world run by HDC agents (live · tunable)</span><span class="lang-zh">MICRO-WORLD · 一个用 HDC 智能体跑的活世界（实时·可调参数）</span></h1>
+  <div class="sub"><span class="lang-en">Each dot = one AI agent, its color = its <b>culture</b> (a hyperdimensional vector). Nobody orders them into groups — they just look for food, move, chat with whoever's nearby, have offspring (who inherit culture), grow old and die. Watch <b>culture and geography emerge together</b>: from a soup of random colors → colored "tribes" growing up on the food patches.</span><span class="lang-zh">每个点 = 一个 AI 智能体，颜色 = 它的<b>文化</b>（一个超维向量）。没人下令分组——它们只是找食物、移动、跟旁边的人聊天、生后代（继承文化）、变老死去。看<b>文化和地理一起涌现</b>：从一锅随机颜色 → 食物斑块上长出一个个有颜色的"部落"。</span></div>
 
   <div class="main">
     <div class="stage">
@@ -41,42 +41,42 @@
     </div>
     <div class="side">
       <div class="panel">
-        <div class="stat"><span>步数 step</span><b id="s_step">0</b></div>
-        <div class="stat"><span>人口 population</span><b id="s_pop">0</b></div>
-        <div class="stat"><span>同地文化相似 <span class="note">(邻居)</span></span><b id="s_ns">0%</b></div>
-        <div class="stat"><span>随机两人相似</span><b id="s_rs">0%</b></div>
-        <div class="stat" style="border:none;margin-top:6px"><span>文化地理信号 <span class="note">(邻居−随机)</span></span></div>
+        <div class="stat"><span><span class="lang-en">step</span><span class="lang-zh">步数 step</span></span><b id="s_step">0</b></div>
+        <div class="stat"><span><span class="lang-en">population</span><span class="lang-zh">人口 population</span></span><b id="s_pop">0</b></div>
+        <div class="stat"><span><span class="lang-en">Same-place culture similarity</span><span class="lang-zh">同地文化相似</span> <span class="note">(<span class="lang-en">neighbors</span><span class="lang-zh">邻居</span>)</span></span><b id="s_ns">0%</b></div>
+        <div class="stat"><span><span class="lang-en">Random pair similarity</span><span class="lang-zh">随机两人相似</span></span><b id="s_rs">0%</b></div>
+        <div class="stat" style="border:none;margin-top:6px"><span><span class="lang-en">Cultural-geography signal</span><span class="lang-zh">文化地理信号</span> <span class="note">(<span class="lang-en">neighbors − random</span><span class="lang-zh">邻居−随机</span>)</span></span></div>
         <div class="big" id="s_geo">+0pp</div>
-        <div class="note" id="s_msg">随机起点：人人不同文化。</div>
-        <div class="stat" style="border:none;margin-top:6px"><span>速度</span><b id="s_fps">— 步/秒</b></div>
+        <div class="note" id="s_msg"><span class="lang-en">Random start: everyone has a different culture.</span><span class="lang-zh">随机起点：人人不同文化。</span></div>
+        <div class="stat" style="border:none;margin-top:6px"><span><span class="lang-en">Speed</span><span class="lang-zh">速度</span></span><b id="s_fps">— <span class="lang-en">steps/s</span><span class="lang-zh">步/秒</span></b></div>
       </div>
 
       <div class="panel">
         <div class="btns">
-          <button class="go" id="btnPlay">⏸ 暂停</button>
-          <button id="btnReset">↺ 重置</button>
-          <button id="btnDiverse">🌍 多元世界</button>
-          <button id="btnMelt">🫧 大熔炉</button>
+          <button class="go" id="btnPlay">⏸ <span class="lang-en">Pause</span><span class="lang-zh">暂停</span></button>
+          <button id="btnReset">↺ <span class="lang-en">Reset</span><span class="lang-zh">重置</span></button>
+          <button id="btnDiverse">🌍 <span class="lang-en">Diverse world</span><span class="lang-zh">多元世界</span></button>
+          <button id="btnMelt">🫧 <span class="lang-en">Melting pot</span><span class="lang-zh">大熔炉</span></button>
         </div>
-        <div class="row"><label>模拟速度 <span id="v_speed">4</span> 步/帧</label>
+        <div class="row"><label><span class="lang-en">Sim speed</span><span class="lang-zh">模拟速度</span> <span id="v_speed">4</span> <span class="lang-en">steps/frame</span><span class="lang-zh">步/帧</span></label>
           <input type="range" id="speed" min="1" max="16" value="4"></div>
-        <div class="row"><label>起始智能体数 <span id="v_pop">220</span> <span class="note">(重置生效)</span></label>
+        <div class="row"><label><span class="lang-en">Starting agents</span><span class="lang-zh">起始智能体数</span> <span id="v_pop">220</span> <span class="note">(<span class="lang-en">applies on reset</span><span class="lang-zh">重置生效</span>)</span></label>
           <input type="range" id="pop0" min="40" max="900" value="220"></div>
-        <div class="row"><label>食物斑块数 <span id="v_patch">4</span> <span class="note">(重置生效)</span></label>
+        <div class="row"><label><span class="lang-en">Food patches</span><span class="lang-zh">食物斑块数</span> <span id="v_patch">4</span> <span class="note">(<span class="lang-en">applies on reset</span><span class="lang-zh">重置生效</span>)</span></label>
           <input type="range" id="patches" min="1" max="8" value="4"></div>
-        <div class="row"><label>文化传播强度 <span id="v_spread">50</span>%</label>
+        <div class="row"><label><span class="lang-en">Cultural transmission strength</span><span class="lang-zh">文化传播强度</span> <span id="v_spread">50</span>%</label>
           <input type="range" id="spread" min="0" max="100" value="50"></div>
-        <div class="row"><label>变异率 <span id="v_mut">0.2</span>% <span class="note">(文化创新)</span></label>
+        <div class="row"><label><span class="lang-en">Mutation rate</span><span class="lang-zh">变异率</span> <span id="v_mut">0.2</span>% <span class="note">(<span class="lang-en">cultural innovation</span><span class="lang-zh">文化创新</span>)</span></label>
           <input type="range" id="mut" min="0" max="40" value="20"></div>
-        <div class="row"><label>寿命 <span id="v_life">130</span> 步</label>
+        <div class="row"><label><span class="lang-en">Lifespan</span><span class="lang-zh">寿命</span> <span id="v_life">130</span> <span class="lang-en">steps</span><span class="lang-zh">步</span></label>
           <input type="range" id="life" min="40" max="320" value="130"></div>
-        <div class="row"><label>流动性/扩散 <span id="v_wander">4</span>% <span class="note">(越低=越定居)</span></label>
+        <div class="row"><label><span class="lang-en">Mobility / diffusion</span><span class="lang-zh">流动性/扩散</span> <span id="v_wander">4</span>% <span class="note">(<span class="lang-en">lower = more settled</span><span class="lang-zh">越低=越定居</span>)</span></label>
           <input type="range" id="wander" min="0" max="40" value="4"></div>
-        <div class="note">想看<b>部落</b>：流动性低 + 变异低 + 传播高。想看<b>大同</b>（全融成一个）：流动性高、斑块=1。想看<b>持续多元</b>：变异调高。</div>
+        <div class="note"><span class="lang-en">Want <b>tribes</b>: low mobility + low mutation + high transmission. Want <b>great unity</b> (all merge into one): high mobility, patches=1. Want <b>lasting diversity</b>: turn mutation up.</span><span class="lang-zh">想看<b>部落</b>：流动性低 + 变异低 + 传播高。想看<b>大同</b>（全融成一个）：流动性高、斑块=1。想看<b>持续多元</b>：变异调高。</span></div>
       </div>
     </div>
   </div>
-  <p class="note" style="margin-top:14px"><span class="tag">这是什么</span>纯浏览器里跑的 HDC 智能体微世界——速度的力量让你几秒看完一部"文明聚合史"。芯片的活：把 N、网格、文化维度各放大数量级，在电池功耗下跑真世界尺度。 — 给学生的可玩 demo。</p>
+  <p class="note" style="margin-top:14px"><span class="tag"><span class="lang-en">What is this</span><span class="lang-zh">这是什么</span></span><span class="lang-en">An HDC-agent micro-world running purely in the browser — the power of speed lets you watch an entire "history of civilization coming together" in seconds. The chip's job: scale up N, the grid, and the culture dimension each by orders of magnitude, and run real-world scale on battery power. — A playable demo for students.</span><span class="lang-zh">纯浏览器里跑的 HDC 智能体微世界——速度的力量让你几秒看完一部"文明聚合史"。芯片的活：把 N、网格、文化维度各放大数量级，在电池功耗下跑真世界尺度。 — 给学生的可玩 demo。</span></p>
 </div>
 
 <script>
@@ -173,16 +173,17 @@ function loop(){
   document.getElementById('s_rs').textContent=(m.rs*100|0)+'%';
   document.getElementById('s_geo').textContent='+'+(geo*100|0)+'pp';
   const msg=document.getElementById('s_msg');
-  if(m.pop===0) msg.textContent='灭绝了 — 食物太少或寿命太短，试试重置/调参。';
-  else if(geo>0.12) msg.textContent='✓ 文化区域涌现了！同斑块文化聚合、跨斑块漂开 = 文化地理。';
-  else if(geo>0.05) msg.textContent='文化区域正在形成…';
-  else msg.textContent='还在混匀（降低流动性、提高传播试试）。';
+  if(m.pop===0) msg.textContent=L('Extinct — too little food or too short a lifespan; try reset / adjusting.','灭绝了 — 食物太少或寿命太短，试试重置/调参。');
+  else if(geo>0.12) msg.textContent=L('✓ Cultural regions emerged! Same-patch cultures cluster, cross-patch ones drift apart = cultural geography.','✓ 文化区域涌现了！同斑块文化聚合、跨斑块漂开 = 文化地理。');
+  else if(geo>0.05) msg.textContent=L('Cultural regions are forming…','文化区域正在形成…');
+  else msg.textContent=L('Still mixing (try lowering mobility, raising transmission).','还在混匀（降低流动性、提高传播试试）。');
   const now=performance.now();
-  if(now-lastT>500){document.getElementById('s_fps').textContent=(stepsSince/((now-lastT)/1000)|0)+' 步/秒';lastT=now;stepsSince=0;}
+  if(now-lastT>500){document.getElementById('s_fps').textContent=(stepsSince/((now-lastT)/1000)|0)+L(' steps/s',' 步/秒');lastT=now;stepsSince=0;}
   requestAnimationFrame(loop);
 }
 
 // ---- controls ----
+function L(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
 function bind(id,key,fn){const el=document.getElementById(id);const lbl=document.getElementById('v_'+id);
   el.addEventListener('input',()=>{P[key]=fn(+el.value); if(lbl)lbl.textContent=el.value;});}
 bind('speed','speed',v=>v);
@@ -192,7 +193,11 @@ bind('life','life',v=>v);
 bind('wander','wander',v=>v/100);
 document.getElementById('pop0').addEventListener('input',e=>{P.pop0=+e.target.value;document.getElementById('v_pop').textContent=e.target.value;reset();});
 document.getElementById('patches').addEventListener('input',e=>{P.patches=+e.target.value;document.getElementById('v_patch').textContent=e.target.value;reset();});
-document.getElementById('btnPlay').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸ 暂停':'▶ 播放';});
+const btnPlay=document.getElementById('btnPlay');
+function renderPlayBtn(){btnPlay.textContent=running?'⏸ '+L('Pause','暂停'):'▶ '+L('Play','播放');}
+btnPlay.addEventListener('click',()=>{running=!running;renderPlayBtn();});
+window.addEventListener('mse:lang',renderPlayBtn);
+renderPlayBtn();
 function reset(){init();}
 document.getElementById('btnReset').addEventListener('click',reset);
 document.getElementById('btnDiverse').addEventListener('click',()=>{ // persistent multiculture

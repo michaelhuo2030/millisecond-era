@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AGORA · 一群 AI 实时对话、形成派别（能看到他们说了啥）</title>
+<title>AGORA · A crowd of AIs talk in real time and form factions (you can see what they say)</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 -apple-system,Segoe UI,"PingFang SC",sans-serif}
@@ -23,32 +23,55 @@ input[type=range]{width:100%;accent-color:#ffd36b}
 #inspect{font-size:12px;color:var(--ink);min-height:34px}
 </style></head><body>
 <div class="wrap">
-<h1>AGORA · 一群 AI 实时对话、自发形成派别 <span class="tag">能看到他们说了啥</span></h1>
-<div class="sub">每个光点 = 一个 agent，位置 = 它的立场（横轴 秩序↔自由，纵轴 传统↔技术）。它们不停两两对话——右边<b>实时信息流</b>能读到它们说了什么、谁被说服了。点画布上任意一个 agent 看它的观点。</div>
+<h1><span class="lang-en">AGORA · A crowd of AIs talk in real time and spontaneously form factions</span><span class="lang-zh">AGORA · 一群 AI 实时对话、自发形成派别</span> <span class="tag"><span class="lang-en">see what they say</span><span class="lang-zh">能看到他们说了啥</span></span></h1>
+<div class="sub"><span class="lang-en">Each dot = one agent, its position = its stance (x-axis: Order ↔ Freedom, y-axis: Tradition ↔ Technology). They keep talking in pairs — the <b>live feed</b> on the right lets you read what they said and who got persuaded. Click any agent on the canvas to see its view.</span><span class="lang-zh">每个光点 = 一个 agent，位置 = 它的立场（横轴 秩序↔自由，纵轴 传统↔技术）。它们不停两两对话——右边<b>实时信息流</b>能读到它们说了什么、谁被说服了。点画布上任意一个 agent 看它的观点。</span></div>
 <div class="main">
   <div class="stage"><canvas id="cv" width="560" height="520"></canvas></div>
   <div class="side">
-    <div class="panel shock">ChatGPT（~50字/秒）打出 <b id="words">0</b> 字的时间里，这群 agent 已对话 <b id="msgs">0</b> 次 · <span id="rate">0/秒</span> · 派别 <b id="fac">—</b> · 最大 <b id="big">—</b></div>
-    <div class="panel"><div style="color:var(--dim);font-size:11px;margin-bottom:4px">🗣 实时对话流（采样）</div><div class="feed" id="feed"></div></div>
-    <div class="panel"><div style="color:var(--dim);font-size:11px">👆 点中的 agent</div><div id="inspect">点画布上一个光点看它说什么…</div></div>
+    <div class="panel shock"><span class="lang-en">In the time it takes ChatGPT (~50 chars/sec) to type </span><span class="lang-zh">ChatGPT（~50字/秒）打出 </span><b id="words">0</b><span class="lang-en"> characters, this crowd of agents has already talked </span><span class="lang-zh"> 字的时间里，这群 agent 已对话 </span><b id="msgs">0</b><span class="lang-en"> times</span><span class="lang-zh"> 次</span> · <span id="rate">0/s</span> · <span class="lang-en">factions</span><span class="lang-zh">派别</span> <b id="fac">—</b> · <span class="lang-en">largest</span><span class="lang-zh">最大</span> <b id="big">—</b></div>
+    <div class="panel"><div style="color:var(--dim);font-size:11px;margin-bottom:4px">🗣 <span class="lang-en">Live conversation feed (sampled)</span><span class="lang-zh">实时对话流（采样）</span></div><div class="feed" id="feed"></div></div>
+    <div class="panel"><div style="color:var(--dim);font-size:11px">👆 <span class="lang-en">Selected agent</span><span class="lang-zh">点中的 agent</span></div><div id="inspect"><span class="lang-en">Click a dot on the canvas to see what it says…</span><span class="lang-zh">点画布上一个光点看它说什么…</span></div></div>
     <div class="panel">
-      <div class="btns"><button id="play">⏸暂停</button><button id="reset">↺重置</button><button id="echo">📢回声室</button><button id="unity">🤝大同</button><button id="exp">⬇导出对话</button></div>
-      <div class="row"><label>对话速度 <span id="vspeed">500</span> 次/帧</label><input id="speed" type="range" min="50" max="3000" value="500"></div>
-      <div class="row"><label>智能体数 <span id="vn">280</span> <span class="tag">重置</span></label><input id="n" type="range" min="40" max="1000" value="280"></div>
-      <div class="row"><label>开放度 <span id="vconf">18</span>%</label><input id="conf" type="range" min="4" max="50" value="18"></div>
-      <div class="row"><label>影响力 <span id="vmu">30</span>%</label><input id="mu" type="range" min="5" max="50" value="30"></div>
+      <div class="btns"><button id="play">⏸<span class="lang-en">Pause</span><span class="lang-zh">暂停</span></button><button id="reset">↺<span class="lang-en">Reset</span><span class="lang-zh">重置</span></button><button id="echo">📢<span class="lang-en">Echo chamber</span><span class="lang-zh">回声室</span></button><button id="unity">🤝<span class="lang-en">Great unity</span><span class="lang-zh">大同</span></button><button id="exp">⬇<span class="lang-en">Export chat</span><span class="lang-zh">导出对话</span></button></div>
+      <div class="row"><label><span class="lang-en">Conversation speed</span><span class="lang-zh">对话速度</span> <span id="vspeed">500</span> <span class="lang-en">/frame</span><span class="lang-zh">次/帧</span></label><input id="speed" type="range" min="50" max="3000" value="500"></div>
+      <div class="row"><label><span class="lang-en">Agents</span><span class="lang-zh">智能体数</span> <span id="vn">280</span> <span class="tag"><span class="lang-en">reset</span><span class="lang-zh">重置</span></span></label><input id="n" type="range" min="40" max="1000" value="280"></div>
+      <div class="row"><label><span class="lang-en">Openness</span><span class="lang-zh">开放度</span> <span id="vconf">18</span>%</label><input id="conf" type="range" min="4" max="50" value="18"></div>
+      <div class="row"><label><span class="lang-en">Influence</span><span class="lang-zh">影响力</span> <span id="vmu">30</span>%</label><input id="mu" type="range" min="5" max="50" value="30"></div>
     </div>
   </div>
 </div>
-<p class="shock" style="margin-top:10px"><span class="tag">为什么震撼</span>50字/秒的世界你只能看一个 AI 慢慢打字；同样几秒，这里一<b>整个社会</b>已吵完、分好派、达成共识——速度解锁的是"<b>模拟一个世界</b>"。</p>
+<p class="shock" style="margin-top:10px"><span class="tag"><span class="lang-en">Why it's striking</span><span class="lang-zh">为什么震撼</span></span><span class="lang-en">In a 50-chars/sec world you can only watch one AI slowly type; in the same few seconds, here <b>a whole society</b> has finished arguing, split into factions, and reached consensus — what speed unlocks is "<b>simulating a world</b>".</span><span class="lang-zh">50字/秒的世界你只能看一个 AI 慢慢打字；同样几秒，这里一<b>整个社会</b>已吵完、分好派、达成共识——速度解锁的是"<b>模拟一个世界</b>"。</span></p>
 </div>
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),feedEl=document.getElementById('feed');
 let N,ox,oy,running=true,pulses,msgs,feed,bubbles,sel=-1,allLog;
 const P={speed:500,n:280,conf:0.18,mu:0.30};
 function ri(n){return(Math.random()*n)|0}
-const XL=["秩序","中间","自由"],YL=["传统","务实","技术"];
-const LINES={
+function L(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
+const XL_ZH=["秩序","中间","自由"],YL_ZH=["传统","务实","技术"];
+const XL_EN=["Order","Center","Freedom"],YL_EN=["Tradition","Pragmatic","Technology"];
+function XL_(i){return (document.documentElement.dataset.lang==='zh'?XL_ZH:XL_EN)[i];}
+function YL_(i){return (document.documentElement.dataset.lang==='zh'?YL_ZH:YL_EN)[i];}
+const LINES_EN={
+"0,0":["I've always believed a society's foundation is stability and order. The rules handed down by our ancestors didn't come from nowhere — they're wisdom distilled from centuries of trial and error. Rather than chasing every new trend and stirring up chaos, we should first guard the existing order and steady the base, so everyone feels secure inside — that is the truly lasting path.",
+"To me, rushing to change is often more dangerous than keeping things as they are. Many traditions that look outdated are quietly sustaining trust and cooperation. I'd rather move a bit slower and steadier than shake the very things that, tested by time, keep society running — just for the sake of novelty."],
+"1,0":["I lean toward guarding tradition, but not rigidly. New voices deserve a hearing; just don't tear everything down from the start. The safest approach: keep the time-tested core, then run small experiments at the edges, and only scale up once the effect is clear — so we neither lose our roots nor miss the times.",
+"I admit change is inevitable, but pace matters. Tradition gives us direction and belonging and shouldn't be dismissed lightly; yet clinging to it unchanged turns rigid too. I favor tradition first, cautiously absorbing the new, letting society evolve slowly within stability rather than flip-flopping and burning trust."],
+"2,0":["What I want is freedom — less control, more personal space, letting everyone live their own way. But freedom isn't recklessness; the roots and the bottom line still must hold. True freedom is, while respecting traditional values, everyone being able to choose without excessive interference — the two aren't in conflict.",
+"The more you control, the more timid people become. I believe that if you give space back to individuals, most will take responsibility for themselves and live well. Of course, freedom must rest on shared bottom lines and traditional foundations, not everyone going their own way; with that root, freedom won't turn into chaos."],
+"0,1":["I don't talk in empty ideals — I only look at real results. Where control is needed, control; you can't just let things slide. But control must have method and mind its cost, handled case by case, never to extremes. The point of order was never control for its own sake, but to make things run efficiently and predictably, truly benefiting the majority.",
+"However beautiful an idea, if it can't land it's just talk. When I judge a policy, I ask only three things: what problem does it solve, how big is the cost, and can it last? Tighten when you should, loosen when you should — everything measured by actual results. Pragmatism is the greatest responsibility to a society."],
+"1,1":["Honestly, freedom and order, tradition and innovation each have their logic; no side is forever right. I'd rather analyze each case concretely: if opening up works better here, open up; if control is steadier there, control. Extreme stances usually do harm — balance and compromise are the wisdom that actually lands.",
+"I'm wary of any 'one correct answer.' Reality is complex, and pushing a single principle to the extreme almost always goes wrong. I trust dynamic weighing among different values — hear all sides, see the consequences clearly, then find the middle road most people can accept and that actually works."],
+"2,1":["I'm for boldly trying things, as long as it's pragmatic and can land. Empty talk of freedom is pointless; what matters is leaving room for innovation, removing needless constraints, so good ideas can be quickly tested. Be boldly free where freedom belongs, while watching the real results — and fix mistakes at once. That's how a society stays vital.",
+"Rather than endlessly debating whether something will work, just try it once, cheaply and fast. I believe in the power of free exploration — not freedom for freedom's sake, but because it finds what truly works faster. Give space, watch the data, iterate fast — that's the way that's both lively and reliable."],
+"0,2":["I think technology is precisely the strongest tool for doing order well. Rather than managing inefficiently with manpower and old methods, use data and intelligent systems to make governance fine-grained, transparent, and traceable. What should be governed still is — but governed with new tools — so it's both efficient and less error-prone, and the whole society's operation truly levels up.",
+"Many people set 'management' and 'technology' against each other; I'm the opposite. Good technology makes rules enforced more fairly, less by personal favor, more able to withstand scrutiny. I support putting modern tools into governance, so order no longer means rigidity but precision, efficiency, and trustworthiness."],
+"1,2":["I'm bullish on technology, but I favor steady progress, no rushing. New tools really can solve many old problems, but rolling them out at scale right away is too risky. Wiser: pilot in a small area first, learn the pitfalls, set the rules, then expand step by step. Embrace innovation while keeping the pace in check — that's how you go far.",
+"I don't doubt technology's direction; what I'm cautious about is speed. Too many good tools in history crashed because they were pushed too fast without the supporting pieces. I'm glad to adopt new technology actively, but I insist on one solid step at a time — verify, review, then expand — so innovation steadily becomes everyone's benefit."],
+"2,2":["The future belongs to those who dare to open up and boldly try new technology. The less control and the faster the trial-and-error, the more innovation erupts. Rather than tying everything down out of fear of mistakes, give ample free space, let countless ideas grow and compete at once — the best will naturally win out. Freedom plus innovation is the real future.",
+"I believe in the power of combinatorial explosion: when thousands of people are allowed to freely try new tools, the whole society's rate of progress rises exponentially. Constraints of course can't be zero, but the default should be allow, not forbid. Loosen the reins, and technology and freedom will take us to places we couldn't even imagine."]};
+const LINES_ZH={
 "0,0":["我始终相信，一个社会的根基是稳定和秩序。老祖宗传下来的规矩不是凭空来的，是几百年试错沉淀下来的智慧。与其追着新潮流瞎折腾，不如先把现有的秩序守住、把基本盘稳住，让每个人心里都有底——这才是真正长久之道。",
 "在我看来，急着改变往往比保持现状更危险。很多看起来过时的传统，其实在默默维系着信任与协作。我宁可走得慢一点、稳一点，也不愿意为了新鲜感去动摇那些经过时间检验、维系社会运转的根本东西。"],
 "1,0":["我倾向于守住传统，但也不是一成不变。新的声音该听，只是别一上来就推倒重来。最稳妥的办法是：保留经过时间检验的核心，再在边缘小步试错，看清楚效果了再推广，这样既不丢根本，也不至于完全错过时代。",
@@ -67,8 +90,9 @@ const LINES={
 "技术的方向我不怀疑，我谨慎的是速度。历史上太多好工具因为推得太急、配套没跟上而翻车。我愿意积极采用新技术，但坚持一步一个脚印——验证、复盘、再扩大，让创新真正稳稳地变成大家的福利。"],
 "2,2":["未来属于那些敢放开、敢用新技术大胆试的人。管制越少、试错越快，创新就越爆发。与其因为怕出错就把一切捆死，不如给足自由空间，让无数想法同时生长、互相竞争——最好的会自然胜出。自由加创新，才是真正的未来。",
 "我相信组合爆炸的力量：当成千上万个人被允许自由地用新工具去试，整个社会的进步速度会指数级提升。约束当然不能没有，但默认应该是放开而不是禁止。把缰绳松开，技术和自由会带我们去想都想不到的地方。"]};
-function stance(x,y){const xi=x<0.38?0:x>0.62?2:1,yi=y<0.38?0:y>0.62?2:1;return{xi,yi,label:XL[xi]+"·"+YL[yi]};}
-function say(i){const s=stance(ox[i],oy[i]);const p=LINES[s.xi+","+s.yi];return{label:s.label,text:p[ri(p.length)]};}
+function curLINES(){return document.documentElement.dataset.lang==='zh'?LINES_ZH:LINES_EN;}
+function stance(x,y){const xi=x<0.38?0:x>0.62?2:1,yi=y<0.38?0:y>0.62?2:1;return{xi,yi,label:XL_(xi)+"·"+YL_(yi)};}
+function say(i){const s=stance(ox[i],oy[i]);const p=curLINES()[s.xi+","+s.yi];return{label:s.label,text:p[ri(p.length)]};}
 function init(){N=P.n;ox=new Float32Array(N);oy=new Float32Array(N);for(let i=0;i<N;i++){ox[i]=Math.random();oy[i]=Math.random();}msgs=0;pulses=[];feed=[];bubbles=[];sel=-1;allLog=[];}
 function step(){let fc=0;
   for(let k=0;k<P.speed;k++){const a=ri(N),b=ri(N);if(a===b)continue;msgs++;
@@ -87,35 +111,44 @@ function px(i){return pad+ox[i]*(W-2*pad);}function py(i){return pad+oy[i]*(H-2*
 function render(){
   ctx.fillStyle='rgba(6,7,13,0.34)';ctx.fillRect(0,0,W,H);
   ctx.fillStyle='#3a3d55';ctx.font='11px sans-serif';
-  ctx.fillText('秩序',4,H/2);ctx.fillText('自由',W-30,H/2);ctx.fillText('传统',W/2-12,14);ctx.fillText('技术',W/2-12,H-6);
+  ctx.fillText(L('Order','秩序'),4,H/2);ctx.fillText(L('Freedom','自由'),W-46,H/2);ctx.fillText(L('Tradition','传统'),W/2-18,14);ctx.fillText(L('Technology','技术'),W/2-22,H-6);
   for(let p=pulses.length-1;p>=0;p--){const[a,b,t]=pulses[p];ctx.strokeStyle=`rgba(255,211,107,${t*0.45})`;ctx.beginPath();ctx.moveTo(px(a),py(a));ctx.lineTo(px(b),py(b));ctx.stroke();pulses[p][2]-=0.045;if(pulses[p][2]<=0)pulses.splice(p,1);}
   for(let i=0;i<N;i++){ctx.fillStyle=hue(ox[i],oy[i]);ctx.beginPath();ctx.arc(px(i),py(i),i===sel?5:2.6,0,6.283);ctx.fill();
     if(i===sel){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}}
   for(let p=bubbles.length-1;p>=0;p--){const bb=bubbles[p];const i=bb.i;ctx.fillStyle=`rgba(255,255,255,${Math.min(bb.ttl,1)*0.9})`;ctx.font='11px sans-serif';ctx.fillText('「'+bb.t.slice(0,12)+'…」',px(i)+6,py(i)-5);bb.ttl-=0.02;if(bb.ttl<=0)bubbles.splice(p,1);}
 }
-function drawFeed(){feedEl.innerHTML=feed.slice(0,4).map(e=>`<div class="e"><span class="who">#${e.who}</span> <span class="tag">${e.lab}</span> ${e.ok?'对 <span class="who">#'+e.b+'</span> 说':'冲 <span class="who">#'+e.b+'</span> 说'}：<br><span class="q">「${e.t}」</span> <span class="${e.ok?'ok':'no'}">${e.ok?'✓ 被说服':'✗ 没被说动'}</span></div>`).join('');}
+function drawFeed(){feedEl.innerHTML=feed.slice(0,4).map(e=>`<div class="e"><span class="who">#${e.who}</span> <span class="tag">${e.lab}</span> ${e.ok?L('tells','对 ')+' <span class="who">#'+e.b+'</span>'+L('','说'):L('challenges','冲 ')+' <span class="who">#'+e.b+'</span>'+L('','说')}${L(':','：')}<br><span class="q">${L('"','「')}${e.t}${L('"','」')}</span> <span class="${e.ok?'ok':'no'}">${e.ok?L('✓ persuaded','✓ 被说服'):L('✗ unmoved','✗ 没被说动')}</span></div>`).join('');}
 let lastT=performance.now(),mlast=0;
 function loop(){if(running)step();render();const now=performance.now();
   if(now-lastT>220){const r=(msgs-mlast)/((now-lastT)/1000);mlast=msgs;lastT=now;
-    document.getElementById('rate').textContent=Math.round(r).toLocaleString()+'/秒';
+    document.getElementById('rate').textContent=Math.round(r).toLocaleString()+L('/s','/秒');
     document.getElementById('words').textContent=Math.round(now/1000*50).toLocaleString();
     document.getElementById('msgs').textContent=msgs.toLocaleString();
     const[f,big]=factions();document.getElementById('fac').textContent=f;document.getElementById('big').textContent=(big*100|0)+'%';
     drawFeed(); if(sel>=0)showInspect();}
   requestAnimationFrame(loop);}
-function showInspect(){if(sel<0||sel>=N)return;const s=say(sel);document.getElementById('inspect').innerHTML=`<span class="who">#${sel}</span> <span class="tag">${s.label}</span><br>它现在会说: <span class="q">"${s.text}"</span>`;}
+function showInspect(){if(sel<0||sel>=N)return;const s=say(sel);document.getElementById('inspect').innerHTML=`<span class="who">#${sel}</span> <span class="tag">${s.label}</span><br>${L('It would now say:','它现在会说:')} <span class="q">"${s.text}"</span>`;}
 cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;let best=1e9,bi=-1;for(let i=0;i<N;i++){const d=(px(i)-mx)**2+(py(i)-my)**2;if(d<best){best=d;bi=i;}}if(best<400){sel=bi;showInspect();}});
 function setS(id,v){const e=document.getElementById(id);e.value=v;e.dispatchEvent(new Event('input'));}
 function bind(id,key,f){const e=document.getElementById(id),l=document.getElementById('v'+id);e.addEventListener('input',()=>{P[key]=f(+e.value);if(l)l.textContent=e.value;});}
 bind('speed','speed',v=>v);bind('conf','conf',v=>{document.getElementById('vconf').textContent=v;return v/100;});bind('mu','mu',v=>{document.getElementById('vmu').textContent=v;return v/100;});
 document.getElementById('n').addEventListener('input',e=>{P.n=+e.target.value;document.getElementById('vn').textContent=e.target.value;init();});
-document.getElementById('play').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸暂停':'▶播放';});
+const playBtn=document.getElementById('play');
+function renderPlayBtn(){playBtn.textContent=running?'⏸'+L('Pause','暂停'):'▶'+L('Play','播放');}
+playBtn.addEventListener('click',()=>{running=!running;renderPlayBtn();});
+window.addEventListener('mse:lang',()=>{renderPlayBtn();drawFeed();if(sel>=0)showInspect();});
+renderPlayBtn();
 document.getElementById('reset').addEventListener('click',init);
 document.getElementById('echo').addEventListener('click',()=>{setS('conf',7);init();});
 document.getElementById('unity').addEventListener('click',()=>{setS('conf',45);init();});
 document.getElementById('exp').addEventListener('click',()=>{
-  const[f,big]=factions();let md=`# AGORA · 对话记录\n\n- 智能体: ${N}\n- 总对话: ${msgs.toLocaleString()} 次\n- 涌现派别: ${f} 个 (最大占 ${(big*100|0)}%)\n\n## 采样到的发言 (${allLog.length} 条)\n\n`;
-  for(const e of allLog) md+=`- **#${e.who}** [${e.lab}] 「${e.t}」 → #${e.b} ${e.ok?'被说服 ✓':'没理 ✗'}\n`;
+  const[f,big]=factions();
+  let md=L(
+    `# AGORA · Conversation log\n\n- Agents: ${N}\n- Total conversations: ${msgs.toLocaleString()}\n- Emergent factions: ${f} (largest ${(big*100|0)}%)\n\n## Sampled utterances (${allLog.length})\n\n`,
+    `# AGORA · 对话记录\n\n- 智能体: ${N}\n- 总对话: ${msgs.toLocaleString()} 次\n- 涌现派别: ${f} 个 (最大占 ${(big*100|0)}%)\n\n## 采样到的发言 (${allLog.length} 条)\n\n`);
+  for(const e of allLog) md+=L(
+    `- **#${e.who}** [${e.lab}] "${e.t}" -> #${e.b} ${e.ok?'persuaded ✓':'ignored ✗'}\n`,
+    `- **#${e.who}** [${e.lab}] 「${e.t}」 → #${e.b} ${e.ok?'被说服 ✓':'没理 ✗'}\n`);
   const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='agora-conversations.md';document.body.appendChild(a);a.click();a.remove();});
 init();requestAnimationFrame(loop);

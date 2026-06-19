@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ReRAM-CIM 架构探索 · crossbar→ADC→macro→拼接→3D(基于真文献)</title>
+<title>ReRAM-CIM Architecture Explorer · crossbar→ADC→macro→tiling→3D (grounded in real literature) | ReRAM-CIM 架构探索 · crossbar→ADC→macro→拼接→3D(基于真文献)</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff;--vio:#caa9ff}
 *{box-sizing:border-box}
@@ -25,120 +25,120 @@ table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}th,td{pa
 b.g{color:var(--ok)}b.r{color:var(--bad)}b.y{color:var(--hot)}b.b{color:var(--blue)}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#cell">①单元 1T1R/2T2R</a><a href="#xbar">②crossbar 子阵列</a><a href="#adc">③ADC 三种方案</a><a href="#counter">③·计数器</a><a href="#rsadc">③··RS-ADC</a><a href="#macro">④macro 拼 tile</a><a href="#tile">⑤核拼接·时钟墙</a><a href="#d3">⑥3D 堆叠</a>
+<a href="#cell"><span class="lang-en">①Cell 1T1R/2T2R</span><span class="lang-zh">①单元 1T1R/2T2R</span></a><a href="#xbar"><span class="lang-en">②crossbar sub-array</span><span class="lang-zh">②crossbar 子阵列</span></a><a href="#adc"><span class="lang-en">③ADC three schemes</span><span class="lang-zh">③ADC 三种方案</span></a><a href="#counter"><span class="lang-en">③·counter</span><span class="lang-zh">③·计数器</span></a><a href="#rsadc"><span class="lang-en">③··RS-ADC</span><span class="lang-zh">③··RS-ADC</span></a><a href="#macro"><span class="lang-en">④macro → tile</span><span class="lang-zh">④macro 拼 tile</span></a><a href="#tile"><span class="lang-en">⑤core tiling · clock wall</span><span class="lang-zh">⑤核拼接·时钟墙</span></a><a href="#d3"><span class="lang-en">⑥3D stacking</span><span class="lang-zh">⑥3D 堆叠</span></a>
 </div></div>
 <div class="wrap">
-<div class="topnav"><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-cim-101.html">🧱 ReRAM 101</a><a href="reram-cim-calculator.html">⚙️ 计算器</a></div>
-<h1>ReRAM-CIM 架构探索 🔬 从一个单元到一整片(基于真文献)</h1>
-<div class="lead">"32Mb 怎么拼起来、crossbar 怎么做、ADC 是不是每块都有、怎么黏一起" —— 用真实芯片的架构,一层层点开看。数字都标了文献来源。</div>
-<div class="real">📚 <b>真文献锚点(ReRAM = RRAM,神经网络/LLM CIM)</b>:
-<br>① 清华 <b>28nm 576K RRAM-CIM macro</b>,2T2R 差分,2.82 TOPS/mm²;
-<br>② ★ <b>SPIKA</b>(RRAM ML 加速器,64×128 crossbar):<b>三元权重 = 二态单元(LRS=±1 / HRS=0)+ 正负权重放相邻两列 + 每 2 列共享 1 个 5-bit 计数器(时域读出,无 ADC,天然做减法)</b>。180nm,195 TOPS/W;
-<br>③ 清华台 <b>ISSCC'24 22nm 16Mb 浮点 ReRAM-CIM</b>(FP16/BF16,28–31 TFLOPS/W);
-<br>④ <b>Cascaded ReRAM crossbar for Transformer</b> + <b>ADC 虚拟化</b>(多阵列动态共享 ADC);
-<br>⑤ <b>华为-字节 ISSCC'26</b> RRAM 芯片(清华,66× CPU)。
-<br><b style="color:#ffd36b">⭐ SPIKA 直接指明三元落硅路径:二态单元 + 相邻 ± 列差分 + 共享计数器 → 不用 3 电平 cell,也不用 ADC。</b></div>
+<div class="topnav"><a href="reram-cim-visual.html"><span class="lang-en">👀 See the chip</span><span class="lang-zh">👀 看得见的芯片</span></a><a href="reram-cim-101.html"><span class="lang-en">🧱 ReRAM 101</span><span class="lang-zh">🧱 ReRAM 101</span></a><a href="reram-cim-calculator.html"><span class="lang-en">⚙️ Calculator</span><span class="lang-zh">⚙️ 计算器</span></a></div>
+<h1><span class="lang-en">ReRAM-CIM Architecture Explorer 🔬 from a single cell to a whole chip (grounded in real literature)</span><span class="lang-zh">ReRAM-CIM 架构探索 🔬 从一个单元到一整片(基于真文献)</span></h1>
+<div class="lead"><span class="lang-en">"How is 32Mb assembled, how is the crossbar built, does every block have an ADC, how is it all glued together" —— using real chip architectures, peeled open layer by layer. Every number is cited to its source.</span><span class="lang-zh">"32Mb 怎么拼起来、crossbar 怎么做、ADC 是不是每块都有、怎么黏一起" —— 用真实芯片的架构,一层层点开看。数字都标了文献来源。</span></div>
+<div class="real">📚 <b><span class="lang-en">Real-literature anchors (ReRAM = RRAM, neural-network / LLM CIM)</span><span class="lang-zh">真文献锚点(ReRAM = RRAM,神经网络/LLM CIM)</span></b>:
+<br><span class="lang-en">① Tsinghua <b>28nm 576K RRAM-CIM macro</b>, 2T2R differential, 2.82 TOPS/mm²;</span><span class="lang-zh">① 清华 <b>28nm 576K RRAM-CIM macro</b>,2T2R 差分,2.82 TOPS/mm²;</span>
+<br><span class="lang-en">② ★ <b>SPIKA</b> (RRAM ML accelerator, 64×128 crossbar): <b>ternary weight = two-state cell (LRS=±1 / HRS=0) + positive and negative weights placed in two adjacent columns + every 2 columns share one 5-bit counter (time-domain readout, no ADC, subtraction is intrinsic)</b>. 180nm, 195 TOPS/W;</span><span class="lang-zh">② ★ <b>SPIKA</b>(RRAM ML 加速器,64×128 crossbar):<b>三元权重 = 二态单元(LRS=±1 / HRS=0)+ 正负权重放相邻两列 + 每 2 列共享 1 个 5-bit 计数器(时域读出,无 ADC,天然做减法)</b>。180nm,195 TOPS/W;</span>
+<br><span class="lang-en">③ Tsinghua <b>ISSCC'24 22nm 16Mb floating-point ReRAM-CIM</b> (FP16/BF16, 28–31 TFLOPS/W);</span><span class="lang-zh">③ 清华台 <b>ISSCC'24 22nm 16Mb 浮点 ReRAM-CIM</b>(FP16/BF16,28–31 TFLOPS/W);</span>
+<br><span class="lang-en">④ <b>Cascaded ReRAM crossbar for Transformer</b> + <b>ADC virtualization</b> (multiple arrays dynamically share an ADC);</span><span class="lang-zh">④ <b>Cascaded ReRAM crossbar for Transformer</b> + <b>ADC 虚拟化</b>(多阵列动态共享 ADC);</span>
+<br><span class="lang-en">⑤ <b>Huawei-ByteDance ISSCC'26</b> RRAM chip (Tsinghua, 66× CPU).</span><span class="lang-zh">⑤ <b>华为-字节 ISSCC'26</b> RRAM 芯片(清华,66× CPU)。</span>
+<br><b style="color:#ffd36b"><span class="lang-en">⭐ SPIKA points directly to a ternary-to-silicon path: two-state cells + adjacent ± column differential + shared counter → no 3-level cell, no ADC needed.</span><span class="lang-zh">⭐ SPIKA 直接指明三元落硅路径:二态单元 + 相邻 ± 列差分 + 共享计数器 → 不用 3 电平 cell,也不用 ADC。</span></b></div>
 
 <!-- ① cell -->
-<h2 id="cell">① 最小单元:1T1R vs 2T2R(差分)</h2>
-<p>一个权重存在一个"单元"里。<b>点切换</b>:</p>
+<h2 id="cell"><span class="lang-en">① Smallest cell: 1T1R vs 2T2R (differential)</span><span class="lang-zh">① 最小单元:1T1R vs 2T2R(差分)</span></h2>
+<p><span class="lang-en">One weight is stored in one "cell". <b>Tap to switch</b>:</span><span class="lang-zh">一个权重存在一个"单元"里。<b>点切换</b>:</span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center"><span class="seg" id="cellseg"><button data-c="1t1r" class="on">1T1R(1管+1电阻)</button><button data-c="2t2r">2T2R 差分(2管+2电阻)</button></span></div>
+<div class="ctl" style="justify-content:center"><span class="seg" id="cellseg"><button data-c="1t1r" class="on"><span class="lang-en">1T1R (1 transistor + 1 resistor)</span><span class="lang-zh">1T1R(1管+1电阻)</span></button><button data-c="2t2r"><span class="lang-en">2T2R differential (2 transistors + 2 resistors)</span><span class="lang-zh">2T2R 差分(2管+2电阻)</span></button></span></div>
 <svg id="cellSvg" viewBox="0 0 360 150" width="360"></svg>
 <div class="note" id="cellNote"></div>
 </div>
 
 <!-- ② crossbar -->
-<h2 id="xbar">② crossbar 子阵列:行进、列汇总</h2>
-<p>把单元排成网格:<b>横线(行)送输入,竖线(列)汇总电流</b>。一列 = 一次"输入向量 × 权重列"的点积(物理一瞬完成)。<b>拖尺寸、点行给输入:</b></p>
+<h2 id="xbar"><span class="lang-en">② crossbar sub-array: rows feed in, columns sum up</span><span class="lang-zh">② crossbar 子阵列:行进、列汇总</span></h2>
+<p><span class="lang-en">Arrange the cells into a grid: <b>horizontal lines (rows) feed inputs, vertical lines (columns) sum the current</b>. One column = one "input vector × weight column" dot product (completed in a physical instant). <b>Drag the size, tap a row to give it an input:</b></span><span class="lang-zh">把单元排成网格:<b>横线(行)送输入,竖线(列)汇总电流</b>。一列 = 一次"输入向量 × 权重列"的点积(物理一瞬完成)。<b>拖尺寸、点行给输入:</b></span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center">阵列 <span class="seg" id="xsize"><button data-n="8">8×8</button><button data-n="16" class="on">16×16</button><button data-n="32">32×32</button></span></div>
+<div class="ctl" style="justify-content:center"><span class="lang-en">Array</span><span class="lang-zh">阵列</span> <span class="seg" id="xsize"><button data-n="8">8×8</button><button data-n="16" class="on">16×16</button><button data-n="32">32×32</button></span></div>
 <svg id="xbarSvg" viewBox="0 0 420 360" width="420"></svg>
-<div class="legend" style="justify-content:center"><span><i style="background:#7aa9ff"></i>行=输入(点亮=1)</span><span><i style="background:#8ee59a"></i>+权重</span><span><i style="background:#3a3d55"></i>0</span><span><i style="background:#ff8aa0"></i>−权重</span><span>底部=列电流和</span></div>
-<div class="note">真芯片子阵列常是 <b>512 行 × 几十列</b>(如 512×12);这里缩小演示。</div>
+<div class="legend" style="justify-content:center"><span><i style="background:#7aa9ff"></i><span class="lang-en">row=input (lit=1)</span><span class="lang-zh">行=输入(点亮=1)</span></span><span><i style="background:#8ee59a"></i><span class="lang-en">+weight</span><span class="lang-zh">+权重</span></span><span><i style="background:#3a3d55"></i>0</span><span><i style="background:#ff8aa0"></i><span class="lang-en">−weight</span><span class="lang-zh">−权重</span></span><span><span class="lang-en">bottom=column current sum</span><span class="lang-zh">底部=列电流和</span></span></div>
+<div class="note"><span class="lang-en">Real chip sub-arrays are often <b>512 rows × a few dozen columns</b> (e.g. 512×12); shrunk here for the demo.</span><span class="lang-zh">真芯片子阵列常是 <b>512 行 × 几十列</b>(如 512×12);这里缩小演示。</span></div>
 </div>
 
 <!-- ③ ADC -->
-<h2 id="adc">③ ADC 怎么设计?是每列都有吗?——三种方案(核心)</h2>
-<p>你的问题:"是每块 16×16 都有 ADC 吗?" —— <b>不是每块,是每"列"</b>读一个电流。但有三种取舍,<b>点切换看面积/密度/速度怎么变:</b></p>
+<h2 id="adc"><span class="lang-en">③ How is the ADC designed? Does every column have one? — three schemes (core)</span><span class="lang-zh">③ ADC 怎么设计?是每列都有吗?——三种方案(核心)</span></h2>
+<p><span class="lang-en">Your question: "Does every 16×16 block have an ADC?" —— <b>not every block, every "column"</b> reads one current. But there are three trade-offs; <b>tap to switch and see how area / density / speed change:</b></span><span class="lang-zh">你的问题:"是每块 16×16 都有 ADC 吗?" —— <b>不是每块,是每"列"</b>读一个电流。但有三种取舍,<b>点切换看面积/密度/速度怎么变:</b></span></p>
 <div class="card">
-<div class="ctl"><span class="seg" id="adcseg"><button data-s="full" class="on">每列一个 ADC</button><button data-s="mux">共享(时分复用)</button><button data-s="sense">灵敏放大器(三元)</button></span></div>
+<div class="ctl"><span class="seg" id="adcseg"><button data-s="full" class="on"><span class="lang-en">one ADC per column</span><span class="lang-zh">每列一个 ADC</span></button><button data-s="mux"><span class="lang-en">shared (time-multiplexed)</span><span class="lang-zh">共享(时分复用)</span></button><button data-s="sense"><span class="lang-en">sense amplifier (ternary)</span><span class="lang-zh">灵敏放大器(三元)</span></button></span></div>
 <svg id="adcSvg" viewBox="0 0 420 260" width="420"></svg>
 <div class="row" id="adcStats"></div>
 <div class="note" id="adcNote"></div>
 </div>
 
 <!-- ③· counter -->
-<h2 id="counter">③· 时域计数器:512 长列怎么数得准?(SPIKA 真招)</h2>
-<p>难点:一列累加几百行,电流幅值大、难量准。SPIKA 的解法 = <b>不量幅值,数 click</b>:正权重一列、负权重一列(二态 cell),电流给电容充电,过阈值就"click"一下<b>共享计数器</b>(+列加、−列减),最后计数=两列之差。<b>点"读出":</b></p>
+<h2 id="counter"><span class="lang-en">③· Time-domain counter: how do you count a 512-long column accurately? (SPIKA's real trick)</span><span class="lang-zh">③· 时域计数器:512 长列怎么数得准?(SPIKA 真招)</span></h2>
+<p><span class="lang-en">The hard part: a column accumulates hundreds of rows, the current amplitude is large and hard to measure accurately. SPIKA's solution = <b>don't measure amplitude, count clicks</b>: one column for positive weights, one for negative (two-state cells); the current charges a capacitor, and crossing the threshold gives one "click" to the <b>shared counter</b> (+column adds, −column subtracts); the final count = the difference between the two columns. <b>Tap "Read out":</b></span><span class="lang-zh">难点:一列累加几百行,电流幅值大、难量准。SPIKA 的解法 = <b>不量幅值,数 click</b>:正权重一列、负权重一列(二态 cell),电流给电容充电,过阈值就"click"一下<b>共享计数器</b>(+列加、−列减),最后计数=两列之差。<b>点"读出":</b></span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center"><button class="go" id="cntRun" style="background:#244d24;color:#fff;border:1px solid #356a35;border-radius:9px;padding:9px 16px;cursor:pointer">▶ 读出(数 click)</button><button class="go" id="cntRand" style="background:#262838;border:1px solid #33354a;color:#fff;border-radius:9px;padding:9px 14px;cursor:pointer">🎲 换权重</button></div>
+<div class="ctl" style="justify-content:center"><button class="go" id="cntRun" style="background:#244d24;color:#fff;border:1px solid #356a35;border-radius:9px;padding:9px 16px;cursor:pointer"><span class="lang-en">▶ Read out (count clicks)</span><span class="lang-zh">▶ 读出(数 click)</span></button><button class="go" id="cntRand" style="background:#262838;border:1px solid #33354a;color:#fff;border-radius:9px;padding:9px 14px;cursor:pointer"><span class="lang-en">🎲 New weights</span><span class="lang-zh">🎲 换权重</span></button></div>
 <svg id="cntSvg" viewBox="0 0 440 250" width="440"></svg>
-<div class="note" id="cntNote">点"读出":+列每个出电流的 cell 让计数器+1,−列每个−1,最后=列和(差分)。</div>
+<div class="note" id="cntNote"><span class="lang-en">Tap "Read out": each current-emitting cell in the + column adds +1 to the counter, each in the − column subtracts 1; the final value = column sum (differential).</span><span class="lang-zh">点"读出":+列每个出电流的 cell 让计数器+1,−列每个−1,最后=列和(差分)。</span></div>
 </div>
 <div class="card" style="border:1px solid #2a3550">
-<h3>为什么这样就准?(顺便答两个问题)</h3>
+<h3><span class="lang-en">Why is this accurate? (and it answers two questions along the way)</span><span class="lang-zh">为什么这样就准?(顺便答两个问题)</span></h3>
 <table>
-<tr><td>① <b>数整数,不量幅值</b></td><td>二态 cell:列和本质是"几个 +1 减几个 −1"=整数。数 click 比量模拟电流稳得多。</td></tr>
-<tr><td>② <b>差分消共模</b></td><td>±两列相减,温漂/IR-drop/老化对两列一样 → 抵消。</td></tr>
-<tr><td>③ <b>全局时钟·并行</b></td><td>一个时钟广播给所有列的计数器,<b>所有列同时数自己的 click</b> —— 这就是"并行发时间",可以。</td></tr>
-<tr><td>④ <b>不需要原子钟</b></td><td>GHz 片上时钟对 µs 读出绰绰有余;<b>精度瓶颈在模拟侧</b>(电容/阈值偏差),原子钟修不了它,还上不了片。</td></tr>
-<tr><td>⑤ <b>大电流的真招</b>(ISSCC'24 34.8)</td><td>输入多bit压缩(不一次发完)+ HRS偏置(多数 cell 是低电流0态)+ 残差共享ADC,把动态范围框住。</td></tr>
+<tr><td>① <b><span class="lang-en">Count integers, don't measure amplitude</span><span class="lang-zh">数整数,不量幅值</span></b></td><td><span class="lang-en">Two-state cells: the column sum is essentially "how many +1s minus how many −1s" = an integer. Counting clicks is far more stable than measuring analog current.</span><span class="lang-zh">二态 cell:列和本质是"几个 +1 减几个 −1"=整数。数 click 比量模拟电流稳得多。</span></td></tr>
+<tr><td>② <b><span class="lang-en">Differential cancels common mode</span><span class="lang-zh">差分消共模</span></b></td><td><span class="lang-en">Subtracting the ± two columns: temperature drift / IR-drop / aging hit both columns equally → they cancel.</span><span class="lang-zh">±两列相减,温漂/IR-drop/老化对两列一样 → 抵消。</span></td></tr>
+<tr><td>③ <b><span class="lang-en">Global clock · parallel</span><span class="lang-zh">全局时钟·并行</span></b></td><td><span class="lang-en">One clock broadcasts to all columns' counters, and <b>all columns count their own clicks simultaneously</b> —— this is "broadcasting time in parallel", and it works.</span><span class="lang-zh">一个时钟广播给所有列的计数器,<b>所有列同时数自己的 click</b> —— 这就是"并行发时间",可以。</span></td></tr>
+<tr><td>④ <b><span class="lang-en">No atomic clock needed</span><span class="lang-zh">不需要原子钟</span></b></td><td><span class="lang-en">A GHz on-chip clock is more than enough for µs readout; <b>the accuracy bottleneck is on the analog side</b> (capacitor / threshold deviation), which an atomic clock can't fix and can't fit on chip anyway.</span><span class="lang-zh">GHz 片上时钟对 µs 读出绰绰有余;<b>精度瓶颈在模拟侧</b>(电容/阈值偏差),原子钟修不了它,还上不了片。</span></td></tr>
+<tr><td>⑤ <b><span class="lang-en">The real trick for large currents</span><span class="lang-zh">大电流的真招</span></b><span class="lang-en"> (ISSCC'24 34.8)</span><span class="lang-zh">(ISSCC'24 34.8)</span></td><td><span class="lang-en">Multi-bit input compression (not sent all at once) + HRS bias (most cells are in the low-current 0 state) + residual shared ADC, bounding the dynamic range.</span><span class="lang-zh">输入多bit压缩(不一次发完)+ HRS偏置(多数 cell 是低电流0态)+ 残差共享ADC,把动态范围框住。</span></td></tr>
 </table>
 </div>
 
 <!-- ③·· RS-ADC -->
-<h2 id="rsadc">③·· RS-ADC:多列怎么共享一个 ADC(ISSCC'24 34.8,真芯片)</h2>
-<p>真芯片确认 ADC 是<b>多列共享</b>的(不是每列一个)。<b>残差共享 ADC(RS-ADC)</b>:每列做便宜的<b>粗量化</b>(比较器),把粗量化后的<b>残差</b>经 MUX 送进<b>一个共享的精 ADC</b>顺序量化。<b>拖共享比看 ADC 数怎么降:</b></p>
+<h2 id="rsadc"><span class="lang-en">③·· RS-ADC: how do multiple columns share one ADC (ISSCC'24 34.8, real chip)</span><span class="lang-zh">③·· RS-ADC:多列怎么共享一个 ADC(ISSCC'24 34.8,真芯片)</span></h2>
+<p><span class="lang-en">Real chips confirm the ADC is <b>shared across columns</b> (not one per column). <b>Residual-shared ADC (RS-ADC)</b>: each column does cheap <b>coarse quantization</b> (a comparator), then the <b>residual</b> after coarse quantization is sent via MUX into <b>one shared fine ADC</b> for sequential quantization. <b>Drag the sharing ratio to see how the ADC count drops:</b></span><span class="lang-zh">真芯片确认 ADC 是<b>多列共享</b>的(不是每列一个)。<b>残差共享 ADC(RS-ADC)</b>:每列做便宜的<b>粗量化</b>(比较器),把粗量化后的<b>残差</b>经 MUX 送进<b>一个共享的精 ADC</b>顺序量化。<b>拖共享比看 ADC 数怎么降:</b></span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center">共享比(1 精ADC : <span class="kpi" id="rsN">2</span> 列)<input type="range" id="rs" min="1" max="8" value="2" oninput="drawRS()"></div>
+<div class="ctl" style="justify-content:center"><span class="lang-en">Sharing ratio (1 fine ADC : <span class="kpi" id="rsN">2</span> columns)</span><span class="lang-zh">共享比(1 精ADC : <span class="kpi" id="rsN">2</span> 列)</span><input type="range" id="rs" min="1" max="8" value="2" oninput="drawRS()"></div>
 <svg id="rsSvg" viewBox="0 0 440 240" width="440"></svg>
 <div class="row" id="rsStats" style="justify-content:center"></div>
 <div class="note" id="rsNote"></div>
 </div>
-<div class="real" style="text-align:left">📌 <b>诚实标注</b>:RS-ADC 的精确电路 <b>JSSC'24 正文付费墙未公开</b>(摘要只说"每个 ADC 可被多列共享")。上图是<b>推断拓扑</b>(粗量化/列 + 残差送共享精 ADC),要画准得拉 IEEE 原文。<br>同期 <b>ISSCC'24 34.3 的 ASQC</b>(电荷域累加+计数器+末端 1 个 6-bit SAR-ADC)= ③· 那个计数器动画的真原型(但用 SRAM)。<b>ADC 共享是全行业标配</b>:RS-ADC / ADC 虚拟化 / TIA 级联免 ADC。</div>
+<div class="real" style="text-align:left">📌 <b><span class="lang-en">Honest annotation</span><span class="lang-zh">诚实标注</span></b><span class="lang-en">: the exact RS-ADC circuit is <b>behind the JSSC'24 paywall, not disclosed</b> (the abstract only says "each ADC can be shared by multiple columns"). The figure above is an <b>inferred topology</b> (coarse quantization / column + residual to a shared fine ADC); drawing it accurately requires pulling the IEEE original.</span><span class="lang-zh">:RS-ADC 的精确电路 <b>JSSC'24 正文付费墙未公开</b>(摘要只说"每个 ADC 可被多列共享")。上图是<b>推断拓扑</b>(粗量化/列 + 残差送共享精 ADC),要画准得拉 IEEE 原文。</span><br><span class="lang-en">The contemporaneous <b>ASQC in ISSCC'24 34.3</b> (charge-domain accumulation + counter + one 6-bit SAR-ADC at the end) = the real prototype of the counter animation in ③· (but using SRAM). <b>ADC sharing is the industry standard</b>: RS-ADC / ADC virtualization / TIA cascade without ADC.</span><span class="lang-zh">同期 <b>ISSCC'24 34.3 的 ASQC</b>(电荷域累加+计数器+末端 1 个 6-bit SAR-ADC)= ③· 那个计数器动画的真原型(但用 SRAM)。<b>ADC 共享是全行业标配</b>:RS-ADC / ADC 虚拟化 / TIA 级联免 ADC。</span></div>
 
 <!-- ④ macro -->
-<h2 id="macro">④ macro:多个子阵列 + 加法树合并</h2>
-<p>一个 <b>macro</b> = 几个子阵列 + 读出 + <b>加法树/XOR 树</b>把各子阵列的部分和合并。真芯片(二元那款):<b>4 个 512×12 子阵列 → XOR 树合并</b>。一个 macro 大概 ~16–32 Mbit。</p>
+<h2 id="macro"><span class="lang-en">④ macro: multiple sub-arrays + adder-tree merge</span><span class="lang-zh">④ macro:多个子阵列 + 加法树合并</span></h2>
+<p><span class="lang-en">One <b>macro</b> = a few sub-arrays + readout + an <b>adder tree / XOR tree</b> that merges each sub-array's partial sums. Real chip (the binary one): <b>4 × 512×12 sub-arrays → XOR-tree merge</b>. One macro is roughly ~16–32 Mbit.</span><span class="lang-zh">一个 <b>macro</b> = 几个子阵列 + 读出 + <b>加法树/XOR 树</b>把各子阵列的部分和合并。真芯片(二元那款):<b>4 个 512×12 子阵列 → XOR 树合并</b>。一个 macro 大概 ~16–32 Mbit。</span></p>
 <div class="card" style="text-align:center"><svg id="macroSvg" viewBox="0 0 420 230" width="420"></svg>
-<div class="note">"32Mb 怎么拼" 的第一层:子阵列 →(片内紧密互联)→ macro。这一层是<b>晶体管级互联,在一块</b>(专家原话)。</div></div>
+<div class="note"><span class="lang-en">The first layer of "how 32Mb is assembled": sub-array →(tight on-chip interconnect)→ macro. This layer is <b>transistor-level interconnect, all on one piece</b> (the expert's exact words).</span><span class="lang-zh">"32Mb 怎么拼" 的第一层:子阵列 →(片内紧密互联)→ macro。这一层是<b>晶体管级互联,在一块</b>(专家原话)。</span></div></div>
 
 <!-- ⑤ tiling -->
-<h2 id="tile">⑤ 多个核拼接:面积不是墙,时钟和互联才是</h2>
-<p>超过 ~32Mbit 就拼多个核(macro/core)。<b>拖核数</b>看代价:核越多,时钟信号走线越长、越难对齐,调度越复杂。</p>
+<h2 id="tile"><span class="lang-en">⑤ Tiling multiple cores: area isn't the wall — clock and interconnect are</span><span class="lang-zh">⑤ 多个核拼接:面积不是墙,时钟和互联才是</span></h2>
+<p><span class="lang-en">Beyond ~32Mbit you tile multiple cores (macro/core). <b>Drag the core count</b> to see the cost: more cores mean longer clock-signal routing, harder alignment, more complex scheduling.</span><span class="lang-zh">超过 ~32Mbit 就拼多个核(macro/core)。<b>拖核数</b>看代价:核越多,时钟信号走线越长、越难对齐,调度越复杂。</span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center">核数 <input type="range" id="cores" min="1" max="16" value="4" oninput="drawTile()"> <span class="kpi" id="coreLbl"></span></div>
+<div class="ctl" style="justify-content:center"><span class="lang-en">Cores</span><span class="lang-zh">核数</span> <input type="range" id="cores" min="1" max="16" value="4" oninput="drawTile()"> <span class="kpi" id="coreLbl"></span></div>
 <svg id="tileSvg" viewBox="0 0 420 240" width="420"></svg>
 <div class="note" id="tileNote"></div>
 </div>
 
 <!-- ⑥ 3D -->
-<h2 id="d3">⑥ 怎么"黏一起":单 die / 4 die · 2.5D organic（我们的路）/ 3D（已弃）</h2>
-<div class="real" style="border-color:#7a3040;background:#241317;color:#f0bdcf">⚠️ <b style="color:#ff8aa0">2026-06 更新</b>：我们<b>走 2.5D organic 转接板</b>按 die 扩容，<b>已弃 3D 堆叠 / 混合键合</b>——in-place CIM 只在 die 间搬<b>激活</b>(~0.1–0.3 GB/s)，便宜的 organic 基板带宽就够；3D 的垂直 TB/s 买不到收益，且产能被大厂占满、小团队拿不到。下面的 3D 仅作对比科普。</div>
-<p><b>先分清两种"3D"(别混):</b></p>
+<h2 id="d3"><span class="lang-en">⑥ How to "glue it together": single die / 4 die · 2.5D organic (our path) / 3D (abandoned)</span><span class="lang-zh">⑥ 怎么"黏一起":单 die / 4 die · 2.5D organic（我们的路）/ 3D（已弃）</span></h2>
+<div class="real" style="border-color:#7a3040;background:#241317;color:#f0bdcf">⚠️ <b style="color:#ff8aa0"><span class="lang-en">2026-06 update</span><span class="lang-zh">2026-06 更新</span></b><span class="lang-en">: we <b>take the 2.5D organic interposer</b> and scale by die, <b>abandoning 3D stacking / hybrid bonding</b> —— in-place CIM only moves <b>activations</b> between dies (~0.1–0.3 GB/s), so a cheap organic substrate's bandwidth is enough; 3D's vertical TB/s buys no benefit, and its capacity is taken up by the big players — small teams can't get it. The 3D below is shown only for comparison.</span><span class="lang-zh">：我们<b>走 2.5D organic 转接板</b>按 die 扩容，<b>已弃 3D 堆叠 / 混合键合</b>——in-place CIM 只在 die 间搬<b>激活</b>(~0.1–0.3 GB/s)，便宜的 organic 基板带宽就够；3D 的垂直 TB/s 买不到收益，且产能被大厂占满、小团队拿不到。下面的 3D 仅作对比科普。</span></div>
+<p><b><span class="lang-en">First distinguish the two kinds of "3D" (don't confuse them):</span><span class="lang-zh">先分清两种"3D"(别混):</span></b></p>
 <table>
-<tr><th>类型</th><th>每层是什么</th><th>外围(ADC/计数器/驱动)</th><th>用来</th></tr>
-<tr><td><b>单片 3D</b>(vertical ReRAM)</td><td>一片 <b>cell 单元层</b>(像 3D NAND 纵向叠 cell)</td><td>在<b>底层 CMOS,几层共享一套</b></td><td><b>提密度</b>(学术界单片多层;⚠️ GB 级量产不存在,我们<b>不</b>依赖它)</td></tr>
-<tr><td><b>die 堆叠</b>(TSV / 3D-PIM)</td><td>一整片 <b>die</b>(自带 macro+外围)</td><td>每层 die <b>各带一套</b></td><td><b>提带宽</b>(三星 3D-PIM)<b style="color:#ff8aa0"> — 我们已弃(只搬激活,用不上)</b></td></tr>
+<tr><th><span class="lang-en">Type</span><span class="lang-zh">类型</span></th><th><span class="lang-en">What each layer is</span><span class="lang-zh">每层是什么</span></th><th><span class="lang-en">Peripherals (ADC/counter/driver)</span><span class="lang-zh">外围(ADC/计数器/驱动)</span></th><th><span class="lang-en">Used for</span><span class="lang-zh">用来</span></th></tr>
+<tr><td><b><span class="lang-en">Monolithic 3D</span><span class="lang-zh">单片 3D</span></b><span class="lang-en"> (vertical ReRAM)</span><span class="lang-zh">(vertical ReRAM)</span></td><td><span class="lang-en">a single <b>cell layer</b> (stacking cells vertically, like 3D NAND)</span><span class="lang-zh">一片 <b>cell 单元层</b>(像 3D NAND 纵向叠 cell)</span></td><td><span class="lang-en">in the <b>bottom CMOS, several layers share one set</b></span><span class="lang-zh">在<b>底层 CMOS,几层共享一套</b></span></td><td><b><span class="lang-en">boost density</span><span class="lang-zh">提密度</span></b><span class="lang-en"> (multi-layer monolithic in academia; ⚠️ GB-scale mass production doesn't exist, we do <b>not</b> rely on it)</span><span class="lang-zh">(学术界单片多层;⚠️ GB 级量产不存在,我们<b>不</b>依赖它)</span></td></tr>
+<tr><td><b><span class="lang-en">Die stacking</span><span class="lang-zh">die 堆叠</span></b><span class="lang-en"> (TSV / 3D-PIM)</span><span class="lang-zh">(TSV / 3D-PIM)</span></td><td><span class="lang-en">a whole <b>die</b> (with its own macro + peripherals)</span><span class="lang-zh">一整片 <b>die</b>(自带 macro+外围)</span></td><td><span class="lang-en">each die layer <b>carries its own set</b></span><span class="lang-zh">每层 die <b>各带一套</b></span></td><td><b><span class="lang-en">boost bandwidth</span><span class="lang-zh">提带宽</span></b><span class="lang-en"> (Samsung 3D-PIM)</span><span class="lang-zh">(三星 3D-PIM)</span><b style="color:#ff8aa0"><span class="lang-en"> — we abandoned it (only moving activations, don't need it)</span><span class="lang-zh"> — 我们已弃(只搬激活,用不上)</span></b></td></tr>
 </table>
-<p class="note"><b>所以不是"macro 堆 macro",也不是堆 16×16:</b>提密度时堆的是 cell 单元层(共享一套外围);提带宽时堆的是整片 die(TSV 连)。<b>点切换看:</b></p>
+<p class="note"><b><span class="lang-en">So it's neither "macro stacked on macro" nor stacking 16×16s:</span><span class="lang-zh">所以不是"macro 堆 macro",也不是堆 16×16:</span></b><span class="lang-en"> for density you stack cell layers (sharing one set of peripherals); for bandwidth you stack whole dies (TSV-connected). <b>Tap to switch:</b></span><span class="lang-zh">提密度时堆的是 cell 单元层(共享一套外围);提带宽时堆的是整片 die(TSV 连)。<b>点切换看:</b></span></p>
 <div class="card" style="text-align:center">
-<div class="ctl" style="justify-content:center"><span class="seg" id="pkg"><button data-p="1">单 die(平铺)</button><button data-p="4" class="on">4 die · 2.5D organic（我们的路）</button><button data-p="3d">3D 堆叠（TSV·已弃）</button></span></div>
+<div class="ctl" style="justify-content:center"><span class="seg" id="pkg"><button data-p="1"><span class="lang-en">single die (planar)</span><span class="lang-zh">单 die(平铺)</span></button><button data-p="4" class="on"><span class="lang-en">4 die · 2.5D organic (our path)</span><span class="lang-zh">4 die · 2.5D organic（我们的路）</span></button><button data-p="3d"><span class="lang-en">3D stacking (TSV · abandoned)</span><span class="lang-zh">3D 堆叠（TSV·已弃）</span></button></span></div>
 <svg id="pkgSvg" viewBox="0 0 420 240" width="420"></svg>
 <div class="note" id="pkgNote"></div>
 </div>
 
 <div class="foot">
-架构按公开 ReRAM 神经网络 CIM 文献还原(某片内部 tiling 未全公开,如华为-字节 ISSCC'26 付费墙)。来源:
-<a href="https://www.frontiersin.org/journals/electronics/articles/10.3389/felec.2025.1567562/full" target="_blank">SPIKA RRAM CIM(64×128,三元,时域计数器无 ADC)</a> ·
+<span class="lang-en">Architecture reconstructed from public ReRAM neural-network CIM literature (some chips' internal tiling isn't fully disclosed, e.g. the Huawei-ByteDance ISSCC'26 paywall). Sources:</span><span class="lang-zh">架构按公开 ReRAM 神经网络 CIM 文献还原(某片内部 tiling 未全公开,如华为-字节 ISSCC'26 付费墙)。来源:</span>
+<a href="https://www.frontiersin.org/journals/electronics/articles/10.3389/felec.2025.1567562/full" target="_blank"><span class="lang-en">SPIKA RRAM CIM (64×128, ternary, time-domain counter without ADC)</span><span class="lang-zh">SPIKA RRAM CIM(64×128,三元,时域计数器无 ADC)</span></a> ·
 <a href="https://www.jos.ac.cn/en/article/doi/10.1088/1674-4926/24100017" target="_blank">JoS 28nm 576K RRAM-CIM macro (2T2R, 2.82 TOPS/mm²)</a> ·
 <a href="https://dl.acm.org/doi/10.1145/3701034" target="_blank">Cascaded ReRAM Crossbar for Transformer (ACM TODAES)</a> ·
-<a href="https://github.com/witmemtech/CIM-Technical-Papers-Collection/blob/main/readme.EN" target="_blank">知存 witmem · CIM 论文合集</a> ·
-<a href="https://www.researchgate.net/publication/385161425" target="_blank">ISSCC'24 34.8 · NTHU 22nm 16Mb FP-ReRAM(RS-ADC)</a> ·
-ISSCC'21 16.1 · NTHU 22nm 4Mb 8b ReRAM · REMNA(MLC FeFET, NAND式读) · ReCAT(级联ReRAM Transformer)。
-<br>★ <b>华为-字节 ISSCC'26 = "HYDAR"</b>(清华+华为+字节,28nm ~36Mb,<b>16 PE × 288×4096 阵列</b>,DL-ADC)—— 真身是<b>推荐系统向量搜索加速器,不是 LLM</b>;系统级 vs CPU 66×(按 QPS)。专家逐字稿里的 36Mbit/1.63Mb-mm² 就是它。
-<br>⚠️ 部分图为<b>推断拓扑</b>(IEEE/ACM 正文付费墙);精确电路需机构访问拉原文。完整文献 digest(7 篇,事实/推断/墙分级)在私有研究档。图为示意。
+<a href="https://github.com/witmemtech/CIM-Technical-Papers-Collection/blob/main/readme.EN" target="_blank"><span class="lang-en">Witmem · CIM papers collection</span><span class="lang-zh">知存 witmem · CIM 论文合集</span></a> ·
+<a href="https://www.researchgate.net/publication/385161425" target="_blank">ISSCC'24 34.8 · NTHU 22nm 16Mb FP-ReRAM (RS-ADC)</a> ·
+<span class="lang-en">ISSCC'21 16.1 · NTHU 22nm 4Mb 8b ReRAM · REMNA (MLC FeFET, NAND-style read) · ReCAT (cascaded ReRAM Transformer).</span><span class="lang-zh">ISSCC'21 16.1 · NTHU 22nm 4Mb 8b ReRAM · REMNA(MLC FeFET, NAND式读) · ReCAT(级联ReRAM Transformer)。</span>
+<br>★ <b><span class="lang-en">Huawei-ByteDance ISSCC'26 = "HYDAR"</span><span class="lang-zh">华为-字节 ISSCC'26 = "HYDAR"</span></b><span class="lang-en"> (Tsinghua + Huawei + ByteDance, 28nm ~36Mb, <b>16 PE × 288×4096 array</b>, DL-ADC) —— it's actually a <b>recommendation-system vector-search accelerator, not an LLM</b>; system-level 66× vs CPU (by QPS). The 36Mbit / 1.63Mb-mm² in the expert transcript is this chip.</span><span class="lang-zh">(清华+华为+字节,28nm ~36Mb,<b>16 PE × 288×4096 阵列</b>,DL-ADC)—— 真身是<b>推荐系统向量搜索加速器,不是 LLM</b>;系统级 vs CPU 66×(按 QPS)。专家逐字稿里的 36Mbit/1.63Mb-mm² 就是它。</span>
+<br>⚠️ <span class="lang-en">Some figures are <b>inferred topologies</b> (IEEE/ACM body text is paywalled); the exact circuits require institutional access to the originals. The full literature digest (7 papers, graded fact / inference / paywall) is in the private research archive. Figures are illustrative.</span><span class="lang-zh">部分图为<b>推断拓扑</b>(IEEE/ACM 正文付费墙);精确电路需机构访问拉原文。完整文献 digest(7 篇,事实/推断/墙分级)在私有研究档。图为示意。</span>
 </div>
 
 <script>
@@ -147,6 +147,9 @@ function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAt
 function clr(s){while(s.firstChild)s.removeChild(s.firstChild);}
 function txt(s,x,y,t,c,sz,anc){const e=el('text',{x:x,y:y,fill:c||'#aab','font-size':sz||12,'text-anchor':anc||'middle'});e.textContent=t;s.appendChild(e);return e;}
 const COL={1:'#8ee59a',0:'#3a3d55','-1':'#ff8aa0'};
+// bilingual helper: pick English or Chinese based on global <html data-lang> toggle (default = English)
+const isZH=()=>document.documentElement.dataset.lang==='zh';
+const L=(en,zh)=>isZH()?zh:en;
 
 // ① cell
 function drawCell(c){const s=document.getElementById('cellSvg');clr(s);
@@ -154,13 +157,13 @@ function drawCell(c){const s=document.getElementById('cellSvg');clr(s);
   s.appendChild(el('rect',{x:60,y:55,width:40,height:40,rx:4,fill:'#2a2d40',stroke:'#556'}));txt(s,80,80,'T',' #7aa9ff',16);
   s.appendChild(el('rect',{x:140,y:55,width:40,height:40,rx:4,fill:'#163a22',stroke:'#2f7a45'}));txt(s,160,80,'R','#8ee59a',16);
   s.appendChild(el('line',{x1:100,y1:75,x2:140,y2:75,stroke:'#778','stroke-width':2}));
-  txt(s,120,40,'1 晶体管 + 1 电阻(ReRAM)','#eee',13);txt(s,120,120,'存 1 个权重 · 最小最密','#8a8ca6',12);
+  txt(s,120,40,L('1 transistor + 1 resistor (ReRAM)','1 晶体管 + 1 电阻(ReRAM)'),'#eee',13);txt(s,120,120,L('stores 1 weight · smallest & densest','存 1 个权重 · 最小最密'),'#8a8ca6',12);
  } else {
   for(let i=0;i<2;i++){const x=40+i*180;
    s.appendChild(el('rect',{x:x,y:55,width:36,height:36,rx:4,fill:'#2a2d40',stroke:'#556'}));txt(s,x+18,78,'T','#7aa9ff',14);
    s.appendChild(el('rect',{x:x+50,y:55,width:36,height:36,rx:4,fill:i?'#3a2030':'#163a22',stroke:i?'#7a3040':'#2f7a45'}));txt(s,x+68,78,'R'+(i?'−':'+'),i?'#ff8aa0':'#8ee59a',13);
    s.appendChild(el('line',{x1:x+36,y1:73,x2:x+50,y2:73,stroke:'#778','stroke-width':2}));}
-  txt(s,180,40,'2T2R 差分:两条互补,读 (R+ − R−)','#ffd36b',13);txt(s,180,120,'抗噪裕度大 ← 这就是"2-SLC 差分"路线(真芯片标配)','#8ee59a',11.5);
+  txt(s,180,40,L('2T2R differential: two complementary, read (R+ − R−)','2T2R 差分:两条互补,读 (R+ − R−)'),'#ffd36b',13);txt(s,180,120,L('large noise margin ← this is the "2-SLC differential" path (real-chip standard)','抗噪裕度大 ← 这就是"2-SLC 差分"路线(真芯片标配)'),'#8ee59a',11.5);
  }
 }
 document.querySelectorAll('#cellseg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#cellseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawCell(b.dataset.c);});
@@ -180,7 +183,7 @@ function drawX(){const s=document.getElementById('xbarSvg');clr(s);const W=420,p
  for(let j=0;j<xN;j++){const x=pad+j*gw;let sum=0;for(let i=0;i<xN;i++)sum+=xIn[i]*xW[i][j];
    const y=top+(xN-1)*H+34; s.appendChild(el('rect',{x:x-8,y:y-10,width:16,height:15,rx:3,fill:'#11131e',stroke:'#33354a'}));
    txt(s,x,y+1,sum,'#ffd36b',Math.max(8,Math.min(11,gw*0.5)));}
- txt(s,12,16,'输入','#7aa9ff',11);txt(s,W-40,top+(xN-1)*H+44,'=列电流和','#ffd36b',11);
+ txt(s,12,16,L('input','输入'),'#7aa9ff',11);txt(s,W-40,top+(xN-1)*H+44,L('=col current sum','=列电流和'),'#ffd36b',11);
 }
 document.querySelectorAll('#xsize button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#xsize button').forEach(x=>x.classList.remove('on'));b.classList.add('on');initX(+b.dataset.n);});
 initX(16);
@@ -191,22 +194,22 @@ function drawADC(scheme){const s=document.getElementById('adcSvg');clr(s);const 
  for(let i=0;i<4;i++)for(let j=0;j<cols;j++)s.appendChild(el('circle',{cx:pad+j*gw,cy:top+i*22,r:5,fill:'#2f7a45'}));
  for(let j=0;j<cols;j++)s.appendChild(el('line',{x1:pad+j*gw,y1:top-8,x2:pad+j*gw,y2:120,stroke:'#2a2d40','stroke-width':1.5}));
  let adcN,area,dens,speed,note,boxw,col;
- if(scheme==='full'){adcN=cols;area='大(20–45%)';dens='低 ~1.5–2';speed='最快(全并行)';col='#ff8aa0';boxw=34;
-   note='每列一个高精度 ADC → 8 列 8 个 ADC,一周期读完所有列。峰值算力最高,但 ADC 吃面积/功耗最多 → 密度低。';
+ if(scheme==='full'){adcN=cols;area=L('large (20–45%)','大(20–45%)');dens=L('low ~1.5–2','低 ~1.5–2');speed=L('fastest (fully parallel)','最快(全并行)');col='#ff8aa0';boxw=34;
+   note=L('One high-precision ADC per column → 8 columns, 8 ADCs, all columns read in one cycle. Highest peak compute, but ADCs eat the most area/power → low density.','每列一个高精度 ADC → 8 列 8 个 ADC,一周期读完所有列。峰值算力最高,但 ADC 吃面积/功耗最多 → 密度低。');
    for(let j=0;j<cols;j++){s.appendChild(el('rect',{x:pad+j*gw-16,y:130,width:32,height:34,rx:5,fill:'#3a2030',stroke:'#7a3040'}));txt(s,pad+j*gw,151,'ADC','#ff8aa0',10);}}
- else if(scheme==='mux'){adcN=2,area='中',dens='中 ~2.5–4',speed='慢(N 周期复用)',col='#ffd36b';
-   note='1 个 ADC 经列 MUX 轮流读多列(如 8 列 8 周期)→ ADC 数 ÷N,面积省、密度升,但慢 N 倍。这是"密度↔速度"旋钮。';
-   s.appendChild(el('rect',{x:40,y:130,width:300,height:14,rx:4,fill:'#23283a',stroke:'#445'}));txt(s,190,141,'列 MUX(多列共享)','#ccd',11);
-   s.appendChild(el('rect',{x:170,y:152,width:60,height:30,rx:5,fill:'#3a2f12',stroke:'#7a6a30'}));txt(s,200,171,'1 ADC','#ffd36b',11);}
- else {adcN=cols,area='很小',dens='高 ~3.5–6',speed='快(并行,读出简单)',col='#8ee59a';
-   note='三元/二元只需"大于阈值吗"→ 每列一个灵敏放大器/比较器(真文献 PCSPC:3.3-bit,0.097mW vs 4-bit ADC 1–78mW)。又快又密 → 但只对低精度成立(三元 cell 路径)。';
+ else if(scheme==='mux'){adcN=2,area=L('medium','中'),dens=L('medium ~2.5–4','中 ~2.5–4'),speed=L('slow (N-cycle multiplex)','慢(N 周期复用)'),col='#ffd36b';
+   note=L('1 ADC reads multiple columns in turn via a column MUX (e.g. 8 columns, 8 cycles) → ADC count ÷N, saves area, raises density, but N× slower. This is the "density ↔ speed" knob.','1 个 ADC 经列 MUX 轮流读多列(如 8 列 8 周期)→ ADC 数 ÷N,面积省、密度升,但慢 N 倍。这是"密度↔速度"旋钮。');
+   s.appendChild(el('rect',{x:40,y:130,width:300,height:14,rx:4,fill:'#23283a',stroke:'#445'}));txt(s,190,141,L('column MUX (shared by columns)','列 MUX(多列共享)'),'#ccd',11);
+   s.appendChild(el('rect',{x:170,y:152,width:60,height:30,rx:5,fill:'#3a2f12',stroke:'#7a6a30'}));txt(s,200,171,L('1 ADC','1 ADC'),'#ffd36b',11);}
+ else {adcN=cols,area=L('very small','很小'),dens=L('high ~3.5–6','高 ~3.5–6'),speed=L('fast (parallel, simple readout)','快(并行,读出简单)'),col='#8ee59a';
+   note=L('Ternary/binary only needs "is it above threshold?" → one sense amplifier/comparator per column (real literature PCSPC: 3.3-bit, 0.097mW vs 4-bit ADC 1–78mW). Fast and dense → but only holds at low precision (the ternary-cell path).','三元/二元只需"大于阈值吗"→ 每列一个灵敏放大器/比较器(真文献 PCSPC:3.3-bit,0.097mW vs 4-bit ADC 1–78mW)。又快又密 → 但只对低精度成立(三元 cell 路径)。');
    for(let j=0;j<cols;j++){s.appendChild(el('rect',{x:pad+j*gw-9,y:130,width:18,height:20,rx:4,fill:'#163a22',stroke:'#2f7a45'}));txt(s,pad+j*gw,144,'▷',' #8ee59a',11);}}
- txt(s,pad-26,top+30,'子\n阵列','#8a8ca6',10,'middle');
+ txt(s,pad-26,top+30,L('sub-\narray','子\n阵列'),'#8a8ca6',10,'middle');
  document.getElementById('adcStats').innerHTML=
-   '<div>读出器件数:<b class="y">'+(scheme==='mux'?'1(复用)':cols)+'</b></div>'+
-   '<div>外围面积:<b>'+area+'</b></div>'+
-   '<div>整片密度:<b class="g">'+dens+' Mb/mm²</b></div>'+
-   '<div>峰值速度:<b class="b">'+speed+'</b></div>';
+   '<div>'+L('Readout devices','读出器件数')+':<b class="y">'+(scheme==='mux'?L('1 (multiplexed)','1(复用)'):cols)+'</b></div>'+
+   '<div>'+L('Peripheral area','外围面积')+':<b>'+area+'</b></div>'+
+   '<div>'+L('Whole-chip density','整片密度')+':<b class="g">'+dens+' Mb/mm²</b></div>'+
+   '<div>'+L('Peak speed','峰值速度')+':<b class="b">'+speed+'</b></div>';
  document.getElementById('adcNote').textContent=note;
 }
 document.querySelectorAll('#adcseg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adcseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawADC(b.dataset.s);});
@@ -217,27 +220,27 @@ let cPlus=[1,0,1,1,0], cMinus=[0,1,0,0,1], cntRunning=false;
 function randCnt(){cPlus=cPlus.map(()=>Math.random()<0.5?1:0);cMinus=cMinus.map(()=>Math.random()<0.5?1:0);drawCnt(0);}
 function drawCnt(count,hi){const s=document.getElementById('cntSvg');clr(s);
  // + column (left), - column (right)
- const cols=[{arr:cPlus,x:90,lab:'+ 列',c:'#8ee59a'},{arr:cMinus,x:350,lab:'− 列',c:'#ff8aa0'}];
- cols.forEach(co=>{txt(s,co.x,22,co.lab,co.c,13);
+ const cols=[{arr:cPlus,x:90,lab:'+ 列',labEn:'+ col',c:'#8ee59a'},{arr:cMinus,x:350,lab:'− 列',labEn:'− col',c:'#ff8aa0'}];
+ cols.forEach(co=>{txt(s,co.x,22,L(co.labEn,co.lab),co.c,13);
    s.appendChild(el('line',{x1:co.x,y1:30,x2:co.x,y2:150,stroke:'#2a2d40','stroke-width':2}));
    co.arr.forEach((v,i)=>{const y=42+i*22;s.appendChild(el('circle',{cx:co.x,cy:y,r:7,fill:v?co.c:'#3a3d55'}));txt(s,co.x+(co.x<200?-22:22),y+4,v?'±1':'0',v?co.c:'#556',10);});
    // capacitor
-   s.appendChild(el('rect',{x:co.x-16,y:158,width:32,height:24,rx:4,fill:'#11131e',stroke:hi===co.lab?'#ffd36b':'#33354a'}));txt(s,co.x,174,'⏚电容','#8a8ca6',9);
+   s.appendChild(el('rect',{x:co.x-16,y:158,width:32,height:24,rx:4,fill:'#11131e',stroke:hi===co.lab?'#ffd36b':'#33354a'}));txt(s,co.x,174,L('⏚cap','⏚电容'),'#8a8ca6',9);
  });
  // shared counter (center)
  s.appendChild(el('rect',{x:175,y:95,width:90,height:50,rx:8,fill:'#1a1c2b',stroke:'#4a3a6a','stroke-width':2}));
- txt(s,220,118,'共享计数器','#caa9ff',11);txt(s,220,140,(count>=0?'+':'')+count,'#ffd36b',22);
+ txt(s,220,118,L('shared counter','共享计数器'),'#caa9ff',11);txt(s,220,140,(count>=0?'+':'')+count,'#ffd36b',22);
  // arrows
  s.appendChild(el('line',{x1:106,y1:120,x2:173,y2:120,stroke:'#8ee59a','stroke-width':1.5,'stroke-dasharray':'4 3'}));txt(s,140,114,'+1/click','#8ee59a',9);
  s.appendChild(el('line',{x1:334,y1:120,x2:267,y2:120,stroke:'#ff8aa0','stroke-width':1.5,'stroke-dasharray':'4 3'}));txt(s,300,114,'−1/click','#ff8aa0',9);
- txt(s,220,210,'click 数 = 列和(差分)= +列出电流数 − −列出电流数','#8a8ca6',11);
+ txt(s,220,210,L('clicks = column sum (differential) = + column current count − − column current count','click 数 = 列和(差分)= +列出电流数 − −列出电流数'),'#8a8ca6',11);
 }
 async function runCnt(){if(cntRunning)return;cntRunning=true;document.getElementById('cntRun').disabled=true;
  let cnt=0;drawCnt(0);await new Promise(r=>setTimeout(r,300));
- for(let i=0;i<cPlus.length;i++){if(cPlus[i]){cnt++;drawCnt(cnt,'+ 列');document.getElementById('cntNote').textContent='+列 cell '+(i+1)+' 出电流 → 电容充电 → click → 计数器 +1 = '+cnt;await new Promise(r=>setTimeout(r,420));}}
- for(let i=0;i<cMinus.length;i++){if(cMinus[i]){cnt--;drawCnt(cnt,'− 列');document.getElementById('cntNote').textContent='−列 cell '+(i+1)+' 出电流 → click → 计数器 −1 = '+cnt;await new Promise(r=>setTimeout(r,420));}}
+ for(let i=0;i<cPlus.length;i++){if(cPlus[i]){cnt++;drawCnt(cnt,'+ 列');document.getElementById('cntNote').textContent=L('+ column cell '+(i+1)+' emits current → capacitor charges → click → counter +1 = '+cnt,'+列 cell '+(i+1)+' 出电流 → 电容充电 → click → 计数器 +1 = '+cnt);await new Promise(r=>setTimeout(r,420));}}
+ for(let i=0;i<cMinus.length;i++){if(cMinus[i]){cnt--;drawCnt(cnt,'− 列');document.getElementById('cntNote').textContent=L('− column cell '+(i+1)+' emits current → click → counter −1 = '+cnt,'−列 cell '+(i+1)+' 出电流 → click → 计数器 −1 = '+cnt);await new Promise(r=>setTimeout(r,420));}}
  const np=cPlus.reduce((a,b)=>a+b,0),nm=cMinus.reduce((a,b)=>a+b,0);
- document.getElementById('cntNote').innerHTML='完成:列和 = '+np+' − '+nm+' = <b style="color:#ffd36b">'+cnt+'</b>。全程<b>数 click 不量幅值</b> + <b>差分消共模</b> → 稳。';
+ document.getElementById('cntNote').innerHTML=L('Done: column sum = '+np+' − '+nm+' = <b style="color:#ffd36b">'+cnt+'</b>. Throughout, <b>count clicks, don\'t measure amplitude</b> + <b>differential cancels common mode</b> → stable.','完成:列和 = '+np+' − '+nm+' = <b style="color:#ffd36b">'+cnt+'</b>。全程<b>数 click 不量幅值</b> + <b>差分消共模</b> → 稳。');
  cntRunning=false;document.getElementById('cntRun').disabled=false;
 }
 document.getElementById('cntRun').onclick=runCnt;
@@ -250,17 +253,17 @@ function drawRS(){const N=+document.getElementById('rs').value;document.getEleme
  for(let j=0;j<cols;j++){const x=pad+j*gw;
    s.appendChild(el('line',{x1:x,y1:top,x2:x,y2:top+48,stroke:'#2a2d40','stroke-width':1.5}));
    for(let i=0;i<3;i++)s.appendChild(el('circle',{cx:x,cy:top+8+i*13,r:3,fill:'#2f7a45'}));
-   s.appendChild(el('rect',{x:x-11,y:top+54,width:22,height:16,rx:3,fill:'#23303a',stroke:'#33454f'}));txt(s,x,top+66,'粗','#7aa9ff',9);}
- txt(s,16,top+64,'粗量化/列','#8a8ca6',9,'start');
+   s.appendChild(el('rect',{x:x-11,y:top+54,width:22,height:16,rx:3,fill:'#23303a',stroke:'#33454f'}));txt(s,x,top+66,L('crs','粗'),'#7aa9ff',9);}
+ txt(s,16,top+64,L('coarse quant/col','粗量化/列'),'#8a8ca6',9,'start');
  const groups=Math.ceil(cols/N);
  for(let g=0;g<groups;g++){const c0=g*N,c1=Math.min(cols,c0+N);const xc=pad+((c0+c1-1)/2)*gw;
    for(let j=c0;j<c1;j++)s.appendChild(el('line',{x1:pad+j*gw,y1:top+70,x2:xc,y2:top+92,stroke:'#556','stroke-width':1}));
    const mw=Math.max(26,(c1-c0)*gw-22);
    s.appendChild(el('rect',{x:xc-mw/2,y:top+92,width:mw,height:15,rx:3,fill:'#2a2438',stroke:'#443a5a'}));txt(s,xc,top+103,'MUX','#caa9ff',9);
-   s.appendChild(el('rect',{x:xc-17,y:top+122,width:34,height:30,rx:5,fill:'#3a2030',stroke:'#7a3040'}));txt(s,xc,top+141,'精ADC','#ff8aa0',9);
+   s.appendChild(el('rect',{x:xc-17,y:top+122,width:34,height:30,rx:5,fill:'#3a2030',stroke:'#7a3040'}));txt(s,xc,top+141,L('fine ADC','精ADC'),'#ff8aa0',9);
    s.appendChild(el('line',{x1:xc,y1:top+107,x2:xc,y2:top+122,stroke:'#7a3040','stroke-width':1.5}));}
- document.getElementById('rsStats').innerHTML='<div>粗量化器 <b class="b">'+cols+'</b>(每列,便宜)</div><div>共享精 ADC <b class="g">'+groups+'</b></div><div>vs 每列一个 <b class="r">'+cols+'</b></div><div>精 ADC 省 <b class="y">'+(cols/groups).toFixed(1)+'×</b></div>';
- document.getElementById('rsNote').textContent='共享比 '+N+' → 8 列只用 '+groups+' 个精 ADC。N 越大省越多,但分时共享 → 慢一点(密度↔速度老权衡)。';
+ document.getElementById('rsStats').innerHTML=L('<div>Coarse quantizers <b class="b">'+cols+'</b> (per column, cheap)</div><div>Shared fine ADCs <b class="g">'+groups+'</b></div><div>vs one per column <b class="r">'+cols+'</b></div><div>Fine ADCs saved <b class="y">'+(cols/groups).toFixed(1)+'×</b></div>','<div>粗量化器 <b class="b">'+cols+'</b>(每列,便宜)</div><div>共享精 ADC <b class="g">'+groups+'</b></div><div>vs 每列一个 <b class="r">'+cols+'</b></div><div>精 ADC 省 <b class="y">'+(cols/groups).toFixed(1)+'×</b></div>');
+ document.getElementById('rsNote').textContent=L('Sharing ratio '+N+' → 8 columns use only '+groups+' fine ADCs. Larger N saves more, but time-shared → a bit slower (the old density ↔ speed trade-off).','共享比 '+N+' → 8 列只用 '+groups+' 个精 ADC。N 越大省越多,但分时共享 → 慢一点(密度↔速度老权衡)。');
 }
 drawRS();
 
@@ -269,27 +272,27 @@ function drawMacro(){const s=document.getElementById('macroSvg');clr(s);
  const pos=[[40,30],[230,30],[40,130],[230,130]];
  pos.forEach((p,k)=>{s.appendChild(el('rect',{x:p[0],y:p[1],width:150,height:70,rx:6,fill:'#163a22',stroke:'#2f7a45'}));
    for(let i=0;i<3;i++)for(let j=0;j<6;j++)s.appendChild(el('circle',{cx:p[0]+30+j*18,cy:p[1]+18+i*18,r:3,fill:'#2f7a45'}));
-   txt(s,p[0]+75,p[1]+64,'子阵列 '+(k+1)+' (512×12)','#8ee59a',10);
+   txt(s,p[0]+75,p[1]+64,L('sub-array ','子阵列 ')+(k+1)+' (512×12)','#8ee59a',10);
    // each sub-array readout
    s.appendChild(el('rect',{x:p[0]+150,y:p[1]+25,width:14,height:20,rx:3,fill:'#3a2030',stroke:'#7a3040'}));});
  // adder/xor tree
- s.appendChild(el('rect',{x:150,y:108,width:120,height:18,rx:5,fill:'#2a2438',stroke:'#443a5a'}));txt(s,210,121,'XOR / 加法树(合并部分和)','#caa9ff',10.5);
- txt(s,210,16,'一个 macro = 4 子阵列 + 读出 + 加法树 ≈ 16–32 Mbit','#eee',12);
+ s.appendChild(el('rect',{x:150,y:108,width:120,height:18,rx:5,fill:'#2a2438',stroke:'#443a5a'}));txt(s,210,121,L('XOR / adder tree (merge partial sums)','XOR / 加法树(合并部分和)'),'#caa9ff',10.5);
+ txt(s,210,16,L('one macro = 4 sub-arrays + readout + adder tree ≈ 16–32 Mbit','一个 macro = 4 子阵列 + 读出 + 加法树 ≈ 16–32 Mbit'),'#eee',12);
 }
 drawMacro();
 
 // ⑤ tiling
-function drawTile(){const n=+document.getElementById('cores').value;document.getElementById('coreLbl').innerHTML='<b>'+n+'</b> 核 ≈ '+(n*32)+' Mbit';
+function drawTile(){const n=+document.getElementById('cores').value;document.getElementById('coreLbl').innerHTML='<b>'+n+'</b> '+L('cores ≈ ','核 ≈ ')+(n*32)+' Mbit';
  const s=document.getElementById('tileSvg');clr(s);const cols=Math.ceil(Math.sqrt(n)),cw=Math.min(70,360/cols),x0=30,y0=30;
  let k=0,first=null,last=null;
  for(let r=0;r<Math.ceil(n/cols);r++)for(let c=0;c<cols;c++){if(k>=n)break;const x=x0+c*(cw+8),y=y0+r*(cw+8);
-   s.appendChild(el('rect',{x:x,y:y,width:cw,height:cw,rx:5,fill:'#163a22',stroke:'#2f7a45'}));txt(s,x+cw/2,y+cw/2+3,'核'+(k+1),'#8ee59a',10);
+   s.appendChild(el('rect',{x:x,y:y,width:cw,height:cw,rx:5,fill:'#163a22',stroke:'#2f7a45'}));txt(s,x+cw/2,y+cw/2+3,L('core','核')+(k+1),'#8ee59a',10);
    if(k===0)first=[x+cw/2,y+cw/2];last=[x+cw/2,y+cw/2];k++;}
  // clock path
  if(first&&last){s.appendChild(el('line',{x1:first[0],y1:first[1],x2:last[0],y2:last[1],stroke:'#ffd36b','stroke-width':2,'stroke-dasharray':'5 4'}));
-   txt(s,(first[0]+last[0])/2,(first[1]+last[1])/2-6,'时钟走线','#ffd36b',10);}
- const skew=n<=4?'小':n<=9?'中 ⚠':'大 ❌';
- document.getElementById('tileNote').innerHTML='核 1 → 核 '+n+' 的时钟路径长 ~<b class="y">'+n+'×</b>;时钟偏斜:<b>'+skew+'</b>。瓶颈是<b>布线/时钟/调度</b>(指数级),不是面积。→ 我们用 <b>2.5D organic</b> 把多 die 并排(不堆叠),按 die 扩容。';
+   txt(s,(first[0]+last[0])/2,(first[1]+last[1])/2-6,L('clock routing','时钟走线'),'#ffd36b',10);}
+ const skew=n<=4?L('small','小'):n<=9?L('medium ⚠','中 ⚠'):L('large ❌','大 ❌');
+ document.getElementById('tileNote').innerHTML=L('Clock path from core 1 → core '+n+' is ~<b class="y">'+n+'×</b> longer; clock skew: <b>'+skew+'</b>. The bottleneck is <b>routing / clock / scheduling</b> (exponential), not area. → We use <b>2.5D organic</b> to place multiple dies side by side (not stacked), scaling by die.','核 1 → 核 '+n+' 的时钟路径长 ~<b class="y">'+n+'×</b>;时钟偏斜:<b>'+skew+'</b>。瓶颈是<b>布线/时钟/调度</b>(指数级),不是面积。→ 我们用 <b>2.5D organic</b> 把多 die 并排(不堆叠),按 die 扩容。');
 }
 drawTile();
 
@@ -298,16 +301,29 @@ function drawPkg(p){const s=document.getElementById('pkgSvg');clr(s);
  function die(x,y,w,h,op){s.appendChild(el('rect',{x:x,y:y,width:w,height:h,rx:6,fill:'#13202e',stroke:'#3a5170','fill-opacity':op||1}));
    for(let i=0;i<3;i++)for(let j=0;j<5;j++)s.appendChild(el('rect',{x:x+8+j*((w-16)/5),y:y+8+i*((h-16)/3),width:(w-16)/5-3,height:(h-16)/3-3,rx:2,fill:'#163a22',stroke:'#2f7a45','stroke-width':0.6}));}
  let note;
- if(p==='1'){die(110,50,200,140);note='单 die:macro 平铺,片内晶体管级互联。容量受单片面积限(>32Mbit 要拼)。';}
+ if(p==='1'){die(110,50,200,140);note=L('Single die: macros laid out flat, transistor-level interconnect on chip. Capacity limited by single-die area (>32Mbit needs tiling).','单 die:macro 平铺,片内晶体管级互联。容量受单片面积限(>32Mbit 要拼)。');}
  else if(p==='4'){for(let i=0;i<2;i++)for(let j=0;j<2;j++)die(70+j*150,40+i*100,130,80);
-   s.appendChild(el('rect',{x:40,y:210,width:340,height:14,rx:3,fill:'#2a2438'}));txt(s,210,235,'↑ interposer 转接板(2.5D)','#caa9ff',11);
-   note='4 die 并排坐转接板:权重分布到 4 die,跨 die 比片内慢 → 切片让跨 die 流量最少。';}
- else {for(let L=3;L>=0;L--){const off=L*16;die(90+off,40+off,200,120,0.93);}
-   for(let L=0;L<4;L++)s.appendChild(el('line',{x1:110,y1:50+L*16,x2:110,y2:64+L*16,stroke:'#ffd36b','stroke-width':2}));
-   txt(s,210,225,'4 层垂直叠 · TSV（我们已弃）','#ff8aa0',12);note='⛔ 我们已弃:in-place CIM 只在 die 间搬激活,便宜的 organic 2.5D 带宽就够;3D 的垂直 TB/s 买不到收益,且产能被大厂占满、小团队拿不到。';}
+   s.appendChild(el('rect',{x:40,y:210,width:340,height:14,rx:3,fill:'#2a2438'}));txt(s,210,235,L('↑ interposer (2.5D)','↑ interposer 转接板(2.5D)'),'#caa9ff',11);
+   note=L('4 dies sitting side by side on an interposer: weights spread across 4 dies; cross-die is slower than on-chip → partition to minimize cross-die traffic.','4 die 并排坐转接板:权重分布到 4 die,跨 die 比片内慢 → 切片让跨 die 流量最少。');}
+ else {for(let lv=3;lv>=0;lv--){const off=lv*16;die(90+off,40+off,200,120,0.93);}
+   for(let lv=0;lv<4;lv++)s.appendChild(el('line',{x1:110,y1:50+lv*16,x2:110,y2:64+lv*16,stroke:'#ffd36b','stroke-width':2}));
+   txt(s,210,225,L('4 layers stacked vertically · TSV (we abandoned it)','4 层垂直叠 · TSV（我们已弃）'),'#ff8aa0',12);note=L('⛔ We abandoned it: in-place CIM only moves activations between dies, so a cheap organic 2.5D substrate has enough bandwidth; 3D\'s vertical TB/s buys no benefit, and its capacity is taken up by the big players — small teams can\'t get it.','⛔ 我们已弃:in-place CIM 只在 die 间搬激活,便宜的 organic 2.5D 带宽就够;3D 的垂直 TB/s 买不到收益,且产能被大厂占满、小团队拿不到。');}
  document.getElementById('pkgNote').textContent=note;
 }
 document.querySelectorAll('#pkg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#pkg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');drawPkg(b.dataset.p);});
 drawPkg('4');
+
+// Re-render all JS-generated (SVG / dynamic) labels when the global EN/中 toggle fires.
+function reRenderAll(){
+  drawCell(document.querySelector('#cellseg button.on').dataset.c);
+  drawX();
+  drawADC(document.querySelector('#adcseg button.on').dataset.s);
+  if(!cntRunning)drawCnt(0);
+  drawRS();
+  drawMacro();
+  drawTile();
+  drawPkg(document.querySelector('#pkg button.on').dataset.p);
+}
+window.addEventListener('mse:lang',reRenderAll);
 </script></div>  <script src="../site-nav.js"></script>
 </body></html>

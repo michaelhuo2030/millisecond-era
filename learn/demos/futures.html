@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1000 个未来 · 平行可能世界</title>
+<title>1000 Futures · Parallel Possible Worlds</title>
 <style>
 :root{--bg:#06070d;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC",sans-serif}
@@ -13,20 +13,20 @@ canvas{display:block;border-radius:12px}.side{flex:1;min-width:240px}
 button{background:#262838;color:var(--ink);border:1px solid #33354a;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;margin-right:6px}
 .tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#241f12;color:var(--hot);font-size:11px}
 </style></head><body><div class="wrap">
-<h1>1000 个未来 · 平行可能世界 <span class="tag">Tier 7</span></h1>
-<div class="sub">从一个起点出发，每一步都分叉出多个"如果"。慢速 AI 一次只能写一个续写；这里同一秒里展开了<b>成千上万个平行的未来</b>，看可能性之树爆开。</div>
+<h1><span class="lang-en">1000 Futures · Parallel Possible Worlds</span><span class="lang-zh">1000 个未来 · 平行可能世界</span> <span class="tag">Tier 7</span></h1>
+<div class="sub"><span class="lang-en">Starting from one point, every step branches into several "what ifs." A slow AI can only write one continuation at a time; here, in a single second, <b>thousands of parallel futures</b> unfold — watch the tree of possibilities explode open.</span><span class="lang-zh">从一个起点出发，每一步都分叉出多个"如果"。慢速 AI 一次只能写一个续写；这里同一秒里展开了<b>成千上万个平行的未来</b>，看可能性之树爆开。</span></div>
 <div class="main">
   <div class="stage"><canvas id="cv" width="640" height="520"></canvas></div>
   <div class="side">
-    <div class="panel"><div class="big" id="leaves">0</div><div style="color:var(--dim);font-size:12px">个被探索的未来</div>
-      <div class="stat" style="margin-top:6px"><span>探索深度</span><b id="depth">0</b> 步</div>
-      <div class="stat"><span>速度</span><b id="rate">0/秒</b></div>
-      <div class="stat"><span>对比 慢速AI</span><b>1 个续写/2秒</b></div></div>
+    <div class="panel"><div class="big" id="leaves">0</div><div style="color:var(--dim);font-size:12px"><span class="lang-en">futures explored</span><span class="lang-zh">个被探索的未来</span></div>
+      <div class="stat" style="margin-top:6px"><span><span class="lang-en">Exploration depth</span><span class="lang-zh">探索深度</span></span><b id="depth">0</b> <span class="lang-en">steps</span><span class="lang-zh">步</span></div>
+      <div class="stat"><span><span class="lang-en">Speed</span><span class="lang-zh">速度</span></span><b id="rate">0/s</b></div>
+      <div class="stat"><span><span class="lang-en">vs. slow AI</span><span class="lang-zh">对比 慢速AI</span></span><b><span class="lang-en">1 continuation / 2s</span><span class="lang-zh">1 个续写/2秒</span></b></div></div>
     <div class="panel">
-      <button id="go">🌱 重新生长</button><button id="play">⏸暂停</button>
-      <div class="row"><label>每步分叉 <span id="vk">3</span></label><input id="k" type="range" min="2" max="4" value="3"></div>
-      <div class="row"><label>生长速度 <span id="vsp">120</span> 节点/帧</label><input id="sp" type="range" min="20" max="600" value="120"></div>
-      <div style="color:var(--dim);font-size:12px">每个叶子 = 一个可能的未来。分叉越多，可能性空间爆炸越快——这正是确定性慢速推理给不了的"广度"。</div>
+      <button id="go">🌱 <span class="lang-en">Regrow</span><span class="lang-zh">重新生长</span></button><button id="play">⏸<span class="lang-en">Pause</span><span class="lang-zh">暂停</span></button>
+      <div class="row"><label><span class="lang-en">Branches per step</span><span class="lang-zh">每步分叉</span> <span id="vk">3</span></label><input id="k" type="range" min="2" max="4" value="3"></div>
+      <div class="row"><label><span class="lang-en">Growth speed</span><span class="lang-zh">生长速度</span> <span id="vsp">120</span> <span class="lang-en">nodes/frame</span><span class="lang-zh">节点/帧</span></label><input id="sp" type="range" min="20" max="600" value="120"></div>
+      <div style="color:var(--dim);font-size:12px"><span class="lang-en">Each leaf = one possible future. The more branches, the faster the space of possibilities explodes — exactly the "breadth" that deterministic slow reasoning can't give you.</span><span class="lang-zh">每个叶子 = 一个可能的未来。分叉越多，可能性空间爆炸越快——这正是确定性慢速推理给不了的"广度"。</span></div>
     </div>
   </div>
 </div></div><script>
@@ -58,18 +58,23 @@ function grow(budget){let added=0;
   }
   return added;
 }
+function L(en,zh){return document.documentElement.dataset.lang==='zh'?zh:en;}
 function loop(){
   if(running && frontier.length && nodeN<CAP) grow(P.sp);
   const el=(performance.now()-t0)/1000;
   document.getElementById('leaves').textContent=nodeN.toLocaleString();
   document.getElementById('depth').textContent=maxd;
-  document.getElementById('rate').textContent=Math.round((nodeN-lastN)/0.016).toLocaleString()+'/秒';lastN=nodeN;
+  document.getElementById('rate').textContent=Math.round((nodeN-lastN)/0.016).toLocaleString()+L('/s','/秒');lastN=nodeN;
   requestAnimationFrame(loop);
 }
 function bind(id,key,f){const e=document.getElementById(id),l=document.getElementById('v'+id);e.addEventListener('input',()=>{P[key]=f(+e.value);if(l)l.textContent=e.value;});}
 bind('k','k',v=>v);bind('sp','sp',v=>v);
 document.getElementById('go').addEventListener('click',init);
-document.getElementById('play').addEventListener('click',e=>{running=!running;e.target.textContent=running?'⏸暂停':'▶播放';});
+const playBtn=document.getElementById('play');
+function renderPlayBtn(){playBtn.textContent=running?'⏸'+L('Pause','暂停'):'▶'+L('Play','播放');}
+playBtn.addEventListener('click',()=>{running=!running;renderPlayBtn();});
+window.addEventListener('mse:lang',renderPlayBtn);
+renderPlayBtn();
 init();requestAnimationFrame(loop);
 </script>  <script src="../../site-nav.js"></script>
 </body></html>

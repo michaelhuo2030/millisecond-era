@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>毫秒纪元 · The Millisecond Era — 点开就能玩的端侧 AI 芯片</title>
-<meta name="description" content="把 AI 做到极致的快——快到能装进一副眼镜、断网也能思考，而且可重刷不锁死。每一张卡片都能在你自己的浏览器里直接跑。">
+<title>Millisecond Era · 毫秒纪元 — click-and-play on-device AI chip</title>
+<meta name="description" content="Make AI insanely fast — fast enough to fit in a pair of glasses and think offline, and rewritable so it never locks in. Every card runs right in your browser.">
 <style>
 :root{
   --bg:#06070d;--bg2:#0a0d16;--panel:#12141f;--panel2:#161a26;--line:#242838;
@@ -20,13 +20,11 @@ body{margin:0;background:
   -webkit-font-smoothing:antialiased}
 a{color:var(--blue);text-decoration:none}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-
-/* hero */
 header.hero{padding:64px 0 30px;text-align:center}
 .kicker{color:var(--dim);font-size:13px;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px}
-h1{font-size:clamp(38px,7vw,68px);line-height:1.02;margin:0;letter-spacing:-1px;font-weight:900}
+h1{font-size:clamp(38px,7vw,68px);line-height:1.04;margin:0;letter-spacing:-1px;font-weight:900}
 h1 .grad{background:linear-gradient(95deg,#7aa9ff,#b48bff 55%,#34d2bf);-webkit-background-clip:text;background-clip:text;color:transparent}
-.tagline{max-width:760px;margin:20px auto 0;font-size:clamp(17px,2.4vw,21px);color:#cdd4e2}
+.tagline{max-width:780px;margin:20px auto 0;font-size:clamp(17px,2.4vw,21px);color:#cdd4e2}
 .tagline b{color:var(--hot)}
 .chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 4px}
 .chip{font-size:13px;color:#cdd4e2;background:#10131e;border:1px solid var(--line);border-radius:999px;padding:7px 14px}
@@ -36,10 +34,8 @@ h1 .grad{background:linear-gradient(95deg,#7aa9ff,#b48bff 55%,#34d2bf);-webkit-b
 .btn:hover{transform:translateY(-2px)}
 .btn.primary{background:linear-gradient(95deg,#5b8def,#7a6bff);color:#fff;box-shadow:0 8px 26px #5b6fff44}
 .btn.ghost{background:#12141f;color:var(--ink);box-shadow:0 0 0 1px var(--line)}
-.howto{max-width:680px;margin:22px auto 0;color:var(--dim);font-size:14px;background:#0c0f18;border:1px dashed #2a3146;border-radius:12px;padding:12px 16px}
+.howto{max-width:700px;margin:22px auto 0;color:var(--dim);font-size:14px;background:#0c0f18;border:1px dashed #2a3146;border-radius:12px;padding:12px 16px}
 .howto b{color:var(--hot)}
-
-/* sections */
 section{padding:40px 0 8px}
 .sehd{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px}
 .sehd h2{font-size:26px;margin:0;font-weight:800}
@@ -60,7 +56,6 @@ a.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px #0009,0 0 0 1px #
 .b-proj{color:var(--proj);border-color:#3b2f5c;background:#160f24}
 .b-read{color:var(--blue);border-color:#26385e;background:#0e1626}
 .b-real{color:var(--hot);border-color:#5c4a1f;background:#1d1707}
-
 footer{margin-top:46px;border-top:1px solid var(--line);padding:26px 0 60px;color:var(--dim);font-size:13.5px;text-align:center}
 footer a{color:var(--blue)}
 footer .one{color:#aab2c4;margin-bottom:8px}
@@ -72,205 +67,222 @@ footer .one{color:#aab2c4;margin-bottom:8px}
 <body>
 
 <header class="hero"><div class="wrap">
-  <div class="kicker">毫秒纪元 · The Millisecond Era</div>
-  <h1>把 AI 做到<span class="grad">极致的快</span></h1>
-  <p class="tagline">快到能<b>装进一副眼镜</b>、<b>断网也能思考</b>，而且<b>可重刷、不锁死</b>。<br>
-  让智能从"租来的云服务"，变回"你真正拥有的能力"。</p>
+  <div class="kicker"><span class="lang-en">The Millisecond Era · 毫秒纪元</span><span class="lang-zh">毫秒纪元 · The Millisecond Era</span></div>
+  <h1><span class="lang-en">Make AI <span class="grad">insanely fast</span></span><span class="lang-zh">把 AI 做到<span class="grad">极致的快</span></span></h1>
+  <p class="tagline">
+    <span class="lang-en">Fast enough to <b>fit in a pair of glasses</b> and <b>think with no connection</b> — and <b>rewritable, never locked in</b>.<br>Turn intelligence from a "rented cloud service" back into "something you actually own."</span>
+    <span class="lang-zh">快到能<b>装进一副眼镜</b>、<b>断网也能思考</b>，而且<b>可重刷、不锁死</b>。<br>让智能从"租来的云服务"，变回"你真正拥有的能力"。</span>
+  </p>
   <div class="chips">
-    <span class="chip">端侧单流 <b>2–5k tok/s</b></span>
-    <span class="chip">存算一体 · <b>不搬权重</b></span>
-    <span class="chip">三值 −1/0/+1 · <b>无乘法</b></span>
-    <span class="chip">ReRAM <b>可擦写</b></span>
+    <span class="chip"><span class="lang-en">On-device single-stream <b>2–5k tok/s</b></span><span class="lang-zh">端侧单流 <b>2–5k tok/s</b></span></span>
+    <span class="chip"><span class="lang-en">Compute-in-memory · <b>weights don't move</b></span><span class="lang-zh">存算一体 · <b>不搬权重</b></span></span>
+    <span class="chip"><span class="lang-en">Ternary −1/0/+1 · <b>no multiplier</b></span><span class="lang-zh">三值 −1/0/+1 · <b>无乘法</b></span></span>
+    <span class="chip"><span class="lang-en">ReRAM <b>rewritable</b></span><span class="lang-zh">ReRAM <b>可擦写</b></span></span>
   </div>
   <div class="cta">
-    <a class="btn primary" href="learn/speed-trial.html">▶ 速度自证 · 别信我，自己点</a>
-    <a class="btn ghost" href="learn/reram-cim-visual.html">🧱 看得见的芯片</a>
+    <a class="btn primary" href="learn/speed-trial.html"><span class="lang-en">▶ Speed Trial · don't trust me, click</span><span class="lang-zh">▶ 速度自证 · 别信我，自己点</span></a>
+    <a class="btn ghost" href="learn/reram-cim-visual.html"><span class="lang-en">🧱 See the chip</span><span class="lang-zh">🧱 看得见的芯片</span></a>
   </div>
-  <div class="howto">👇 下面每一张卡片，<b>点开就能在你自己的浏览器里直接跑</b>——零下载、零联网（个别标注除外）。这是给课堂、给任何人亲手玩的。</div>
+  <div class="howto">
+    <span class="lang-en">👇 Every card below <b>runs right in your own browser</b> — no download, no network (except where noted). Built to be played with, in class or anywhere.</span>
+    <span class="lang-zh">👇 下面每一张卡片，<b>点开就能在你自己的浏览器里直接跑</b>——零下载、零联网（个别标注除外）。这是给课堂、给任何人亲手玩的。</span>
+  </div>
 </div></header>
 
 <main class="wrap">
 
-<!-- ⚡ 速度 -->
+<!-- ⚡ speed -->
 <section id="speed">
   <div class="sehd">
-    <h2>⚡ 速度的力量</h2>
-    <div class="lead">你每天用的 AI 约 <b>50 字/秒</b>（人类阅读速度）。当 AI 每秒能想<b>几千到几十万步</b>，解锁的不是"答得更快"，而是<b>一整类全新的事</b>。在打完一句话的时间里，看一部文明史。</div>
+    <h2><span class="lang-en">⚡ The power of speed</span><span class="lang-zh">⚡ 速度的力量</span></h2>
+    <div class="lead">
+      <span class="lang-en">The AI you use daily runs at about <b>50 words/s</b> (human reading speed). When an AI can think <b>thousands to hundreds of thousands of steps per second</b>, what it unlocks isn't "faster answers" — it's <b>a whole class of new things</b>. Watch a civilization's history in the time it takes to finish one sentence.</span>
+      <span class="lang-zh">你每天用的 AI 约 <b>50 字/秒</b>（人类阅读速度）。当 AI 每秒能想<b>几千到几十万步</b>，解锁的不是"答得更快"，而是<b>一整类全新的事</b>。在打完一句话的时间里，看一部文明史。</span>
+    </div>
   </div>
   <div class="grid">
     <a class="card" href="learn/demos/index.html">
-      <div class="top"><span class="badge b-live">画廊</span></div>
-      <div class="ct">🎮 速度 demo 画廊（8 个）</div>
-      <div class="cd">一站点开全部速度演示：极速梯子、真 WebGPU 模型、分屏慢↔快、议会、微世界、思想传播、千个未来、反射……</div>
-      <div class="go">进入画廊 →</div>
+      <div class="top"><span class="badge b-live"><span class="lang-en">Gallery</span><span class="lang-zh">画廊</span></span></div>
+      <div class="ct"><span class="lang-en">🎮 Speed demo gallery (8)</span><span class="lang-zh">🎮 速度 demo 画廊（8 个）</span></div>
+      <div class="cd"><span class="lang-en">All speed demos in one place: speed ladder, a real WebGPU model, slow-vs-fast split, the agora, a micro-world, idea spread, 1000 futures, sub-ms reflex.</span><span class="lang-zh">一站点开全部速度演示：极速梯子、真 WebGPU 模型、分屏慢↔快、议会、微世界、思想传播、千个未来、反射。</span></div>
+      <div class="go"><span class="lang-en">Enter gallery →</span><span class="lang-zh">进入画廊 →</span></div>
     </a>
     <a class="card" href="learn/demos/tiny-ladder.html">
-      <div class="top"><span class="badge b-live">真跑·零下载</span></div>
-      <div class="ct">⚡ 极速梯子 micro→small</div>
-      <div class="cd">字符级 Transformer 在你浏览器里<b>真跑前向</b>，micro 冲<b>几万 t/s</b>，看 <b>tok/s ∝ 1/参数</b> 当场上演。</div>
-      <div class="go">在你机器上飙速 →</div>
+      <div class="top"><span class="badge b-live"><span class="lang-en">Real · no download</span><span class="lang-zh">真跑·零下载</span></span></div>
+      <div class="ct"><span class="lang-en">⚡ Speed ladder micro→small</span><span class="lang-zh">⚡ 极速梯子 micro→small</span></div>
+      <div class="cd"><span class="lang-en">A char-level Transformer <b>really runs a forward pass</b> in your browser; micro hits <b>tens of thousands of t/s</b> — watch <b>tok/s ∝ 1/params</b> happen live.</span><span class="lang-zh">字符级 Transformer 在你浏览器里<b>真跑前向</b>，micro 冲<b>几万 t/s</b>，看 <b>tok/s ∝ 1/参数</b> 当场上演。</span></div>
+      <div class="go"><span class="lang-en">Run it on your machine →</span><span class="lang-zh">在你机器上飙速 →</span></div>
     </a>
     <a class="card" href="learn/demos/webgpu-real.html">
-      <div class="top"><span class="badge b-live">真模型·真英文</span></div>
-      <div class="ct">🔥 真 WebGPU 模型</div>
-      <div class="cd">一个<b>真模型</b>在<b>你自己的 GPU</b> 上生成真英文、显示真实 tok/s（首次下载一次）。</div>
-      <div class="go">在你的 GPU 上跑 →</div>
+      <div class="top"><span class="badge b-live"><span class="lang-en">Real model · real English</span><span class="lang-zh">真模型·真英文</span></span></div>
+      <div class="ct"><span class="lang-en">🔥 Real WebGPU model</span><span class="lang-zh">🔥 真 WebGPU 模型</span></div>
+      <div class="cd"><span class="lang-en">A <b>real model</b> generates real English on <b>your own GPU</b> and shows your real tok/s (one-time download).</span><span class="lang-zh">一个<b>真模型</b>在<b>你自己的 GPU</b> 上生成真英文、显示真实 tok/s（首次下载一次）。</span></div>
+      <div class="go"><span class="lang-en">Run on your GPU →</span><span class="lang-zh">在你的 GPU 上跑 →</span></div>
     </a>
     <a class="card" href="learn/demos/split.html">
-      <div class="top"><span class="badge b-sim">模拟</span></div>
-      <div class="ct">🐢 vs ⚡ 分屏</div>
-      <div class="cd">左边一个 AI 慢慢打字；右边同样几秒里，一整个社会已经吵完、分好派。</div>
-      <div class="go">一眼看懂"你活在慢速世界" →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Sim</span><span class="lang-zh">模拟</span></span></div>
+      <div class="ct"><span class="lang-en">🐢 vs ⚡ split screen</span><span class="lang-zh">🐢 vs ⚡ 分屏</span></div>
+      <div class="cd"><span class="lang-en">Left: one AI slowly types a sentence. Right: in the same seconds, a whole society has already argued and split into camps.</span><span class="lang-zh">左边一个 AI 慢慢打字；右边同样几秒里，一整个社会已经吵完、分好派。</span></div>
+      <div class="go"><span class="lang-en">See you live in a slow world →</span><span class="lang-zh">一眼看懂"你活在慢速世界" →</span></div>
     </a>
     <a class="card" href="learn/demos/reflex.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">⚡ 反射 · 甩不掉的群</div>
-      <div class="cd">鼠标移上去——几百个 AI 在亚毫秒内躲开你，每秒重新决策几万次，比慢速 AI 快一万倍。</div>
-      <div class="go">试着甩掉它们 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">⚡ Reflex · the swarm you can't shake</span><span class="lang-zh">⚡ 反射 · 甩不掉的群</span></div>
+      <div class="cd"><span class="lang-en">Move your mouse over it — hundreds of AIs dodge you in sub-milliseconds, re-deciding tens of thousands of times a second, 10,000× faster than a slow AI.</span><span class="lang-zh">鼠标移上去——几百个 AI 在亚毫秒内躲开你，每秒重新决策几万次，比慢速 AI 快一万倍。</span></div>
+      <div class="go"><span class="lang-en">Try to shake them →</span><span class="lang-zh">试着甩掉它们 →</span></div>
     </a>
     <a class="card" href="learn/demos/micro_world_live.html">
-      <div class="top"><span class="badge b-sim">真 HDC 代数</span></div>
-      <div class="ct">🌍 微世界 · 文明涌现</div>
-      <div class="cd"><b>8000 步/秒</b>，智能体觅食繁殖老死、文化随地理聚成"部落"，几秒一部生态史。</div>
-      <div class="go">看世界长出来 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Real HDC algebra</span><span class="lang-zh">真 HDC 代数</span></span></div>
+      <div class="ct"><span class="lang-en">🌍 Micro-world · civilization emerges</span><span class="lang-zh">🌍 微世界 · 文明涌现</span></div>
+      <div class="cd"><span class="lang-en"><b>8,000 steps/s</b>: agents forage, breed, die; culture clusters into "tribes" along geography — an ecological history in seconds.</span><span class="lang-zh"><b>8000 步/秒</b>，智能体觅食繁殖老死、文化随地理聚成"部落"，几秒一部生态史。</span></div>
+      <div class="go"><span class="lang-en">Watch a world grow →</span><span class="lang-zh">看世界长出来 →</span></div>
     </a>
   </div>
 </section>
 
-<!-- 🧱 芯片 -->
+<!-- 🧱 chip -->
 <section id="chip">
   <div class="sehd">
-    <h2>🧱 芯片与原理</h2>
-    <div class="lead">速度从哪来？<b>存算一体（ReRAM-CIM）</b>——权重就是电路，<b>不搬数据</b>，绕开拖死所有 AI 设备的内存带宽墙。下面把芯片<b>拆开给你看、给你算</b>。</div>
+    <h2><span class="lang-en">🧱 The chip & how it works</span><span class="lang-zh">🧱 芯片与原理</span></h2>
+    <div class="lead">
+      <span class="lang-en">Where does the speed come from? <b>Compute-in-memory (ReRAM-CIM)</b> — the weights <i>are</i> the circuit, so <b>no data moves</b>, sidestepping the memory-bandwidth wall that throttles every AI device. Below: the chip <b>taken apart and made tweakable</b>.</span>
+      <span class="lang-zh">速度从哪来？<b>存算一体（ReRAM-CIM）</b>——权重就是电路，<b>不搬数据</b>，绕开拖死所有 AI 设备的内存带宽墙。下面把芯片<b>拆开给你看、给你算</b>。</span>
+    </div>
   </div>
   <div class="grid">
     <a class="card" href="learn/reram-cim-visual.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">👀 看得见的芯片</div>
-      <div class="cd">一格一格点亮存算一体阵列，亲眼看"内存即计算"怎么发生——为什么它又快又省。</div>
-      <div class="go">把芯片点开 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">👀 See the chip</span><span class="lang-zh">👀 看得见的芯片</span></div>
+      <div class="cd"><span class="lang-en">Light up a compute-in-memory array cell by cell and watch "memory IS the compute" happen — why it's both fast and frugal.</span><span class="lang-zh">一格一格点亮存算一体阵列，亲眼看"内存即计算"怎么发生——为什么它又快又省。</span></div>
+      <div class="go"><span class="lang-en">Open the chip →</span><span class="lang-zh">把芯片点开 →</span></div>
     </a>
     <a class="card" href="learn/reram-cim-101.html">
-      <div class="top"><span class="badge b-read">科普</span></div>
-      <div class="ct">🧱 ReRAM-CIM 101</div>
-      <div class="cd">从零讲清"存算一体"：什么是 ReRAM、为什么权重能当电阻算乘加、为什么没有内存墙。</div>
-      <div class="go">从零搞懂 →</div>
+      <div class="top"><span class="badge b-read"><span class="lang-en">Explainer</span><span class="lang-zh">科普</span></span></div>
+      <div class="ct"><span class="lang-en">🧱 ReRAM-CIM 101</span><span class="lang-zh">🧱 ReRAM-CIM 101</span></div>
+      <div class="cd"><span class="lang-en">Compute-in-memory from scratch: what ReRAM is, why a weight-as-resistance does multiply-accumulate, why there's no memory wall.</span><span class="lang-zh">从零讲清"存算一体"：什么是 ReRAM、为什么权重能当电阻算乘加、为什么没有内存墙。</span></div>
+      <div class="go"><span class="lang-en">Get it from zero →</span><span class="lang-zh">从零搞懂 →</span></div>
     </a>
     <a class="card" href="learn/reram-cim-calculator.html">
-      <div class="top"><span class="badge b-proj">可调参</span></div>
-      <div class="ct">⚙️ 容量↔速度 计算器</div>
-      <div class="cd">给定芯片大小/精度/工艺，推算装得下哪个模型、预期多少 tok/s。把"速度"落到硅的现实。</div>
-      <div class="go">自己调参数 →</div>
+      <div class="top"><span class="badge b-proj"><span class="lang-en">Adjustable</span><span class="lang-zh">可调参</span></span></div>
+      <div class="ct"><span class="lang-en">⚙️ Capacity ↔ speed calculator</span><span class="lang-zh">⚙️ 容量↔速度 计算器</span></div>
+      <div class="cd"><span class="lang-en">Pick chip size / precision / process node, estimate which model fits and the expected tok/s. Speed grounded in silicon reality.</span><span class="lang-zh">给定芯片大小/精度/工艺，推算装得下哪个模型、预期多少 tok/s。把"速度"落到硅的现实。</span></div>
+      <div class="go"><span class="lang-en">Tune the parameters →</span><span class="lang-zh">自己调参数 →</span></div>
     </a>
     <a class="card" href="learn/reram-architecture.html">
-      <div class="top"><span class="badge b-read">架构</span></div>
-      <div class="ct">🏗️ 芯片架构走读</div>
-      <div class="cd">从单元到阵列到数据流，看这颗三值存算芯片是怎么搭起来的。</div>
-      <div class="go">读架构 →</div>
+      <div class="top"><span class="badge b-read"><span class="lang-en">Architecture</span><span class="lang-zh">架构</span></span></div>
+      <div class="ct"><span class="lang-en">🏗️ Architecture walkthrough</span><span class="lang-zh">🏗️ 芯片架构走读</span></div>
+      <div class="cd"><span class="lang-en">From cell to array to dataflow — how this ternary compute-in-memory chip is built up.</span><span class="lang-zh">从单元到阵列到数据流，看这颗三值存算芯片是怎么搭起来的。</span></div>
+      <div class="go"><span class="lang-en">Read the architecture →</span><span class="lang-zh">读架构 →</span></div>
     </a>
     <a class="card" href="learn/hdc-101.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🧠 HDC 101 · 超维计算</div>
-      <div class="cd">亲手点 bind/bundle/permute，看相似度条变化，明白为什么这套代数又快又省、又适合 ReRAM。</div>
-      <div class="go">动手玩 HDC →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🧠 HDC 101 · hyperdimensional computing</span><span class="lang-zh">🧠 HDC 101 · 超维计算</span></div>
+      <div class="cd"><span class="lang-en">Click bind/bundle/permute and watch the similarity bars move — why this algebra is fast, frugal, and a fit for ReRAM.</span><span class="lang-zh">亲手点 bind/bundle/permute，看相似度条变化，明白为什么这套代数又快又省、又适合 ReRAM。</span></div>
+      <div class="go"><span class="lang-en">Play with HDC →</span><span class="lang-zh">动手玩 HDC →</span></div>
     </a>
     <a class="card" href="rwkv-on-chip/">
-      <div class="top"><span class="badge b-read">研究</span></div>
-      <div class="ct">🤝 RWKV：芯片的最佳拍档</div>
-      <div class="cd">没有 KV cache、没有内存带宽墙的 LLM 架构，为什么是这颗三值芯片的天作之合。含诚实台账。</div>
-      <div class="go">读拍档分析 →</div>
+      <div class="top"><span class="badge b-read"><span class="lang-en">Research</span><span class="lang-zh">研究</span></span></div>
+      <div class="ct"><span class="lang-en">🤝 RWKV: the chip's best match</span><span class="lang-zh">🤝 RWKV：芯片的最佳拍档</span></div>
+      <div class="cd"><span class="lang-en">The LLM architecture with no KV cache and no memory-bandwidth wall — why it's a perfect fit for this ternary chip. With an honest trust ledger.</span><span class="lang-zh">没有 KV cache、没有内存带宽墙的 LLM 架构，为什么是这颗三值芯片的天作之合。含诚实台账。</span></div>
+      <div class="go"><span class="lang-en">Read the match-up →</span><span class="lang-zh">读拍档分析 →</span></div>
     </a>
   </div>
 </section>
 
-<!-- 🛡️ 应用 -->
+<!-- 🛡️ apps -->
 <section id="apps">
   <div class="sehd">
-    <h2>🛡️ 三扇门 · 应用与文明</h2>
-    <div class="lead">够快、够省、又在端上私有——一整类以前不可能的应用第一次成立：<b>断网也能思考的眼镜 · 7×24 私有守护 · 记录一生随时可查</b>。护城河是物理，不是更聪明。</div>
+    <h2><span class="lang-en">🛡️ Three doors · apps & civilization</span><span class="lang-zh">🛡️ 三扇门 · 应用与文明</span></h2>
+    <div class="lead">
+      <span class="lang-en">Fast enough, frugal enough, and private on-device — a whole class of previously-impossible apps becomes real for the first time: <b>glasses that think offline · 24/7 private guardianship · a lifetime recorded, searchable anytime</b>. The moat is physics, not being smarter.</span>
+      <span class="lang-zh">够快、够省、又在端上私有——一整类以前不可能的应用第一次成立：<b>断网也能思考的眼镜 · 7×24 私有守护 · 记录一生随时可查</b>。护城河是物理，不是更聪明。</span>
+    </div>
   </div>
   <div class="grid">
     <a class="card" href="learn/civilization/index.html">
-      <div class="top"><span class="badge b-sim">画廊 · 10 个</span></div>
-      <div class="ct">🌃 另一种机器视觉（全部）</div>
-      <div class="cd">十个端上可玩 demo：可逆身份、行车取证、家庭/婴儿安全、工厂维护、老人照护，外加导盲、记录一生、反盗猎哨兵、家庭安防、罕见事件显微。</div>
-      <div class="go">进入应用画廊 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Gallery · 10</span><span class="lang-zh">画廊 · 10 个</span></span></div>
+      <div class="ct"><span class="lang-en">🌃 The Other Kind of Machine Vision (all)</span><span class="lang-zh">🌃 另一种机器视觉（全部）</span></div>
+      <div class="cd"><span class="lang-en">Ten on-device playable demos: owned identity, dashcam evidence, home/baby safety, factory upkeep, elderly care — plus blind-aid, lifetime memory, anti-poaching sentinel, home safety, rare-event microscopy.</span><span class="lang-zh">十个端上可玩 demo：可逆身份、行车取证、家庭/婴儿安全、工厂维护、老人照护，外加导盲、记录一生、反盗猎哨兵、家庭安防、罕见事件显微。</span></div>
+      <div class="go"><span class="lang-en">Enter the apps gallery →</span><span class="lang-zh">进入应用画廊 →</span></div>
     </a>
     <a class="card" href="learn/civilization/daily-life-memory.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">📼 记录一生 · 眼镜帮你记住一天</div>
-      <div class="cd">三扇门里的"记录一生"：眼镜把你的一天编码成可查的记忆，按时间/内容/相似度回放，<b>钥匙在你手里</b>、可精确遗忘。</div>
-      <div class="go">看一天被记住 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">📼 A lifetime recorded · your glasses remember your day</span><span class="lang-zh">📼 记录一生 · 眼镜帮你记住一天</span></div>
+      <div class="cd"><span class="lang-en">The "record a lifetime" door: glasses encode your day into a searchable memory, replay it by time/content/similarity — <b>you hold the key</b>, exact forgetting.</span><span class="lang-zh">三扇门里的"记录一生"：眼镜把你的一天编码成可查的记忆，按时间/内容/相似度回放，<b>钥匙在你手里</b>、可精确遗忘。</span></div>
+      <div class="go"><span class="lang-en">See a day remembered →</span><span class="lang-zh">看一天被记住 →</span></div>
     </a>
     <a class="card" href="learn/civilization/dashcam-evidence.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🚗 行车记录 · 取证助手</div>
-      <div class="cd">车上视频抓到闯红灯的瞬间，生成可审计的证据包，<b>由你决定</b>是否上报。端上、自有、可遗忘。</div>
-      <div class="go">试一次取证 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🚗 Dashcam · evidence helper</span><span class="lang-zh">🚗 行车记录 · 取证助手</span></div>
+      <div class="cd"><span class="lang-en">Your car's video catches the instant of a violation, builds an auditable evidence package, and <b>you decide</b> whether to report. On-device, owned, forgettable.</span><span class="lang-zh">车上视频抓到闯红灯的瞬间，生成可审计的证据包，<b>由你决定</b>是否上报。端上、自有、可遗忘。</span></div>
+      <div class="go"><span class="lang-en">Try a capture →</span><span class="lang-zh">试一次取证 →</span></div>
     </a>
     <a class="card" href="learn/civilization/elderly-decline-care.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🧓 老人衰退照护</div>
-      <div class="cd">只看"变化"的步态学习，提前发现摔倒前的缓慢退化，<b>电池能撑数周</b>、家里没有云端视频。</div>
-      <div class="go">看怎么照护 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🧓 Elderly decline care</span><span class="lang-zh">🧓 老人衰退照护</span></div>
+      <div class="cd"><span class="lang-en">Change-only gait learning catches the slow decline before a fall, at a power budget that lasts <b>weeks</b>, with no cloud video of the home.</span><span class="lang-zh">只看"变化"的步态学习，提前发现摔倒前的缓慢退化，<b>电池能撑数周</b>、家里没有云端视频。</span></div>
+      <div class="go"><span class="lang-en">See how it cares →</span><span class="lang-zh">看怎么照护 →</span></div>
     </a>
     <a class="card" href="learn/civilization/owned-identity.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🪪 可逆 · 自有身份</div>
-      <div class="cd">不暴露原始生物特征也能证明"同一个人"，再外科式地分离一条危险记录——带审计。（叙利亚难民 Hassan）</div>
-      <div class="go">玩可逆身份 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🪪 Reversible · owned identity</span><span class="lang-zh">🪪 可逆 · 自有身份</span></div>
+      <div class="cd"><span class="lang-en">Prove "same person" without exposing the raw biometric, then surgically separate one dangerous record — with an audit note. (Hassan, Syrian refugee.)</span><span class="lang-zh">不暴露原始生物特征也能证明"同一个人"，再外科式地分离一条危险记录——带审计。（叙利亚难民 Hassan）</span></div>
+      <div class="go"><span class="lang-en">Play with reversible identity →</span><span class="lang-zh">玩可逆身份 →</span></div>
     </a>
     <a class="card" href="hdc/applications/sign-language/demo.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🤟 手语识别 demo</div>
-      <div class="cd">用 HDC 把手势编码成超向量、当场识别——又一个"端上私有感知"的例子。</div>
-      <div class="go">比划试试 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🤟 Sign-language recognition</span><span class="lang-zh">🤟 手语识别 demo</span></div>
+      <div class="cd"><span class="lang-en">HDC encodes a gesture into a hypervector and recognizes it on the spot — another "private on-device perception" example.</span><span class="lang-zh">用 HDC 把手势编码成超向量、当场识别——又一个"端上私有感知"的例子。</span></div>
+      <div class="go"><span class="lang-en">Sign and try →</span><span class="lang-zh">比划试试 →</span></div>
     </a>
     <a class="card" href="learn/reflexive-world.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🪞 反身的世界</div>
-      <div class="cd">为什么"反事实"你永远跑不了：内生操纵、平行世界、先验胜数据——一页可玩的世界观。</div>
-      <div class="go">进入反身世界 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🪞 The reflexive world</span><span class="lang-zh">🪞 反身的世界</span></div>
+      <div class="cd"><span class="lang-en">Why the counterfactual is one you can never run: endogenous manipulation, parallel worlds, priors beating data — a playable worldview in one page.</span><span class="lang-zh">为什么"反事实"你永远跑不了：内生操纵、平行世界、先验胜数据——一页可玩的世界观。</span></div>
+      <div class="go"><span class="lang-en">Enter the reflexive world →</span><span class="lang-zh">进入反身世界 →</span></div>
     </a>
     <a class="card" href="learn/civilization-ratchet.html">
-      <div class="top"><span class="badge b-sim">互动</span></div>
-      <div class="ct">🚪 核实门 · 不说谎的知识库</div>
-      <div class="cd">会自己长大、又不说谎的 AI 知识库：加一道"核实门"（有门 vs 没门），看知识怎样复利而不腐烂。</div>
-      <div class="go">玩核实门 →</div>
+      <div class="top"><span class="badge b-sim"><span class="lang-en">Interactive</span><span class="lang-zh">互动</span></span></div>
+      <div class="ct"><span class="lang-en">🚪 The verify-gate · a knowledge base that doesn't lie</span><span class="lang-zh">🚪 核实门 · 不说谎的知识库</span></div>
+      <div class="cd"><span class="lang-en">A self-growing AI knowledge base that doesn't lie: add one "verify-gate" (gate vs no gate) and watch knowledge compound instead of rotting.</span><span class="lang-zh">会自己长大、又不说谎的 AI 知识库：加一道"核实门"（有门 vs 没门），看知识怎样复利而不腐烂。</span></div>
+      <div class="go"><span class="lang-en">Play the verify-gate →</span><span class="lang-zh">玩核实门 →</span></div>
     </a>
   </div>
 </section>
 
-<!-- 📊 自证 -->
+<!-- 📊 proof -->
 <section id="proof">
   <div class="sehd">
-    <h2>📊 自己验证 · 诚实台账</h2>
-    <div class="lead">我们把<b>能跑给你看的</b>和<b>还在路上的</b>分开——前者建立信任，后者是路线图。声誉复利，诚实复利更快。</div>
+    <h2><span class="lang-en">📊 Verify it yourself · honest ledger</span><span class="lang-zh">📊 自己验证 · 诚实台账</span></h2>
+    <div class="lead">
+      <span class="lang-en">We split <b>what we can run for you</b> from <b>what's still on the way</b> — the first builds trust, the second is the roadmap. Reputation compounds; honesty compounds faster.</span>
+      <span class="lang-zh">我们把<b>能跑给你看的</b>和<b>还在路上的</b>分开——前者建立信任，后者是路线图。声誉复利，诚实复利更快。</span>
+    </div>
   </div>
   <div class="grid">
     <a class="card" href="learn/speed-trial.html">
-      <div class="top"><span class="badge b-live">实测</span></div>
-      <div class="ct">🏁 Speed Trial</div>
-      <div class="cd">把每个速度证明摆出来、标清"实测 / 真实模拟 / 推算"，你现在就能在自己浏览器里跑。</div>
-      <div class="go">别信我，自己点 →</div>
+      <div class="top"><span class="badge b-live"><span class="lang-en">Measured</span><span class="lang-zh">实测</span></span></div>
+      <div class="ct"><span class="lang-en">🏁 Speed Trial</span><span class="lang-zh">🏁 Speed Trial</span></div>
+      <div class="cd"><span class="lang-en">Every speed proof laid out and labeled "measured / real-sim / projected" — run them in your own browser right now.</span><span class="lang-zh">把每个速度证明摆出来、标清"实测 / 真实模拟 / 推算"，你现在就能在自己浏览器里跑。</span></div>
+      <div class="go"><span class="lang-en">Don't trust me, click →</span><span class="lang-zh">别信我，自己点 →</span></div>
     </a>
     <a class="card" href="learn/real-world-speed-proof.html">
-      <div class="top"><span class="badge b-real">他人实测</span></div>
-      <div class="ct">🌍 这不是空想</div>
-      <div class="cd">第三方 Taalas 把权重烧进硅，公开实测 Llama-8B <b>16,960 tok/s</b>，证明"权重即硅"的速度论是真的。</div>
-      <div class="go">看第三方证据 →</div>
+      <div class="top"><span class="badge b-real"><span class="lang-en">Third-party measured</span><span class="lang-zh">他人实测</span></span></div>
+      <div class="ct"><span class="lang-en">🌍 Not just a dream</span><span class="lang-zh">🌍 这不是空想</span></div>
+      <div class="cd"><span class="lang-en">Third-party Taalas burned weights into silicon and publicly measured Llama-8B at <b>16,960 tok/s</b> — proof the "weights-as-silicon" speed thesis is real.</span><span class="lang-zh">第三方 Taalas 把权重烧进硅，公开实测 Llama-8B <b>16,960 tok/s</b>，证明"权重即硅"的速度论是真的。</span></div>
+      <div class="go"><span class="lang-en">See third-party proof →</span><span class="lang-zh">看第三方证据 →</span></div>
     </a>
     <a class="card" href="https://github.com/michaelhuo2030/millisecond-era/blob/main/fpga/SILICON-MEASURED-2026-06-13.md" target="_blank" rel="noopener">
-      <div class="top"><span class="badge b-live">真硅实测</span></div>
-      <div class="ct">🔬 FPGA 硅上实测</div>
-      <div class="cd">我们自己的三值 MAC 阵列在真 FPGA（xc7z010）上<b>逐比特算对</b>，满配 512 路、0 DSP。</div>
-      <div class="go">读实测文档 →</div>
+      <div class="top"><span class="badge b-live"><span class="lang-en">On real silicon</span><span class="lang-zh">真硅实测</span></span></div>
+      <div class="ct"><span class="lang-en">🔬 FPGA silicon-measured</span><span class="lang-zh">🔬 FPGA 硅上实测</span></div>
+      <div class="cd"><span class="lang-en">Our own ternary MAC array runs <b>bit-exact</b> on a real FPGA (xc7z010), full 512 lanes, 0 DSP.</span><span class="lang-zh">我们自己的三值 MAC 阵列在真 FPGA（xc7z010）上<b>逐比特算对</b>，满配 512 路、0 DSP。</span></div>
+      <div class="go"><span class="lang-en">Read the measured doc →</span><span class="lang-zh">读实测文档 →</span></div>
     </a>
     <a class="card" href="https://github.com/michaelhuo2030/millisecond-era" target="_blank" rel="noopener">
-      <div class="top"><span class="badge b-read">开源</span></div>
-      <div class="ct">⌥ 完整研究 · 源码</div>
-      <div class="cd">全部代码、方法、迭代记录、诚实台账都在 GitHub。看"DeepSeek 缺失的硬件层"完整论证。</div>
-      <div class="go">去 GitHub →</div>
+      <div class="top"><span class="badge b-read"><span class="lang-en">Open source</span><span class="lang-zh">开源</span></span></div>
+      <div class="ct"><span class="lang-en">⌥ Full research · source</span><span class="lang-zh">⌥ 完整研究 · 源码</span></div>
+      <div class="cd"><span class="lang-en">All code, methods, iteration log and honest ledger on GitHub — the full case for "the missing hardware layer of DeepSeek's full stack."</span><span class="lang-zh">全部代码、方法、迭代记录、诚实台账都在 GitHub。看"DeepSeek 缺失的硬件层"完整论证。</span></div>
+      <div class="go"><span class="lang-en">Go to GitHub →</span><span class="lang-zh">去 GitHub →</span></div>
     </a>
   </div>
 </section>
@@ -279,15 +291,15 @@ footer .one{color:#aab2c4;margin-bottom:8px}
 
 <footer><div class="wrap">
   <div class="legend">
-    <span><i class="dot" style="background:var(--good)"></i>实测 measured · 此刻能跑</span>
-    <span><i class="dot" style="background:var(--sim)"></i>真实模拟 · 算法是真的</span>
-    <span><i class="dot" style="background:var(--proj)"></i>推算 projected · 芯片未流片</span>
+    <span><i class="dot" style="background:var(--good)"></i><span class="lang-en">measured · runs now</span><span class="lang-zh">实测 measured · 此刻能跑</span></span>
+    <span><i class="dot" style="background:var(--sim)"></i><span class="lang-en">real simulation · the algorithm is real</span><span class="lang-zh">真实模拟 · 算法是真的</span></span>
+    <span><i class="dot" style="background:var(--proj)"></i><span class="lang-en">projected · chip not yet taped out</span><span class="lang-zh">推算 projected · 芯片未流片</span></span>
   </div>
-  <div class="one">合抱之木，生于毫末。Built in Shanghai · 上海，一个人，1.5 个月，~$1,400。</div>
+  <div class="one"><span class="lang-en">A great tree grows from a tiny sprout. Built in Shanghai · one person, 1.5 months, ~$1,400.</span><span class="lang-zh">合抱之木，生于毫末。Built in Shanghai · 上海，一个人，1.5 个月，~$1,400。</span></div>
   <a href="https://github.com/michaelhuo2030/millisecond-era">GitHub</a> ·
-  <a href="https://github.com/michaelhuo2030/millisecond-era/blob/main/PHILOSOPHY.md" target="_blank" rel="noopener">设计哲学</a> ·
+  <a href="https://github.com/michaelhuo2030/millisecond-era/blob/main/PHILOSOPHY.md" target="_blank" rel="noopener"><span class="lang-en">Philosophy</span><span class="lang-zh">设计哲学</span></a> ·
   <a href="learn/speed-trial.html">Speed Trial</a> ·
-  <span>毫秒纪元 · 速度 ↔ 文明</span>
+  <span><span class="lang-en">Millisecond Era · speed ↔ civilization</span><span class="lang-zh">毫秒纪元 · 速度 ↔ 文明</span></span>
 </div></footer>
 
 <script src="site-nav.js"></script>

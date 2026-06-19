@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>会自己长大、又不说谎的知识库 — 一道"核实门"的小实验</title>
+<title>A knowledge base that grows itself and never lies — a small "verify-gate" experiment · 会自己长大、又不说谎的知识库</title>
 <style>
   :root{ --bg:#0a0e14; --panel:#0f1620; --ink:#dfe7ef; --dim:#7e8aa0;
          --green:#34d399; --red:#f87171; --gold:#fbbf24; --cyan:#38bdf8; --slate:#64748b; --line:#1e2a3a; }
@@ -57,73 +57,88 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>让 AI 攒出一座<span class="sub">不说谎</span>的知识库</h1>
-  <p class="kick">我们管这件事叫"文明棘轮"——知识能一层层往上叠、而且永不掺假。这是它最核心那一下。</p>
+  <h1><span class="lang-en">Let AI build up a knowledge base that <span class="sub">never lies</span></span><span class="lang-zh">让 AI 攒出一座<span class="sub">不说谎</span>的知识库</span></h1>
+  <p class="kick"><span class="lang-en">We call this the "civilization ratchet" — knowledge can stack up layer by layer and never gets adulterated. This is its single most essential move.</span><span class="lang-zh">我们管这件事叫"文明棘轮"——知识能一层层往上叠、而且永不掺假。这是它最核心那一下。</span></p>
 
   <p class="lead">
+    <span class="lang-en">
+    AI is smart, but it will <b>make things up with a straight face</b>. If you store what it says into the knowledge base without verifying, over time <b>half of it becomes false</b> — and you can't even tell.<br>
+    The fix is actually simple: add a <b>"verify-gate"</b> — only what is checked to be true is allowed in.<br>
+    Below are <b>two identical</b> knowledge networks (nodes are diseases, genes, drugs). The left one has this gate, the right one doesn't. Click "Start" and watch each of them grow.
+    </span><span class="lang-zh">
     AI 很聪明,但它会<b>一本正经地编</b>。要是不核实就把它说的东西存进知识库,时间一长,里面<b>一半都是假的</b>——你还看不出来。<br>
     办法其实很简单:加一道 <b>"核实门"</b>,只有被核对为真的,才准进库。<br>
     下面是<b>两张一模一样</b>的知识网(节点是病、基因、药)。左边有这道门,右边没有。点"开始",看着它们各自长大。
+    </span>
   </p>
 
   <div class="stat">
-    <span class="chip">真实验跑在一张 <b>4 万节点</b>的真实医学知识图上 · 换 <b>12 种设置</b>结果几乎一样:</span>
-    <span class="chip g">有门:存进去 <b>100% 是真的</b>,补全了 <b>97%</b></span>
-    <span class="chip r">没门:存进去 <b>只有一半</b>是真的</span>
+    <span class="chip"><span class="lang-en">The real experiment runs on a real medical knowledge graph of <b>40k nodes</b> · across <b>12 settings</b> the result is nearly identical:</span><span class="lang-zh">真实验跑在一张 <b>4 万节点</b>的真实医学知识图上 · 换 <b>12 种设置</b>结果几乎一样:</span></span>
+    <span class="chip g"><span class="lang-en">With gate: what gets stored is <b>100% true</b>, completed <b>97%</b></span><span class="lang-zh">有门:存进去 <b>100% 是真的</b>,补全了 <b>97%</b></span></span>
+    <span class="chip r"><span class="lang-en">No gate: only <b>half</b> of what gets stored is true</span><span class="lang-zh">没门:存进去 <b>只有一半</b>是真的</span></span>
   </div>
 
   <div class="controls">
-    <button class="primary" id="play">▶ 开始</button>
-    <button id="step">⏭ 一步一步</button>
-    <button id="reset">↺ 重来</button>
-    <span class="roundtag">第 <b id="round">0</b> / <b id="maxr">5</b> 轮 — 每一轮,AI 补几条它觉得缺的连接,门来判真假</span>
+    <button class="primary" id="play"><span class="lang-en">▶ Start</span><span class="lang-zh">▶ 开始</span></button>
+    <button id="step"><span class="lang-en">⏭ Step by step</span><span class="lang-zh">⏭ 一步一步</span></button>
+    <button id="reset"><span class="lang-en">↺ Restart</span><span class="lang-zh">↺ 重来</span></button>
+    <span class="roundtag"><span class="lang-en">Round </span><span class="lang-zh">第 </span><b id="round">0</b> / <b id="maxr">5</b><span class="lang-en"> — each round, the AI proposes a few links it thinks are missing, and the gate judges true or false</span><span class="lang-zh"> 轮 — 每一轮,AI 补几条它觉得缺的连接,门来判真假</span></span>
   </div>
 
   <div class="grid">
     <div class="card on">
-      <div class="chead"><span class="t">✅ 有核实门</span><span class="badge g">存进去之前,先核对一下是不是真的</span></div>
+      <div class="chead"><span class="t"><span class="lang-en">✅ With verify-gate</span><span class="lang-zh">✅ 有核实门</span></span><span class="badge g"><span class="lang-en">Before storing, check whether it's true</span><span class="lang-zh">存进去之前,先核对一下是不是真的</span></span></div>
       <canvas id="cvA"></canvas>
       <div class="metrics">
-        <div class="m"><div class="lab"><span>补全了多少</span><b id="covA">—</b></div>
+        <div class="m"><div class="lab"><span><span class="lang-en">How much completed</span><span class="lang-zh">补全了多少</span></span><b id="covA">—</b></div>
           <div class="bar"><i id="covAb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
-        <div class="m"><div class="lab"><span>存进去的,有几成是真的</span><b id="prcA">—</b></div>
+        <div class="m"><div class="lab"><span><span class="lang-en">Of what's stored, what fraction is true</span><span class="lang-zh">存进去的,有几成是真的</span></span><b id="prcA">—</b></div>
           <div class="bar"><i id="prcAb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
       </div>
     </div>
 
     <div class="card off">
-      <div class="chead"><span class="t">❌ 没有核实门</span><span class="badge r">AI 说啥,就直接存啥</span></div>
+      <div class="chead"><span class="t"><span class="lang-en">❌ No verify-gate</span><span class="lang-zh">❌ 没有核实门</span></span><span class="badge r"><span class="lang-en">Whatever the AI says, store it as-is</span><span class="lang-zh">AI 说啥,就直接存啥</span></span></div>
       <canvas id="cvB"></canvas>
       <div class="metrics">
-        <div class="m"><div class="lab"><span>补全了多少</span><b id="covB">—</b></div>
+        <div class="m"><div class="lab"><span><span class="lang-en">How much completed</span><span class="lang-zh">补全了多少</span></span><b id="covB">—</b></div>
           <div class="bar"><i id="covBb" style="background:linear-gradient(90deg,#1d6f5c,#34d399)"></i></div></div>
-        <div class="m"><div class="lab"><span>存进去的,有几成是真的</span><b id="prcB">—</b></div>
+        <div class="m"><div class="lab"><span><span class="lang-en">Of what's stored, what fraction is true</span><span class="lang-zh">存进去的,有几成是真的</span></span><b id="prcB">—</b></div>
           <div class="bar"><i id="prcBb" style="background:linear-gradient(90deg,#7a2c3a,#f87171)"></i></div></div>
       </div>
     </div>
   </div>
 
   <div class="legend">
-    <span><i class="dot" style="background:#33415590"></i>本来就知道的连接</span>
-    <span><i class="dot" style="background:var(--green)"></i>核对为真 → 存进来了</span>
-    <span><i class="dot" style="background:var(--red)"></i>没核对,把假的也存了进来</span>
-    <span><i class="dot" style="background:var(--gold)"></i>病 · <i class="dot" style="background:var(--cyan)"></i>基因 · <i class="dot" style="background:var(--slate)"></i>药/通路</span>
+    <span><i class="dot" style="background:#33415590"></i><span class="lang-en">links already known</span><span class="lang-zh">本来就知道的连接</span></span>
+    <span><i class="dot" style="background:var(--green)"></i><span class="lang-en">verified true → stored</span><span class="lang-zh">核对为真 → 存进来了</span></span>
+    <span><i class="dot" style="background:var(--red)"></i><span class="lang-en">unverified, false ones stored too</span><span class="lang-zh">没核对,把假的也存了进来</span></span>
+    <span><i class="dot" style="background:var(--gold)"></i><span class="lang-en">disease</span><span class="lang-zh">病</span> · <i class="dot" style="background:var(--cyan)"></i><span class="lang-en">gene</span><span class="lang-zh">基因</span> · <i class="dot" style="background:var(--slate)"></i><span class="lang-en">drug/pathway</span><span class="lang-zh">药/通路</span></span>
   </div>
 
   <div class="scis">
-    <div class="t">可信度对照 <small>每一轮,存进去的知识有几成是真的 —— 一条稳稳守在 100%,一条塌到 50%</small></div>
+    <div class="t"><span class="lang-en">Trustworthiness comparison</span><span class="lang-zh">可信度对照</span> <small><span class="lang-en">Each round, what fraction of stored knowledge is true — one holds steady at 100%, the other collapses to 50%</span><span class="lang-zh">每一轮,存进去的知识有几成是真的 —— 一条稳稳守在 100%,一条塌到 50%</span></small></div>
     <canvas id="cvS" style="height:150px"></canvas>
   </div>
 
   <p class="foot">
+    <span class="lang-en">
+    This little network is only here to let you <b>grasp the underlying idea at a glance</b>; the real experiment runs on a real medical knowledge graph of 40k nodes, and the conclusion is rock-solid.
+    In one line — <b style="color:#cfe9ff">what's truly powerful is not how much the AI can make up, but the gate that lets true knowledge accumulate without adulteration.</b>
+    Today most AI "memory" has no such gate; with it, knowledge can for the first time stack up layer by layer like civilization — and never slide back.
+    </span><span class="lang-zh">
     这里的小网只是为了让你<b>一眼看懂背后的道理</b>;真刀真枪的实验跑在一张 4 万个节点的真实医学知识图上,结论稳得很。
     一句话——<b style="color:#cfe9ff">真正厉害的不是 AI 多能编,而是那道让真知识攒起来、不掺假的门。</b>
     今天大多数 AI 的"记忆"是没有这道门的;有了它,知识才第一次能像文明那样,一层层叠上去、而且不往回滑。
+    </span>
   </p>
 </div>
 
 <script>
 (()=>{
+// language helper (drives JS-generated bilingual text)
+const isZH=()=>document.documentElement.dataset.lang==='zh';
+const L=(en,zh)=>isZH()?zh:en;
 const MAXR=5, KT=2, KF=2;
 const COL={disease:'#fbbf24',gene:'#38bdf8',leaf:'#64748b'};
 let RS=20260615;
@@ -162,8 +177,15 @@ function makePanel(canvas){
   return {canvas,ctx,W:rect.width,H:rect.height};
 }
 
-let A,B,S, graphA,graphB, round, playing=false, lastT=0;
+let A,B,S, graphA,graphB, round, playing=false, lastT=0, finished=false;
 let histA=[], histB=[];
+
+function setPlayLabel(){
+  const el=document.getElementById('play');
+  if(finished){ el.textContent=L('✓ Done — see the two lines below','✓ 跑完了 — 看下面那两条线'); }
+  else if(playing){ el.textContent=L('⏸ Pause','⏸ 暂停'); }
+  else { el.textContent=L('▶ Start','▶ 开始'); }
+}
 
 function reset(){
   A=makePanel(document.getElementById('cvA'));
@@ -180,8 +202,8 @@ function reset(){
     g.held=[...held]; g.queue=[...held];
     g.fab=[]; g.rejects=[]; g.addedTrue=0; g.addedFab=0;
   });
-  round=0; playing=false; histA=[]; histB=[];
-  document.getElementById('play').textContent='▶ 开始';
+  round=0; playing=false; finished=false; histA=[]; histB=[];
+  setPlayLabel();
   metrics();                         // the rAF frame() loop handles all drawing
 }
 
@@ -263,25 +285,27 @@ function drawScissor(){
      for(let r=1;r<=round;r++){ if(hist[r]==null)continue; ctx.beginPath();ctx.arc(x(r),y(hist[r]),3,0,7);ctx.fillStyle=color;ctx.fill(); } };
   plot(histA,'#34d399'); plot(histB,'#f87171');
   ctx.font='12px sans-serif';
-  if(round>0){ ctx.fillStyle='#34d399'; ctx.fillText('有门 → 全真', x(round)+6, y(histA[round]||1)+4);
-               ctx.fillStyle='#f87171'; ctx.fillText('没门 → 一半假', x(round)+6, y(histB[round]||0.5)+4); }
+  if(round>0){ ctx.fillStyle='#34d399'; ctx.fillText(L('with gate → all true','有门 → 全真'), x(round)+6, y(histA[round]||1)+4);
+               ctx.fillStyle='#f87171'; ctx.fillText(L('no gate → half false','没门 → 一半假'), x(round)+6, y(histB[round]||0.5)+4); }
 }
 
 function frame(t){
   drawGraph(A,graphA); drawGraph(B,graphB); drawScissor();
-  if(playing && t-lastT>1150){ lastT=t; if(!step()){ playing=false; document.getElementById('play').textContent='✓ 跑完了 — 看下面那两条线'; } }
+  if(playing && t-lastT>1150){ lastT=t; if(!step()){ playing=false; finished=true; setPlayLabel(); } }
   requestAnimationFrame(frame);
 }
 
-document.getElementById('step').onclick=()=>{ playing=false; document.getElementById('play').textContent='▶ 开始'; step(); };
+document.getElementById('step').onclick=()=>{ playing=false; finished=false; setPlayLabel(); step(); };
 document.getElementById('play').onclick=(e)=>{ if(round>=MAXR) reset();
-  playing=!playing; e.target.textContent=playing?'⏸ 暂停':'▶ 开始'; lastT=performance.now(); };
+  playing=!playing; finished=false; setPlayLabel(); lastT=performance.now(); };
 document.getElementById('reset').onclick=reset;
 document.getElementById('maxr').textContent=MAXR;
 window.addEventListener('resize',()=>{ const r=round, hA=histA.slice(), hB=histB.slice(); reset();
   for(let i=0;i<r;i++) step(); histA=hA; histB=hB; });
 reset();
 requestAnimationFrame(frame);
+// re-render JS-generated text on global language toggle (scissor labels redraw via rAF)
+window.addEventListener('mse:lang',()=>{ setPlayLabel(); });
 })();
 </script>
   <script src="../site-nav.js"></script>

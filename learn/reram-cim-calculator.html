@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ReRAM-CIM 三元模型容量计算器</title>
+<title>ReRAM-CIM Ternary Model Capacity Calculator | ReRAM-CIM 三元模型容量计算器</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff}
 *{box-sizing:border-box}
@@ -39,63 +39,63 @@ td:first-child,th:first-child{text-align:left}
 .formula{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:#0c0d15;border:1px solid #22232f;border-radius:8px;padding:10px;color:#bcd;margin-top:10px;overflow-x:auto}
 .bar{height:8px;background:#1c1d2a;border-radius:5px;overflow:hidden;margin-top:4px}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#8ee59a,#ffd36b)}
 </style></head><body><div class="wrap">
-<div class="nav"><a href="reram-cim-101.html">← 回科普</a><a href="#" onclick="explainTopic('overview');return false;">❓ 这工具在算什么</a></div>
-<h1>ReRAM-CIM 三元模型容量计算器 ⚙️</h1>
-<div class="sub">给定一块 ReRAM-CIM 芯片的容量,算它能塞下多大的 <b>ternary(三元 {−1,0,+1})</b> 模型。所有要考虑的物理因素——cell 类型、电平数、差分、ECC 冗余、激活预留——都做成旋钮。<b>每个带 <span style="color:var(--blue)">?</span> 的词点一下有大白话解释。</b></div>
+<div class="nav"><a href="reram-cim-101.html"><span class="lang-en">← Back to basics</span><span class="lang-zh">← 回科普</span></a><a href="#" onclick="explainTopic('overview');return false;"><span class="lang-en">❓ What is this tool computing</span><span class="lang-zh">❓ 这工具在算什么</span></a></div>
+<h1><span class="lang-en">ReRAM-CIM Ternary Model Capacity Calculator ⚙️</span><span class="lang-zh">ReRAM-CIM 三元模型容量计算器 ⚙️</span></h1>
+<div class="sub"><span class="lang-en">Given the capacity of a ReRAM-CIM chip, compute how large a <b>ternary ({−1,0,+1})</b> model it can hold. Every physical factor to consider — cell type, number of levels, differential, ECC redundancy, activation reserve — is a knob. <b>Tap any word with a <span style="color:var(--blue)">?</span> for a plain-language explanation.</b></span><span class="lang-zh">给定一块 ReRAM-CIM 芯片的容量,算它能塞下多大的 <b>ternary(三元 {−1,0,+1})</b> 模型。所有要考虑的物理因素——cell 类型、电平数、差分、ECC 冗余、激活预留——都做成旋钮。<b>每个带 <span style="color:var(--blue)">?</span> 的词点一下有大白话解释。</b></span></div>
 
 <div class="grid">
   <!-- INPUTS -->
   <div class="card">
-    <h2>① 旋钮 — 调这里</h2>
+    <h2><span class="lang-en">① Knobs — adjust here</span><span class="lang-zh">① 旋钮 — 调这里</span></h2>
 
-    <label>芯片容量 <span class="q" onclick="explainTopic('capacity')">?</span> <span class="valbig" id="capLbl"></span></label>
+    <label><span class="lang-en">Chip capacity</span><span class="lang-zh">芯片容量</span> <span class="q" onclick="explainTopic('capacity')">?</span> <span class="valbig" id="capLbl"></span></label>
     <input type="range" id="cap" min="0" max="1000" value="0" oninput="calc()">
     <div class="row" style="margin-top:8px">
       <input type="number" id="capNum" step="1" oninput="capFromNum()">
       <select id="capUnit" onchange="capFromNum()"><option value="1048576">MB</option><option value="1073741824">GB</option></select>
     </div>
-    <div class="note">范围 32 MB → 30 GB。直接拖滑块,或在框里输精确数字。</div>
+    <div class="note"><span class="lang-en">Range 32 MB → 30 GB. Drag the slider, or type an exact number in the box.</span><span class="lang-zh">范围 32 MB → 30 GB。直接拖滑块,或在框里输精确数字。</span></div>
 
-    <label>这容量指的是 <span class="q" onclick="explainTopic('whatcap')">?</span></label>
+    <label><span class="lang-en">What this capacity refers to</span><span class="lang-zh">这容量指的是</span> <span class="q" onclick="explainTopic('whatcap')">?</span></label>
     <select id="capKind" onchange="calc()">
-      <option value="weights">纯权重阵列(只存模型权重)</option>
-      <option value="total">芯片总存储(含激活/KV 缓冲)</option>
+      <option value="weights" data-en="Pure weight array (stores model weights only)" data-zh="纯权重阵列(只存模型权重)">Pure weight array (stores model weights only)</option>
+      <option value="total" data-en="Total chip storage (incl. activations / KV buffer)" data-zh="芯片总存储(含激活/KV 缓冲)">Total chip storage (incl. activations / KV buffer)</option>
     </select>
 
-    <label>Cell 类型 / 每个权重占几个 cell <span class="q" onclick="explainTopic('cell')">?</span></label>
+    <label><span class="lang-en">Cell type / cells per weight</span><span class="lang-zh">Cell 类型 / 每个权重占几个 cell</span> <span class="q" onclick="explainTopic('cell')">?</span></label>
     <select id="cell" onchange="calc()">
-      <option value="2|SLC 差分对(2×二态cell·我们的路·无ADC)">SLC 差分对 — 2 cell/权重 (2.0 bit) ⭐我们的路</option>
-      <option value="2|MLC-4 单 cell(4 电平,浪费1档)">MLC 4 电平 单 cell — 2.0 bit/权重</option>
-      <option value="1.58|MLC-3 原生三元(3 电平/cell·我们不用,会飘)">MLC 3 电平 原生三元 — 1.58 bit/权重 (纸面最密·我们不用)</option>
-      <option value="1.58|理论极限(完美打包)">理论极限 packed — 1.58 bit/权重</option>
-      <option value="3|保守(含纠错冗余)">保守(单 cell + 1bit ECC) — 3.0 bit/权重</option>
+      <option value="2|SLC diff pair (2× two-state cells · our path · no ADC)‖SLC 差分对(2×二态cell·我们的路·无ADC)" data-en="SLC differential pair — 2 cells/weight (2.0 bit) ⭐ our path" data-zh="SLC 差分对 — 2 cell/权重 (2.0 bit) ⭐我们的路">SLC differential pair — 2 cells/weight (2.0 bit) ⭐ our path</option>
+      <option value="2|MLC-4 single cell (4 levels, 1 wasted)‖MLC-4 单 cell(4 电平,浪费1档)" data-en="MLC 4-level single cell — 2.0 bit/weight" data-zh="MLC 4 电平 单 cell — 2.0 bit/权重">MLC 4-level single cell — 2.0 bit/weight</option>
+      <option value="1.58|MLC-3 native ternary (3 levels/cell · we don't use, drifts)‖MLC-3 原生三元(3 电平/cell·我们不用,会飘)" data-en="MLC 3-level native ternary — 1.58 bit/weight (densest on paper · we don't use)" data-zh="MLC 3 电平 原生三元 — 1.58 bit/权重 (纸面最密·我们不用)">MLC 3-level native ternary — 1.58 bit/weight (densest on paper · we don't use)</option>
+      <option value="1.58|theoretical limit (perfectly packed)‖理论极限(完美打包)" data-en="theoretical limit packed — 1.58 bit/weight" data-zh="理论极限 packed — 1.58 bit/权重">theoretical limit packed — 1.58 bit/weight</option>
+      <option value="3|conservative (incl. ECC redundancy)‖保守(含纠错冗余)" data-en="conservative (single cell + 1bit ECC) — 3.0 bit/weight" data-zh="保守(单 cell + 1bit ECC) — 3.0 bit/权重">conservative (single cell + 1bit ECC) — 3.0 bit/weight</option>
     </select>
 
-    <label>额外开销:ECC + 冗余 + 外围 <span class="q" onclick="explainTopic('overhead')">?</span> <span class="valbig" id="ovLbl"></span></label>
+    <label><span class="lang-en">Extra overhead: ECC + redundancy + peripherals</span><span class="lang-zh">额外开销:ECC + 冗余 + 外围</span> <span class="q" onclick="explainTopic('overhead')">?</span> <span class="valbig" id="ovLbl"></span></label>
     <input type="range" id="ov" min="0" max="40" value="12" oninput="calc()">
 
-    <label>给激活 / KV cache 预留 <span class="q" onclick="explainTopic('activation')">?</span> <span class="valbig" id="actLbl"></span></label>
+    <label><span class="lang-en">Reserve for activations / KV cache</span><span class="lang-zh">给激活 / KV cache 预留</span> <span class="q" onclick="explainTopic('activation')">?</span> <span class="valbig" id="actLbl"></span></label>
     <input type="range" id="act" min="0" max="50" value="0" oninput="calc()">
-    <div class="note">仅当上面选「芯片总存储」时生效。权重模式下激活通常放单独 SRAM。</div>
+    <div class="note"><span class="lang-en">Only takes effect when "Total chip storage" is selected above. In weight mode, activations usually live in separate SRAM.</span><span class="lang-zh">仅当上面选「芯片总存储」时生效。权重模式下激活通常放单独 SRAM。</span></div>
 
-    <label>算力(估 tok/s 用)<span class="q" onclick="explainTopic('tops')">?</span> <span class="valbig" id="topsLbl"></span></label>
+    <label><span class="lang-en">Compute (for estimating tok/s)</span><span class="lang-zh">算力(估 tok/s 用)</span><span class="q" onclick="explainTopic('tops')">?</span> <span class="valbig" id="topsLbl"></span></label>
     <input type="range" id="tops" min="0" max="200" value="20" oninput="calc()">
-    <div class="note">CIM 的速度由阵列每秒 MAC 次数(TOPS)决定,不是带宽。这只是粗估,看落在速度阶梯哪一档。</div>
+    <div class="note"><span class="lang-en">CIM speed is set by the array's MACs per second (TOPS), not bandwidth. This is just a rough estimate, to see which speed tier you land in.</span><span class="lang-zh">CIM 的速度由阵列每秒 MAC 次数(TOPS)决定,不是带宽。这只是粗估,看落在速度阶梯哪一档。</span></div>
   </div>
 
   <!-- OUTPUTS -->
   <div class="card">
-    <h2>② 结果 — 能塞多大模型</h2>
+    <h2><span class="lang-en">② Result — how large a model fits</span><span class="lang-zh">② 结果 — 能塞多大模型</span></h2>
     <div class="out">
-      <div style="color:var(--dim);font-size:13px">最大三元参数量</div>
+      <div style="color:var(--dim);font-size:13px"><span class="lang-en">Max ternary parameter count</span><span class="lang-zh">最大三元参数量</span></div>
       <div class="bignum" id="params">—</div>
       <div id="tierLine" style="margin:4px 0 12px"></div>
 
-      <div class="outrow"><span>有效 bit/权重 <span class="q" onclick="explainTopic('bpw')">?</span></span><b id="bpw">—</b></div>
-      <div class="outrow"><span>可用容量(扣开销/激活后)</span><b id="usable">—</b></div>
-      <div class="outrow"><span>同尺寸 fp16 模型要多大 <span class="q" onclick="explainTopic('compress')">?</span></span><b id="fp16">—</b></div>
-      <div class="outrow"><span>三元压缩比</span><b id="ratio">—</b></div>
-      <div class="outrow"><span>粗估速度(权重全在片上)<span class="q" onclick="explainTopic('speed')">?</span></span><b id="toks">—</b></div>
+      <div class="outrow"><span><span class="lang-en">Effective bit/weight</span><span class="lang-zh">有效 bit/权重</span> <span class="q" onclick="explainTopic('bpw')">?</span></span><b id="bpw">—</b></div>
+      <div class="outrow"><span><span class="lang-en">Usable capacity (after overhead/activation)</span><span class="lang-zh">可用容量(扣开销/激活后)</span></span><b id="usable">—</b></div>
+      <div class="outrow"><span><span class="lang-en">Size of same-param fp16 model</span><span class="lang-zh">同尺寸 fp16 模型要多大</span> <span class="q" onclick="explainTopic('compress')">?</span></span><b id="fp16">—</b></div>
+      <div class="outrow"><span><span class="lang-en">Ternary compression ratio</span><span class="lang-zh">三元压缩比</span></span><b id="ratio">—</b></div>
+      <div class="outrow"><span><span class="lang-en">Rough speed (all weights on chip)</span><span class="lang-zh">粗估速度(权重全在片上)</span><span class="q" onclick="explainTopic('speed')">?</span></span><b id="toks">—</b></div>
     </div>
     <div class="formula" id="formula"></div>
   </div>
@@ -103,21 +103,21 @@ td:first-child,th:first-child{text-align:left}
 
 <!-- MODEL FIT TABLE -->
 <div class="card" style="margin-top:16px">
-  <h2>③ 常见模型 — 这块芯片装得下哪些?(按当前旋钮)</h2>
-  <table id="modeltbl"><thead><tr><th>模型</th><th>参数量</th><th>三元需容量</th><th>装得下?</th><th>剩余</th></tr></thead><tbody></tbody></table>
-  <div class="note">绿=整模型塞进当前芯片;红=塞不下(需蒸馏更小 / 多片拼 / 更大容量)。高亮行=当前容量下最大能装的那档。</div>
+  <h2><span class="lang-en">③ Common models — which fit on this chip? (per current knobs)</span><span class="lang-zh">③ 常见模型 — 这块芯片装得下哪些?(按当前旋钮)</span></h2>
+  <table id="modeltbl"><thead><tr><th><span class="lang-en">Model</span><span class="lang-zh">模型</span></th><th><span class="lang-en">Params</span><span class="lang-zh">参数量</span></th><th><span class="lang-en">Ternary capacity needed</span><span class="lang-zh">三元需容量</span></th><th><span class="lang-en">Fits?</span><span class="lang-zh">装得下?</span></th><th><span class="lang-en">Remaining</span><span class="lang-zh">剩余</span></th></tr></thead><tbody></tbody></table>
+  <div class="note"><span class="lang-en">Green = whole model fits on the current chip; red = doesn't fit (needs distillation to smaller / multi-chip tiling / larger capacity). Highlighted row = the largest tier that fits at the current capacity.</span><span class="lang-zh">绿=整模型塞进当前芯片;红=塞不下(需蒸馏更小 / 多片拼 / 更大容量)。高亮行=当前容量下最大能装的那档。</span></div>
 </div>
 
 <!-- QUICK SCENARIOS -->
 <div class="card" style="margin-top:16px">
-  <h2>④ 一键场景</h2>
-  <span class="pill" onclick="preset(32,'1048576')">示例 32 MB</span>
+  <h2><span class="lang-en">④ One-click scenarios</span><span class="lang-zh">④ 一键场景</span></h2>
+  <span class="pill" onclick="preset(32,'1048576')"><span class="lang-en">e.g. 32 MB</span><span class="lang-zh">示例 32 MB</span></span>
   <span class="pill" onclick="preset(150,'1048576')">150 MB</span>
   <span class="pill" onclick="preset(512,'1048576')">512 MB</span>
   <span class="pill" onclick="preset(2,'1073741824')">2 GB</span>
   <span class="pill" onclick="preset(8,'1073741824')">8 GB</span>
-  <span class="pill" onclick="preset(30,'1073741824')">30 GB(满配)</span>
-  <div class="note" style="margin-top:12px">名词不懂就点旁边的 <span style="color:var(--blue)">?</span>。所有数都按"权重住在片上 → memory wall 消失 → 高速档"这个前提。</div>
+  <span class="pill" onclick="preset(30,'1073741824')"><span class="lang-en">30 GB (max config)</span><span class="lang-zh">30 GB(满配)</span></span>
+  <div class="note" style="margin-top:12px"><span class="lang-en">If a term is unclear, tap the <span style="color:var(--blue)">?</span> next to it. All numbers assume "weights live on chip → memory wall disappears → high-speed tier".</span><span class="lang-zh">名词不懂就点旁边的 <span style="color:var(--blue)">?</span>。所有数都按"权重住在片上 → memory wall 消失 → 高速档"这个前提。</span></div>
 </div>
 
 </div>
@@ -133,30 +133,56 @@ const MODELS=[
  ["Phi-2",2700],["Qwen 3B",3000],["Llama-3 8B",8000],["Qwen 14B",14000],
  ["Qwen 32B",32000],["Llama 70B",70000]];
 
-// ---- plain-Chinese explainers ----
+// bilingual helper: pick English or Chinese based on global <html data-lang> toggle (default = English)
+const isZH=()=>document.documentElement.dataset.lang==='zh';
+const L=(en,zh)=>isZH()?zh:en;
+
+// ---- bilingual explainers (each entry: [titleEn,bodyEn,titleZh,bodyZh]) ----
 const EXP={
- overview:["这工具在算什么",
+ overview:["What this tool computes",
+  "In one line: <b>capacity ÷ bits per weight = how many weights (parameters) fit</b>.<br><br>A ReRAM-CIM chip stores model weights directly in the memory cells, and can also do multiply-accumulate in place (CIM = compute-in-memory). Each weight of a ternary model is just {−1,0,+1}, so in theory 1.58 bit is enough, but how much it actually takes depends on how the cell stores it. Adjust all these physical factors to see how large a model the target chip can really run.",
+  "这工具在算什么",
   "一句话:<b>容量 ÷ 每个权重占的 bit = 能装多少个权重(参数)</b>。<br><br>ReRAM-CIM 芯片把模型权重直接存在存储单元(cell)里,还能就地做乘加(CIM=存内计算)。三元模型每个权重只是 {−1,0,+1},理论上只要 1.58 bit,但实际占多少取决于 cell 怎么存。把这些物理因素都调一调,就知道目标芯片到底能跑多大的模型。"],
- capacity:["芯片容量",
+ capacity:["Chip capacity",
+  "The total storage of the ReRAM array, in MB/GB. <b>Note: this is the physical capacity for weights, not the size of an fp16 model.</b><br><br>The same 130M-parameter model: fp16 needs 260MB, ternary only ~32MB —— this 8× gap is exactly why ternary exists. So don't map your fp16 intuition for \"0.5B/8B\" directly onto chip capacity.",
+  "芯片容量",
   "ReRAM 阵列的总存储量,单位 MB/GB。<b>注意:这是存权重的物理容量,不是 fp16 模型的大小。</b><br><br>同样 1.3 亿参数的模型:fp16 要 260MB,三元只要 ~32MB——这 8 倍差距正是三元存在的意义。所以别拿“0.5B/8B”的 fp16 直觉直接套芯片容量。"],
- whatcap:["这容量指什么",
+ whatcap:["What this capacity refers to",
+  "<b>Pure weight array</b>: all 32MB used to store model weights (most optimistic, activations live in separate SRAM).<br><b>Total chip storage</b>: 32MB must hold weights + intermediate activations during inference + KV cache, so the weights get less —— carve out a slice with the \"activation reserve\" slider below.<br><br>First confirm: which kind is this 32MB? It makes a big difference.",
+  "这容量指什么",
   "<b>纯权重阵列</b>:32MB 全部用来存模型权重(最乐观,激活另放 SRAM)。<br><b>芯片总存储</b>:32MB 要同时装权重 + 推理时的中间激活 + KV cache,那权重能用的就更少——用下面的“激活预留”滑块切出一块。<br><br>先确认:这 32MB 是哪一种?差很多。"],
- cell:["Cell 类型 / 电平 / 差分",
+ cell:["Cell type / levels / differential",
+  "A ReRAM memory unit is called a <b>cell</b>. How many resistance levels it can distinguish decides how many bits it stores:<br><br>• <b>SLC differential pair (our path) ⭐</b>: each cell only has high/low 2 levels (best to read, most stable); use <b>2 cells in a differential pair</b> (+column − −column) to robustly represent signed ±1/0 = 2 bit/weight, and read out with a <b>digital counter, no ADC</b>.<br>• <b>MLC-4</b> (4 levels): 1 cell stores 2 bit. Ternary only uses 3 of the levels, wasting 1.<br>• <b>MLC-3 native ternary</b>: a cell precisely splits into 3 levels, densest on paper (1.58 bit), <b>but we don't use it</b> —— multi-level single cells drift with aging/temperature and need analog readout.<br>• <b>Conservative</b>: single cell plus error-correction bits, ~3 bit/weight.<br><br>More levels save more space on paper but are harder to distinguish (they drift), which is exactly why we <b>take two-state differential rather than MLC</b> —— two-state cells have the widest tolerance, fit ReRAM best, and avoid the analog ADC.",
+  "Cell 类型 / 电平 / 差分",
   "ReRAM 的一个存储单元叫 <b>cell</b>。它能区分几个电阻档位(电平)决定能存几 bit:<br><br>• <b>SLC 差分对(我们的路)⭐</b>:每个 cell 只分高/低 2 档(最好读、最稳),用 <b>2 个 cell 做差分</b>(+列 − −列)稳稳表示带符号的 ±1/0,= 2 bit/权重,还能用<b>数字计数器无-ADC 读出</b>。<br>• <b>MLC-4</b>(4 电平):1 个 cell 存 2 bit。三元只用其中 3 档,浪费 1 档。<br>• <b>MLC-3 原生三元</b>:cell 精确分 3 档,纸面密度最高(1.58 bit),<b>但我们不用</b>——单 cell 多档会随老化/温度飘、还要模拟读出。<br>• <b>保守</b>:单 cell 再加纠错位,~3 bit/权重。<br><br>电平越多纸面越省地方,但越难分清(会飘),这正是我们<b>走二态差分而非 MLC</b>的原因——二态 cell 容差最宽、最适合 ReRAM,还能避开模拟 ADC。"],
- overhead:["ECC / 冗余 / 外围开销",
+ overhead:["ECC / redundancy / peripheral overhead",
+  "A real chip can never use 100% of itself for weights:<br>• <b>ECC</b> (error-correcting code): ReRAM has bad cells/drift, so check bits are needed.<br>• <b>Redundancy</b>: spare rows/columns replace bad ones.<br>• <b>Peripherals</b>: ADC, readout, row/column decoders also take area (not capacity, but budget).<br><br>Typically deducts 10–20%. Raise it to be conservative.",
+  "ECC / 冗余 / 外围开销",
   "真芯片不可能 100% 都拿来存权重:<br>• <b>ECC</b>(纠错码):ReRAM 会有坏点/漂移,要加校验位。<br>• <b>冗余</b>:备用行列替换坏的。<br>• <b>外围</b>:ADC、读出、行列译码也占面积(不占容量但占预算)。<br><br>典型扣掉 10–20%。保守就拉高。"],
- activation:["激活 / KV cache 预留",
+ activation:["Activation / KV cache reserve",
+  "When the model runs, besides weights there are <b>activations</b> (the intermediate results of each layer) and the <b>KV cache</b> (attention history, growing with context length).<br><br>If the chip \"shares one storage for weights + activations\", you have to carve out a slice for them. In pure-weight-array mode (activations in separate SRAM) you can set 0. For small models + short context this slice is tiny.",
+  "激活 / KV cache 预留",
   "模型跑的时候除了权重,还有<b>激活值</b>(每层的中间结果)和 <b>KV cache</b>(注意力的历史,随上下文长度涨)。<br><br>如果芯片是“权重+激活共用同一块存储”,就得切一块给它们。纯权重阵列模式(激活另有 SRAM)可设 0。小模型 + 短上下文时这块很小。"],
- tops:["算力 TOPS",
+ tops:["Compute TOPS",
+  "<b>TOPS = trillion operations per second</b>. A CIM chip's speed is set by how many multiply-accumulates the in-memory array can do per second, <b>not</b> by memory bandwidth (weights don't shuttle back and forth — that's exactly CIM's killer feature).<br><br>Generating 1 token ≈ passing through the whole model once ≈ 2× params operations. So tok/s ≈ TOPS ÷ (2× params). This gives a rough estimate to see which speed tier you land in.",
+  "算力 TOPS",
   "<b>TOPS = 每秒万亿次操作</b>。CIM 芯片的速度由存内阵列每秒能做多少次乘加决定,<b>不是</b>由内存带宽决定(权重不用搬来搬去,这正是 CIM 的杀手锏)。<br><br>每生成 1 个 token ≈ 要把整个模型过一遍 ≈ 2×参数 次操作。所以 tok/s ≈ TOPS ÷ (2×参数)。这里给个粗估,看落在咱速度阶梯哪一档。"],
- bpw:["有效 bit/权重",
+ bpw:["Effective bit/weight",
+  "Working out cell type + levels, the average number of bits each ternary weight actually takes. 1.58 is the theoretical floor, 2.0 is the common implementation, 3.0 is the conservative value with error correction. <b>Smaller = more parameters in the same capacity.</b>",
+  "有效 bit/权重",
   "把 cell 类型 + 电平算下来,平均每个三元权重实际占多少 bit。1.58 是理论地板,2.0 是常见实做,3.0 是带纠错的保守值。<b>越小 = 同容量装越多参数。</b>"],
- compress:["同尺寸 fp16 要多大",
+ compress:["Size of same-param fp16",
+  "For the same parameter count, how big it would be stored as ordinary fp16. Used for comparison: how large a \"conventional\" model your tiny ReRAM chip is equivalent to holding. Ternary compression ratio = fp16 size ÷ chip capacity, usually ~8–10×.",
+  "同尺寸 fp16 要多大",
   "同样参数量,如果用普通 fp16 存要占多大。用来对比:你这块小小的 ReRAM 芯片,等效装下了一个多大的“常规”模型。三元压缩比 = fp16 大小 ÷ 芯片容量,通常 ~8–10×。"],
- speed:["粗估速度 tok/s",
+ speed:["Rough speed tok/s",
+  "Premise: <b>the entire model's weights are on chip</b> → no repeatedly fetching weights from DRAM → the memory wall disappears → this is the physical basis of the \"tens of thousands t/s\" tier in the speed ladder.<br><br>Value = TOPS ÷ (2× params), very rough, only for a qualitative sense of the tier. In reality it's also limited by activation movement, pipelining, and peripheral ADCs.",
+  "粗估速度 tok/s",
   "前提:<b>整个模型权重都在片上</b> → 不用反复从 DRAM 搬权重 → memory wall 消失 → 这就是速度阶梯里“几万 t/s”那一档的物理基础。<br><br>数值 = TOPS ÷ (2×参数),很粗,只为定性看档位。真实还受激活搬运、流水线、外围 ADC 限制。"],
 };
-function explainTopic(k){const e=EXP[k];if(!e)return;document.getElementById('exTitle').innerHTML=e[0];document.getElementById('exBody').innerHTML=e[1];document.getElementById('explain').classList.add('show');}
+let curExplainKey=null;
+function explainTopic(k){const e=EXP[k];if(!e)return;curExplainKey=k;renderExplain();document.getElementById('explain').classList.add('show');}
+function renderExplain(){if(!curExplainKey)return;const e=EXP[curExplainKey];if(!e)return;document.getElementById('exTitle').innerHTML=L(e[0],e[2]);document.getElementById('exBody').innerHTML=L(e[1],e[3]);}
 
 // ---- capacity slider: log scale 32MB .. 30GB ----
 const MINB=32*1048576, MAXB=30*1073741824;
@@ -184,7 +210,9 @@ function calc(){
  document.getElementById('actLbl').textContent=act+'%';
  document.getElementById('topsLbl').textContent=tops+' TOPS';
 
- const [bpwStr,cellName]=document.getElementById('cell').value.split('|');
+ const [bpwStr,cellNamePair]=document.getElementById('cell').value.split('|');
+ const cnParts=(cellNamePair||'').split('‖');
+ const cellName=L(cnParts[0],cnParts[1]||cnParts[0]);
  const bpw=parseFloat(bpwStr);
  const capKind=document.getElementById('capKind').value;
  const actFrac=(capKind==='total')?act/100:0;
@@ -206,17 +234,20 @@ function calc(){
 
  // tier label
  let tier,desc;
- if(toks>=50000){tier='Tier 8';desc='社会级实时演化';}
- else if(toks>=10000){tier='Tier 6–7';desc='千未来 / 反射';}
- else if(toks>=1000){tier='Tier 4–5';desc='超人速思考';}
- else if(toks>=100){tier='Tier 2–3';desc='比人快';}
- else {tier='Tier 1';desc='约人类阅读速';}
- document.getElementById('tierLine').innerHTML='<span class="tier">'+tier+'</span> &nbsp;<span style="color:var(--dim);font-size:13px">'+desc+' · cell:'+cellName+'</span>';
+ if(toks>=50000){tier='Tier 8';desc=L('society-scale real-time evolution','社会级实时演化');}
+ else if(toks>=10000){tier='Tier 6–7';desc=L('thousand futures / reflexive','千未来 / 反射');}
+ else if(toks>=1000){tier='Tier 4–5';desc=L('superhuman-speed thinking','超人速思考');}
+ else if(toks>=100){tier='Tier 2–3';desc=L('faster than human','比人快');}
+ else {tier='Tier 1';desc=L('about human reading speed','约人类阅读速');}
+ document.getElementById('tierLine').innerHTML='<span class="tier">'+tier+'</span> &nbsp;<span style="color:var(--dim);font-size:13px">'+desc+' · '+L('cell','cell')+':'+cellName+'</span>';
 
  document.getElementById('formula').textContent=
-   '参数 = 容量×8 ×(1−开销'+ov+'%)'+(actFrac?' ×(1−激活'+act+'%)':'')+' ÷ '+bpw.toFixed(2)+'bit/权重\n'+
-   '     = '+(curBytes*8).toExponential(2)+' bit × '+((1-ov/100)*(1-actFrac)).toFixed(2)+' ÷ '+bpw.toFixed(2)+' = '+fmtParams(params)+' 参数\n'+
-   'tok/s ≈ '+tops+' TOPS ÷ (2 × '+fmtParams(params)+') = '+(toks>=1000?Math.round(toks).toLocaleString():toks.toFixed(0))+' tok/s';
+   L('params = capacity×8 ×(1−overhead'+ov+'%)'+(actFrac?' ×(1−activation'+act+'%)':'')+' ÷ '+bpw.toFixed(2)+'bit/weight\n'+
+     '       = '+(curBytes*8).toExponential(2)+' bit × '+((1-ov/100)*(1-actFrac)).toFixed(2)+' ÷ '+bpw.toFixed(2)+' = '+fmtParams(params)+' params\n'+
+     'tok/s ≈ '+tops+' TOPS ÷ (2 × '+fmtParams(params)+') = '+(toks>=1000?Math.round(toks).toLocaleString():toks.toFixed(0))+' tok/s',
+     '参数 = 容量×8 ×(1−开销'+ov+'%)'+(actFrac?' ×(1−激活'+act+'%)':'')+' ÷ '+bpw.toFixed(2)+'bit/权重\n'+
+     '     = '+(curBytes*8).toExponential(2)+' bit × '+((1-ov/100)*(1-actFrac)).toFixed(2)+' ÷ '+bpw.toFixed(2)+' = '+fmtParams(params)+' 参数\n'+
+     'tok/s ≈ '+tops+' TOPS ÷ (2 × '+fmtParams(params)+') = '+(toks>=1000?Math.round(toks).toLocaleString():toks.toFixed(0))+' tok/s');
 
  // model table
  const tb=document.querySelector('#modeltbl tbody');tb.innerHTML='';
@@ -228,12 +259,26 @@ function calc(){
    const tr=document.createElement('tr');
    if(fits&&(!bestRow||mp>bestRow._mp))bestRow=tr,tr._mp=mp;
    tr.innerHTML='<td>'+nm+'</td><td>'+(mp>=1000?(mp/1000)+' B':mp+' M')+'</td><td>'+fmtBytes(need)+'</td>'+
-     '<td class="'+(fits?'fit':'nofit')+'">'+(fits?'✓ 装得下':'✗ 超容量')+'</td>'+
-     '<td>'+(fits?fmtBytes(rem):'缺 '+fmtBytes(-rem))+'</td>';
+     '<td class="'+(fits?'fit':'nofit')+'">'+(fits?L('✓ fits','✓ 装得下'):L('✗ over capacity','✗ 超容量'))+'</td>'+
+     '<td>'+(fits?fmtBytes(rem):L('short ','缺 ')+fmtBytes(-rem))+'</td>';
    tr._mp=mp;tb.appendChild(tr);
  });
  if(bestRow)bestRow.classList.add('hl');
 }
+// localize <option> text (lang-en/lang-zh CSS can't toggle inside <option>; do it in JS)
+function localizeOptions(){
+  document.querySelectorAll('#capKind option, #cell option').forEach(function(o){
+    var t=isZH()?o.getAttribute('data-zh'):o.getAttribute('data-en');
+    if(t)o.textContent=t;
+  });
+}
+// Re-render everything that holds dynamic / JS-generated text when the global EN/中 toggle fires.
+window.addEventListener('mse:lang',function(){
+  localizeOptions();
+  renderExplain();   // refresh the explainer drawer if open
+  calc();            // re-render all outputs (tier/desc, formula, model table)
+});
+localizeOptions();
 document.getElementById('cap').value=0;preset(32,'1048576');
 </script>  <script src="../site-nav.js"></script>
 </body></html>

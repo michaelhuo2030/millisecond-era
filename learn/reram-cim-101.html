@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ReRAM-CIM 从底层说起 · 超级科普 (for dummies)</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReRAM-CIM From the Ground Up · A Super-Simple Explainer (for dummies) | ReRAM-CIM 从底层说起 · 超级科普</title>
 <style>
 :root{--bg:#06070d;--panel:#13141f;--panel2:#1a1c2b;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b;--ok:#8ee59a;--bad:#ff8aa0;--blue:#7aa9ff;--vio:#caa9ff}
 *{box-sizing:border-box}
@@ -52,193 +52,200 @@ input[type=number]{background:#1c1d2a;color:var(--ink);border:1px solid #33354a;
 .foot{color:var(--dim);font-size:13px;margin-top:50px;border-top:1px solid #20212c;padding-top:18px}
 </style></head><body>
 <div class="nav"><div class="inner">
-<a href="#count">①数数(bit/Mb)</a><a href="#cell">②一个cell</a><a href="#reram">③ReRAM物理</a><a href="#mat">④材料+论文</a><a href="#mlc">⑤多电平</a><a href="#cim">⑥存算一体</a><a href="#vs">⑦SRAM vs ReRAM</a><a href="#density">⑧能放多少</a><a href="#next">⑨接下来</a>
+<a href="#count"><span class="lang-en">①Counting (bit/Mb)</span><span class="lang-zh">①数数(bit/Mb)</span></a><a href="#cell"><span class="lang-en">②One cell</span><span class="lang-zh">②一个cell</span></a><a href="#reram"><span class="lang-en">③ReRAM physics</span><span class="lang-zh">③ReRAM物理</span></a><a href="#mat"><span class="lang-en">④Materials + papers</span><span class="lang-zh">④材料+论文</span></a><a href="#mlc"><span class="lang-en">⑤Multi-level</span><span class="lang-zh">⑤多电平</span></a><a href="#cim"><span class="lang-en">⑥Compute-in-memory</span><span class="lang-zh">⑥存算一体</span></a><a href="#vs"><span class="lang-en">⑦SRAM vs ReRAM</span><span class="lang-zh">⑦SRAM vs ReRAM</span></a><a href="#density"><span class="lang-en">⑧How much fits</span><span class="lang-zh">⑧能放多少</span></a><a href="#next"><span class="lang-en">⑨What's next</span><span class="lang-zh">⑨接下来</span></a>
 </div></div>
 <div class="wrap">
-<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="reram-architecture.html">🔬 架构探索</a><a href="hdc-101.html">🧠 HDC 科普</a><a href="demos/index.html">⚡ 速度↔文明 demos</a><a href="real-world-speed-proof.html">🌍 真实世界证据</a><a href="reram-cim-calculator.html">⚙️ 容量计算器</a></div>
-<h1>ReRAM-CIM,从最底层说起 🧱</h1>
-<div class="tagline">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</div>
-<p class="lead">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、最想弄清的那个问题。</p>
-<div class="callout"><b>📌 先记一条,免得绊倒:RRAM = ReRAM = 阻变存储器,是同一个东西。</b> 英文全称都是 <b>Re</b>sistive <b>RAM</b>,有人写 RRAM、有人写 ReRAM、有人叫 memristor(忆阻器)——指同一个物理器件(金属–氧化物–金属,靠电阻高低存数据)。就像 US 和 USA 是同一个国家。看到论文写 RRAM,直接当 ReRAM 读。</div>
+<div class="topnav"><a href="../README.md">← millisecond-era</a><a href="reram-cim-visual.html"><span class="lang-en">👀 The Chip You Can See</span><span class="lang-zh">👀 看得见的芯片</span></a><a href="reram-architecture.html"><span class="lang-en">🔬 Architecture Tour</span><span class="lang-zh">🔬 架构探索</span></a><a href="hdc-101.html"><span class="lang-en">🧠 HDC Explainer</span><span class="lang-zh">🧠 HDC 科普</span></a><a href="demos/index.html"><span class="lang-en">⚡ Speed↔Civilization demos</span><span class="lang-zh">⚡ 速度↔文明 demos</span></a><a href="real-world-speed-proof.html"><span class="lang-en">🌍 Real-World Evidence</span><span class="lang-zh">🌍 真实世界证据</span></a><a href="reram-cim-calculator.html"><span class="lang-en">⚙️ Capacity Calculator</span><span class="lang-zh">⚙️ 容量计算器</span></a></div>
+<h1><span class="lang-en">ReRAM-CIM, From the Very Bottom Up 🧱</span><span class="lang-zh">ReRAM-CIM,从最底层说起 🧱</span></h1>
+<div class="tagline"><span class="lang-en">For the complete non-expert (including someone who couldn't write code half a year ago). Click any <span class="g">blue dashed word</span> and a plain-language explanation pops up at the bottom.</span><span class="lang-zh">给完全的外行(包括一个半年前还不写代码的人)。每个 <span class="g">蓝色虚线词</span> 点一下,底部弹出大白话解释。</span></div>
+<p class="lead"><span class="lang-en">We want to build a chip that engraves an AI model's "brain" directly into the memory cells, so it runs blazingly fast (thousands to tens of thousands of words per second) and sips power. This chip is called <b>ReRAM-CIM</b>. This page starts from "what is a bit" and goes all the way to "exactly how big a model can it hold" — the question I'm most unsure about and most want to nail down.</span><span class="lang-zh">我们想做一块芯片,把一个 AI 模型的"脑子"直接刻进存储单元里,让它跑得飞快(每秒几千到几万个字)还省电。这块芯片叫 <b>ReRAM-CIM</b>。这页从"什么是一个 bit"开始,一路讲到"它到底能装下多大的模型"——也就是我心里最没底、最想弄清的那个问题。</span></p>
+<div class="callout"><span class="lang-en"><b>📌 Note one thing first, so you don't trip up: RRAM = ReRAM = resistive memory, they're the same thing.</b> The full English name is <b>Re</b>sistive <b>RAM</b>; some write RRAM, some write ReRAM, some call it a memristor — all referring to the same physical device (metal–oxide–metal, storing data via high vs. low resistance). Just like US and USA are the same country. When a paper writes RRAM, just read it as ReRAM.</span><span class="lang-zh"><b>📌 先记一条,免得绊倒:RRAM = ReRAM = 阻变存储器,是同一个东西。</b> 英文全称都是 <b>Re</b>sistive <b>RAM</b>,有人写 RRAM、有人写 ReRAM、有人叫 memristor(忆阻器)——指同一个物理器件(金属–氧化物–金属,靠电阻高低存数据)。就像 US 和 USA 是同一个国家。看到论文写 RRAM,直接当 ReRAM 读。</span></div>
 
-<h2 id="count">① 先学会数数:bit、byte、Mb、MB</h2>
-<p>所有"容量"都是在数同一个东西:能存多少个 <span class="g" data-k="bit">bit</span>。</p>
+<h2 id="count"><span class="lang-en">① First, learn to count: bit, byte, Mb, MB</span><span class="lang-zh">① 先学会数数:bit、byte、Mb、MB</span></h2>
+<p><span class="lang-en">Every "capacity" is just counting the same thing: how many <span class="g" data-k="bit">bit</span>s can it store.</span><span class="lang-zh">所有"容量"都是在数同一个东西:能存多少个 <span class="g" data-k="bit">bit</span>。</span></p>
 <table>
-<tr><th>单位</th><th>等于</th><th>大白话</th></tr>
-<tr><td><b>bit(比特)</b></td><td>1 个 0 或 1</td><td>最小的信息,一个开关</td></tr>
-<tr><td><b>byte(字节)</b></td><td>8 bit</td><td>1 个英文字母</td></tr>
-<tr><td><b>Kb / KB</b></td><td>1024 bit / 1024 byte</td><td>一句话</td></tr>
-<tr><td><b>Mb / MB</b></td><td>100万 bit / 100万 byte</td><td>一张图 / 一本书</td></tr>
-<tr><td><b>Gb / GB</b></td><td>10亿 bit / 10亿 byte</td><td>一部电影</td></tr>
+<tr><th><span class="lang-en">Unit</span><span class="lang-zh">单位</span></th><th><span class="lang-en">Equals</span><span class="lang-zh">等于</span></th><th><span class="lang-en">In plain words</span><span class="lang-zh">大白话</span></th></tr>
+<tr><td><b><span class="lang-en">bit</span><span class="lang-zh">bit(比特)</span></b></td><td><span class="lang-en">one 0 or 1</span><span class="lang-zh">1 个 0 或 1</span></td><td><span class="lang-en">the smallest unit of information, a single switch</span><span class="lang-zh">最小的信息,一个开关</span></td></tr>
+<tr><td><b><span class="lang-en">byte</span><span class="lang-zh">byte(字节)</span></b></td><td>8 bit</td><td><span class="lang-en">one English letter</span><span class="lang-zh">1 个英文字母</span></td></tr>
+<tr><td><b>Kb / KB</b></td><td>1024 bit / 1024 byte</td><td><span class="lang-en">one sentence</span><span class="lang-zh">一句话</span></td></tr>
+<tr><td><b>Mb / MB</b></td><td><span class="lang-en">1 million bit / 1 million byte</span><span class="lang-zh">100万 bit / 100万 byte</span></td><td><span class="lang-en">one image / one book</span><span class="lang-zh">一张图 / 一本书</span></td></tr>
+<tr><td><b>Gb / GB</b></td><td><span class="lang-en">1 billion bit / 1 billion byte</span><span class="lang-zh">10亿 bit / 10亿 byte</span></td><td><span class="lang-en">one movie</span><span class="lang-zh">一部电影</span></td></tr>
 </table>
 <div class="card" style="border:1px solid #2a3550">
-<h3>🤔 "我们不是用三元组吗,为什么 byte 还是 8 bit?"</h3>
-<p class="note">好问题,这是两层不同的事——<b>byte=8bit 只是"数容量的尺子",和数据是二元还是三元无关</b>。就像"一打=12 个",不管你数鸡蛋还是苹果都是 12。</p>
+<h3><span class="lang-en">🤔 "Aren't we using ternary? Then why is a byte still 8 bit?"</span><span class="lang-zh">🤔 "我们不是用三元组吗,为什么 byte 还是 8 bit?"</span></h3>
+<p class="note"><span class="lang-en">Good question — these are two different layers. <b>byte=8bit is just the "ruler for measuring capacity," and has nothing to do with whether the data is binary or ternary.</b> Just like "a dozen = 12," whether you count eggs or apples it's always 12.</span><span class="lang-zh">好问题,这是两层不同的事——<b>byte=8bit 只是"数容量的尺子",和数据是二元还是三元无关</b>。就像"一打=12 个",不管你数鸡蛋还是苹果都是 12。</span></p>
 <table>
-<tr><th>层</th><th>在说什么</th><th>数值</th></tr>
-<tr><td><b>容量(尺子)</b></td><td>芯片能存多少 bit/byte</td><td>16.32 Mb(固定,byte=8bit)</td></tr>
-<tr><td><b>三元编码</b></td><td>我们模型<b>每个权重</b>占几 bit</td><td>~1.58–2 bit/权重</td></tr>
-<tr><td><b>能装多少权重</b></td><td>容量 ÷ 每权重 bit</td><td>总 bit ÷ 2</td></tr>
+<tr><th><span class="lang-en">Layer</span><span class="lang-zh">层</span></th><th><span class="lang-en">What it describes</span><span class="lang-zh">在说什么</span></th><th><span class="lang-en">Value</span><span class="lang-zh">数值</span></th></tr>
+<tr><td><b><span class="lang-en">Capacity (the ruler)</span><span class="lang-zh">容量(尺子)</span></b></td><td><span class="lang-en">how many bit/byte the chip can store</span><span class="lang-zh">芯片能存多少 bit/byte</span></td><td><span class="lang-en">16.32 Mb (fixed, byte=8bit)</span><span class="lang-zh">16.32 Mb(固定,byte=8bit)</span></td></tr>
+<tr><td><b><span class="lang-en">Ternary encoding</span><span class="lang-zh">三元编码</span></b></td><td><span class="lang-en">how many bit <b>each weight</b> of our model takes</span><span class="lang-zh">我们模型<b>每个权重</b>占几 bit</span></td><td><span class="lang-en">~1.58–2 bit/weight</span><span class="lang-zh">~1.58–2 bit/权重</span></td></tr>
+<tr><td><b><span class="lang-en">How many weights fit</span><span class="lang-zh">能装多少权重</span></b></td><td><span class="lang-en">capacity ÷ bit per weight</span><span class="lang-zh">容量 ÷ 每权重 bit</span></td><td><span class="lang-en">total bit ÷ 2</span><span class="lang-zh">总 bit ÷ 2</span></td></tr>
 </table>
-<p class="note">三元的好处在<b>第二层</b>:普通权重要 16 bit(fp16),三元只要 ~2 bit → 同容量多塞 <b>8 倍</b>权重。但第一层那把尺子(byte=8bit)<b>本身没变</b>。<br>为什么 byte 恰好 8 bit?纯历史约定:8 bit=2⁸=256 种,刚好够编一个字符,就定成标准单位了。Mb 和 MB 差 8 倍,根子就在 1 byte=8 bit。</p>
+<p class="note"><span class="lang-en">The benefit of ternary is in the <b>second layer</b>: an ordinary weight needs 16 bit (fp16), but ternary needs only ~2 bit → you can cram in <b>8×</b> more weights at the same capacity. But the ruler in the first layer (byte=8bit) <b>itself doesn't change</b>.<br>Why is a byte exactly 8 bit? Pure historical convention: 8 bit = 2⁸ = 256 possibilities, just enough to encode one character, so it became the standard unit. Mb and MB differ by 8×, and the root of that is 1 byte = 8 bit.</span><span class="lang-zh">三元的好处在<b>第二层</b>:普通权重要 16 bit(fp16),三元只要 ~2 bit → 同容量多塞 <b>8 倍</b>权重。但第一层那把尺子(byte=8bit)<b>本身没变</b>。<br>为什么 byte 恰好 8 bit?纯历史约定:8 bit=2⁸=256 种,刚好够编一个字符,就定成标准单位了。Mb 和 MB 差 8 倍,根子就在 1 byte=8 bit。</span></p>
 </div>
 <div class="callout">
-<b>⚠️ 全场最大的坑:小写 b = bit,大写 B = byte,差 8 倍。</b><br>
-举个工程量级:28nm 上<b>单个 ReRAM-CIM macro</b> 大约 <b>16 Mb</b>(megabit)= 只有 <b>2 MB</b>(megabyte)。如果误当成 32 MB,就高估了 16 倍。<span class="g" data-k="trap">为什么这要命?</span>
+<span class="lang-en"><b>⚠️ The biggest trap of all: lowercase b = bit, uppercase B = byte, they differ by 8×.</b><br>
+An engineering scale to illustrate: at 28nm, <b>a single ReRAM-CIM macro</b> is about <b>16 Mb</b> (megabit) = only <b>2 MB</b> (megabyte). If you mistake it for 32 MB, you've overestimated by 16×. <span class="g" data-k="trap">Why is this fatal?</span></span><span class="lang-zh"><b>⚠️ 全场最大的坑:小写 b = bit,大写 B = byte,差 8 倍。</b><br>
+举个工程量级:28nm 上<b>单个 ReRAM-CIM macro</b> 大约 <b>16 Mb</b>(megabit)= 只有 <b>2 MB</b>(megabyte)。如果误当成 32 MB,就高估了 16 倍。<span class="g" data-k="trap">为什么这要命?</span></span>
 </div>
 <div class="card">
-<h3>🔢 自己换算一下</h3>
+<h3><span class="lang-en">🔢 Convert it yourself</span><span class="lang-zh">🔢 自己换算一下</span></h3>
 <div class="conv">
 <input type="number" id="cv" value="16.32" step="0.01" oninput="conv()">
 <select id="cu" onchange="conv()" style="background:#1c1d2a;color:#eef;border:1px solid #33354a;border-radius:8px;padding:8px"><option value="mb">Mb (megabit)</option><option value="MB">MB (megabyte)</option><option value="gb">Gb</option><option value="GB">GB</option></select>
-<button class="btn" onclick="conv()">换算</button>
+<button class="btn" onclick="conv()"><span class="lang-en">Convert</span><span class="lang-zh">换算</span></button>
 </div>
 <div id="cvout" style="margin-top:12px"></div>
-<div class="note">三元模型每个权重约占 <span class="g" data-k="bpw">2 bit</span>(实做),理论极限 1.58 bit。这里按 2 bit 估能装多少参数。</div>
+<div class="note"><span class="lang-en">A ternary model takes about <span class="g" data-k="bpw">2 bit</span> per weight (in practice), with a theoretical limit of 1.58 bit. Here we estimate how many parameters fit using 2 bit.</span><span class="lang-zh">三元模型每个权重约占 <span class="g" data-k="bpw">2 bit</span>(实做),理论极限 1.58 bit。这里按 2 bit 估能装多少参数。</span></div>
 </div>
 
-<h2 id="cell">② 什么是一个"存储单元"(cell)?</h2>
-<p>芯片里存 1 个 bit 的最小零件叫 <span class="g" data-k="cell">cell</span>。怎么造它,是 SRAM 和 ReRAM 最根本的区别:</p>
+<h2 id="cell"><span class="lang-en">② What is a "memory cell"?</span><span class="lang-zh">② 什么是一个"存储单元"(cell)?</span></h2>
+<p><span class="lang-en">The smallest part in a chip that stores 1 bit is called a <span class="g" data-k="cell">cell</span>. How you build it is the most fundamental difference between SRAM and ReRAM:</span><span class="lang-zh">芯片里存 1 个 bit 的最小零件叫 <span class="g" data-k="cell">cell</span>。怎么造它,是 SRAM 和 ReRAM 最根本的区别:</span></p>
 <div class="flip">
-<div><h4 class="blue" style="color:var(--blue)">SRAM cell</h4><p class="note">用 <b>6 个晶体管</b>搭一个"跷跷板",靠通电保持 0/1。<br>• 快、成熟<br>• 但占地大(6 个管子存 1 bit)<br>• <b>断电就忘</b>(易失)<br>• 权重每次要重新搬进来</p></div>
-<div><h4 style="color:var(--hot)">ReRAM cell</h4><p class="note">用 <b>1 个晶体管 + 1 个电阻开关</b>(叫 <span class="g" data-k="1t1r">1T1R</span>)。<br>• 小得多(密度高)<br>• <b>断电不忘</b>(非易失)<br>• 权重刻进去就一直在<br>• 但写得慢、会"老化"、多电平不稳</p></div>
+<div><h4 class="blue" style="color:var(--blue)">SRAM cell</h4><p class="note"><span class="lang-en">Uses <b>6 transistors</b> to build a "seesaw," holding 0/1 as long as it's powered.<br>• fast, mature<br>• but takes up a lot of space (6 transistors to store 1 bit)<br>• <b>forgets when power is off</b> (volatile)<br>• weights must be reloaded every time</span><span class="lang-zh">用 <b>6 个晶体管</b>搭一个"跷跷板",靠通电保持 0/1。<br>• 快、成熟<br>• 但占地大(6 个管子存 1 bit)<br>• <b>断电就忘</b>(易失)<br>• 权重每次要重新搬进来</span></p></div>
+<div><h4 style="color:var(--hot)">ReRAM cell</h4><p class="note"><span class="lang-en">Uses <b>1 transistor + 1 resistive switch</b> (called <span class="g" data-k="1t1r">1T1R</span>).<br>• much smaller (high density)<br>• <b>remembers when power is off</b> (non-volatile)<br>• once weights are engraved, they stay<br>• but slow to write, "ages," and multi-level is unstable</span><span class="lang-zh">用 <b>1 个晶体管 + 1 个电阻开关</b>(叫 <span class="g" data-k="1t1r">1T1R</span>)。<br>• 小得多(密度高)<br>• <b>断电不忘</b>(非易失)<br>• 权重刻进去就一直在<br>• 但写得慢、会"老化"、多电平不稳</span></p></div>
 </div>
-<p class="dim">关键一点:ReRAM 相对 SRAM 只是换了工艺和存储单元,<b>整体架构(尤其外围电路)高度相通</b>——所以做 SRAM-CIM 的经验能很快迁移到 ReRAM-CIM。</p>
+<p class="dim"><span class="lang-en">Key point: relative to SRAM, ReRAM only swaps out the process and the memory cell — <b>the overall architecture (especially the peripheral circuits) is highly shared</b>. So experience building SRAM-CIM transfers quickly to ReRAM-CIM.</span><span class="lang-zh">关键一点:ReRAM 相对 SRAM 只是换了工艺和存储单元,<b>整体架构(尤其外围电路)高度相通</b>——所以做 SRAM-CIM 的经验能很快迁移到 ReRAM-CIM。</span></p>
 
-<h2 id="reram">③ ReRAM 到底是什么物理?(点一下亲手"造"一个)</h2>
-<p>ReRAM = <b>Re</b>sistive <b>RAM</b>,电阻式存储器。结构简单到不可思议:<b>金属 — 氧化物 — 金属</b>,像个三明治。给它加电压,中间的氧化物里会<span class="g" data-k="filament">长出或断开一根导电细丝</span>:</p>
+<h2 id="reram"><span class="lang-en">③ What physics is ReRAM, exactly? (click to "build" one yourself)</span><span class="lang-zh">③ ReRAM 到底是什么物理?(点一下亲手"造"一个)</span></h2>
+<p><span class="lang-en">ReRAM = <b>Re</b>sistive <b>RAM</b>, a resistance-based memory. Its structure is unbelievably simple: <b>metal — oxide — metal</b>, like a sandwich. Apply a voltage, and inside the middle oxide a <span class="g" data-k="filament">conductive filament grows or breaks</span>:</span><span class="lang-zh">ReRAM = <b>Re</b>sistive <b>RAM</b>,电阻式存储器。结构简单到不可思议:<b>金属 — 氧化物 — 金属</b>,像个三明治。给它加电压,中间的氧化物里会<span class="g" data-k="filament">长出或断开一根导电细丝</span>:</span></p>
 <div class="cell-demo">
 <div class="atom" id="atom" onclick="toggleAtom()">
-<div class="electrode">上电极</div>
+<div class="electrode"><span class="lang-en">Top electrode</span><span class="lang-zh">上电极</span></div>
 <div class="oxide"><div class="filament"></div></div>
-<div class="electrode bot">下电极</div>
-<div class="state" id="atomState">高阻 (HRS) = 0</div>
+<div class="electrode bot"><span class="lang-en">Bottom electrode</span><span class="lang-zh">下电极</span></div>
+<div class="state" id="atomState"><span class="lang-en">High resistance (HRS) = 0</span><span class="lang-zh">高阻 (HRS) = 0</span></div>
 </div>
 <div style="max-width:330px">
-<p class="note">👆 点这个 cell:</p>
-<p class="note"><b class="ok">长出细丝</b> → 电阻变低(<span class="g" data-k="lrs">LRS</span>)→ 电流好通过 → 记作 <b>1</b>(SET)<br><b class="bad">断开细丝</b> → 电阻变高(HRS)→ 电流难通过 → 记作 <b>0</b>(RESET)</p>
-<p class="note">就这么个开关,反复刻录就能存模型权重。整块芯片是几百万个这样的 cell 排成网格(<span class="g" data-k="crossbar">crossbar 阵列</span>)。</p>
+<p class="note"><span class="lang-en">👆 Click this cell:</span><span class="lang-zh">👆 点这个 cell:</span></p>
+<p class="note"><span class="lang-en"><b class="ok">Grow a filament</b> → resistance drops (<span class="g" data-k="lrs">LRS</span>) → current flows easily → recorded as <b>1</b> (SET)<br><b class="bad">Break the filament</b> → resistance rises (HRS) → current flows poorly → recorded as <b>0</b> (RESET)</span><span class="lang-zh"><b class="ok">长出细丝</b> → 电阻变低(<span class="g" data-k="lrs">LRS</span>)→ 电流好通过 → 记作 <b>1</b>(SET)<br><b class="bad">断开细丝</b> → 电阻变高(HRS)→ 电流难通过 → 记作 <b>0</b>(RESET)</span></p>
+<p class="note"><span class="lang-en">That's the whole switch — engrave it over and over and you can store model weights. The whole chip is millions of such cells arranged in a grid (a <span class="g" data-k="crossbar">crossbar array</span>).</span><span class="lang-zh">就这么个开关,反复刻录就能存模型权重。整块芯片是几百万个这样的 cell 排成网格(<span class="g" data-k="crossbar">crossbar 阵列</span>)。</span></p>
 </div>
 </div>
 
-<h2 id="mat">④ 用什么材料?(选型 + 对应论文)</h2>
-<p>"中间那层氧化物"用什么,决定了它好不好用。主流几条路线:</p>
+<h2 id="mat"><span class="lang-en">④ What materials? (choices + corresponding papers)</span><span class="lang-zh">④ 用什么材料?(选型 + 对应论文)</span></h2>
+<p><span class="lang-en">What you use for "that middle oxide layer" decides how usable it is. The mainstream routes:</span><span class="lang-zh">"中间那层氧化物"用什么,决定了它好不好用。主流几条路线:</span></p>
 <table>
-<tr><th>材料路线</th><th>代表</th><th>特点</th><th>谁在用</th></tr>
-<tr><td><b>HfO₂ 氧化铪</b><br><span class="note">OxRAM 主流</span></td><td>HfOₓ</td><td>和 CMOS 工艺最兼容、最容易量产 ✅</td><td>TSMC 22/28nm 嵌入式、清华 CIM 芯片</td></tr>
-<tr><td><b>TaOₓ 氧化钽</b></td><td>Ta₂O₅</td><td>耐久最好(能反复刻很多次)</td><td>Panasonic 已商用</td></tr>
-<tr><td><b>TiO₂ 氧化钛</b></td><td>—</td><td>最早的"忆阻器",历史意义大</td><td>HP 实验室(2008)</td></tr>
-<tr><td><b>CBRAM 导电桥</b></td><td>Ag/Cu 离子</td><td>另一种机理(金属离子搭桥),更省电但更飘</td><td>Weebit Nano (SiOₓ) 等</td></tr>
+<tr><th><span class="lang-en">Material route</span><span class="lang-zh">材料路线</span></th><th><span class="lang-en">Example</span><span class="lang-zh">代表</span></th><th><span class="lang-en">Traits</span><span class="lang-zh">特点</span></th><th><span class="lang-en">Who uses it</span><span class="lang-zh">谁在用</span></th></tr>
+<tr><td><b><span class="lang-en">HfO₂ hafnium oxide</span><span class="lang-zh">HfO₂ 氧化铪</span></b><br><span class="note"><span class="lang-en">mainstream OxRAM</span><span class="lang-zh">OxRAM 主流</span></span></td><td>HfOₓ</td><td><span class="lang-en">most compatible with CMOS processes, easiest to mass-produce ✅</span><span class="lang-zh">和 CMOS 工艺最兼容、最容易量产 ✅</span></td><td><span class="lang-en">TSMC 22/28nm embedded, Tsinghua CIM chips</span><span class="lang-zh">TSMC 22/28nm 嵌入式、清华 CIM 芯片</span></td></tr>
+<tr><td><b><span class="lang-en">TaOₓ tantalum oxide</span><span class="lang-zh">TaOₓ 氧化钽</span></b></td><td>Ta₂O₅</td><td><span class="lang-en">best endurance (can be re-engraved many times)</span><span class="lang-zh">耐久最好(能反复刻很多次)</span></td><td><span class="lang-en">Panasonic, already commercial</span><span class="lang-zh">Panasonic 已商用</span></td></tr>
+<tr><td><b><span class="lang-en">TiO₂ titanium oxide</span><span class="lang-zh">TiO₂ 氧化钛</span></b></td><td>—</td><td><span class="lang-en">the earliest "memristor," great historical significance</span><span class="lang-zh">最早的"忆阻器",历史意义大</span></td><td><span class="lang-en">HP Labs (2008)</span><span class="lang-zh">HP 实验室(2008)</span></td></tr>
+<tr><td><b><span class="lang-en">CBRAM conductive bridge</span><span class="lang-zh">CBRAM 导电桥</span></b></td><td><span class="lang-en">Ag/Cu ions</span><span class="lang-zh">Ag/Cu 离子</span></td><td><span class="lang-en">a different mechanism (metal ions bridging), more power-efficient but more drifty</span><span class="lang-zh">另一种机理(金属离子搭桥),更省电但更飘</span></td><td><span class="lang-en">Weebit Nano (SiOₓ), etc.</span><span class="lang-zh">Weebit Nano (SiOₓ) 等</span></td></tr>
 </table>
-<h3>👉 想读原始论文(从入门到 CIM 整机)</h3>
-<div class="paper"><b>Strukov 等,"The missing memristor found"</b> <span class="y">Nature 2008</span> — HP 用 TiO₂ 第一次坐实"忆阻器",ReRAM 的起点。</div>
-<div class="paper"><b>Wong 等,"Metal–Oxide RRAM"</b> <span class="y">Proc. IEEE 2012</span> — RRAM 的经典综述,想搞懂器件就读它。</div>
-<div class="paper"><b>Ielmini & Wong,"In-memory computing with resistive switching devices"</b> <span class="y">Nature Electronics 2018</span> — 存内计算(CIM)的奠基综述。</div>
-<div class="paper"><b>Yao 等,"Fully hardware-implemented memristor CNN"</b> <span class="y">Nature 2020</span> — 清华(吴华强/钱鹤组)做出<b>完整的 RRAM CIM 芯片</b>跑 CNN,里程碑。</div>
-<div class="paper"><b>Wan 等,"A compute-in-memory chip based on RRAM (NeuRRAM)"</b> <span class="y">Nature 2022</span> — Stanford/UCSD,48 核 RRAM-CIM,能效与精度兼顾的标杆。</div>
-<p class="note">这几篇是这个领域的共同语言。ReRAM-CIM 除论文外少有公开资料——上面就是那些奠基论文。</p>
+<h3><span class="lang-en">👉 Want to read the original papers (from intro to full CIM systems)</span><span class="lang-zh">👉 想读原始论文(从入门到 CIM 整机)</span></h3>
+<div class="paper"><b>Strukov et al., "The missing memristor found"</b> <span class="y">Nature 2008</span> — <span class="lang-en">HP used TiO₂ to confirm the "memristor" for the first time, the starting point of ReRAM.</span><span class="lang-zh">HP 用 TiO₂ 第一次坐实"忆阻器",ReRAM 的起点。</span></div>
+<div class="paper"><b>Wong et al., "Metal–Oxide RRAM"</b> <span class="y">Proc. IEEE 2012</span> — <span class="lang-en">the classic RRAM review; read it to understand the device.</span><span class="lang-zh">RRAM 的经典综述,想搞懂器件就读它。</span></div>
+<div class="paper"><b>Ielmini & Wong, "In-memory computing with resistive switching devices"</b> <span class="y">Nature Electronics 2018</span> — <span class="lang-en">the foundational review of compute-in-memory (CIM).</span><span class="lang-zh">存内计算(CIM)的奠基综述。</span></div>
+<div class="paper"><b>Yao et al., "Fully hardware-implemented memristor CNN"</b> <span class="y">Nature 2020</span> — <span class="lang-en">Tsinghua (Wu Huaqiang / Qian He group) built a <b>complete RRAM CIM chip</b> running a CNN, a milestone.</span><span class="lang-zh">清华(吴华强/钱鹤组)做出<b>完整的 RRAM CIM 芯片</b>跑 CNN,里程碑。</span></div>
+<div class="paper"><b>Wan et al., "A compute-in-memory chip based on RRAM (NeuRRAM)"</b> <span class="y">Nature 2022</span> — <span class="lang-en">Stanford/UCSD, a 48-core RRAM-CIM, the benchmark for balancing energy efficiency and accuracy.</span><span class="lang-zh">Stanford/UCSD,48 核 RRAM-CIM,能效与精度兼顾的标杆。</span></div>
+<p class="note"><span class="lang-en">These few papers are the shared language of this field. Beyond papers, there's little public material on ReRAM-CIM — the above are the foundational ones.</span><span class="lang-zh">这几篇是这个领域的共同语言。ReRAM-CIM 除论文外少有公开资料——上面就是那些奠基论文。</span></p>
 
-<h2 id="mlc">⑤ 多电平(MLC):一个 cell 能不能存更多?</h2>
-<p>如果导电细丝能调出<b>好几种粗细</b>(几档电阻),一个 cell 就能存不止 1 bit。这叫 <span class="g" data-k="mlc">MLC</span>。听起来很美——但这正是我最担心、也是 ReRAM 最大的软肋:</p>
+<h2 id="mlc"><span class="lang-en">⑤ Multi-level (MLC): can one cell store more?</span><span class="lang-zh">⑤ 多电平(MLC):一个 cell 能不能存更多?</span></h2>
+<p><span class="lang-en">If the conductive filament can be tuned to <b>several different thicknesses</b> (several resistance levels), one cell can store more than 1 bit. This is called <span class="g" data-k="mlc">MLC</span>. It sounds great — but this is exactly what I worry about most, and ReRAM's biggest weakness:</span><span class="lang-zh">如果导电细丝能调出<b>好几种粗细</b>(几档电阻),一个 cell 就能存不止 1 bit。这叫 <span class="g" data-k="mlc">MLC</span>。听起来很美——但这正是我最担心、也是 ReRAM 最大的软肋:</span></p>
 <div class="card">
-<h3>🎚 拖一下:一个 cell 想存几档?</h3>
+<h3><span class="lang-en">🎚 Drag it: how many levels should one cell store?</span><span class="lang-zh">🎚 拖一下:一个 cell 想存几档?</span></h3>
 <input type="range" id="lvl" min="2" max="16" value="2" oninput="lvlCalc()">
 <div style="display:flex;justify-content:space-between;margin-top:8px">
-<span>能存 <b id="lvlN" class="kpi" style="font-size:20px">2</b> 档 = <b id="lvlBit">1.0</b> bit/cell</span>
-<span id="lvlRel" class="ok">可靠度:高 ✅</span>
+<span><span class="lang-en">Stores </span><span class="lang-zh">能存 </span><b id="lvlN" class="kpi" style="font-size:20px">2</b><span class="lang-en"> levels = </span><span class="lang-zh"> 档 = </span><b id="lvlBit">1.0</b> bit/cell</span>
+<span id="lvlRel" class="ok">Reliability: high ✅</span>
 </div>
 <div class="barwrap"><div class="bar"><i id="lvlBar" style="width:100%;background:var(--ok)"></i></div></div>
 <p class="note" id="lvlMsg"></p>
 </div>
 <div class="callout">
-<b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只有 3 个值 {−1,0,+1},HDC 二元只有 2 个值</b>。<span class="g" data-k="ternfit">关键:我们<b>不</b>靠"一个 cell 调多档"(那会飘)——而是用<b>两个二态 cell 差分 + 数字无-ADC 计数器读出</b></span>:既避开高档位 MLC、又避开模拟 ADC。低精度算法 + 二态 cell + 数字读出,这是整个技术路线的赌注。
+<span class="lang-en"><b>This is the crux for ternary/HDC.</b> An ordinary 8-bit DNN needs one cell to reliably resolve 16+ levels — ReRAM can't, it drifts. But <b>ternary has only 3 values {−1,0,+1}, and binary HDC has only 2 values</b>. <span class="g" data-k="ternfit">Key: we do <b>not</b> rely on "tuning many levels in one cell" (that drifts) — instead we use <b>two binary cells in a differential pair + a digital ADC-free counter readout</b></span>: avoiding both high-level MLC and analog ADCs. Low-precision algorithm + binary cells + digital readout — this is the bet of the entire technical roadmap.</span><span class="lang-zh"><b>这就是三元/HDC 的命门所在。</b> 普通 8-bit DNN 需要一个 cell 稳稳分出 16+ 档——ReRAM 做不到、会飘。但<b>三元只有 3 个值 {−1,0,+1},HDC 二元只有 2 个值</b>。<span class="g" data-k="ternfit">关键:我们<b>不</b>靠"一个 cell 调多档"(那会飘)——而是用<b>两个二态 cell 差分 + 数字无-ADC 计数器读出</b></span>:既避开高档位 MLC、又避开模拟 ADC。低精度算法 + 二态 cell + 数字读出,这是整个技术路线的赌注。</span>
 </div>
-<p class="note">🔎 <b>"MLC=3 是不是就是三元组?"</b> 理论上能对上(单 cell 分 3 挡存一个三元值),<b>但我们不走这条</b>:单 cell 多档会飘、难读。<b>我们走的是另一条:用 2 个普通二态(SLC)cell 差分存三元</b>(+列一个、−列一个,读它俩的差),二态 cell 最好读、最稳,还能用数字计数器无-ADC 读出。所以本项目的"三元落硅"= <b>二态差分,不是 MLC-3</b>。<b><a href="reram-cim-visual.html#tern" style="color:var(--hot)">→ 点这里看"两个二态 cell 差分"的交互图</a></b>(下一档的 MLC 图只是演示"为什么多档会飘、我们为什么不走")。</p>
+<p class="note"><span class="lang-en">🔎 <b>"Is MLC=3 the same as ternary?"</b> In theory it lines up (one cell split into 3 levels storing one ternary value), <b>but we don't go this way</b>: many levels in one cell drift and are hard to read. <b>We take a different route: store ternary using 2 ordinary binary (SLC) cells in a differential pair</b> (one for the + column, one for the − column, read their difference). Binary cells are the easiest to read and most stable, and can be read out with a digital counter, ADC-free. So this project's "ternary in silicon" = <b>binary differential, not MLC-3</b>. <b><a href="reram-cim-visual.html#tern" style="color:var(--hot)">→ Click here for the interactive diagram of "two binary cells in a differential pair"</a></b> (the MLC diagram in the next level just demonstrates "why many levels drift, and why we don't go there").</span><span class="lang-zh">🔎 <b>"MLC=3 是不是就是三元组?"</b> 理论上能对上(单 cell 分 3 挡存一个三元值),<b>但我们不走这条</b>:单 cell 多档会飘、难读。<b>我们走的是另一条:用 2 个普通二态(SLC)cell 差分存三元</b>(+列一个、−列一个,读它俩的差),二态 cell 最好读、最稳,还能用数字计数器无-ADC 读出。所以本项目的"三元落硅"= <b>二态差分,不是 MLC-3</b>。<b><a href="reram-cim-visual.html#tern" style="color:var(--hot)">→ 点这里看"两个二态 cell 差分"的交互图</a></b>(下一档的 MLC 图只是演示"为什么多档会飘、我们为什么不走")。</span></p>
 
-<h2 id="cim">⑥ "存算一体"(CIM)是什么黑魔法?</h2>
-<p>普通电脑:数据存在内存,要算的时候搬到 CPU,算完搬回去——<b>搬运</b>本身又慢又费电(这叫<span class="g" data-k="memwall">内存墙</span>)。</p>
-<p><b>CIM(Compute-in-Memory,存内计算)</b>:干脆<b>在存权重的地方直接做计算,权重一步都不挪</b>。怎么做到?靠两条中学物理:</p>
+<h2 id="cim"><span class="lang-en">⑥ What black magic is "compute-in-memory" (CIM)?</span><span class="lang-zh">⑥ "存算一体"(CIM)是什么黑魔法?</span></h2>
+<p><span class="lang-en">An ordinary computer: data lives in memory, and when you need to compute you move it to the CPU, then move the result back — the <b>moving</b> itself is slow and power-hungry (this is the <span class="g" data-k="memwall">memory wall</span>).</span><span class="lang-zh">普通电脑:数据存在内存,要算的时候搬到 CPU,算完搬回去——<b>搬运</b>本身又慢又费电(这叫<span class="g" data-k="memwall">内存墙</span>)。</span></p>
+<p><span class="lang-en"><b>CIM (Compute-in-Memory)</b>: simply <b>do the computation right where the weights are stored, without moving the weights a single step</b>. How? With two pieces of high-school physics:</span><span class="lang-zh"><b>CIM(Compute-in-Memory,存内计算)</b>:干脆<b>在存权重的地方直接做计算,权重一步都不挪</b>。怎么做到?靠两条中学物理:</span></p>
 <table>
-<tr><td><b>欧姆定律</b></td><td>电流 = 电压 × 电导(=1/电阻)。把输入做成电压、权重做成 cell 电阻 → 电流自动 = 输入×权重。<b>一次乘法,零指令。</b></td></tr>
-<tr><td><b>基尔霍夫定律</b></td><td>一整列 cell 的电流在导线上自动相加 → 一列就是一次"乘加求和"(<span class="g" data-k="mac">MAC</span>)。整个矩阵乘法在一瞬间、用物理完成。</td></tr>
+<tr><td><b><span class="lang-en">Ohm's law</span><span class="lang-zh">欧姆定律</span></b></td><td><span class="lang-en">current = voltage × conductance (=1/resistance). Make the input a voltage and the weight a cell resistance → current automatically = input × weight. <b>One multiplication, zero instructions.</b></span><span class="lang-zh">电流 = 电压 × 电导(=1/电阻)。把输入做成电压、权重做成 cell 电阻 → 电流自动 = 输入×权重。<b>一次乘法,零指令。</b></span></td></tr>
+<tr><td><b><span class="lang-en">Kirchhoff's law</span><span class="lang-zh">基尔霍夫定律</span></b></td><td><span class="lang-en">the currents of a whole column of cells add up automatically on the wire → one column is one "multiply-accumulate sum" (<span class="g" data-k="mac">MAC</span>). The entire matrix multiplication is done in an instant, by physics.</span><span class="lang-zh">一整列 cell 的电流在导线上自动相加 → 一列就是一次"乘加求和"(<span class="g" data-k="mac">MAC</span>)。整个矩阵乘法在一瞬间、用物理完成。</span></td></tr>
 </table>
-<p>所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种乘加。模拟 CIM 要把电流读成数字、需要大量 <span class="g" data-k="adc">ADC</span>(又大又费电,常吃掉大半面积/功耗)——<b>我们正是为此走"二态差分 + 数字计数器"读出、无 ADC,把这块最难的省掉</b>。</p>
+<p><span class="lang-en">So CIM's speed is <b>not about memory bandwidth</b> (weights don't move), but about how many such multiply-accumulates the array can do per second. Analog CIM has to read the current back into digital and needs lots of <span class="g" data-k="adc">ADC</span>s (big and power-hungry, often eating up most of the area/power) — <b>this is exactly why we go with "binary differential + digital counter" readout, ADC-free, sparing ourselves this hardest part</b>.</span><span class="lang-zh">所以 CIM 的速度<b>不是看内存带宽</b>(权重不搬),而是看阵列每秒能做多少次这种乘加。模拟 CIM 要把电流读成数字、需要大量 <span class="g" data-k="adc">ADC</span>(又大又费电,常吃掉大半面积/功耗)——<b>我们正是为此走"二态差分 + 数字计数器"读出、无 ADC,把这块最难的省掉</b>。</span></p>
 
-<h2 id="vs">⑦ SRAM-CIM、ReRAM-CIM……各种存储怎么选?</h2>
-<p>先看最常拿来对比的两种:两者<b>架构、外围、ADC 那套几乎一样</b>,区别只在"用什么 cell 存权重":</p>
+<h2 id="vs"><span class="lang-en">⑦ SRAM-CIM, ReRAM-CIM... how to choose among memory types?</span><span class="lang-zh">⑦ SRAM-CIM、ReRAM-CIM……各种存储怎么选?</span></h2>
+<p><span class="lang-en">First, the two most often compared: their <b>architecture, peripherals, and the ADC stack are almost identical</b>; the only difference is "which cell stores the weight":</span><span class="lang-zh">先看最常拿来对比的两种:两者<b>架构、外围、ADC 那套几乎一样</b>,区别只在"用什么 cell 存权重":</span></p>
 <table>
-<tr><th>维度</th><th>SRAM-CIM</th><th>ReRAM-CIM(我们的方向)</th></tr>
-<tr><td>存储单元</td><td>6+ 晶体管搭的 SRAM</td><td>1 晶体管 + 1 电阻开关</td></tr>
-<tr><td>断电</td><td class="bad">就忘(<span class="g" data-k="volatile">易失</span>)→ 权重每次重搬</td><td class="ok">不忘(非易失)→ 权重刻进去常驻 ⭐</td></tr>
-<tr><td>密度(同面积存多少)</td><td class="bad">低(管子多)</td><td class="ok">高 3–10×</td></tr>
-<tr><td>读/算速度</td><td class="ok">极快、稳</td><td>快;我们走<b>数字无-ADC 计数器读出</b>(不靠模拟 ADC)</td></tr>
-<tr><td>写入</td><td class="ok">快、随便写</td><td class="bad">慢、会老化(耐久有限)</td></tr>
-<tr><td>模拟精度</td><td class="ok">好(数字单元)</td><td class="bad">差(细丝会飘)← 我们用<b>二态差分 + 数字读出</b>绕开,不靠模拟精度</td></tr>
-<tr><td>成熟度</td><td class="ok">标准 CMOS,谁都能做</td><td class="bad">要特殊工艺,资料只在论文里</td></tr>
+<tr><th><span class="lang-en">Dimension</span><span class="lang-zh">维度</span></th><th>SRAM-CIM</th><th><span class="lang-en">ReRAM-CIM (our direction)</span><span class="lang-zh">ReRAM-CIM(我们的方向)</span></th></tr>
+<tr><td><span class="lang-en">Memory cell</span><span class="lang-zh">存储单元</span></td><td><span class="lang-en">SRAM built from 6+ transistors</span><span class="lang-zh">6+ 晶体管搭的 SRAM</span></td><td><span class="lang-en">1 transistor + 1 resistive switch</span><span class="lang-zh">1 晶体管 + 1 电阻开关</span></td></tr>
+<tr><td><span class="lang-en">Power off</span><span class="lang-zh">断电</span></td><td class="bad"><span class="lang-en">forgets (<span class="g" data-k="volatile">volatile</span>) → weights reloaded every time</span><span class="lang-zh">就忘(<span class="g" data-k="volatile">易失</span>)→ 权重每次重搬</span></td><td class="ok"><span class="lang-en">remembers (non-volatile) → weights engraved and resident ⭐</span><span class="lang-zh">不忘(非易失)→ 权重刻进去常驻 ⭐</span></td></tr>
+<tr><td><span class="lang-en">Density (how much per area)</span><span class="lang-zh">密度(同面积存多少)</span></td><td class="bad"><span class="lang-en">low (many transistors)</span><span class="lang-zh">低(管子多)</span></td><td class="ok"><span class="lang-en">high, 3–10×</span><span class="lang-zh">高 3–10×</span></td></tr>
+<tr><td><span class="lang-en">Read/compute speed</span><span class="lang-zh">读/算速度</span></td><td class="ok"><span class="lang-en">very fast, stable</span><span class="lang-zh">极快、稳</span></td><td><span class="lang-en">fast; we use <b>digital ADC-free counter readout</b> (not analog ADCs)</span><span class="lang-zh">快;我们走<b>数字无-ADC 计数器读出</b>(不靠模拟 ADC)</span></td></tr>
+<tr><td><span class="lang-en">Writing</span><span class="lang-zh">写入</span></td><td class="ok"><span class="lang-en">fast, write freely</span><span class="lang-zh">快、随便写</span></td><td class="bad"><span class="lang-en">slow, ages (limited endurance)</span><span class="lang-zh">慢、会老化(耐久有限)</span></td></tr>
+<tr><td><span class="lang-en">Analog precision</span><span class="lang-zh">模拟精度</span></td><td class="ok"><span class="lang-en">good (digital cell)</span><span class="lang-zh">好(数字单元)</span></td><td class="bad"><span class="lang-en">poor (filament drifts) ← we sidestep with <b>binary differential + digital readout</b>, not relying on analog precision</span><span class="lang-zh">差(细丝会飘)← 我们用<b>二态差分 + 数字读出</b>绕开,不靠模拟精度</span></td></tr>
+<tr><td><span class="lang-en">Maturity</span><span class="lang-zh">成熟度</span></td><td class="ok"><span class="lang-en">standard CMOS, anyone can do it</span><span class="lang-zh">标准 CMOS,谁都能做</span></td><td class="bad"><span class="lang-en">needs special process, material only in papers</span><span class="lang-zh">要特殊工艺,资料只在论文里</span></td></tr>
 </table>
 <div class="callout">
-<b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进<b>可重刷</b>的卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的模拟不精确,被我们的<b>二态差分 + 数字无-ADC 读出</b>绕开(不靠模拟精度)。
+<span class="lang-en"><b>In one sentence:</b> SRAM-CIM is like "moving and computing on the fly with expensive fast memory," while ReRAM-CIM is like "burning the model once into a <b>re-flashable</b> cartridge, after which the weights never move." For LLM inference where "weights are big, you want them resident, and you want to save power," <b>ReRAM's non-volatility + high density are the key advantages</b>; its analog imprecision is sidestepped by our <b>binary differential + digital ADC-free readout</b> (not relying on analog precision).</span><span class="lang-zh"><b>一句话:</b> SRAM-CIM 像"用昂贵的快内存现搬现算",ReRAM-CIM 像"把模型一次性烧进<b>可重刷</b>的卡带,从此权重不动"。对"模型权重很大、又想常驻、又想省电"的 LLM 推理,<b>ReRAM 的非易失 + 高密度是关键优势</b>;它的模拟不精确,被我们的<b>二态差分 + 数字无-ADC 读出</b>绕开(不靠模拟精度)。</span>
 </div>
 
-<h3>再放宽一点:整个存储 / 存内计算家族</h3>
-<p>世界上不止 SRAM 和 ReRAM。把常见的几种排一排,就明白为什么我们押 ReRAM(也明白别人为什么选别的):</p>
+<h3><span class="lang-en">Widening a bit: the whole memory / compute-in-memory family</span><span class="lang-zh">再放宽一点:整个存储 / 存内计算家族</span></h3>
+<p><span class="lang-en">There's more in the world than SRAM and ReRAM. Lay the common ones side by side and you'll see why we bet on ReRAM (and why others choose differently):</span><span class="lang-zh">世界上不止 SRAM 和 ReRAM。把常见的几种排一排,就明白为什么我们押 ReRAM(也明白别人为什么选别的):</span></p>
 <table>
-<tr><th>技术</th><th>断电</th><th>密度</th><th>写入</th><th>适合存内计算?</th><th>一句话 / 谁在用</th></tr>
-<tr><td><b>SRAM</b></td><td class="bad">易失</td><td class="bad">低</td><td class="ok">极快·无限次</td><td class="ok">✅ 成熟</td><td>CPU 缓存;快但占地、断电忘(存算公司主流之一)</td></tr>
-<tr><td><b>DRAM</b></td><td class="bad">易失</td><td>中</td><td class="ok">快</td><td>△ 在研</td><td>电脑内存条;要不停刷新</td></tr>
-<tr><td><b>NOR Flash</b></td><td class="ok">非易失</td><td>中</td><td class="bad">慢</td><td class="ok">✅ 模拟CIM</td><td>存固件;Mythic 用它做模拟存算</td></tr>
-<tr><td><b>NAND Flash</b></td><td class="ok">非易失</td><td class="ok">极高(3D 堆叠王)</td><td class="bad">慢·有限次</td><td>△</td><td>U盘/SSD;最便宜的大容量</td></tr>
-<tr><td><b>ReRAM</b>(我们)</td><td class="ok">非易失 ⭐</td><td class="ok">高</td><td>中·有限次</td><td class="ok">✅ 主攻</td><td>电阻丝;非易失+高密度+容忍低精度</td></tr>
-<tr><td><b>MRAM</b></td><td class="ok">非易失</td><td>中</td><td class="ok">快·耐久好</td><td>△</td><td>磁存储;耐久好但密度一般</td></tr>
-<tr><td><b>PCM</b></td><td class="ok">非易失</td><td class="ok">高</td><td class="bad">慢·发热</td><td>△</td><td>相变材料;Intel Optane 那一类,IBM 也在做 CIM</td></tr>
+<tr><th><span class="lang-en">Tech</span><span class="lang-zh">技术</span></th><th><span class="lang-en">Power off</span><span class="lang-zh">断电</span></th><th><span class="lang-en">Density</span><span class="lang-zh">密度</span></th><th><span class="lang-en">Writing</span><span class="lang-zh">写入</span></th><th><span class="lang-en">Good for CIM?</span><span class="lang-zh">适合存内计算?</span></th><th><span class="lang-en">In one line / who uses it</span><span class="lang-zh">一句话 / 谁在用</span></th></tr>
+<tr><td><b>SRAM</b></td><td class="bad"><span class="lang-en">volatile</span><span class="lang-zh">易失</span></td><td class="bad"><span class="lang-en">low</span><span class="lang-zh">低</span></td><td class="ok"><span class="lang-en">very fast · unlimited</span><span class="lang-zh">极快·无限次</span></td><td class="ok"><span class="lang-en">✅ mature</span><span class="lang-zh">✅ 成熟</span></td><td><span class="lang-en">CPU cache; fast but bulky, forgets on power-off (one of the mainstream choices for CIM companies)</span><span class="lang-zh">CPU 缓存;快但占地、断电忘(存算公司主流之一)</span></td></tr>
+<tr><td><b>DRAM</b></td><td class="bad"><span class="lang-en">volatile</span><span class="lang-zh">易失</span></td><td><span class="lang-en">medium</span><span class="lang-zh">中</span></td><td class="ok"><span class="lang-en">fast</span><span class="lang-zh">快</span></td><td><span class="lang-en">△ in research</span><span class="lang-zh">△ 在研</span></td><td><span class="lang-en">computer RAM sticks; needs constant refresh</span><span class="lang-zh">电脑内存条;要不停刷新</span></td></tr>
+<tr><td><b>NOR Flash</b></td><td class="ok"><span class="lang-en">non-volatile</span><span class="lang-zh">非易失</span></td><td><span class="lang-en">medium</span><span class="lang-zh">中</span></td><td class="bad"><span class="lang-en">slow</span><span class="lang-zh">慢</span></td><td class="ok"><span class="lang-en">✅ analog CIM</span><span class="lang-zh">✅ 模拟CIM</span></td><td><span class="lang-en">stores firmware; Mythic uses it for analog CIM</span><span class="lang-zh">存固件;Mythic 用它做模拟存算</span></td></tr>
+<tr><td><b>NAND Flash</b></td><td class="ok"><span class="lang-en">non-volatile</span><span class="lang-zh">非易失</span></td><td class="ok"><span class="lang-en">very high (3D stacking king)</span><span class="lang-zh">极高(3D 堆叠王)</span></td><td class="bad"><span class="lang-en">slow · limited</span><span class="lang-zh">慢·有限次</span></td><td>△</td><td><span class="lang-en">USB drives/SSDs; cheapest mass capacity</span><span class="lang-zh">U盘/SSD;最便宜的大容量</span></td></tr>
+<tr><td><b>ReRAM</b><span class="lang-en"> (us)</span><span class="lang-zh">(我们)</span></td><td class="ok"><span class="lang-en">non-volatile ⭐</span><span class="lang-zh">非易失 ⭐</span></td><td class="ok"><span class="lang-en">high</span><span class="lang-zh">高</span></td><td><span class="lang-en">medium · limited</span><span class="lang-zh">中·有限次</span></td><td class="ok"><span class="lang-en">✅ main focus</span><span class="lang-zh">✅ 主攻</span></td><td><span class="lang-en">resistive filament; non-volatile + high density + tolerates low precision</span><span class="lang-zh">电阻丝;非易失+高密度+容忍低精度</span></td></tr>
+<tr><td><b>MRAM</b></td><td class="ok"><span class="lang-en">non-volatile</span><span class="lang-zh">非易失</span></td><td><span class="lang-en">medium</span><span class="lang-zh">中</span></td><td class="ok"><span class="lang-en">fast · good endurance</span><span class="lang-zh">快·耐久好</span></td><td>△</td><td><span class="lang-en">magnetic storage; good endurance but mediocre density</span><span class="lang-zh">磁存储;耐久好但密度一般</span></td></tr>
+<tr><td><b>PCM</b></td><td class="ok"><span class="lang-en">non-volatile</span><span class="lang-zh">非易失</span></td><td class="ok"><span class="lang-en">high</span><span class="lang-zh">高</span></td><td class="bad"><span class="lang-en">slow · runs hot</span><span class="lang-zh">慢·发热</span></td><td>△</td><td><span class="lang-en">phase-change material; the Intel Optane family, IBM is also doing CIM with it</span><span class="lang-zh">相变材料;Intel Optane 那一类,IBM 也在做 CIM</span></td></tr>
 </table>
-<p class="note">看这张表就懂我们的取舍:LLM 权重又大又想常驻又想省电 → 要<b>非易失 + 高密度</b>(排除 SRAM/DRAM)、又要能在原地做模拟乘加(排除纯 NAND)、又能容忍器件不精确(三元/HDC 的低精度正好接得住 ReRAM 的飘)。这几条交集,<b>ReRAM 最顺</b>。但这不是唯一解——NOR Flash(Mythic)、PCM(IBM)都是真在做的路线。</p>
+<p class="note"><span class="lang-en">This table makes our trade-off clear: LLM weights are big, want to stay resident, and want to save power → you need <b>non-volatile + high density</b> (rules out SRAM/DRAM), the ability to do analog multiply-accumulate in place (rules out pure NAND), and tolerance for imprecise devices (the low precision of ternary/HDC catches ReRAM's drift perfectly). At the intersection of these, <b>ReRAM fits best</b>. But it's not the only answer — NOR Flash (Mythic) and PCM (IBM) are routes people are genuinely pursuing.</span><span class="lang-zh">看这张表就懂我们的取舍:LLM 权重又大又想常驻又想省电 → 要<b>非易失 + 高密度</b>(排除 SRAM/DRAM)、又要能在原地做模拟乘加(排除纯 NAND)、又能容忍器件不精确(三元/HDC 的低精度正好接得住 ReRAM 的飘)。这几条交集,<b>ReRAM 最顺</b>。但这不是唯一解——NOR Flash(Mythic)、PCM(IBM)都是真在做的路线。</span></p>
 
-<h2 id="density">⑧ 那……到底能放下多大的模型?(我心里没底的那个数)</h2>
-<p>"能放多少"不是一个数,是 <b>6 个因子相乘</b>。把它拆开,就知道该去确认哪几个数:</p>
+<h2 id="density"><span class="lang-en">⑧ So... exactly how big a model can it hold? (the number I'm most unsure about)</span><span class="lang-zh">⑧ 那……到底能放下多大的模型?(我心里没底的那个数)</span></h2>
+<p><span class="lang-en">"How much fits" is not one number, it's <b>several factors multiplied together</b>. Break it apart and you know which numbers to go confirm:</span><span class="lang-zh">"能放多少"不是一个数,是 <b>6 个因子相乘</b>。把它拆开,就知道该去确认哪几个数:</span></p>
 <div class="card stack">
-<div class="row"><div class="n">A</div><div><b>每个 cell 存几 bit</b> — 多电平可靠吗?<span class="dim">(第⑤节,我们的三元命门)</span></div></div>
-<div class="row"><div class="n">B</div><div><b>每 mm² 多少 cell</b> — 28nm 下单元多大</div></div>
-<div class="row"><div class="n">C</div><div><b>阵列有效率</b> — macro 里真正是 cell 的面积占比(ADC/驱动吃掉 50–80%)<span class="dim">← 理论 vs 实操最大落差</span></div></div>
-<div class="row"><div class="n">D</div><div><b>可用面积</b> — 良率/reticle 限制下实际能用多大</div></div>
-<div class="row"><div class="n">E</div><div><b>层数</b> — 能不能 3D 堆叠(目前业界还没人做过 400mm² 的 ReRAM-CIM)</div></div>
+<div class="row"><div class="n">A</div><div><span class="lang-en"><b>How many bit per cell</b> — is multi-level reliable? <span class="dim">(Section ⑤, our ternary crux)</span></span><span class="lang-zh"><b>每个 cell 存几 bit</b> — 多电平可靠吗?<span class="dim">(第⑤节,我们的三元命门)</span></span></div></div>
+<div class="row"><div class="n">B</div><div><span class="lang-en"><b>How many cells per mm²</b> — how big a cell is at 28nm</span><span class="lang-zh"><b>每 mm² 多少 cell</b> — 28nm 下单元多大</span></div></div>
+<div class="row"><div class="n">C</div><div><span class="lang-en"><b>Array efficiency</b> — the fraction of macro area that is actually cells (ADC/drivers eat 50–80%) <span class="dim">← the biggest gap between theory and practice</span></span><span class="lang-zh"><b>阵列有效率</b> — macro 里真正是 cell 的面积占比(ADC/驱动吃掉 50–80%)<span class="dim">← 理论 vs 实操最大落差</span></span></div></div>
+<div class="row"><div class="n">D</div><div><span class="lang-en"><b>Usable area</b> — how much can actually be used given yield/reticle limits</span><span class="lang-zh"><b>可用面积</b> — 良率/reticle 限制下实际能用多大</span></div></div>
+<div class="row"><div class="n">E</div><div><span class="lang-en"><b>Number of layers</b> — can you 3D-stack (so far no one in industry has built a 400mm² ReRAM-CIM)</span><span class="lang-zh"><b>层数</b> — 能不能 3D 堆叠(目前业界还没人做过 400mm² 的 ReRAM-CIM)</span></div></div>
 </div>
-<p>峰值密度(Mb/mm²)= A×B×C。<b>只要拿到 A、C 和"峰值密度"这三个数,前面那个计算器就能填准,心里就有底了。</b></p>
-<div class="callout"><b>一个工程量级:</b> 28nm 上单个 ReRAM-CIM macro 大约 <b>16 Mb</b>。要拼到能跑 BERT-base(~110M 参数 ≈ 256 Mb)需要拼 ~16 个这样的 macro——能不能拼、拼到大面积行不行,就是没人验证过的无人区。</div>
+<p><span class="lang-en">Peak density (Mb/mm²) = A×B×C. <b>Just get A, C, and "peak density" — these three numbers — and the calculator above can be filled in accurately, and you'll have solid footing.</b></span><span class="lang-zh">峰值密度(Mb/mm²)= A×B×C。<b>只要拿到 A、C 和"峰值密度"这三个数,前面那个计算器就能填准,心里就有底了。</b></span></p>
+<div class="callout"><span class="lang-en"><b>An engineering scale:</b> at 28nm, a single ReRAM-CIM macro is about <b>16 Mb</b>. To assemble enough to run BERT-base (~110M parameters ≈ 256 Mb) you'd need to tile ~16 such macros — whether you can tile them, and whether tiling to a large area works at all, is the unexplored no-man's-land no one has verified.</span><span class="lang-zh"><b>一个工程量级:</b> 28nm 上单个 ReRAM-CIM macro 大约 <b>16 Mb</b>。要拼到能跑 BERT-base(~110M 参数 ≈ 256 Mb)需要拼 ~16 个这样的 macro——能不能拼、拼到大面积行不行,就是没人验证过的无人区。</span></div>
 
-<h2 id="next">⑨ 接下来:把空格填上</h2>
-<p>这页讲清了<b>是什么</b>。剩下的是<b>拿真实数字</b>——向行业一线请教、读论文、做实验。配套一个工具:</p>
-<p>⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)">容量计算器</a>(拿到真实密度数,当场算能跑多大的三元模型 + 落在速度阶梯哪一档)</p>
-<p class="dim">这是一个半年前还不写代码的人,用 AI 当帮手,一砖一瓦学底层的记录。错了就改(见 README 的 Bayesian 修正史)。</p>
+<h2 id="next"><span class="lang-en">⑨ Next: filling in the blanks</span><span class="lang-zh">⑨ 接下来:把空格填上</span></h2>
+<p><span class="lang-en">This page explained <b>what it is</b>. What remains is <b>getting the real numbers</b> — asking industry insiders, reading papers, running experiments. A companion tool:</span><span class="lang-zh">这页讲清了<b>是什么</b>。剩下的是<b>拿真实数字</b>——向行业一线请教、读论文、做实验。配套一个工具:</span></p>
+<p>⚙️ <a href="reram-cim-calculator.html" style="color:var(--hot)"><span class="lang-en">Capacity Calculator</span><span class="lang-zh">容量计算器</span></a><span class="lang-en"> (plug in a real density number and instantly compute how big a ternary model can run + which rung of the speed ladder it lands on)</span><span class="lang-zh">(拿到真实密度数,当场算能跑多大的三元模型 + 落在速度阶梯哪一档)</span></p>
+<p class="dim"><span class="lang-en">This is the record of someone who couldn't write code half a year ago, using AI as a helper, learning the fundamentals brick by brick. Wrong? Fix it (see the Bayesian correction history in the README).</span><span class="lang-zh">这是一个半年前还不写代码的人,用 AI 当帮手,一砖一瓦学底层的记录。错了就改(见 README 的 Bayesian 修正史)。</span></p>
 
-<div class="foot">millisecond-era · 毫秒纪 · ReRAM-CIM 101 · 2026-06-01<br>声明:科普向,数字以公开论文为准;材料/论文条目均为公开文献,如有出入以原文为准。</div>
+<div class="foot"><span class="lang-en">millisecond-era · ReRAM-CIM 101 · 2026-06-01<br>Disclaimer: this is an educational explainer; numbers follow public papers; material/paper entries are all public literature — where they differ, the originals govern.</span><span class="lang-zh">millisecond-era · 毫秒纪 · ReRAM-CIM 101 · 2026-06-01<br>声明:科普向,数字以公开论文为准;材料/论文条目均为公开文献,如有出入以原文为准。</span></div>
 </div>
 
 <!-- glossary sources (kept in DOM to avoid JS-string escaping issues) -->
-<div class="defsrc" id="def-bit"><b>bit(比特)</b>：信息的最小单位，只有 0 或 1，就像一个开关。8 个 bit = 1 个 byte（字节）= 1 个英文字母的存储量。芯片"容量"本质就是在数能存多少个 bit。</div>
-<div class="defsrc" id="def-trap">小写 b 是 bit，大写 B 是 byte，1 byte = 8 bit。"16.32 Mb" = 16.32 兆比特 = 2.04 兆字节(MB)。如果误读成 32 MB，就把容量高估了约 16 倍——能跑的模型从"几百万参数的小玩具"被错当成"上亿参数的 BERT"。所以拿到任何容量数字，第一句先确认：是 Mb 还是 MB？</div>
-<div class="defsrc" id="def-bpw">三元权重只有 {−1,0,+1} 三个值，理论上用 log₂3 ≈ 1.58 bit 就能表示。但物理上一个 cell 往往要占 2 bit（比如用两个单元做差分、或一个四电平单元只用其中三档）。所以估算容量时按 2 bit/权重比较稳妥，1.58 是最乐观的理论地板。</div>
-<div class="defsrc" id="def-cell">cell（存储单元）：芯片里存 1 个 bit 的最小零件。SRAM 用 6 个晶体管搭一个，ReRAM 用 1 个晶体管 + 1 个电阻开关。cell 越小，同样面积能存越多，密度越高。</div>
-<div class="defsrc" id="def-1t1r">1T1R = 1 Transistor + 1 Resistor，一个晶体管串一个电阻开关。晶体管负责"选中这个单元"，电阻开关负责"存 0 还是 1"。这是 ReRAM 阵列最常见的单元结构，比 SRAM 的 6 管小很多。</div>
-<div class="defsrc" id="def-filament">导电细丝（conductive filament）：在金属-氧化物-金属三明治里，加电压会让氧化物中的氧原子移动，留下一串"氧空位"连成一根纳米细丝，像在绝缘层里搭了一座桥。桥通（LRS，低阻）= 1，桥断（HRS，高阻）= 0。反复加正/负电压就能反复搭桥/拆桥，于是能反复写入模型权重。它"会飘"——每次搭出来的桥粗细略有不同，这就是 ReRAM 模拟精度差的根源。</div>
-<div class="defsrc" id="def-lrs">LRS = Low Resistance State（低阻态），细丝接通、电流好走，记作 1。反义是 HRS = High Resistance State（高阻态），细丝断开，记作 0。读出时给个小电压看电流大小，就知道存的是 0 还是 1。</div>
-<div class="defsrc" id="def-crossbar">crossbar（交叉阵列）：把横线（行）和竖线（列）交叉排成网格，每个交叉点放一个 cell。这种结构让"一整列同时做乘加求和"成为可能——正是存内计算 CIM 的物理基础。几百万个 cell 就这样排成一大片。</div>
-<div class="defsrc" id="def-mlc">MLC = Multi-Level Cell（多电平单元）：让一个 cell 能区分好几档电阻（不只是高/低两档），从而一个单元存不止 1 bit。能省地方，但 ReRAM 的细丝会随时间漂移、不同单元也不一致，档分得越多越容易读错——良率和可靠性是它的死穴。这恰恰是为什么三元/HDC（只需要 2–3 档）特别适配 ReRAM。</div>
-<div class="defsrc" id="def-ternfit">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元只有 3 个值、HDC 二元只有 2 个值——我们<b>不</b>用单个多档 cell（会飘），而是用<b>两个二态 cell 差分</b>存一个三元值（每个 cell 只需可靠区分"开/关"两态，这是 ReRAM 最容易做到的），再用<b>数字计数器无-ADC 读出</b>。于是"算法低精度 + 二态 cell + 数字读出"对上，既避开高档位 MLC、又避开模拟 ADC。这是 millisecond-era 的核心押注，需在真硅上验证（见 README）。</div>
-<div class="defsrc" id="def-memwall">内存墙（memory wall）：现代芯片算得很快，但数据要从内存搬到计算单元，这段"搬运"又慢又费电，成了真正的瓶颈。大模型推理时反复搬几个 GB 的权重，大量时间和电力耗在搬运上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</div>
-<div class="defsrc" id="def-mac">MAC = Multiply-Accumulate（乘加）：神经网络最基本的运算——把输入乘以权重再累加。一个 1000×1000 的矩阵乘法就是上百万次 MAC。CIM 用一列 cell 的电流自动相加，一瞬间完成一整列的 MAC，这就是它快的来源。</div>
-<div class="defsrc" id="def-adc">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这正是 CIM 里电路设计最难的部分，也是"理论密度"远高于"实际能放"的主因。</div>
-<div class="defsrc" id="def-volatile">易失 vs 非易失：易失（volatile）= 一断电就忘，SRAM/DRAM 都是，所以每次开机要重新把权重搬进去。非易失（non-volatile）= 断电也记得，ReRAM/闪存是，权重一次刻进去就常驻芯片。对"权重大又想常驻又想省电"的 LLM，非易失是 ReRAM 的关键卖点。</div>
+<div class="defsrc" id="def-bit"><span class="lang-en"><b>bit</b>: the smallest unit of information, just 0 or 1, like a switch. 8 bits = 1 byte = the storage of one English letter. A chip's "capacity" is essentially counting how many bits it can store.</span><span class="lang-zh"><b>bit(比特)</b>：信息的最小单位，只有 0 或 1，就像一个开关。8 个 bit = 1 个 byte（字节）= 1 个英文字母的存储量。芯片"容量"本质就是在数能存多少个 bit。</span></div>
+<div class="defsrc" id="def-trap"><span class="lang-en">Lowercase b is bit, uppercase B is byte, 1 byte = 8 bit. "16.32 Mb" = 16.32 megabit = 2.04 megabyte (MB). If you misread it as 32 MB, you've overestimated capacity by about 16× — and the model you can run gets mistaken from a "small few-million-parameter toy" for a "hundred-million-parameter BERT." So with any capacity number, your first question is: is it Mb or MB?</span><span class="lang-zh">小写 b 是 bit，大写 B 是 byte，1 byte = 8 bit。"16.32 Mb" = 16.32 兆比特 = 2.04 兆字节(MB)。如果误读成 32 MB，就把容量高估了约 16 倍——能跑的模型从"几百万参数的小玩具"被错当成"上亿参数的 BERT"。所以拿到任何容量数字，第一句先确认：是 Mb 还是 MB？</span></div>
+<div class="defsrc" id="def-bpw"><span class="lang-en">A ternary weight has only 3 values {−1,0,+1}, which in theory can be represented with log₂3 ≈ 1.58 bit. But physically a cell often takes 2 bit (e.g. using two cells for a differential pair, or using only 3 of a 4-level cell's levels). So when estimating capacity it's safer to use 2 bit/weight; 1.58 is the most optimistic theoretical floor.</span><span class="lang-zh">三元权重只有 {−1,0,+1} 三个值，理论上用 log₂3 ≈ 1.58 bit 就能表示。但物理上一个 cell 往往要占 2 bit（比如用两个单元做差分、或一个四电平单元只用其中三档）。所以估算容量时按 2 bit/权重比较稳妥，1.58 是最乐观的理论地板。</span></div>
+<div class="defsrc" id="def-cell"><span class="lang-en">cell (memory cell): the smallest part in a chip that stores 1 bit. SRAM builds one from 6 transistors; ReRAM uses 1 transistor + 1 resistive switch. The smaller the cell, the more you can store in the same area, the higher the density.</span><span class="lang-zh">cell（存储单元）：芯片里存 1 个 bit 的最小零件。SRAM 用 6 个晶体管搭一个，ReRAM 用 1 个晶体管 + 1 个电阻开关。cell 越小，同样面积能存越多，密度越高。</span></div>
+<div class="defsrc" id="def-1t1r"><span class="lang-en">1T1R = 1 Transistor + 1 Resistor, one transistor in series with one resistive switch. The transistor "selects this cell," the resistive switch "stores 0 or 1." This is the most common cell structure in ReRAM arrays, much smaller than SRAM's 6 transistors.</span><span class="lang-zh">1T1R = 1 Transistor + 1 Resistor，一个晶体管串一个电阻开关。晶体管负责"选中这个单元"，电阻开关负责"存 0 还是 1"。这是 ReRAM 阵列最常见的单元结构，比 SRAM 的 6 管小很多。</span></div>
+<div class="defsrc" id="def-filament"><span class="lang-en">conductive filament: inside the metal-oxide-metal sandwich, applying a voltage makes oxygen atoms in the oxide move, leaving a chain of "oxygen vacancies" that connect into a nanoscale filament, like building a bridge across the insulating layer. Bridge connected (LRS, low resistance) = 1, bridge broken (HRS, high resistance) = 0. Repeatedly applying positive/negative voltage builds/breaks the bridge over and over, so you can repeatedly write model weights. It "drifts" — each bridge comes out slightly different in thickness, which is the root cause of ReRAM's poor analog precision.</span><span class="lang-zh">导电细丝（conductive filament）：在金属-氧化物-金属三明治里，加电压会让氧化物中的氧原子移动，留下一串"氧空位"连成一根纳米细丝，像在绝缘层里搭了一座桥。桥通（LRS，低阻）= 1，桥断（HRS，高阻）= 0。反复加正/负电压就能反复搭桥/拆桥，于是能反复写入模型权重。它"会飘"——每次搭出来的桥粗细略有不同，这就是 ReRAM 模拟精度差的根源。</span></div>
+<div class="defsrc" id="def-lrs"><span class="lang-en">LRS = Low Resistance State, the filament is connected, current flows easily, recorded as 1. Its opposite is HRS = High Resistance State, the filament is broken, recorded as 0. To read, apply a small voltage and look at the current magnitude to know whether 0 or 1 is stored.</span><span class="lang-zh">LRS = Low Resistance State（低阻态），细丝接通、电流好走，记作 1。反义是 HRS = High Resistance State（高阻态），细丝断开，记作 0。读出时给个小电压看电流大小，就知道存的是 0 还是 1。</span></div>
+<div class="defsrc" id="def-crossbar"><span class="lang-en">crossbar (crossbar array): horizontal lines (rows) and vertical lines (columns) crossed into a grid, with a cell at each crossing point. This structure makes "a whole column doing multiply-accumulate at once" possible — exactly the physical basis of compute-in-memory (CIM). Millions of cells are arranged into one big sheet this way.</span><span class="lang-zh">crossbar（交叉阵列）：把横线（行）和竖线（列）交叉排成网格，每个交叉点放一个 cell。这种结构让"一整列同时做乘加求和"成为可能——正是存内计算 CIM 的物理基础。几百万个 cell 就这样排成一大片。</span></div>
+<div class="defsrc" id="def-mlc"><span class="lang-en">MLC = Multi-Level Cell: lets one cell distinguish several resistance levels (not just high/low two levels), so one cell stores more than 1 bit. It saves space, but ReRAM's filament drifts over time and varies cell to cell — the more levels you split into, the more likely a read error — so yield and reliability are its Achilles' heel. This is exactly why ternary/HDC (needing only 2–3 levels) fits ReRAM especially well.</span><span class="lang-zh">MLC = Multi-Level Cell（多电平单元）：让一个 cell 能区分好几档电阻（不只是高/低两档），从而一个单元存不止 1 bit。能省地方，但 ReRAM 的细丝会随时间漂移、不同单元也不一致，档分得越多越容易读错——良率和可靠性是它的死穴。这恰恰是为什么三元/HDC（只需要 2–3 档）特别适配 ReRAM。</span></div>
+<div class="defsrc" id="def-ternfit"><span class="lang-en">In deep learning, an 8-bit weight needs one cell to reliably resolve 256 levels (or multiple cells combined), which ReRAM's filament drift makes very hard. But ternary has only 3 values and binary HDC only 2 — we do <b>not</b> use a single multi-level cell (it drifts), but instead use <b>two binary cells in a differential pair</b> to store one ternary value (each cell only needs to reliably distinguish "on/off" two states, which is what ReRAM does most easily), then read it out with a <b>digital counter, ADC-free</b>. So "low-precision algorithm + binary cells + digital readout" lines up, avoiding both high-level MLC and analog ADCs. This is millisecond-era's core bet, to be verified on real silicon (see README).</span><span class="lang-zh">深度学习里 8-bit 权重需要一个单元稳稳分出 256 档（或多个单元拼），ReRAM 的细丝漂移让这很难。但三元只有 3 个值、HDC 二元只有 2 个值——我们<b>不</b>用单个多档 cell（会飘），而是用<b>两个二态 cell 差分</b>存一个三元值（每个 cell 只需可靠区分"开/关"两态，这是 ReRAM 最容易做到的），再用<b>数字计数器无-ADC 读出</b>。于是"算法低精度 + 二态 cell + 数字读出"对上，既避开高档位 MLC、又避开模拟 ADC。这是 millisecond-era 的核心押注，需在真硅上验证（见 README）。</span></div>
+<div class="defsrc" id="def-memwall"><span class="lang-en">memory wall: modern chips compute very fast, but data must be moved from memory to the compute units, and this "moving" is slow and power-hungry, becoming the real bottleneck. During large-model inference, several GB of weights are moved back and forth repeatedly, and a huge amount of time and power is spent on moving. The whole point of CIM is: don't move the weights, compute in place, and the wall disappears.</span><span class="lang-zh">内存墙（memory wall）：现代芯片算得很快，但数据要从内存搬到计算单元，这段"搬运"又慢又费电，成了真正的瓶颈。大模型推理时反复搬几个 GB 的权重，大量时间和电力耗在搬运上。CIM 的全部意义就是：权重不搬，在原地算掉，墙就消失了。</span></div>
+<div class="defsrc" id="def-mac"><span class="lang-en">MAC = Multiply-Accumulate: the most basic operation in neural networks — multiply the input by the weight and accumulate. A 1000×1000 matrix multiplication is millions of MACs. CIM adds up the currents of a column of cells automatically, completing a whole column's MAC in an instant — that's the source of its speed.</span><span class="lang-zh">MAC = Multiply-Accumulate（乘加）：神经网络最基本的运算——把输入乘以权重再累加。一个 1000×1000 的矩阵乘法就是上百万次 MAC。CIM 用一列 cell 的电流自动相加，一瞬间完成一整列的 MAC，这就是它快的来源。</span></div>
+<div class="defsrc" id="def-adc"><span class="lang-en">ADC = Analog-to-Digital Converter: what CIM computes inside the array is an "analog current," which must be turned back into digital to be usable, via an ADC. The problem is ADCs are big and power-hungry — in many CIM designs, ADCs eat up most of the area and power (once measured at ~88% energy, ~75% area). This is the hardest part of circuit design in CIM, and the main reason "theoretical density" is far higher than "what can actually fit."</span><span class="lang-zh">ADC = Analog-to-Digital Converter（模数转换器）：CIM 在阵列里算出来的是"模拟电流"，要变回数字才能用，靠 ADC 转换。问题是 ADC 又大又费电——在很多 CIM 设计里，ADC 吃掉了大部分面积和功耗（曾测到 ~88% 能耗、~75% 面积）。这正是 CIM 里电路设计最难的部分，也是"理论密度"远高于"实际能放"的主因。</span></div>
+<div class="defsrc" id="def-volatile"><span class="lang-en">volatile vs non-volatile: volatile = forgets the moment power is off, like SRAM/DRAM, so weights must be reloaded at every boot. non-volatile = remembers even with power off, like ReRAM/flash, where weights are engraved once and stay resident on the chip. For LLMs where "weights are big, you want them resident, and you want to save power," non-volatility is ReRAM's key selling point.</span><span class="lang-zh">易失 vs 非易失：易失（volatile）= 一断电就忘，SRAM/DRAM 都是，所以每次开机要重新把权重搬进去。非易失（non-volatile）= 断电也记得，ReRAM/闪存是，权重一次刻进去就常驻芯片。对"权重大又想常驻又想省电"的 LLM，非易失是 ReRAM 的关键卖点。</span></div>
 
 <div class="pop" id="pop"><span class="x" onclick="document.getElementById('pop').classList.remove('show')">×</span><h3 id="popT"></h3><div class="body" id="popB"></div></div>
 
 <script>
+// current site-wide language ('zh' or 'en'); site-nav.js sets <html data-lang>
+function mseLang(){ return document.documentElement.dataset.lang === 'zh' ? 'zh' : 'en'; }
 // glossary popups — read text from hidden DOM nodes (no JS string escaping pitfalls)
 document.querySelectorAll('.g').forEach(function(el){
   el.addEventListener('click',function(){
     var k=el.getAttribute('data-k'); if(!k)return;
     var src=document.getElementById('def-'+k); if(!src)return;
-    document.getElementById('popT').textContent=el.textContent;
+    // trigger word may carry both lang spans; show only the visible one in the title
+    var en=el.querySelector('.lang-en'), zh=el.querySelector('.lang-zh');
+    var title=(mseLang()==='zh') ? (zh?zh.textContent:el.textContent) : (en?en.textContent:el.textContent);
+    document.getElementById('popT').textContent=title;
+    // the popup body keeps both lang spans; CSS hides the wrong language automatically
     document.getElementById('popB').innerHTML=src.innerHTML;
     document.getElementById('pop').classList.add('show');
   });
@@ -250,14 +257,24 @@ function conv(){
   var bits;
   if(u==='mb')bits=v*1e6; else if(u==='MB')bits=v*8e6; else if(u==='gb')bits=v*1e9; else bits=v*8e9;
   var MB=bits/8/1e6, params=bits/2; // 2 bit/weight
+  var zh=mseLang()==='zh';
+  var tier = params>=80e6 ? '≈ BERT/GPT-2-small' : params>=10e6 ? (zh?'≈ 小模型/TinyStories 级':'≈ small model / TinyStories') : (zh?'≈ 玩具模型':'≈ toy model');
+  var line = zh
+    ? '三元模型(2bit/权重)约能装 <span class="kpi">'+fmtP(params)+'</span> 参数 '
+    : 'A ternary model (2bit/weight) holds about <span class="kpi">'+fmtP(params)+'</span> parameters ';
   document.getElementById('cvout').innerHTML=
     '= <b class="warn">'+bits.toLocaleString()+'</b> bit = <b class="ok">'+MB.toFixed(2)+' MB</b><br>'+
-    '三元模型(2bit/权重)约能装 <span class="kpi">'+fmtP(params)+'</span> 参数 '+
-    '<span class="note">('+(params>=80e6?'≈ BERT/GPT-2-small 级':params>=10e6?'≈ 小模型/TinyStories 级':'≈ 玩具模型')+')</span>';
+    line + '<span class="note">('+tier+')</span>';
 }
 // ③ atom
-function toggleAtom(){var a=document.getElementById('atom');a.classList.toggle('on');
-  document.getElementById('atomState').innerHTML=a.classList.contains('on')?'<span class="ok">低阻 (LRS) = 1</span>':'<span class="bad">高阻 (HRS) = 0</span>';}
+function toggleAtom(){var a=document.getElementById('atom');a.classList.toggle('on');renderAtom();}
+function renderAtom(){
+  var a=document.getElementById('atom'); if(!a)return;
+  var on=a.classList.contains('on'), zh=mseLang()==='zh';
+  document.getElementById('atomState').innerHTML = on
+    ? '<span class="ok">'+(zh?'低阻 (LRS) = 1':'Low resistance (LRS) = 1')+'</span>'
+    : '<span class="bad">'+(zh?'高阻 (HRS) = 0':'High resistance (HRS) = 0')+'</span>';
+}
 // ⑤ MLC reliability
 function lvlCalc(){
   var n=+document.getElementById('lvl').value;
@@ -268,14 +285,27 @@ function lvlCalc(){
   var rel=Math.max(2,100*Math.pow(0.78,n-2));
   var bar=document.getElementById('lvlBar'), relEl=document.getElementById('lvlRel'), msg=document.getElementById('lvlMsg');
   bar.style.width=rel.toFixed(0)+'%';
+  var zh=mseLang()==='zh';
   var col,txt,m;
-  if(n<=2){col='var(--ok)';txt='可靠度:高 ✅';m='2 档 = 标准 0/1。最稳。HDC 二元只要这个。';}
-  else if(n<=3){col='var(--hot)';txt='可靠度:中 ⚠️';m='3 档虽能对上三元,但单 cell 也会随老化/温度飘 → 我们不赌单 cell,改用 2 个二态 cell 差分(更稳、可数字无-ADC 读出)。';}
-  else if(n<=4){col='var(--hot)';txt='可靠度:中 ⚠️';m='4 档(2 bit)开始吃力,论文里有但良率打折。';}
-  else if(n<=8){col='var(--hot)';txt='可靠度:差 ⚠️';m='8 档:细丝漂移让相邻档容易读错,实验室能演示、量产很难。';}
-  else{col='var(--bad)';txt='可靠度:很差 ❌';m='16+ 档(8-bit DNN 想要的精度):ReRAM 基本扛不住——这就是为什么普通 DNN 难、而三元正合适。';}
+  if(n<=2){col='var(--ok)';
+    txt= zh?'可靠度:高 ✅':'Reliability: high ✅';
+    m= zh?'2 档 = 标准 0/1。最稳。HDC 二元只要这个。':'2 levels = standard 0/1. The most stable. Binary HDC needs only this.';}
+  else if(n<=3){col='var(--hot)';
+    txt= zh?'可靠度:中 ⚠️':'Reliability: medium ⚠️';
+    m= zh?'3 档虽能对上三元,但单 cell 也会随老化/温度飘 → 我们不赌单 cell,改用 2 个二态 cell 差分(更稳、可数字无-ADC 读出)。':'3 levels can map to ternary, but a single cell still drifts with aging/temperature → we don\'t bet on a single cell; instead we use 2 binary cells in a differential pair (more stable, digital ADC-free readout).';}
+  else if(n<=4){col='var(--hot)';
+    txt= zh?'可靠度:中 ⚠️':'Reliability: medium ⚠️';
+    m= zh?'4 档(2 bit)开始吃力,论文里有但良率打折。':'4 levels (2 bit) starts to strain; it exists in papers but at a yield discount.';}
+  else if(n<=8){col='var(--hot)';
+    txt= zh?'可靠度:差 ⚠️':'Reliability: poor ⚠️';
+    m= zh?'8 档:细丝漂移让相邻档容易读错,实验室能演示、量产很难。':'8 levels: filament drift makes adjacent levels easy to misread; demonstrable in the lab, very hard to mass-produce.';}
+  else{col='var(--bad)';
+    txt= zh?'可靠度:很差 ❌':'Reliability: very poor ❌';
+    m= zh?'16+ 档(8-bit DNN 想要的精度):ReRAM 基本扛不住——这就是为什么普通 DNN 难、而三元正合适。':'16+ levels (the precision an 8-bit DNN wants): ReRAM basically can\'t handle it — this is why ordinary DNNs are hard and ternary fits just right.';}
   bar.style.background=col;relEl.style.color=col;relEl.textContent=txt;msg.textContent=m;
 }
-conv();lvlCalc();
+conv();lvlCalc();renderAtom();
+// re-render JS-generated strings when the global EN/中 toggle fires
+window.addEventListener('mse:lang',function(){ conv();lvlCalc();renderAtom(); });
 </script>  <script src="../site-nav.js"></script>
 </body></html>

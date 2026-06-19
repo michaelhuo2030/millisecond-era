@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>反射 · 一群比你眨眼还快的 AI</title>
+<title>Reflex · A Swarm of AIs Faster Than Your Blink / 反射 · 一群比你眨眼还快的 AI</title>
 <style>
 :root{--bg:#06070d;--ink:#eef;--dim:#8a8ca6;--hot:#ffd36b}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC",sans-serif}
@@ -12,19 +12,19 @@ canvas{display:block;border-radius:12px;cursor:none}.side{flex:1;min-width:240px
 .row{margin:8px 0}.row label{display:flex;justify-content:space-between;color:var(--dim);font-size:12px}input[type=range]{width:100%;accent-color:#ffd36b}
 .tag{display:inline-block;padding:1px 6px;border-radius:5px;background:#241f12;color:var(--hot);font-size:11px}
 </style></head><body><div class="wrap">
-<h1>反射 · 一群比你眨眼还快的 AI <span class="tag">Tier 6</span></h1>
-<div class="sub"><b>把鼠标移到画面上</b>——每个光点都是一个 AI，它在亚毫秒内"看到→决定→躲开"。你怎么甩都甩不掉，因为它每秒重新决策几万次，比世界变化快几千倍。</div>
+<h1><span class="lang-en">Reflex · A Swarm of AIs Faster Than Your Blink</span><span class="lang-zh">反射 · 一群比你眨眼还快的 AI</span> <span class="tag">Tier 6</span></h1>
+<div class="sub"><span class="lang-en"><b>Move your mouse over the canvas</b>——every dot is an AI that, in under a millisecond, "sees → decides → dodges." No matter how you swing, you can't hit them, because each one re-decides tens of thousands of times per second——thousands of times faster than the world changes.</span><span class="lang-zh"><b>把鼠标移到画面上</b>——每个光点都是一个 AI，它在亚毫秒内"看到→决定→躲开"。你怎么甩都甩不掉，因为它每秒重新决策几万次，比世界变化快几千倍。</span></div>
 <div class="main">
   <div class="stage"><canvas id="cv" width="640" height="500"></canvas></div>
   <div class="side">
-    <div class="panel"><div class="big" id="dps">0</div><div style="color:var(--dim);font-size:12px">次决策/秒（全体）</div>
-      <div class="stat" style="margin-top:6px"><span>单次决策延迟</span><b id="lat">~微秒级</b></div>
-      <div class="stat"><span>对比 慢速AI</span><b>50ms → 慢 1万倍</b></div>
-      <div class="stat"><span>一帧(16ms)内决策</span><b id="perframe">0</b></div></div>
+    <div class="panel"><div class="big" id="dps">0</div><div style="color:var(--dim);font-size:12px"><span class="lang-en">decisions/sec (all agents)</span><span class="lang-zh">次决策/秒（全体）</span></div>
+      <div class="stat" style="margin-top:6px"><span><span class="lang-en">Latency per decision</span><span class="lang-zh">单次决策延迟</span></span><b id="lat">~<span class="lang-en">microseconds</span><span class="lang-zh">微秒级</span></b></div>
+      <div class="stat"><span><span class="lang-en">vs. a slow AI</span><span class="lang-zh">对比 慢速AI</span></span><b><span class="lang-en">50ms → 10,000× slower</span><span class="lang-zh">50ms → 慢 1万倍</span></b></div>
+      <div class="stat"><span><span class="lang-en">Decisions per frame (16ms)</span><span class="lang-zh">一帧(16ms)内决策</span></span><b id="perframe">0</b></div></div>
     <div class="panel">
-      <div class="row"><label>智能体数 <span id="vn">400</span></label><input id="n" type="range" min="50" max="1500" value="400"></div>
-      <div class="row"><label>警觉范围 <span id="vr">90</span></label><input id="r" type="range" min="30" max="180" value="90"></div>
-      <div style="color:var(--dim);font-size:12px">慢速 AI（思考要 50ms）每步落后整整一拍，追不上世界。能"反应"靠的就是速度——实时控制、游戏 NPC、机器人反射都要它。</div>
+      <div class="row"><label><span class="lang-en">Agents</span><span class="lang-zh">智能体数</span> <span id="vn">400</span></label><input id="n" type="range" min="50" max="1500" value="400"></div>
+      <div class="row"><label><span class="lang-en">Alert radius</span><span class="lang-zh">警觉范围</span> <span id="vr">90</span></label><input id="r" type="range" min="30" max="180" value="90"></div>
+      <div style="color:var(--dim);font-size:12px"><span class="lang-en">A slow AI (50ms to think) falls a full beat behind at every step and can't keep up with the world. "Reacting" depends purely on speed——real-time control, game NPCs, and robot reflexes all need it.</span><span class="lang-zh">慢速 AI（思考要 50ms）每步落后整整一拍，追不上世界。能"反应"靠的就是速度——实时控制、游戏 NPC、机器人反射都要它。</span></div>
     </div>
   </div>
 </div></div><script>

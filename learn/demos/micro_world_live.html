@@ -76,7 +76,7 @@
       </div>
     </div>
   </div>
-  <p class="note" style="margin-top:14px"><span class="tag"><span class="lang-en">What is this</span><span class="lang-zh">这是什么</span></span><span class="lang-en">An HDC-agent micro-world running purely in the browser — the power of speed lets you watch an entire "history of civilization coming together" in seconds. The chip's job: scale up N, the grid, and the culture dimension each by orders of magnitude, and run real-world scale on battery power. — A playable demo for students.</span><span class="lang-zh">纯在浏览器里跑的 HDC 智能体微世界——速度的力量，让你几秒看完一部"文明聚合史"。芯片要干的活：把 N、网格、文化维度各放大好几个数量级，在电池功耗下跑出真实世界的尺度。 — 给学生玩的 demo。</span></p>
+  <p class="note" style="margin-top:14px"><span class="tag"><span class="lang-en">What is this · D=160</span><span class="lang-zh">这是什么</span></span><span class="lang-en">An HDC-agent micro-world running purely in the browser — the power of speed lets you watch an entire "history of civilization coming together" in seconds. The chip's job: scale up N, the grid, and the culture dimension each by orders of magnitude, and run real-world scale on battery power. — A playable demo for students.</span><span class="lang-zh">纯在浏览器里跑的 HDC 智能体微世界——速度的力量，让你几秒看完一部"文明聚合史"。芯片要干的活：把 N、网格、文化维度各放大好几个数量级，在电池功耗下跑出真实世界的尺度。 — 给学生玩的 demo。</span></p>
 </div>
 
 <script>
@@ -105,7 +105,7 @@ function init(){
   cult=new Uint8Array(CAP*D); freeStack=[];
   for(let s=CAP-1;s>=P.pop0;s--) freeStack.push(s);
   for(let a=0;a<P.pop0;a++){alive[a]=1;ax[a]=ri(S);ay[a]=ri(S);en[a]=1.5;age[a]=0;
-    life[a]=80+ri(100); const o=a*D; for(let d=0;d<D;d++)cult[o+d]=ri(2);}
+    life[a]=(P.life*0.6|0)+ri(P.life*0.8|0||1); const o=a*D; for(let d=0;d<D;d++)cult[o+d]=ri(2);}
   step=0;
 }
 

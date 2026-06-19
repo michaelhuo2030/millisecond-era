@@ -98,8 +98,8 @@ footer .one{color:#aab2c4;margin-bottom:8px}
       <span class="badge b-live" style="font-size:12px">● <span class="lang-en">NEW · measured on real silicon</span><span class="lang-zh">最新 · 真硅实测</span></span>
     </div>
     <h2 style="text-align:center;font-size:clamp(22px,4.2vw,34px);line-height:1.12;margin:6px 0 6px;font-weight:850">
-      <span class="lang-en">Our ternary LLM generating text on a <span style="color:var(--hot)">¥205 FPGA</span> — <span class="grad">~13,671 tok/s</span></span>
-      <span class="lang-zh">我们的三值 LLM 在一块 <span style="color:var(--hot)">¥205 的 FPGA</span> 上生成文字 —— <span class="grad">~13,671 tok/s</span></span>
+      <span class="lang-en">Our ternary LLM generating text on a <span style="color:var(--hot)">¥205 (~$29) FPGA</span> — <span class="grad">~13,671 tok/s</span></span>
+      <span class="lang-zh">我们的三值 LLM 在一块 <span style="color:var(--hot)">¥205（约 $29）的 FPGA</span> 上生成文字 —— <span class="grad">~13,671 tok/s</span></span>
     </h2>
     <p style="text-align:center;color:var(--dim);max-width:700px;margin:0 auto 16px;font-size:14.5px">
       <span class="lang-en">Not a projection — <b style="color:var(--good)">measured on the board, verified three independent ways</b>: ~68,000 tokens streamed in ~5 s, 99.95% contiguous.</span>
@@ -118,7 +118,7 @@ footer .one{color:#aab2c4;margin-bottom:8px}
       </div>
       <ul style="margin:0;padding-left:18px;color:#c4cdda;font-size:13.5px;line-height:1.78">
         <li><span class="lang-en"><b>Throughput:</b> ~13,671 tok/s on the chip — verified three independent ways (token counter vs the board's wall clock over 0.5 / 1.0 / 2.0 s, all ~13,676) and matching theory (50 MHz ÷ 3,656 cycles/token = 13,675).</span><span class="lang-zh"><b>吞吐：</b>芯片上 ~13,671 tok/s —— 三种独立方法核实（芯片自带计数器对板子墙钟，0.5/1.0/2.0 秒都 ~13,676），并对上理论值（50 MHz ÷ 3,656 周期/词 = 13,675）。</span></li>
-        <li><span class="lang-en"><b>Hardware:</b> EBAZ4205 — a salvaged Bitcoin-miner board (Zynq xc7z010), ~¥205.</span><span class="lang-zh"><b>硬件：</b>EBAZ4205 —— 一块捡来的比特币矿机板（Zynq xc7z010），约 ¥205。</span></li>
+        <li><span class="lang-en"><b>Hardware:</b> EBAZ4205 — a salvaged Bitcoin-miner board (Zynq xc7z010), ~¥205 RMB (≈ $29).</span><span class="lang-zh"><b>硬件：</b>EBAZ4205 —— 一块捡来的比特币矿机板（Zynq xc7z010），约 ¥205 人民币（约 $29）。</span></li>
         <li><span class="lang-en"><b>Weights:</b> ternary {−1, 0, +1} — a multiply-free datapath.</span><span class="lang-zh"><b>权重：</b>三值 {−1, 0, +1} —— 无乘法器的数据通路。</span></li>
         <li><span class="lang-en"><b>On-chip model:</b> a tiny proof-of-concept — ~5K ternary params, D=16, 2 layers, 32-token vocab, 8-token context. <i>(The fluent paragraphs in the demo's "simulation" panel are a larger <b>558K software</b> model with bit-identical math — clearly labeled, not the chip.)</i></span><span class="lang-zh"><b>芯片上的模型：</b>一个很小的概念验证 —— 约 5K 三值参数，D=16、2 层、词表 32、上下文 8。<i>（demo 里"模拟"面板那些通顺的段落，是一个更大的 <b>558K 软件</b>模型，数学与芯片逐比特一致，已明确标注，不是芯片本身。）</i></span></li>
         <li><span class="lang-en"><b>A first:</b> this is the first time our ternary RTL runs the full autoregressive generation loop on real hardware (before: synthesis + co-sim + register readback only).</span><span class="lang-zh"><b>第一次：</b>这是我们的三值 RTL 头一回在真硬件上跑完整的自回归生成循环（此前只有综合 + 协同仿真 + 寄存器回读）。</span></li>

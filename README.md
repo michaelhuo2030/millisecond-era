@@ -3,18 +3,18 @@
 > **The Missing Hardware Layer of DeepSeek's Full Stack**
 > *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~$1,400 out of pocket*
 
-## 🔥 New — measured on real silicon: a ternary LLM generating text on a ¥205 FPGA at **~13,671 tok/s**
+## 🔥 New — measured on real silicon: a ternary LLM generating text on a ¥205 RMB (~$29) FPGA at **~13,671 tok/s**
 
 <video src="https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm.mp4" poster="https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm-poster.jpg" controls muted width="720"></video>
 
-[![Watch the demo — a ternary LLM at ~13,671 tok/s on a ¥205 FPGA](assets/demo-ternary-llm-poster.jpg)](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)
+[![Watch the demo — a ternary LLM at ~13,671 tok/s on a ¥205 RMB (~$29) FPGA](assets/demo-ternary-llm-poster.jpg)](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)
 
 ▶ **[Play it inline on the site](https://michaelhuo2030.github.io/millisecond-era/#breakthrough)** · or [download the clip](https://github.com/michaelhuo2030/millisecond-era/raw/main/assets/demo-ternary-llm.mp4) *(40 s)*
 
 **What's running in the video — measured on real FPGA silicon, not a projection:**
 
 - **Throughput:** **~13,671 tokens/second** on the chip — verified **three independent ways** (the chip's own token counter vs the board's wall clock over 0.5 / 1.0 / 2.0 s, all ~13,676) and matching theory (50 MHz ÷ 3,656 cycles/token = 13,675). ~68,000 tokens streamed in ~5 s, 99.95% contiguous.
-- **Hardware:** **EBAZ4205** — a salvaged Bitcoin-miner board (Zynq xc7z010), **~¥205**.
+- **Hardware:** **EBAZ4205** — a salvaged Bitcoin-miner board (Zynq xc7z010), **~¥205 RMB (≈ $29)**.
 - **Weights:** ternary **{−1, 0, +1}** — a multiply-free datapath.
 - **On-chip model:** a *tiny* proof-of-concept — **~5K ternary params, D=16, 2 layers, 32-token vocab, 8-token context**. *(The fluent paragraphs in the demo's "simulation" panel are a larger **558K software** model with bit-identical math — clearly labeled, **not** the chip.)*
 - **First** time our ternary RTL runs the **full autoregressive generation loop on real hardware** (before this: synthesis + co-simulation + register readback only).

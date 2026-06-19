@@ -85,7 +85,7 @@ footer .one{color:#aab2c4;margin-bottom:8px}
   </div>
   <div class="howto">
     <span class="lang-en">👇 Every card below <b>runs right in your own browser</b> — no download, no network (except where noted). Built to be played with, in class or anywhere.</span>
-    <span class="lang-zh">👇 下面每一张卡片，<b>点开就能在你自己的浏览器里直接跑</b>——零下载、零联网（个别标注除外）。这是给课堂、给任何人亲手玩的。</span>
+    <span class="lang-zh">👇 下面每张卡片，<b>点开就能在你浏览器里直接跑</b>——零下载、零联网（个别标注除外）。专门做给课堂、也给任何人亲手玩。</span>
   </div>
 </div></header>
 
@@ -103,7 +103,7 @@ footer .one{color:#aab2c4;margin-bottom:8px}
     </h2>
     <p style="text-align:center;color:var(--dim);max-width:700px;margin:0 auto 16px;font-size:14.5px">
       <span class="lang-en">Not a projection — <b style="color:var(--good)">measured on the board, verified three independent ways</b>: ~68,000 tokens streamed in ~5 s, 99.95% contiguous.</span>
-      <span class="lang-zh">不是推算——<b style="color:var(--good)">板子上实测、三种独立方法核实过</b>：约 5 秒流出约 68,000 个 token，99.95% 连续。</span>
+      <span class="lang-zh">不是推算——<b style="color:var(--good)">板子上实测、三种独立方法都核实过</b>：约 5 秒就吐出约 68,000 个 token，99.95% 连续。</span>
     </p>
     <video controls preload="metadata" playsinline poster="assets/demo-ternary-llm-poster.jpg"
       style="display:block;width:100%;max-width:880px;margin:0 auto;border-radius:12px;box-shadow:0 0 0 1px #2a3350;background:#000">
@@ -117,10 +117,10 @@ footer .one{color:#aab2c4;margin-bottom:8px}
         <span style="color:var(--good);font-weight:600;font-size:12px"> — <span class="lang-en">measured on FPGA silicon</span><span class="lang-zh">FPGA 硅上实测</span></span>
       </div>
       <ul style="margin:0;padding-left:18px;color:#c4cdda;font-size:13.5px;line-height:1.78">
-        <li><span class="lang-en"><b>Throughput:</b> ~13,671 tok/s on the chip — verified three independent ways (token counter vs the board's wall clock over 0.5 / 1.0 / 2.0 s, all ~13,676) and matching theory (50 MHz ÷ 3,656 cycles/token = 13,675).</span><span class="lang-zh"><b>吞吐：</b>芯片上 ~13,671 tok/s —— 三种独立方法核实（芯片自带计数器对板子墙钟，0.5/1.0/2.0 秒都 ~13,676），并对上理论值（50 MHz ÷ 3,656 周期/词 = 13,675）。</span></li>
-        <li><span class="lang-en"><b>Hardware:</b> EBAZ4205 — a salvaged Bitcoin-miner board (Zynq xc7z010), ~¥205 RMB (≈ $29).</span><span class="lang-zh"><b>硬件：</b>EBAZ4205 —— 一块捡来的比特币矿机板（Zynq xc7z010），约 ¥205 人民币（约 $29）。</span></li>
+        <li><span class="lang-en"><b>Throughput:</b> ~13,671 tok/s on the chip — verified three independent ways (token counter vs the board's wall clock over 0.5 / 1.0 / 2.0 s, all ~13,676) and matching theory (50 MHz ÷ 3,656 cycles/token = 13,675).</span><span class="lang-zh"><b>吞吐：</b>芯片上 ~13,671 tok/s —— 三种独立方法核实（拿芯片自己的计数器去对照真实耗时，0.5/1.0/2.0 秒都 ~13,676），并和理论值对上（50 MHz ÷ 3,656 周期/词 = 13,675）。</span></li>
+        <li><span class="lang-en"><b>Hardware:</b> EBAZ4205 — a salvaged Bitcoin-miner board (Zynq xc7z010), ~¥205 RMB (≈ $29).</span><span class="lang-zh"><b>硬件：</b>EBAZ4205 —— 一块淘来的二手比特币矿机板（Zynq xc7z010），约 ¥205 人民币（约 $29）。</span></li>
         <li><span class="lang-en"><b>Weights:</b> ternary {−1, 0, +1} — a multiply-free datapath.</span><span class="lang-zh"><b>权重：</b>三值 {−1, 0, +1} —— 无乘法器的数据通路。</span></li>
-        <li><span class="lang-en"><b>On-chip model:</b> a tiny proof-of-concept — ~5K ternary params, D=16, 2 layers, 32-token vocab, 8-token context. <i>(The fluent paragraphs in the demo's "simulation" panel are a larger <b>558K software</b> model with bit-identical math — clearly labeled, not the chip.)</i></span><span class="lang-zh"><b>芯片上的模型：</b>一个很小的概念验证 —— 约 5K 三值参数，D=16、2 层、词表 32、上下文 8。<i>（demo 里"模拟"面板那些通顺的段落，是一个更大的 <b>558K 软件</b>模型，数学与芯片逐比特一致，已明确标注，不是芯片本身。）</i></span></li>
+        <li><span class="lang-en"><b>On-chip model:</b> a tiny proof-of-concept — ~5K ternary params, D=16, 2 layers, 32-token vocab, 8-token context. <i>(The fluent paragraphs in the demo's "simulation" panel are a larger <b>558K software</b> model with bit-identical math — clearly labeled, not the chip.)</i></span><span class="lang-zh"><b>芯片上的模型：</b>一个很小的概念验证 —— 约 5K 三值参数，D=16、2 层、词表 32、上下文 8。<i>（demo 里"模拟"面板那些通顺的段落，是一个更大的 <b>558K 软件</b>模型，数学上和芯片逐比特一致，页面已经标清楚、不是芯片在跑的。）</i></span></li>
         <li><span class="lang-en"><b>A first:</b> this is the first time our ternary RTL runs the full autoregressive generation loop on real hardware (before: synthesis + co-sim + register readback only).</span><span class="lang-zh"><b>第一次：</b>这是我们的三值 RTL 头一回在真硬件上跑完整的自回归生成循环（此前只有综合 + 协同仿真 + 寄存器回读）。</span></li>
       </ul>
       <div style="margin-top:10px;color:var(--dim);font-size:12.5px;border-top:1px dashed #2a3146;padding-top:9px">
@@ -137,7 +137,7 @@ footer .one{color:#aab2c4;margin-bottom:8px}
     <h2><span class="lang-en">⚡ The power of speed</span><span class="lang-zh">⚡ 速度的力量</span></h2>
     <div class="lead">
       <span class="lang-en">The AI you use daily runs at about <b>50 words/s</b> (human reading speed). When an AI can think <b>thousands to hundreds of thousands of steps per second</b>, what it unlocks isn't "faster answers" — it's <b>a whole class of new things</b>. Watch a civilization's history in the time it takes to finish one sentence.</span>
-      <span class="lang-zh">你每天用的 AI 约 <b>50 字/秒</b>（人类阅读速度）。当 AI 每秒能想<b>几千到几十万步</b>，解锁的不是"答得更快"，而是<b>一整类全新的事</b>。在打完一句话的时间里，看一部文明史。</span>
+      <span class="lang-zh">你每天用的 AI 约 <b>50 字/秒</b>（人类阅读速度）。当 AI 每秒能想<b>几千到几十万步</b>，解锁的不是"答得更快"，而是<b>一整类全新的可能</b>。在打完一句话的时间里，看一部文明史。</span>
     </div>
   </div>
   <div class="grid">
@@ -150,7 +150,7 @@ footer .one{color:#aab2c4;margin-bottom:8px}
     <a class="card" href="learn/demos/tiny-ladder.html">
       <div class="top"><span class="badge b-live"><span class="lang-en">Real · no download</span><span class="lang-zh">真跑·零下载</span></span></div>
       <div class="ct"><span class="lang-en">⚡ Speed ladder micro→small</span><span class="lang-zh">⚡ 极速梯子 micro→small</span></div>
-      <div class="cd"><span class="lang-en">A char-level Transformer <b>really runs a forward pass</b> in your browser; micro hits <b>tens of thousands of t/s</b> — watch <b>tok/s ∝ 1/params</b> happen live.</span><span class="lang-zh">字符级 Transformer 在你浏览器里<b>真跑前向</b>，micro 冲<b>几万 t/s</b>，看 <b>tok/s ∝ 1/参数</b> 当场上演。</span></div>
+      <div class="cd"><span class="lang-en">A char-level Transformer <b>really runs a forward pass</b> in your browser; micro hits <b>tens of thousands of t/s</b> — watch <b>tok/s ∝ 1/params</b> happen live.</span><span class="lang-zh">字符级 Transformer 在你浏览器里<b>真的跑一遍前向</b>，micro 冲<b>几万 t/s</b>，看 <b>tok/s ∝ 1/参数</b> 当场上演。</span></div>
       <div class="go"><span class="lang-en">Run it on your machine →</span><span class="lang-zh">在你机器上飙速 →</span></div>
     </a>
     <a class="card" href="learn/demos/webgpu-real.html">

@@ -1,4 +1,16 @@
-# chip — the architecture decision record
+# chip — the architecture & the model
+
+Two layers live here:
+
+1. **[`model-2026-06/`](model-2026-06) — the clean-room calculation model (newest).** A rules-first, single-source-of-truth
+   rebuild of every chip number: density, throughput, energy, the ADC-free counter, all panel-cross-validated and graded.
+   **Start at [`model-2026-06/00-STATE-OF-MODEL.md`](model-2026-06/00-STATE-OF-MODEL.md).** This is where the numbers are now
+   most rigorous — it refines several conclusions in the ADR below (a single ledger; `t_vmm` on 5 legs; a paradigm-native
+   `decode = min(timing, power)` throughput model; a corrected, readout-limited density ceiling; an honest ~2–4× H100 *system*
+   efficiency number).
+2. **[`ADR-v1-architecture.md`](ADR-v1-architecture.md) — the architecture decision record** (the v1 build decision, below).
+
+---
 
 **[ADR-v1-architecture.md](ADR-v1-architecture.md)** synthesizes the whole program into one v1 chip decision:
 

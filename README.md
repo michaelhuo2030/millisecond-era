@@ -31,6 +31,34 @@
 
 ---
 
+## 📊 2026-06-27 — the chip's numbers, rebuilt clean-room (current model)
+
+A from-scratch rebuild of the whole chip-performance model: **methodology locked first, every number grounded before use, every load-bearing claim cross-checked by four independent AI engines** (codex / kimi / minimax / glm), graded 🟢 measured · 🟡 modeled · 🔴 silicon-gap. Full model + derivations + the runnable parametric engine: **[`chip/model-2026-06/`](chip/model-2026-06/)** — start at [`00-STATE-OF-MODEL.md`](chip/model-2026-06/00-STATE-OF-MODEL.md).
+
+> These **supersede** the older "3,000–20,000 tok/s / 240–960×" speed numbers further down — those used a systolic/roofline mental model that doesn't fit a weight-stationary analog chip. The corrected throughput physics is **paradigm-native**: `decode = min(timing-ceiling, power-bound)`, single-stream `= 1/(D·t_vmm)` (the autoregressive wall — pipelining can't help one user), **not** systolic.
+
+**Decode throughput — single user, edge @3 W** (🟡 modeled, panel-validated; power-bound = a soft ceiling, ~1.3–2× lower after attention/LayerNorm overhead):
+
+| model | 0.1B | 0.3B | 0.5B | 1B | 1.5B | 3B |
+|---|---|---|---|---|---|---|
+| **tok/s** | ~300k | ~100k | ~60k | ~30k | ~20k | ~10k |
+
+Response **"thinking heartbeat" @3 W**: 0.1B short-QA **~900 Hz** · 1B mid-chat **~23 Hz** · 3B mid-chat ~8 Hz. Every size is **far past human reading (~10–50 tok/s)** — so the moat was never raw speed. It is **always-on intelligence at microwatts a GPU structurally can't reach.** Edge sweet spot = **0.1B–1B** (3B is power-starved at the edge → it wants a box).
+
+**The physics, in five graded numbers:**
+
+| finding | value | grade |
+|---|---|---|
+| **t_vmm** (one analog matrix-vector multiply) | **5–18 ns**, now on 5 convergent legs (the "60–190 ns" naive-ramp scare is dead) | 🟡 modeled / measured-adjacent |
+| **Density** (the gate) | CIM-core **1.5–2.5 Mb/mm²** realistic (~3–3.5 ceiling), readout-limited → **0.1B fits ~90–110 mm² @28nm** (50 mm² is dead) | 🟡 modeled, panel 4/4 |
+| **Efficiency** | core **~12–15 TOPS/W**; system **~6–11 (≈ 2–4× an H100)** — ADC-free keeps the penalty small | 🟡 modeled |
+| **ADC-free counter readout** | NOT the hard bottleneck (2-step/window readout ~5–20 ns, overlaps the analog settle) | 🟡 4-leg |
+| **Model quality** | ternary ≈ fp16; a real trained BitCPM-0.5B keeps perplexity **+<1% at 2–5% ReRAM read-noise**, graceful to 20% | 🟢 measured |
+
+Honest boundary: the chip is **not taped out** — these are modeled + cross-validated, not silicon. The make-or-break open number is a **real ternary-differential macro density** measurement. Every figure above is graded and sourced in the [ledger](chip/model-2026-06/04-LEDGER.md).
+
+---
+
 > **✅ 2026-06 — current v1 design (supersedes BOTH boxes below)**
 >
 > The 2026-05 numbers below are kept as the honest iteration record — but they've since been superseded again. Current v1 (full decision in **[chip/ADR-v1-architecture.md](chip/ADR-v1-architecture.md)**):
@@ -572,6 +600,7 @@ The path forward — open thesis, public 18-row transparency, public invitations
 ## Documents in this repo
 
 - **README.md** (this file) — English thesis + transparency
+- **chip/model-2026-06/** — the current clean-room chip model: single-source ledger + density / throughput / energy / counter studies + a runnable parametric engine, every number graded 🟢/🟡/🔴 and panel-cross-validated ★ **NEW 2026-06-27**
 - **article-3.md** — Scaling to big models: the wall we don't have (KV cache, throughput, tensor parallelism, ReRAM's real limits) ★ **NEW 2026-06-15**
 - **article-2.md** — Stage 1 validation report (15 hypotheses checked, one architecture locked) ★ **NEW 2026-05-18**
 - **docs/article-1-zh.md** — Article 1 Chinese version (公众号 / 知乎 / Substack-zh)
@@ -594,4 +623,4 @@ MIT.
 
 ---
 
-*Last updated: 2026-05-16. Thesis baseline locked. Comments, contributions, criticisms welcome.*
+*Last updated: 2026-06-27 — chip performance model rebuilt clean-room (see [the numbers, rebuilt](#-2026-06-27--the-chips-numbers-rebuilt-clean-room-current-model) at the top; full model in [`chip/model-2026-06/`](chip/model-2026-06/)). Thesis baseline 2026-05-16. Comments, contributions, criticisms welcome.*

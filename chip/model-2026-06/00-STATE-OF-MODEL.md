@@ -1,5 +1,10 @@
 # 00 — STATE OF THE MODEL (归档收敛, 2026-06-27)
 
+> **Public archive note, 2026-07-07:** this 2026-06 folder remains the physics / derivation snapshot. The current public
+> product boundary is **C1**: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, and provisionable resident
+> model slots. Start from [`../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md) for
+> current public positioning.
+
 > One-page convergence of every verified finding. **`04-LEDGER.md` stays the single number-source** — this doc does NOT
 > duplicate numbers, it indexes the HEADLINE conclusions, their evidence-legs, the open GAPs, and where each lives.
 > Grades: 🟢 GROUNDED · 🟡 MODELED · 🔴 GAP · ⚫ SUPERSEDED. Discipline: a conclusion stands only on multiple legs
@@ -8,10 +13,11 @@
 ## THE THESIS (what the chip is)
 A **ternary ReRAM-CIM** chip: weights are **resident physical conductances**; the matrix-vector multiply happens by
 **analog physics** (Ohm + Kirchhoff, the whole matrix in one settle), read out **ADC-free** by a per-2-column
-differential up/down counter. **Moat = µW always-on inference** (a GPU can't run at µW; a digital NPU can neither hold
-the model resident nor do in-memory compute). **Density is the GATE** (must fit 0.1B in a manufacturable die); **energy/
-µW-always-on is the winning AXIS**. The FPGA is an **execution-credibility demo** (proves the ternary model runs/ is
-correct on real hardware) — **NOT** the product (it's digital: it streams weights through P MACs, it has none of the
+differential up/down counter. **Moat = resident low-latency inference in a power envelope GPUs cannot occupy** (a GPU
+can't run at µW; a digital NPU can neither hold the model resident nor do in-memory compute). **Density is the GATE**
+(must fit 0.1B in a manufacturable die); **speed/latency is the first buyer axis, then power/local/privacy decide
+deployment fit**. The FPGA is an **execution-credibility demo** (proves the ternary model runs/ is correct on real
+hardware) — **NOT** the product (it's digital: it streams weights through P MACs, it has none of the
 analog in-memory speed/energy).
 
 ## HEADLINE CONCLUSIONS (by topic; → detail doc)
@@ -28,7 +34,7 @@ analog in-memory speed/energy).
 ### Throughput & response cycle, 0.1B–3B (`09-THROUGHPUT-CYCLE`, engine L7, panel 4/4)
 - **Single-stream decode = 1/(D·t_vmm)** (latency-bound, the autoregressive wall — pipelining can't help one user);
   **aggregate/multi-user = ~tiles/t_vmm** (×D higher; our resident-layers enable this, an FPGA can't). **operating = min(timing, power).**
-- **Edge decode @3W:** 0.1B ~300k · 1B ~30k · 3B ~10k tok/s (= W/(N·E_MAC), power-bound). **All ≫ human-read 10–50** → speed is never the bottleneck.
+- **Edge decode @3W:** 0.1B ~300k · 1B ~30k · 3B ~10k tok/s (= W/(N·E_MAC), power-bound). **All ≫ human-read 10–50**; public comparisons should still lead with same-task speed/latency, because that is what buyers can feel and measure.
 - **Edge heartbeat @3W:** 0.1B short-QA ~900 Hz · 1B mid-chat ~23 Hz · 3B ~8 Hz. **Edge sweet spot 0.1B–1B**; 3B is power-starved at the edge.
 - ⚠️ **energy/tok = N·E_MAC is the weight-MAC FLOOR** (codex): +attn/softmax/LN/control ⇒ real edge **~1.3–2× lower** → edge numbers are a SOFT ceiling.
 - **FPGA vs chip:** FPGA tok/s ∝ 1/N (streams weights through P MACs, bigger model = much slower); chip ∝ 1/D (whole matrix per settle, **layer width is free**). Different machines (`f·P/2N` vs `1/(D·t_vmm)`).

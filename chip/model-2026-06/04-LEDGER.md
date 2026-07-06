@@ -1,5 +1,10 @@
 # 04 — LEDGER (the SINGLE SOURCE OF TRUTH for the ReRAM-CIM chip)
 
+> **Public archive note, 2026-07-07:** this ledger is the 2026-06 physics snapshot. The current public product boundary
+> is **C1**: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, provisionable resident model slots, and explicit
+> write/drift support tax. Start from [`../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md)
+> for current public positioning.
+
 > Every number the engine/calculator may use, grounded in `03-GROUNDING/`, each a graded RANGE (or an explicit 🔴 GAP).
 > **If a number is not here — or contradicts here — it is NOT confirmed.** Everything scattered elsewhere is
 > historical; re-derive disagreements against THIS. Supersedes `01-chip-core/GROUNDED-NUMBERS-LEDGER.md`.

@@ -31,31 +31,37 @@
 
 ---
 
-## 📊 2026-06-27 — the chip's numbers, rebuilt clean-room (current model)
+## 📊 2026-07-07 — C1 cleanroom update: the first public SKU boundary
 
-A from-scratch rebuild of the whole chip-performance model: **methodology locked first, every number grounded before use, every load-bearing claim cross-checked by four independent AI engines** (codex / kimi / minimax / glm), graded 🟢 measured · 🟡 modeled · 🔴 silicon-gap. Full model + derivations + the runnable parametric engine: **[`chip/model-2026-06/`](chip/model-2026-06/)** — start at [`00-STATE-OF-MODEL.md`](chip/model-2026-06/00-STATE-OF-MODEL.md).
+The latest cleanroom pass narrowed the project from "build a giant AI chip" to a first product family: **C1**, a resident-weight, low-bit inference accelerator with a local controller. Full public brief: **[`chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md)**.
 
-> These **supersede** the older "3,000–20,000 tok/s / 240–960×" speed numbers further down — those used a systolic/roofline mental model that doesn't fit a weight-stationary analog chip. The corrected throughput physics is **paradigm-native**: `decode = min(timing-ceiling, power-bound)`, single-stream `= 1/(D·t_vmm)` (the autoregressive wall — pipelining can't help one user), **not** systolic.
+**What changed:** the sales comparison is no longer a TOPS contest. The native comparison is **same-task tok/s, p50/p99 latency, peak-reflex Hz, closed-loop success, and local/private deployment**. TOPS/TFLOPS are only footnotes because incumbent vendors publish them.
 
-**Decode throughput — single user, edge @3 W** (🟡 modeled, panel-validated; power-bound = a soft ceiling, ~1.3–2× lower after attention/LayerNorm overhead):
+**C1 is plausible only because it is narrow:**
 
-| model | 0.1B | 0.3B | 0.5B | 1B | 1.5B | 3B |
-|---|---|---|---|---|---|---|
-| **tok/s** | ~300k | ~100k | ~60k | ~30k | ~20k | ~10k |
+- weight-resident inference, not general compute;
+- ternary / low-bit model path, not arbitrary FP16/BF16;
+- local controller, not a host-driven bare compute die;
+- firmware-class resident model provisioning, not per-request hot-swap;
+- one compute die family, partner foundry / OSAT / IP;
+- model ladder: **0.1B / 0.3B / 1B / bounded 3B**. Anything **>3B** is C2/C3 future work.
 
-Response **"thinking heartbeat" @3 W**: 0.1B short-QA **~900 Hz** · 1B mid-chat **~23 Hz** · 3B mid-chat ~8 Hz. Every size is **far past human reading (~10–50 tok/s)** — so the moat was never raw speed. It is **always-on intelligence at microwatts a GPU structurally can't reach.** Edge sweet spot = **0.1B–1B** (3B is power-starved at the edge → it wants a box).
+**Modeled C1 speed targets** (not taped-out silicon; source = cleanroom model and engine):
 
-**The physics, in five graded numbers:**
+| SKU | model | form | speed-first public target | role |
+|---|---:|---|---|---|
+| **C1-A** | 0.1B | single chip | ~300k tok/s; peak-reflex ~1.9kHz (~0.53ms/loop); short-QA ~381Hz (~2.6ms/loop) | first edge proof: wearables, small cameras, always-on voice |
+| **C1-B0** | 0.3B | small module | ~92k tok/s; peak-reflex ~1.3kHz (~0.77ms/loop); Hz95 ~357Hz (~2.8ms/loop) | if 0.1B is too weak |
+| **C1-B1** | 1B | module/card | ~97k tok/s; peak-reflex ~1.4kHz (~0.71ms/loop); Hz95 ~377Hz (~2.7ms/loop) | stronger private-edge / enterprise small-model proof |
+| **C1-B2** | 3B | upper module/card | ~27.6k tok/s; peak-reflex ~425Hz (~2.4ms/loop); Hz95 ~108Hz (~9.3ms/loop) | bounded upper C1 SKU; stricter package/thermal/write gates |
 
-| finding | value | grade |
-|---|---|---|
-| **t_vmm** (one analog matrix-vector multiply) | **5–18 ns**, now on 5 convergent legs (the "60–190 ns" naive-ramp scare is dead) | 🟡 modeled / measured-adjacent |
-| **Density** (the gate) | CIM-core **1.5–2.5 Mb/mm²** realistic (~3–3.5 ceiling), readout-limited → **0.1B fits ~90–110 mm² @28nm** (50 mm² is dead) | 🟡 modeled, panel 4/4 |
-| **Efficiency** | core **~12–15 TOPS/W**; system **~6–11 (≈ 2–4× an H100)** — ADC-free keeps the penalty small | 🟡 modeled |
-| **ADC-free counter readout** | NOT the hard bottleneck (2-step/window readout ~5–20 ns, overlaps the analog settle) | 🟡 4-leg |
-| **Model quality** | ternary ≈ fp16; a real trained BitCPM-0.5B keeps perplexity **+<1% at 2–5% ReRAM read-noise**, graceful to 20% | 🟢 measured |
+**Why it is fast:** the model matrix is physically resident in the ReRAM-CIM array. Instead of moving a large weight block from memory to compute on every token, the chip streams a small input vector into the resident matrix and the local controller advances the loop. The fastest data movement is the one you delete.
 
-Honest boundary: the chip is **not taped out** — these are modeled + cross-validated, not silicon. The make-or-break open number is a **real ternary-differential macro density** measurement. Every figure above is graded and sourced in the [ledger](chip/model-2026-06/04-LEDGER.md).
+**Writable, but not hot-swappable:** ReRAM makes the resident model provisionable and upgradeable, but C1 should promise firmware/OTA/service model loads, verify, drift health checks, and rare refresh. It should **not** promise changing the model every request.
+
+**Current density tax for write/health support:** support-plane overhead is modeled at ~4% optimistic / **~12% nominal** / ~30% harsh. At 90% raw CIM area, nominal support tax gives **79.2% effective useful weight area** and **1.136× same-capacity die growth**. This is survivable if density lands in the product band, but it is a named C1 gate.
+
+**Honest boundary:** the FPGA result below is measured on real FPGA silicon; the ReRAM-CIM ASIC is **not taped out**. C1 speed, density, write/drift tax, and package numbers are cleanroom-modeled design targets until a real ternary-differential macro closes the silicon gap.
 
 ---
 
@@ -92,7 +98,11 @@ Honest boundary: the chip is **not taped out** — these are modeled + cross-val
 
 ---
 
-## The numbers (5-second read, original 2026-05-16 — see correction above)
+## The numbers (5-second read, original 2026-05-16 — historical record)
+
+> **Historical only.** This table is preserved as the original 2026-05 thesis record. It is superseded for product
+> positioning by the 2026-07 C1 boundary above: 0.1B / 0.3B / 1B / bounded 3B, speed-first latency metrics, and no
+> fixed USB-C / PCIe / Pro Cloud promise before C1 evidence.
 
 | | |
 |---|---|
@@ -230,7 +240,7 @@ This is the empirical + black-tech-design output of one person, 1.5 months, ~$1,
 
 ---
 
-## How a token physically computes — and where our 240-960× lives
+## How a token physically computes — why resident weights change latency
 
 The wall-clock bottleneck in LLM inference is **not** compute — it's **how far weights physically travel per token**. A modern GPU spends most of its time waiting for HBM. The architectural lever isn't attention sweep or speculative decoding (both are software optimizations that layer on top of any chip). The lever is **where the weights live**.
 
@@ -327,9 +337,9 @@ Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply
 | Taalas HC1 (Toronto) | **Literal silicon wires** (fab-baked) | 0 (no memory, IS the model) | ~0.001 pJ/bit (wire) | <10 nm in-cell | ~2-3 W (Llama 8B) | **NO** ($30M NRE / model) | Edge ASIC |
 | Groq LPU | On-chip SRAM (~230 MB / chip) | 0 per chip; activation flows across chips | ~1-5 pJ/bit local; ~10-50 pJ/bit network | <1 mm on-chip; 5+ mm network | 100-150 W / chip × N chips | Yes | Cloud rack (multi-chip) |
 | Tenstorrent Blackhole (Toronto) | Mixed: 32 GB on-die SRAM + off-chip DRAM | Yes for large models | ~1-5 pJ/bit on-die; ~100 pJ/bit off-chip | <1 mm on-chip; ~20-50 mm off-chip | 150-200 W | Yes | Cloud rack / IP-license |
-| **★ Ours — 28nm ReRAM-CIM** | **Non-volatile ReRAM AT compute (in-situ MAC)** | **0** (resident, non-volatile) | **~5 pJ/bit in-cell** | **50 nm in-cell; <1 mm TSV** | **~70-150 W target ($850-$11,300 SKUs)** | **YES** (re-flashable) | **Edge / desktop / Pro Cloud card** |
+| **★ Ours — 28nm ReRAM-CIM** | **Non-volatile ReRAM AT compute (in-situ MAC)** | **0** (resident, non-volatile) | **modeled; see C1 brief** | **in-cell / local package** | **C1 form-dependent; modeled, not silicon** | **YES** (provisionable resident slots) | **C1 edge/module first; C2/C3 later** |
 
-Notes on target / TBD: *Etched Sohu* power not public — estimated. *Ours 5 pJ/bit and ~70-150 W* are target specs (HYDAR ISSCC 2026 hybrid CIM + 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) 28nm CIM precedent) — to be empirically validated via vendor eval boards, then MPW silicon (see Roadmap below). *Cerebras 10 kW* is system-level including cooling.
+Notes on target / TBD: *Etched Sohu* power not public — estimated. Our public C1 numbers are cleanroom-modeled design targets and remain to be empirically validated by a real ternary-differential macro, package work, and buyer task evidence. *Cerebras 10 kW* is system-level including cooling.
 
 ### The 2×2 that matters — where each architecture sits
 
@@ -362,7 +372,7 @@ The bottom row (on-chip + non-volatile) is the **most power-efficient cell** —
 
 **3. Per-token transport energy (V4-Flash, 13B active)**: Traditional GPU + HBM ~10 J / token (weight transport across HBM boundary); Ours ~0.3 J / token (in-situ MAC, no transport) → **~30× lower energy per token**.
 
-**4. The architectural lever, summarized**: Attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are **software-level optimizations**. They layer on top of *any* of the architectures above and compound with chip-side gains. They are not substitutes for the physical lever. The lever is **where the weights physically sit relative to the compute units**, and the energy / distance cost of moving them. Our 240-960× speed target (vs Mac M4 Max baseline) comes from **eliminating the HBM bandwidth bottleneck physically**, not from algorithmic cleverness. Spec decode + attention optimization would be additive multipliers on top.
+**4. The architectural lever, summarized**: Attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are **software-level optimizations**. They layer on top of *any* architecture and compound with chip-side gains. They are not substitutes for the physical lever. The lever is **where the weights physically sit relative to the compute units**, and the energy / distance cost of moving them. Current C1 comparisons must be made on same-task tok/s, latency, peak-reflex Hz, and task success, not on a single old 240-960× headline.
 
 ### Honest gaps
 
@@ -386,7 +396,7 @@ All data: 2-bit DeepSeek V4-Flash (antirez Q2-K GGUF, 81 GB) on M4 Max 128 GB. R
 
 **Exp 5**: cold prefill 636 s; warm (in-RAM KV) 8.16 s; **diskwarm (disk-backed KV via `--kv-disk-dir`) 5.65 s**. Diskwarm is *equal-or-faster* than in-RAM warm — OS page cache holds the hot pages, so mmap'd disk KV reads at RAM speed.
 
-**Implication**: 3FS-style spillover ("256K hot SRAM + 1M via cluster KV") goes from theoretical to **empirically validated**. Pro Cloud SKU storyline now has an empirical anchor.
+**Implication**: 3FS-style spillover ("256K hot SRAM + 1M via cluster KV") goes from theoretical to **empirically validated** as a research direction. It is no longer a C1 product promise; >3B / rack / Pro Cloud style systems stay C2/C3 until C1 evidence exists.
 
 ### Signal 3 — `ds4-server` is fully serial (no batch parallelism)
 
@@ -429,16 +439,16 @@ Token generation speed isn't a tech specsheet number. It's a **civilizational th
 
 Today's M4 Max at 250K context is in the **< 10 t/s tier** — that's the floor on local hardware for V4-Flash-class models. Hosted services with network sit in 10-100 t/s.
 
-Our chip is engineered to use **Chinese-fab-accessible 28nm ReRAM-CIM** to push local hardware up to:
+The current public C1 ladder is narrower and more honest:
 
-| Our tier | Speed band | Civilizational tier reached |
+| Public stage | Modeled speed-first target | Civilizational tier it can test |
 |---|---|---|
-| Entry $850 (¥6K) USB-C box | 3-8K t/s @ 32-128K ctx | **"longform feels instant"** — local LLM finally usable |
-| Mid $1,400 (¥10K) PCIe card | 3-6K t/s @ 180-250K ctx | **"longform feels instant" at domain-document scale** |
-| High $5,000 (¥35K) standalone + LPDDR5 | 3-8K t/s @ 256K + 1M via spillover | **"longform feels instant" / "LLM-as-OS-shell"** on multi-document scope |
-| Pro Cloud $11,300 (¥80K) rack + 3FS | 3-8K × N users (cluster aggregate 10K-50K) | **"LLM-as-OS-shell" / "compute substrate"** for enterprise |
+| **C1-A 0.1B** | ~300k tok/s; peak-reflex ~1.9kHz (~0.53ms/loop) | always-on local reflex: short voice, camera, wearable loops |
+| **C1-B0/B1 0.3B-1B** | ~92k-97k tok/s; peak-reflex ~1.3-1.4kHz (~0.7-0.8ms/loop) | private-edge small-model workflows, offline assistant, routing/extraction |
+| **C1-B2 bounded 3B** | ~27.6k tok/s; peak-reflex ~425Hz (~2.4ms/loop) | stronger local model only after package/thermal/write-load gates pass |
+| **C2/C3 >3B** | future / modeled / learning only | datacenter, long-context, and broad platform work after C1 proof |
 
-**Each tier of our chip pushes Chinese-fab-accessible hardware up one whole civilizational rung**, on V4-Flash-class models, at consumer/SMB prices, locally and privately.
+**The current question is not "which box tier do we sell?" It is "which real loop can a small resident low-bit model make dramatically faster, local, private, or lower-power?"**
 
 ### What that means for use cases
 
@@ -452,7 +462,7 @@ Concrete examples of what "longform feels instant" unlocks once it's local + pri
 - **Agent loops** that don't degrade after dozens of turns
 - **Real-time multi-modal**: meeting transcription + summary + recommendation in one place
 
-And once we hit "compute substrate" tier (Pro Cloud cluster):
+And if C2/C3 later reaches a "compute substrate" tier:
 
 - **Major law firm**: every case file from a decade as one searchable context
 - **Pharma research**: full molecule / trial / literature corpus for drug repurposing
@@ -572,16 +582,19 @@ Don't send a resume. **Write me a letter telling me why you want to do this thin
 
 ---
 
-## 4-tier product matrix (preview)
+## C1 product ladder (current public boundary)
 
-| Tier | Form | Context | Single-stream (chip target, P50) | M4 Max baseline today | Price |
-|---|---|---|---|---|---|
-| Entry | USB-C box (10×7×2 cm, like Hailo-8 USB) | 32K-128K | 3-8K t/s | 14-16 t/s | **$850 (¥6,000)** |
-| Mid | PCIe 5.0 ×16 card | 250K | 3-6K t/s | 12 t/s | **$1,400 (¥10,000)** |
-| High | Standalone device (Mac mini sized) + LPDDR5 spillover | 256K hot + 1M via LPDDR5 | 3-8K + spillover | (M4 Max OOM at 1M) | **$5,000 (¥35,000)** |
-| Pro Cloud | 1U rack + 3FS Bridge protocol chip | 256K hot + 1M+ via 3FS cluster | 3-8K × N users (cluster aggregate 10K-20K+) | n/a | **$11,300 (¥80,000)** |
+The first product is **not** a GPU replacement and not a broad AI-card platform. It is a narrow C1 ladder: resident weights, low-bit inference, local controller, and one compute die family.
 
-**The first chip — the entry-tier USB-C box — goes to antirez.** Plug it into his M4 Max, macOS recognizes it as a USB-Network device (no driver install), `ds4-server` runs *on the box*, his Mac sends HTTP requests, M4 Max GPU stays at 0 watts. That's the form factor.
+| Stage | Form | Model size | What it is for | Status |
+|---|---|---:|---|---|
+| **C0** | macro / proof chip / eval board | tiny to 0.1B proof path | close density, t_vmm, write/verify, drift, yield, and toolchain gaps | required proof ladder |
+| **C1-A** | single packaged chip | 0.1B | always-on edge device proof: glasses, earbuds, cameras, short voice loops | first beachhead if 0.1B is useful |
+| **C1-B0/B1** | small module/card | 0.3B / 1B | private-edge small-model workflows, offline assistant, local routing/extraction | design-partner target |
+| **C1-B2** | upper module/card | bounded 3B | stronger local model only if package/thermal/write-load/buyer gates pass | upper C1, not first beachhead |
+| **C2/C3** | multi-module / rack | >3B, 8B+ | future learning track, not current product claim | parked |
+
+**The first chip still goes to antirez.** The exact physical form should follow the C1 proof that survives silicon and buyer discovery; the public promise is no longer a fixed USB-C/PCIe tier table.
 
 ---
 
@@ -600,7 +613,8 @@ The path forward — open thesis, public 18-row transparency, public invitations
 ## Documents in this repo
 
 - **README.md** (this file) — English thesis + transparency
-- **chip/model-2026-06/** — the current clean-room chip model: single-source ledger + density / throughput / energy / counter studies + a runnable parametric engine, every number graded 🟢/🟡/🔴 and panel-cross-validated ★ **NEW 2026-06-27**
+- **chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md** — current public C1 boundary: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, rewritable resident slots, and the write/drift support tax ★ **NEW 2026-07-07**
+- **chip/model-2026-06/** — archived public clean-room physics snapshot: single-source ledger + density / throughput / energy / counter studies + runnable parametric engine. Still useful, but product/outreach boundary is superseded by the C1 brief.
 - **article-3.md** — Scaling to big models: the wall we don't have (KV cache, throughput, tensor parallelism, ReRAM's real limits) ★ **NEW 2026-06-15**
 - **article-2.md** — Stage 1 validation report (15 hypotheses checked, one architecture locked) ★ **NEW 2026-05-18**
 - **docs/article-1-zh.md** — Article 1 Chinese version (公众号 / 知乎 / Substack-zh)
@@ -623,4 +637,4 @@ MIT.
 
 ---
 
-*Last updated: 2026-06-27 — chip performance model rebuilt clean-room (see [the numbers, rebuilt](#-2026-06-27--the-chips-numbers-rebuilt-clean-room-current-model) at the top; full model in [`chip/model-2026-06/`](chip/model-2026-06/)). Thesis baseline 2026-05-16. Comments, contributions, criticisms welcome.*
+*Last updated: 2026-07-07 — C1 public boundary folded from the private cleanroom: 0.1B / 0.3B / 1B / bounded 3B, speed-first comparison, writable resident model slots, and explicit support-plane tax. Physics snapshot remains in [`chip/model-2026-06/`](chip/model-2026-06/). Thesis baseline 2026-05-16. Comments, contributions, criticisms welcome.*

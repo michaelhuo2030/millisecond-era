@@ -1,5 +1,10 @@
 # chip model — 2026-06 clean-room convergence
 
+> **Public archive note, 2026-07-07:** this folder remains the public physics snapshot and derivation record. The
+> current product/outreach boundary is now **C1** — 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, and
+> provisionable resident model slots. Start there for public positioning:
+> [`../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](../C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md).
+
 A from-scratch, **rules-first** rebuild of the ternary ReRAM-CIM chip calculation system: methodology locked
 *before* any number, every number grounded *before* use, each checked one-by-one, and every load-bearing claim
 cross-validated by a multi-engine panel (codex + kimi + minimax + glm). It supersedes the earlier scattered
@@ -27,9 +32,10 @@ its evidence-legs, the open 🔴 GAPs, and the doc map.
 
 A **ternary ReRAM-CIM** chip: weights are **resident physical conductances**; the matrix-vector multiply happens by
 **analog physics** (Ohm + Kirchhoff — the whole matrix in one settle), read out **ADC-free** by a per-2-column
-differential up/down counter. The moat is **µW always-on inference** (a GPU can't run at µW; a digital NPU can
-neither hold the model resident nor compute in-memory). **Density is the gate** (fit 0.1B in a manufacturable die);
-**energy / µW-always-on is the winning axis**; speed is never the bottleneck (every size beats human reading). The
+differential up/down counter. The moat is **resident low-latency inference in a power envelope GPUs cannot occupy**
+(a GPU can't run at µW; a digital NPU can neither hold the model resident nor compute in-memory). **Density is the
+gate** (fit 0.1B in a manufacturable die); **speed/latency is the first buyer comparison axis, then power/local/privacy
+decide deployment fit**. The
 FPGA work elsewhere in this repo is an **execution-credibility demo** (it proves the ternary model runs correctly on
 real silicon) — *not* the product (it's digital and systolic; it has none of the analog in-memory speed/energy).
 

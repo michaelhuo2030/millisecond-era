@@ -1,14 +1,19 @@
-# chip — the architecture & the model
+# chip — public architecture, model, and C1 boundary
 
-Two layers live here:
+Three layers live here:
 
-1. **[`model-2026-06/`](model-2026-06) — the clean-room calculation model (newest).** A rules-first, single-source-of-truth
+1. **[`C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md) — the current public product boundary.**
+   This is the cleanroom-derived C1 update: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics,
+   provisionable resident model slots, write/verify/drift support tax, and the public-safe red lines.
+2. **[`model-2026-06/`](model-2026-06) — the archived public clean-room calculation model.** A rules-first, single-source-of-truth
    rebuild of every chip number: density, throughput, energy, the ADC-free counter, all panel-cross-validated and graded.
-   **Start at [`model-2026-06/00-STATE-OF-MODEL.md`](model-2026-06/00-STATE-OF-MODEL.md).** This is where the numbers are now
-   most rigorous — it refines several conclusions in the ADR below (a single ledger; `t_vmm` on 5 legs; a paradigm-native
-   `decode = min(timing, power)` throughput model; a corrected, readout-limited density ceiling; an honest ~2–4× H100 *system*
-   efficiency number).
-2. **[`ADR-v1-architecture.md`](ADR-v1-architecture.md) — the architecture decision record** (the v1 build decision, below).
+   **Start at [`model-2026-06/00-STATE-OF-MODEL.md`](model-2026-06/00-STATE-OF-MODEL.md)** when you want the physics
+   snapshot and old derivations. Product/outreach wording now starts from the C1 public brief above.
+3. **[`ADR-v1-architecture.md`](ADR-v1-architecture.md) — the architecture decision record** (the v1 build decision, below).
+
+Current public rule: lead with **speed and latency on a real buyer loop**, not TOPS. Then state local/private/power,
+then rewritable resident model slots. Keep measured FPGA evidence, cleanroom-modeled ASIC targets, and future dreams
+separate.
 
 ---
 

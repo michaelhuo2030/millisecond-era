@@ -17,6 +17,19 @@ It is not a GPU, not a CPU, not a general PyTorch target, and not a broad accele
 
 Anything **>3B** is C2/C3 future work until C1 evidence exists.
 
+## Whole picture: C1 bridgehead, 100B frontier
+
+Bounded 3B is a **C1 constraint**, not a technology ceiling.
+
+C1 exists to prove the smallest useful version of the substrate: a resident low-bit model answering a real local loop much faster than the incumbent. The later vision remains larger: if density, write/refresh, packaging, low-bit training, and buyer evidence all compound, the same resident-weight idea can move toward 8B, 32B, and eventually 100B-class systems. Those are **C2/C3 frontier coordinates**, not first-SKU promises.
+
+| horizon | public meaning | model scale | claim status |
+|---|---|---:|---|
+| **C0** | proof vehicles | tiny / toy | measured FPGA and lab evidence only |
+| **C1** | first product boundary | 0.1B / 0.3B / 1B / bounded 3B | current public SKU target |
+| **C2** | stronger modules / boxes | 3B+ / 8B / 32B | future research and buyer learning |
+| **C3** | civilization-scale substrate frontier | 100B-class | possibility frontier, not a sales claim |
+
 ## Why the chip is useful
 
 Most accelerators move model weights from memory to compute again and again. C1 is useful when the model can be a mostly-static resident matrix:

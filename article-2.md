@@ -4,6 +4,11 @@
 
 ---
 
+> **2026-07 public update / historical record:** this Stage-1 report is kept as the then-current validation snapshot.
+> Its 5-die / 100GB / 5K-15K tok/s / USB-C puck architecture is **superseded for public product positioning**.
+> Current product wording starts from **C1**: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, writable resident
+> model slots, and explicit measured-vs-modeled labels. 8B / 32B / 100B-class work remains C2/C3 frontier research.
+
 ## Where we are
 
 Article 1 launched the thesis: a 28nm ReRAM-CIM chip running DeepSeek V4-Flash, ~$850 entry, ~10K tokens/sec target. It also disclosed the Stage 0+ harness — 50+ datapoints measured on antirez's `ds4-server` running on a 128 GB M4 Max.

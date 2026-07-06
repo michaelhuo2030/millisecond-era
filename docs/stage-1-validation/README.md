@@ -1,5 +1,9 @@
 # Stage 1 Validation — Empirical Evidence
 
+> **2026-07 archive label:** Stage 1 evidence remains part of the public audit trail, but the Stage-1 product architecture
+> is superseded for outreach by the C1 boundary: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer loops, and explicit
+> modeled-vs-measured labels.
+
 Summary JSON files from the six Stage 1 first-principles experiments. All reproducible from the methodology files in the parent repo.
 
 | File | What it contains | Referenced in |

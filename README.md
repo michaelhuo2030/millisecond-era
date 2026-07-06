@@ -46,6 +46,8 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 - one compute die family, partner foundry / OSAT / IP;
 - model ladder: **0.1B / 0.3B / 1B / bounded 3B**. Anything **>3B** is C2/C3 future work.
 
+**Whole-picture rule:** C1 is the bridgehead, not the ceiling. The reason this public repo still keeps 8B / 32B / 100B-class exploration in the archive and frontier notes is to show the possible shape of the substrate if C1 works. Public product claims start at 0.1B / 0.3B / 1B / bounded 3B; larger models are C2/C3 research coordinates until the small resident-weight loop is proven.
+
 **Modeled C1 speed targets** (not taped-out silicon; source = cleanroom model and engine):
 
 | SKU | model | form | speed-first public target | role |

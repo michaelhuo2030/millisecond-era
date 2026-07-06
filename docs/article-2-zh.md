@@ -4,6 +4,11 @@
 
 ---
 
+> **2026-07 公开更新 / 历史稿标注:** 这篇保留为当时的 Stage-1 验证快照。文中的 5-die / 100GB /
+> 5K-15K tok/s / USB-C 桌面方块架构, 在对外产品定位上已经被 **C1** 边界取代: 0.1B / 0.3B / 1B /
+> bounded 3B, 先比同任务速度/延迟/Hz/闭环成功率, 保留可写入模型槽位, 所有 ASIC 数字标为 modeled。
+> 8B / 32B / 100B 属于 C2/C3 可能性前沿研究, 不是第一 SKU 承诺。
+
 ## 我们走到哪儿了
 
 Article 1 抛出了主线: 28nm ReRAM-CIM 芯片跑 DeepSeek V4-Flash, 入门款约 $850, 目标 ~10K tokens/sec。同时披露了 Stage 0+ 的实测 harness — 在 128 GB M4 Max 上跑 antirez 的 `ds4-server`, 拿到 50+ 个数据点。

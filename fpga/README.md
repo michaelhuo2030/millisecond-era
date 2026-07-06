@@ -2,6 +2,10 @@
 
 This is the **measured FPGA proof** under millisecond-era's speed thesis: a SPIKA-style ternary {−1, 0, +1} multiply-accumulate array, synthesized on a real **Zynq-7010 (EBAZ4205, ~¥150 board)** in Vivado 2023.2 (`xc7z010clg400-1`).
 
+> **2026-07 C1 framing:** FPGA evidence proves the multiplier-free ternary datapath and tiny C0 loops. It does **not**
+> prove the ReRAM-CIM ASIC SKU. Current public C1 starts at 0.1B / 0.3B / 1B / bounded 3B; older 1B/4B ASIC
+> projections here are historical anchors, not buyer promises.
+
 ## Measured (the honest floor)
 - **0 DSPs** — multiplier-free by construction (ternary weights ⇒ add/subtract only).
 - **Fmax 194–266 MHz** on the tiny 17.6k-LUT xc7z010 (−1 speed grade); ~84% of the critical path is *routing* delay → a 28nm ASIC clocks far higher (600 MHz–1 GHz assumption holds).

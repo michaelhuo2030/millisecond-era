@@ -4,6 +4,10 @@
 
 > **TL;DR (English)** — [RWKV-7](https://arxiv.org/abs/2503.14456) is the LLM architecture that fits our ternary compute-in-memory chip best: a pure RNN with **no KV-cache → no memory-bandwidth wall**. We ran four "gates" to check whether a *ternary* RWKV is actually buildable, and all four came back green at small (proof-of-concept) scale. The chip itself is **not taped out** — but our own ternary MAC RTL already runs functionally correct on real FPGA silicon (xc7z010, bit-exact over 4096 outputs; see [`../fpga/`](../fpga/)). This is a *defensible build*, not a free ride. Every figure below is labelled with how much you should trust it (see "How to read this" right under here).
 
+> **2026-07 C1 framing:** this folder is a model-architecture fit study, not the current SKU promise. Current public C1 starts at
+> **0.1B / 0.3B / 1B / bounded 3B** resident low-bit inference. RWKV 7B / 9B / 13B fit rows below are **C2/C3 exploration
+> coordinates** that show why the substrate could scale if density and packaging work; they are not first-product commitments.
+
 ---
 
 ## 0. 怎么读这份文档 — 每个数字都告诉你「该信几分」
@@ -133,12 +137,12 @@ byte-level 语言模型，留出集 CE，单位 bits/byte，**越低越好**；2
 1. **batch=1 是边缘场景**——这正是「片上常驻权重」芯片天生的命。RWKV 高并发服务时，状态是**每条序列一份**，256 路并发就把状态乘到 GB 级——那是**另一本账（服务器账）**，不是这颗边缘片要打的仗。
 2. **大模型可以切片拼模组**——RWKV 是逐层递归、状态恒定，**架构天生好切**：单片放不下的，按层切到 2–3 片拼成一个模组（13.3B 就是这种）。
 
-**甜点区怎么落：**
+**甜点区怎么落（按 2026-07 C1/C2/C3 分层读）：**
 
-- **1GB 三值片（设计目标）** → 舒服地单片跑 **~0.4B–3B**（正好覆盖 RWKV-7 真实可用的 0.4B / 1.5B / 2.9B）。4B 正好压在 1GB 线上（~1.1GB）。
-- **3GB 三值片（我们的设计余量目标）** → 单片直接吃下 **4B、7.2B、乃至 ~9B（~2.2GB）**；**13.3B 临界（~2.96GB）**，要么 3GB 单片擦边、要么 2 片拼模组。
+- **C1 current boundary** → **0.1B / 0.3B / 1B / bounded 3B**. RWKV-7 0.4B / 1.5B / 2.9B are the closest public model-family reference points for that band.
+- **C2/C3 exploration** → 4B / 7.2B / ~9B / 13.3B rows show the scaling direction if density, package, and low-bit training all land. Do not pitch them as C1.
 
-换句话说：**1GB 这颗，是 1–3B 边缘 RWKV 的命；只要把密度做到 3GB，9B 这一档我们也单片吃得下。** 这就是为什么我们一直把芯片容量当成可滑动的设计旋钮，而不是写死。
+换句话说：**C1 先证明 0.1B–3B 的边缘/盒子循环；9B 以上是下一阶段的可能性前沿。** 这就是为什么我们保留大模型适配账，但不把它写成第一 SKU。
 
 ---
 

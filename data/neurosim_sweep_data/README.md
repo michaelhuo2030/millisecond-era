@@ -2,6 +2,10 @@
 
 # NeuroSim V1.3 ARM64 Mac Sweep Data — Phase 47.7.10 Empirical Deliverables
 
+> **2026-07 archive label:** this is the May-2026 sweep-data archive. It is useful provenance for how earlier Mini/Mid/Pro
+> assumptions were tested and corrected. It is **not** the current C1 product boundary. Current public C1 starts at
+> 0.1B / 0.3B / 1B / bounded 3B; rows mentioning 9B / 27B / 30B are historical inputs or C2/C3 frontier coordinates.
+
 **Source**: Phase 47.7.10 NeuroSim V1.3 ARM64 native compile + 45+ data point sweeps (2026-05-19)
 
 **Note**: This folder contains the **empirical sweep outputs + replication artifacts**. The full NeuroSim source tree was cloned into `../neurosim_v13_arm64_build/` (which has its own .git, gitignored — not tracked in main repo). To replicate the experiments, re-clone NeuroSim V1.3 + apply the patches shown in `*.patched` files below.

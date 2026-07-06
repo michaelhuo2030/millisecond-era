@@ -43,6 +43,11 @@ td:first-child,th:first-child{text-align:left}
 <h1><span class="lang-en">ReRAM-CIM Ternary Model Capacity Calculator ⚙️</span><span class="lang-zh">ReRAM-CIM 三元模型容量计算器 ⚙️</span></h1>
 <div class="sub"><span class="lang-en">Given the capacity of a ReRAM-CIM chip, compute how large a <b>ternary ({−1,0,+1})</b> model it can hold. Every physical factor to consider — cell type, number of levels, differential, ECC redundancy, activation reserve — is a knob. <b>Tap any word with a <span style="color:var(--blue)">?</span> for a plain-language explanation.</b></span><span class="lang-zh">给定一块 ReRAM-CIM 芯片的容量,算它能塞下多大的 <b>ternary(三元 {−1,0,+1})</b> 模型。所有要考虑的物理因素——cell 类型、电平数、差分、ECC 冗余、激活预留——都做成旋钮。<b>每个带 <span style="color:var(--blue)">?</span> 的词点一下有大白话解释。</b></span></div>
 
+<div class="card" style="border-color:#2f7a45;background:#0e2417">
+  <h2><span class="lang-en">2026-07 C1 framing</span><span class="lang-zh">2026-07 C1 读法</span></h2>
+  <div class="note"><span class="lang-en">Use this calculator for capacity intuition, not as a product promise. Current public C1 is <b>0.1B / 0.3B / 1B / bounded 3B</b>. Larger 8B / 32B / 100B-class rows are C2/C3 frontier coordinates. Buyer comparisons should use same-task tok/s, p99 latency, loop Hz, and closed-loop success first; TOPS is only the rough internal compute knob below.</span><span class="lang-zh">这个工具用来建立容量直觉,不是产品承诺。当前公开 C1 是 <b>0.1B / 0.3B / 1B / bounded 3B</b>。8B / 32B / 100B 级只属于 C2/C3 前沿坐标。买家比较要先看同任务 tok/s、p99 latency、循环 Hz、闭环成功率; TOPS 只是下面的粗略内部计算旋钮。</span></div>
+</div>
+
 <div class="grid">
   <!-- INPUTS -->
   <div class="card">
@@ -78,9 +83,9 @@ td:first-child,th:first-child{text-align:left}
     <input type="range" id="act" min="0" max="50" value="0" oninput="calc()">
     <div class="note"><span class="lang-en">Only takes effect when "Total chip storage" is selected above. In weight mode, activations usually live in separate SRAM.</span><span class="lang-zh">仅当上面选「芯片总存储」时生效。权重模式下激活通常放单独 SRAM。</span></div>
 
-    <label><span class="lang-en">Compute (for estimating tok/s)</span><span class="lang-zh">算力(估 tok/s 用)</span><span class="q" onclick="explainTopic('tops')">?</span> <span class="valbig" id="topsLbl"></span></label>
+    <label><span class="lang-en">Rough compute knob (legacy TOPS)</span><span class="lang-zh">粗略计算旋钮(传统 TOPS)</span><span class="q" onclick="explainTopic('tops')">?</span> <span class="valbig" id="topsLbl"></span></label>
     <input type="range" id="tops" min="0" max="200" value="20" oninput="calc()">
-    <div class="note"><span class="lang-en">CIM speed is set by the array's MACs per second (TOPS), not bandwidth. This is just a rough estimate, to see which speed tier you land in.</span><span class="lang-zh">CIM 的速度由阵列每秒 MAC 次数(TOPS)决定,不是带宽。这只是粗估,看落在速度阶梯哪一档。</span></div>
+    <div class="note"><span class="lang-en">Use this only to estimate tok/s. For buyers, compare same-task tok/s, p99 latency, Hz, and success rate first; TOPS is a footnote.</span><span class="lang-zh">这里只用来粗估 tok/s。给买家比较时,先比同任务 tok/s、p99 latency、Hz、成功率; TOPS 只是脚注。</span></div>
   </div>
 
   <!-- OUTPUTS -->
@@ -163,10 +168,10 @@ const EXP={
   "When the model runs, besides weights there are <b>activations</b> (the intermediate results of each layer) and the <b>KV cache</b> (attention history, growing with context length).<br><br>If the chip \"shares one storage for weights + activations\", you have to carve out a slice for them. In pure-weight-array mode (activations in separate SRAM) you can set 0. For small models + short context this slice is tiny.",
   "激活 / KV cache 预留",
   "模型跑的时候除了权重,还有<b>激活值</b>(每层的中间结果)和 <b>KV cache</b>(注意力的历史,随上下文长度涨)。<br><br>如果芯片是“权重+激活共用同一块存储”,就得切一块给它们。纯权重阵列模式(激活另有 SRAM)可设 0。小模型 + 短上下文时这块很小。"],
- tops:["Compute TOPS",
-  "<b>TOPS = trillion operations per second</b>. A CIM chip's speed is set by how many multiply-accumulates the in-memory array can do per second, <b>not</b> by memory bandwidth (weights don't shuttle back and forth — that's exactly CIM's killer feature).<br><br>Generating 1 token ≈ passing through the whole model once ≈ 2× params operations. So tok/s ≈ TOPS ÷ (2× params). This gives a rough estimate to see which speed tier you land in.",
-  "算力 TOPS",
-  "<b>TOPS = 每秒万亿次操作</b>。CIM 芯片的速度由存内阵列每秒能做多少次乘加决定,<b>不是</b>由内存带宽决定(权重不用搬来搬去,这正是 CIM 的杀手锏)。<br><br>每生成 1 个 token ≈ 要把整个模型过一遍 ≈ 2×参数 次操作。所以 tok/s ≈ TOPS ÷ (2×参数)。这里给个粗估,看落在咱速度阶梯哪一档。"],
+ tops:["Rough compute knob",
+  "<b>TOPS = trillion operations per second</b>. This slider is only a rough way to turn array work into tok/s. The real public comparison is not TOPS; it is same-task tok/s, p99 latency, loop Hz, and closed-loop success. The reason CIM helps is that resident weights stop shuttling back and forth, so the memory wall is removed for the resident model.",
+  "粗略计算旋钮",
+  "<b>TOPS = 每秒万亿次操作</b>。这个滑块只是把阵列工作量粗略换成 tok/s。真正对外比较不是 TOPS,而是同任务 tok/s、p99 latency、循环 Hz、闭环成功率。CIM 有用的根本原因是权重常驻,不再来回搬,所以常驻模型的 memory wall 被删掉。"],
  bpw:["Effective bit/weight",
   "Working out cell type + levels, the average number of bits each ternary weight actually takes. 1.58 is the theoretical floor, 2.0 is the common implementation, 3.0 is the conservative value with error correction. <b>Smaller = more parameters in the same capacity.</b>",
   "有效 bit/权重",

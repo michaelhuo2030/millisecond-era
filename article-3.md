@@ -4,6 +4,10 @@
 
 ---
 
+> **2026-07 public update / frontier label:** this article is explicitly C2/C3 frontier exploration. It is the reason the
+> repo does **not** stop philosophically at 3B. It is **not** the current first-SKU promise. Current public product wording
+> starts from C1: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer loops, and measured-vs-modeled separation.
+
 ## The one idea, restated: the weights don't move
 
 A GPU running a large model spends most of its energy **moving weights** — streaming hundreds of GB out of HBM into the compute units, every forward pass. That traffic is the "memory wall," and most of modern accelerator design — HBM stacks, NVLink at 1.8 TB/s per GPU [measured, NVIDIA], the whole optical-interconnect roadmap — exists to fight it.

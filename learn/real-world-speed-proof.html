@@ -22,6 +22,7 @@ a.btn:hover{border-color:var(--hot)}
 <div class="topnav"><a href="reram-cim-101.html">🧱 ReRAM 科普</a><a href="reram-cim-visual.html">👀 看得见的芯片</a><a href="demos/index.html">⚡ 速度↔文明 demos</a></div>
 <h1>真实世界证据:这速度不是我们空想 🌍</h1>
 <div class="lead">有人<b>已经</b>把"模型权重常驻片上、不再反复搬运"做成了真芯片,跑出了几千–上万 tok/s/user。这页摆出公开数据,并说清<b>他们怎么做的、我们的路线哪里不同</b>。</div>
+<div class="callout"><b>2026-07 C1 读法:</b> 这页证明的是"权重常驻片上 → 速度跃迁"这个物理原则已有第三方实物坐标。它不是说 C1 就是 8B/9B 产品。当前 C1 边界是 <b>0.1B / 0.3B / 1B / bounded 3B</b>; 8B / 32B / 100B 属于 C2/C3 前沿研究。</div>
 
 <h2>① 公开对比:Taalas HC1 vs 主流</h2>
 <p class="note">数据来源:Taalas 官方 <a href="https://taalas.com/products/" target="_blank" style="color:var(--blue)">taalas.com/products</a>(他们发布的 Tokens/Second/User,Llama 3.1 8B,输入/输出 1k/1k)。下面是按这些公开数字<b>自己重画</b>的图。</p>
@@ -32,18 +33,18 @@ a.btn:hover{border-color:var(--hot)}
 
 <h2>② Taalas 怎么做到的?</h2>
 <p><b>把模型硬编码进硅(model-in-silicon / "hardcore" silicon)。</b> 权重不再从 DRAM 流进流出,而是<b>直接固化在芯片里、就地计算</b> —— 内存墙消失 → 飙速。HC1 是技术演示芯:<b>TSMC 6nm、815mm²、53B 晶体管、2.5 kW 服务器</b>,跑 Llama 3.1 8B。</p>
-<div class="callout"><b>关键:这恰恰印证了我们的核心原理</b> —— "<b>权重常驻片上 → 不流式 → 飙速</b>"。Taalas 用"硬编码进硅"这一种方式实现了它;<b>我们用另一种方式(ReRAM-CIM)</b>实现同一个原理,但走的是完全不同的取舍。</p>
+<div class="callout"><b>关键:这恰恰印证了我们的核心原理</b> —— "<b>权重常驻片上 → 不流式 → 飙速</b>"。Taalas 用"硬编码进硅"这一种方式实现了它;<b>我们用另一种方式(ReRAM-CIM)</b>实现同一个原理,但走的是完全不同的取舍。</div>
 
 <h2>③ 同一个原理,两条不同的路</h2>
 <table>
 <tr><th>维度</th><th class="theirs">Taalas HC1</th><th class="ours">毫秒纪(我们)</th></tr>
 <tr><td>权重怎么"住"在片上</td><td>硬编码<b>焊死</b>进硅(固定)</td><td>ReRAM-CIM,常驻但<b>可反复重写</b>(换模型/更新)</td></tr>
 <tr><td>工艺节点</td><td>TSMC <b>6nm</b>(尖端、贵)</td><td><b>28nm 成熟节点</b>(便宜、可及)</td></tr>
-<tr><td>体量 / 功耗</td><td>815mm² · 53B 管 · <b>2.5 kW 服务器</b></td><td><b>边缘形态</b> · ~25–60 W</td></tr>
+<tr><td>体量 / 功耗</td><td>815mm² · 53B 管 · <b>2.5 kW 服务器</b></td><td><b>C1 小模型边缘/盒子优先</b> · 功耗/封装待实测</td></tr>
 <tr><td>精度路线</td><td>(其 LLM)</td><td><b>三元 + HDC</b>(低精度;<b>数字无-ADC</b>计数器读出,不靠模拟精度)</td></tr>
-<tr><td>模型</td><td>Llama 3.1 8B,固定</td><td><b>4B 三元(~1 GB),可重刷更新</b></td></tr>
+<tr><td>模型</td><td>Llama 3.1 8B,固定</td><td><b>C1:0.1B/0.3B/1B/bounded 3B,可写入/可升级</b>; 8B+ 是 C2/C3</td></tr>
 <tr><td>开放性</td><td>专有</td><td><b>开放 / 可编程</b>生态(毫末)</td></tr>
-<tr><td>速度</td><td>16,960 tok/s(发布值)</td><td>Mini 目标 1.5–5k 持续 / 4–12k 峰(投影,未流片)</td></tr>
+<tr><td>速度</td><td>16,960 tok/s(发布值)</td><td>按同任务比 tok/s / p99 latency / loop Hz / 成功率; C1 ASIC 仍是投影,未流片</td></tr>
 </table>
 <p class="note">诚实标注:Taalas 的 16,960 是<b>厂商发布值</b>;我们的数是<b>投影/模拟</b>(还没流片)。我们不声称比它快——我们赌的是<b>更便宜的节点 + 可重编程 + 低精度 + 边缘 + 开放</b>这组不同取舍。</p>
 

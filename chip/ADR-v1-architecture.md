@@ -13,6 +13,12 @@
 
 > **Public version:** private expert-consultation attributions and specific partner-engagement details have been removed; the technical analysis is unchanged.
 
+> **2026-07 public update:** this ADR is now a historical v1 architecture record. Product/outreach wording is superseded by
+> [`C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md): C1 starts at
+> **0.1B / 0.3B / 1B / bounded 3B**, speed-first buyer metrics, and provisionable resident model slots. The ADR remains useful
+> for physical architecture reasoning, but its 4B target is not the current first-SKU promise. Larger 8B / 32B / 100B-class
+> systems are C2/C3 frontier work, not C1.
+
 ---
 
 ## TL;DR — the v1 decision in 5 lines

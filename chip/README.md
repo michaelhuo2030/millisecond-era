@@ -15,11 +15,15 @@ Current public rule: lead with **speed and latency on a real buyer loop**, not T
 then rewritable resident model slots. Keep measured FPGA evidence, cleanroom-modeled ASIC targets, and future dreams
 separate.
 
+Whole-picture rule: **C1 is the bridgehead, not the ceiling.** Public product wording starts at 0.1B / 0.3B / 1B /
+bounded 3B because that is the first useful and falsifiable buyer wedge. 8B / 32B / 100B-class work belongs to C2/C3
+frontier research until C1 evidence exists.
+
 ---
 
 **[ADR-v1-architecture.md](ADR-v1-architecture.md)** synthesizes the whole program into one v1 chip decision:
 
-- **What to build first** — a 4B train-time-ternary {−1,0,+1} text model (~1 GB), **weights resident on-chip**, digital SPIKA binary-cell CIM with a counter readout and **no ADC**. (Not 8B, not 9B-Q4, not analog — each rejection argued.)
+- **Historical v1 decision now superseded for product wording** — the ADR's first target was a 4B train-time-ternary {−1,0,+1} text model (~1 GB), **weights resident on-chip**, digital SPIKA binary-cell CIM with a counter readout and **no ADC**. The current public product boundary is the C1 ladder above: 0.1B / 0.3B / 1B / bounded 3B.
 - **How to de-risk it cheaply** — the **M0 → M4 tape-out ladder**: FPGA twin (¥0) → open-PDK digital shuttle (¥0) → a single-die ReRAM test-tile (~¥50万) **only** once the free rungs are green. Each rung buys exactly one missing number before the next 10× of spend.
 - **The honest blocker list** — single-layer density (the 60× open question), FPGA utilization, and **market validation as the now-binding constraint** (not the physics).
 

@@ -4,6 +4,14 @@
 
 ---
 
+> **2026-07 public update / historical record:** this article is preserved as the original public thesis and correction trail.
+> Its Mini / Mid / Pro tiers, 9B / 27-70B wording, USB-C product shape, and price claims are **not** the current public
+> product boundary. Current product wording starts from **C1**: 0.1B / 0.3B / 1B / bounded 3B resident low-bit inference,
+> speed-first buyer metrics, provisionable model slots, and no claim that C1 replaces GPUs or general accelerators. Larger
+> 8B / 32B / 100B-class systems remain C2/C3 possibility-frontier research, not first-SKU promises.
+
+---
+
 ## The reference frame matters more than the claim
 
 Almost all "AI chip" coverage assumes a *static* world: "NVIDIA owns CUDA, China can't catch up, the game is over." Read from that frame, this work looks audacious or naive.

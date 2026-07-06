@@ -4,6 +4,9 @@
 >
 > **出处全部做成了可点的链接**（论文 / 代码 / App，直接点表格里的链接就能跳到原始来源）。**已于 2026-06-14 逐条核对**——每篇论文 / 每个页面都打开过，标题、关键数字、发表场所都对着原始来源确认过，全部能打开（无杜撰）。
 
+> **2026-07 C1 framing:** this map is a future-model/application compass. It does **not** expand the current C1 SKU beyond
+> **0.1B / 0.3B / 1B / bounded 3B**. Rows involving 7B / 13B or high-concurrency server use are C2/C3 learning coordinates.
+
 ---
 
 ## 这张表的成熟度怎么标（一眼看清「能信几分」）

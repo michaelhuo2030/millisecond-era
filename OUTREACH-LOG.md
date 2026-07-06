@@ -4,6 +4,7 @@ This is the public repo ledger for shareable artifacts. Archive does not automat
 
 | date | artifact | channel | status | public-safe boundary |
 |---|---|---|---|---|
+| 2026-07-07 | repo-wide C1/C2/C3 consistency pass + [`scripts/public_c1_consistency_audit.py`](scripts/public_c1_consistency_audit.py) | GitHub + GitHub Pages | ready to publish when pushed | Live README/docs/explainers now distinguish C1 bridgehead from C2/C3 frontier; old Mini/Pro/USB-C/9B claims are historical or archived, not current sales language. |
 | 2026-07-07 | [`chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md) + README / Pages updates | GitHub + GitHub Pages | published to repo when pushed | C1 product boundary only: 0.1B / 0.3B / 1B / bounded 3B, speed-first metrics, writable resident slots, support-plane tax. No circuit, pulse, floorplan, partner, package, or process private detail. |
 
 ## Launch discipline

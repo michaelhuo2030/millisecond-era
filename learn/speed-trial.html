@@ -55,6 +55,10 @@
     <span class="badge b-sim"><span class="lang-en">◇ real HDC sim — the algorithm is real</span><span class="lang-zh">◇ 真实模拟 real HDC sim — 算法是真的</span></span>
     <span class="badge b-proj"><span class="lang-en">? projected — chip not yet taped out</span><span class="lang-zh">? 推算 projected — 芯片未流片</span></span>
   </div>
+  <div class="honest" style="text-align:left;max-width:760px;margin:18px auto 0">
+    <span class="lang-en"><b>2026-07 C1 framing:</b> speed is the priority, but C1 is the first bridgehead: 0.1B / 0.3B / 1B / bounded 3B. Taalas and high-speed demos prove the resident-weight principle; 8B / 32B / 100B-class systems are C2/C3 frontier work, not first-SKU promises.</span>
+    <span class="lang-zh"><b>2026-07 C1 读法:</b> 速度优先,但 C1 是第一座桥头堡:0.1B / 0.3B / 1B / bounded 3B。Taalas 和高速 demo 证明的是权重常驻原理;8B / 32B / 100B 级属于 C2/C3 前沿,不是第一 SKU 承诺。</span>
+  </div>
 </header>
 
 <h2><span class="lang-en">Three you can run right now</span><span class="lang-zh">三个你现在就能跑 · run these now</span></h2>
@@ -94,14 +98,14 @@
     <span class="badge b-meas"><span class="lang-en">✓ measured by others</span><span class="lang-zh">✓ 他人实测</span></span> <span class="badge b-proj"><span class="lang-en">? not our chip</span><span class="lang-zh">? 非我们的芯片</span></span>
     <div class="num meas">16,960 tok/s</div>
     <h3><span class="lang-en">Not wishful thinking: someone already built it</span><span class="lang-zh">这不是空想:有人已经做出来了</span></h3>
-    <p><span class="lang-en">Third party <b>Taalas</b> burned weights into silicon and publicly measured Llama-8B at <b>16,960 tok/s</b> (vs the H200's 230 tok/s). This proves the "<b>weights are silicon</b>" speed thesis is real — which makes our ReRAM-CIM route (target <b>2–5k tok/s</b>) credible.</span><span class="lang-zh">第三方 <b>Taalas</b> 把权重烧进硅,公开实测 Llama-8B <b>16,960 tok/s</b>(对比 H200 的 230 tok/s)。这证明"<b>权重即硅</b>"的速度论是真的——我们的 ReRAM-CIM 路线(目标 <b>2–5k tok/s</b>)因此可信。</span></p>
+    <p><span class="lang-en">Third party <b>Taalas</b> burned weights into silicon and publicly measured Llama-8B at <b>16,960 tok/s</b> (vs the H200's 230 tok/s). This proves the "<b>resident weights</b>" speed thesis is real. Our route is different: C1 starts with smaller writable ReRAM-CIM models, then C2/C3 explores larger scales.</span><span class="lang-zh">第三方 <b>Taalas</b> 把权重烧进硅,公开实测 Llama-8B <b>16,960 tok/s</b>(对比 H200 的 230 tok/s)。这证明"<b>权重常驻</b>"的速度论是真的。我们的路线不同:C1 先从更小、可写的 ReRAM-CIM 模型开始,再由 C2/C3 探索更大尺度。</span></p>
     <span class="go"><span class="lang-en">▶ See the third-party measurement →</span><span class="lang-zh">▶ 看第三方实测 →</span></span>
   </a>
   <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/reram-cim-calculator.html" target="_blank" rel="noopener">
     <span class="badge b-proj"><span class="lang-en">? projected</span><span class="lang-zh">? 推算</span></span>
     <div class="num proj">GB → tok/s</div>
     <h3><span class="lang-en">Capacity ↔ speed calculator</span><span class="lang-zh">容量↔速度计算器</span></h3>
-    <p><span class="lang-en">Given chip size / precision / process node, estimate which model fits and the expected throughput. Grounds "speed" in the reality of silicon (e.g. ~1 GB → 4B ternary (our v1) → 2–5k tok/s projected).</span><span class="lang-zh">给定芯片大小/精度/工艺,推算装得下哪个模型、吞吐大概多少。把"速度"落回硅片的现实(例:~1 GB → 4B 三元(我们的 v1)→ 2–5k tok/s 推算)。</span></p>
+    <p><span class="lang-en">Given chip size / precision / process node, estimate which model fits and the expected throughput. Read it with the current boundary: C1 = 0.1B / 0.3B / 1B / bounded 3B; larger rows are C2/C3 frontier coordinates.</span><span class="lang-zh">给定芯片大小/精度/工艺,推算装得下哪个模型、吞吐大概多少。按当前边界读:C1 = 0.1B / 0.3B / 1B / bounded 3B;更大行是 C2/C3 前沿坐标。</span></p>
     <span class="go"><span class="lang-en">▶ Tweak the parameters yourself →</span><span class="lang-zh">▶ 自己调参数 →</span></span>
   </a>
   <a class="card" href="https://michaelhuo2030.github.io/millisecond-era/learn/hdc-101.html" target="_blank" rel="noopener">
@@ -122,7 +126,7 @@
   <tr><td><span class="lang-en">FPGA ternary MAC synthesis</span><span class="lang-zh">FPGA 三值 MAC 综合</span></td><td><b>0 DSP · 194 MHz</b><span class="lang-en"> (real synthesis)</span><span class="lang-zh">(真综合)</span></td><td class="meas"><span class="lang-en">✓ measured</span><span class="lang-zh">✓ 实测</span></td></tr>
   <tr><td><span class="lang-en">HDC society/reflex simulation</span><span class="lang-zh">HDC 社会/反射模拟</span></td><td><b><span class="lang-en">8,000 steps/s · 25k decisions/s</span><span class="lang-zh">8,000 步/秒 · 2.5万决策/秒</span></b></td><td class="sim"><span class="lang-en">◇ real HDC binary vectors</span><span class="lang-zh">◇ 真实 HDC 二值向量</span></td></tr>
   <tr><td><span class="lang-en">Third-party "weights are silicon" (Taalas)</span><span class="lang-zh">第三方"权重即硅"(Taalas)</span></td><td><b>16,960 tok/s</b><span class="lang-en"> (Llama-8B)</span><span class="lang-zh">(Llama-8B)</span></td><td class="meas"><span class="lang-en">✓ publicly measured by others</span><span class="lang-zh">✓ 他人公开实测</span></td></tr>
-  <tr><td><span class="lang-en">Our ternary-CIM chip throughput</span><span class="lang-zh">我们的三值-CIM 芯片吞吐</span></td><td><b>2–5k tok/s</b><span class="lang-en"> (design target)</span><span class="lang-zh">(设计目标)</span></td><td class="proj"><span class="lang-en">? projected (not taped out)</span><span class="lang-zh">? 推算(未流片)</span></td></tr>
+  <tr><td><span class="lang-en">Our C1 ternary-CIM targets</span><span class="lang-zh">我们的 C1 三值-CIM 目标</span></td><td><b><span class="lang-en">0.1B→3B ladder; compare tok/s + p99 + Hz</span><span class="lang-zh">0.1B→3B 阶梯; 比 tok/s + p99 + Hz</span></b></td><td class="proj"><span class="lang-en">? projected (not taped out)</span><span class="lang-zh">? 推算(未流片)</span></td></tr>
   <tr><td><span class="lang-en">"~100× more once on-chip"</span><span class="lang-zh">"上芯片再 ~100×"</span></td><td><b><span class="lang-en">~µs scale @ any D</span><span class="lang-zh">~µs 级 @ 任意 D</span></b></td><td class="proj"><span class="lang-en">? projected</span><span class="lang-zh">? 推算</span></td></tr>
 </table>
 <div class="small" style="margin-top:10px"><span class="lang-en">Principle: keep <b>what we can run for you</b> separate from <b>what's still on the way</b>. The former builds trust, the latter is the roadmap. Reputation compounds; honesty compounds faster.</span><span class="lang-zh">原则:把<b>能跑给你看的</b>和<b>还在路上的</b>分开。前者建立信任,后者是路线图。声誉复利,诚实复利更快。</span></div>

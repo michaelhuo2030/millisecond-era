@@ -3,6 +3,11 @@
 
 ---
 
+> **2026-07 public update:** the measured FPGA facts below still stand. Product-level ASIC projections in this document
+> are historical support evidence, not the current first-SKU boundary. Current public product wording starts from C1:
+> 0.1B / 0.3B / 1B / bounded 3B resident low-bit inference; larger 8B / 32B / 100B-class systems are C2/C3 frontier work.
+> Keep the distinction strict: **FPGA measured** vs **ReRAM-CIM ASIC modeled**.
+
 ## 说人话：发生了什么、意味着什么（先读这段）
 
 **一句话**：我们自己设计的那块"**不用乘法器**"的 AI 计算电路，第一次在一块 **¥150 的真芯片**上跑起来了，而且**算得分毫不差**。

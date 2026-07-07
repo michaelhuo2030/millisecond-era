@@ -1,7 +1,7 @@
 # millisecond-era — 毫秒纪 (háo miǎo jì, "the millisecond age")
 
-> **The Missing Hardware Layer of DeepSeek's Full Stack**
-> *Substrate-layer 28nm ReRAM-CIM chip research for DeepSeek V4-Flash-class models — 1.5 months, one person, 50+ datapoints, ~$1,400 out of pocket*
+> **Resident-weight ReRAM-CIM research for the millisecond age**
+> *From a tiny real-silicon ternary FPGA proof to a narrow C1 edge substrate: 0.1B / 0.3B / 1B / bounded 3B first; DeepSeek-class and 100B-class systems remain C2/C3 frontier research.*
 
 ## 🔥 New — measured on real silicon: a ternary LLM generating text on a ¥205 RMB (~$29) FPGA at **~13,671 tok/s**
 
@@ -67,9 +67,9 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 
 ---
 
-> **✅ 2026-06 — current v1 design (supersedes BOTH boxes below)**
+> **⚠️ 2026-06 — archived v1 design record (superseded by the C1 boundary above)**
 >
-> The 2026-05 numbers below are kept as the honest iteration record — but they've since been superseded again. Current v1 (full decision in **[chip/ADR-v1-architecture.md](chip/ADR-v1-architecture.md)**):
+> The 2026-05 numbers below are kept as the honest iteration record. The June v1 decision in **[chip/ADR-v1-architecture.md](chip/ADR-v1-architecture.md)** superseded those May boxes, but it has now itself been narrowed by the 2026-07 C1 product boundary above:
 >
 > | | Current (2026-06) |
 > |---|---|
@@ -78,11 +78,13 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 > | **Capacity** | **2.5D organic** — N single-layer dies side-by-side. *3D / hybrid-bonding retired (in-place CIM moves only activations between dies → organic bandwidth suffices).* |
 > | **Measured** | real ternary 8B on the no-ADC path = **+3.8% ppl, Chinese accuracy preserved, int4 KV full quality, maj@16 lifts GSM8K 50→87%** |
 >
-> Everything below this box is the May-2026 record (kept for the iteration story; some numbers there are now outdated). 合抱之木生于毫末.
+> Treat this box as physics-learning evidence, not as the current public product SKU. The live C1 ladder is 0.1B / 0.3B / 1B / bounded 3B. 合抱之木生于毫末.
 
 ---
 
 > **⚠️ 2026-05-18 Corrections — please read before the numbers below**
+>
+> **This correction block is also historical now.** It fixed the original 2026-05 thesis, but the current product/outreach boundary is the 2026-07 C1 ladder above.
 >
 > The numbers table below was published 2026-05-16. Two days later, a bottom-up physical audit found a fundamental error: **"25 GB/die pure CIM @ 28nm" is physically infeasible** — it requires ~1,500× the cell density of 2026 industry SOTA. The architecture has been recalibrated.
 >
@@ -145,30 +147,30 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 
 ---
 
-## Open Source: HDC SDK for the Mini SKU
+## Open Source: HDC SDK for C0/C1 Prototypes
 
-The Mini SKU includes a dedicated **Hyperdimensional Computing (HDC)** module alongside the LLM inference engine. HDC = 100,000-dimension binary vectors + 3 operations (bind / bundle / permute). On ReRAM CIM it does things no neural network can:
+The open HDC path is a prototype and application layer for C0/C1, not a separate old "Mini SKU" promise. HDC = high-dimensional vectors + 3 operations (bind / bundle / permute). On software today it is useful for one-shot memory and sensor loops; on a future C1-class resident substrate it could become a tiny, fast, local companion module next to the low-bit inference path.
 
-| Capability | HDC on Mini SKU | Neural network |
+| Capability | HDC prototype path | Neural network |
 |---|---|---|
 | 1-shot learning | 1,000 classes, 100% accuracy | Needs 50–200 gradient steps minimum |
 | Forgetting | Zero (tested to 500+ incremental classes) | Catastrophic forgetting without EWC |
 | 30% bit-flip noise | Still fully functional | Random output |
-| Search latency | **1.27 μs** (comparator mode) | GPU: 50–200 μs for equivalent search |
-| Tokamak disruption detection | **1–2 μs** reaction time | DeepMind AlphaControl: ~10 ms |
+| Search latency | software measured today; C1-class comparator target remains hardware-gated | GPU: 50–200 μs for equivalent search |
+| Fast control applications | microsecond-class target if the HDC comparator path lands on silicon | millisecond-class neural controller stack |
 
 **The SDK is open source:**
 
 > **[michaelhuo2030/torchhd](https://github.com/michaelhuo2030/torchhd/tree/reram-cim-backend)** — fork of `hyperdimensional-computing/torchhd` with a drop-in ReRAM CIM backend.
 >
 > ```python
-> # 2-line swap: replace standard torchhd with Mini SKU simulation
+> # 2-line swap: replace standard torchhd with a ReRAM-CIM simulation backend
 > from torchhd.reram_torchhd_backend import ReRAMHDC
-> hdc = ReRAMHDC(d=100_000, mode="comparator")   # models Mini SKU CIM
+> hdc = ReRAMHDC(d=100_000, mode="comparator")   # models a C0/C1-style CIM path
 >
 > mem = hdc.make_memory()
 > mem.add("gesture_open", training_hvs)   # 1-shot: one bundle per class
-> result = mem.search(query_hv)           # 1.27 μs on chip
+> result = mem.search(query_hv)           # modeled comparator path; silicon-gated
 > print(hdc.energy_report())             # pJ/op + μs/query
 > ```
 >
@@ -178,7 +180,7 @@ The Mini SKU includes a dedicated **Hyperdimensional Computing (HDC)** module al
 
 ## HDC Applications: Sign Language, Sports Coaching, and Games
 
-**HDC enables near-real-time gesture recognition on any Mac or GPU today — no chip required for prototypes.** The Mini SKU later provides ~50,000× latency speedup for embedded deployment.
+**HDC enables near-real-time gesture recognition on any Mac or GPU today — no chip required for prototypes.** A future C1-class HDC module could provide much lower embedded latency, but that remains a silicon proof target, not a current product claim.
 
 Measured on M4 Max (D=10K, 10 CSL signs, 1-shot):
 
@@ -191,7 +193,7 @@ Measured on M4 Max (D=10K, 10 CSL signs, 1-shot):
 
 Three killer applications:
 
-- **Sign language (deaf recognition)**: 1 example per sign + 1 example per signer = done. ~28M deaf people in China. Works on Mac today. Mini SKU later: 1.27 μs/query embedded in glasses or phone.
+- **Sign language (deaf recognition)**: 1 example per sign + 1 example per signer = done. ~28M deaf people in China. Works on Mac today. A C1-class path would be for embedded glasses / phone / wearable latency after hardware proof.
 - **Sports coaching**: Coach demonstrates correct form once → athlete gets real-time similarity score forever. No labeled dataset, no retraining, no ML engineer.
 - **Game gesture library**: HDC superposition bundles 100M gesture variants into ~10K prototype vectors. AI-generated gesture vocabulary is semantic by construction.
 
@@ -234,9 +236,9 @@ Not because we expect anything in return. Not because it's good marketing. Becau
 
 Over the past 18 months, 5 milestones already happened: Etched $120M (2024-06, "transformer-only"), Taalas $169M ("weight-locked silicon"), Cerebras $5.55B IPO (2026-05), DeepSeek's viral moment (140 countries #1 App Store, 2025-01), HYDAR ISSCC 2026 (28nm Hybrid Analog/Digital RRAM CIM, silicon-validated).
 
-**Half this picture is drawn.** Hardware path (Etched/Taalas/Cerebras) and model path (DeepSeek full stack) have run independently to scale. **The other half will inevitably be the missing hardware-layer piece of DeepSeek's full stack — China's 28nm ReRAM-CIM × DeepSeek V4-Flash × 3FS protocol compatibility.**
+**Half this picture is drawn.** Hardware path (Etched/Taalas/Cerebras) and model path (DeepSeek full stack) have run independently to scale. **The open question is whether a resident-weight, rewritable ReRAM-CIM substrate can make the same speed/latency leap in a smaller, cheaper, local form.** C1 tests that question first on 0.1B / 0.3B / 1B / bounded 3B models. DeepSeek-class systems stay as the C2/C3 frontier, not the first SKU claim.
 
-This is the empirical + black-tech-design output of one person, 1.5 months, ~$1,400 (¥10K) out of pocket. Stage 0+ harness with 50+ datapoints on M4 Max 128 GB + antirez ds4-server with custom `printf` instrumentation, 10 framework reframes (one was agent-vs-agent), Path C architecture lock (8-layer 28nm + asymmetric layer composition unlocking 250K context).
+This is the empirical + design output of one person, 1.5 months, ~$1,400 (¥10K) out of pocket. Stage 0+ harness with 50+ datapoints on M4 Max 128 GB + antirez ds4-server with custom `printf` instrumentation, followed by a 2026-07 cleanroom narrowing into the C1 proof ladder.
 
 **The first chip goes to antirez. We don't burn capital chasing investors — we burn time, geek hacks, and honest public asks.**
 
@@ -246,7 +248,7 @@ This is the empirical + black-tech-design output of one person, 1.5 months, ~$1,
 
 The wall-clock bottleneck in LLM inference is **not** compute — it's **how far weights physically travel per token**. A modern GPU spends most of its time waiting for HBM. The architectural lever isn't attention sweep or speculative decoding (both are software optimizations that layer on top of any chip). The lever is **where the weights live**.
 
-Below: five architectures, side-by-side, with the actual physical journey of one token — distance traveled, picojoules per bit, and per-token energy cost. Then a comparison table covering seven approaches, a 2×2 positioning matrix, and four key ratios.
+Below: five architectures, side-by-side, with the physical journey of one token. Read this as a principle map, not a C1 floorplan. The current product boundary is still C1 small resident models first; the old V4-Flash / multi-layer-stack diagrams are archive evidence for the C2/C3 frontier.
 
 ### Traditional GPU + HBM (NVIDIA H100 / Apple M4 Max)
 
@@ -312,22 +314,18 @@ All-SRAM, on-chip weights, 0 DRAM access — but per-chip SRAM is small (~230 MB
 
 ```mermaid
 flowchart LR
-    T1[Token in] --> KV["KV SRAM<br/>~6.7 GB on-die<br/>0.1 pJ/bit"]
-    KV --> L1["Chip layer 1<br/>ReRAM cells (weights resident)<br/>in-situ MAC, 50 nm in-cell<br/>~5 pJ/bit, 0 weight reads"]
-    L1 -->|"TSV vertical &lt;1 mm<br/>~0.1 pJ/bit"| L2["Chip layer 2"]
-    L2 --> L3["..."]
-    L3 --> L8["Chip layer 8"]
-    L8 --> T2[Token out]
-    L8 -.- TOTAL["per token total:<br/>× 43 model layers across 8 chip layers<br/>~0 J weight transport<br/>+ ~0.3 J compute"]
-    style L1 fill:#9c9
-    style L2 fill:#9c9
-    style L3 fill:#9c9
-    style L8 fill:#9c9
-    style KV fill:#bcf
+    T1[Token / sensor chunk in] --> CTRL["local controller<br/>schedule + verify"]
+    CTRL --> ACT["small activation buffer<br/>not a full CPU/GPU runtime"]
+    ACT --> CIM["ReRAM-CIM array<br/>weights resident<br/>low-bit / ternary MAC near the cells"]
+    CIM --> CTRL
+    CTRL --> T2[Token / decision out]
+    CIM -.- TOTAL["C1 target:<br/>delete repeated weight transport<br/>compare same-task tok/s + p99 latency + peak-reflex Hz + success"]
+    style CIM fill:#9c9
+    style ACT fill:#bcf
     style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
 ```
 
-Weights live ON-CHIP in non-volatile ReRAM, **at the compute site** — multiply-accumulate happens directly inside the memory array (compute-in-memory). Physical path per weight read = ~50 nm (within a ReRAM cell) instead of ~10 mm (across the HBM boundary). KV cache sits on-die in SRAM. 8-layer 3D stack means the 43 model layers are spread across 8 physical chip layers — TSV cross-layer hops are <1 mm and ~1 ns latency per hop (signal propagation + driver), so 7-8 TSV hops per token total ~8 ns — negligible vs the ~50-70 ns ReRAM-read + ADC time per tile operation. **Compute (ReRAM cell read + ADC) is the latency floor, not the wires.** TSV bandwidth utilization is ~0.026% (vertical hops are not the bottleneck). **Per-token weight transport energy: ~0 J. In-situ MAC compute: ~0.3 J / token.** And because ReRAM is **non-volatile + re-programmable**, the chip can be re-flashed for a new model — unlike Taalas where the model is fab-baked permanently.
+Weights live in non-volatile ReRAM near the compute operation. For C1, the buyer-facing claim is not "we built a GPU" and not "we fit every frontier model." It is narrower: keep a small low-bit model resident, stream the input vector locally, and avoid moving a large weight block every token. Because ReRAM is non-volatile and writable, the model slot can be provisioned / verified / refreshed over service cycles. That is different from per-request hot-swap, and different from Taalas-style fab-baked one-model silicon.
 
 ### Seven-approach comparison
 
@@ -368,21 +366,23 @@ The bottom row (on-chip + non-volatile) is the **most power-efficient cell** —
 
 ### Four key ratios
 
-**1. Energy per bit moved**: ReRAM-CIM in-cell MAC at ~5 pJ/bit vs HBM3 off-chip read at ~100 pJ/bit → **~20× more efficient per bit moved**.
+**1. Energy per bit moved**: off-chip HBM movement is expensive; local ReRAM-CIM movement should be much cheaper. The exact C1 number is still a silicon measurement target, not a taped-out fact.
 
-**2. Physical path length per weight read**: Traditional GPU hops weights ~10 mm to HBM and back per layer; ReRAM-CIM reads in-cell at ~50 nm → **~200,000× shorter physical path**. This is the actual reason the bandwidth bottleneck disappears (Coulomb energy and RC delay both scale with distance).
+**2. Physical path length per weight read**: traditional GPU inference repeatedly moves weights across package-scale distances. Resident ReRAM-CIM keeps weights near the operation. This is the actual reason the bandwidth bottleneck can shrink: the fastest data movement is the one you delete.
 
-**3. Per-token transport energy (V4-Flash, 13B active)**: Traditional GPU + HBM ~10 J / token (weight transport across HBM boundary); Ours ~0.3 J / token (in-situ MAC, no transport) → **~30× lower energy per token**.
+**3. Same-task latency**: the live comparison should be same-model / same-task `tok/s`, p50/p99 latency, peak-reflex Hz, and closed-loop success. TOPS can be a footnote; it is not the native value proposition.
 
-**4. The architectural lever, summarized**: Attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are **software-level optimizations**. They layer on top of *any* architecture and compound with chip-side gains. They are not substitutes for the physical lever. The lever is **where the weights physically sit relative to the compute units**, and the energy / distance cost of moving them. Current C1 comparisons must be made on same-task tok/s, latency, peak-reflex Hz, and task success, not on a single old 240-960× headline.
+**4. The architectural lever, summarized**: attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are software-level optimizations. They layer on top of any architecture and can compound with chip-side gains. They are not substitutes for the physical lever: where the weights physically sit relative to compute.
 
 ### Honest gaps
 
-We have not yet measured 5 pJ/bit on our own silicon — that arrives with vendor eval boards then MPW (see Roadmap below). 28nm ReRAM endurance / retention at production yield is currently validated only against published literature + vendor datasheets, not first-hand silicon measurements. 4-bit cell BER at production yield with 昕原 (Xinyuan) is deferred — small-batch evaluation is acceptable for now. Numbers in this section are anchored against: HYDAR ISSCC 2026 (Hybrid Analog/Digital CIM precedent), 知存 (Zhicun) WTM2101 datasheet, IBM Analog Foundation Models paper (Nature Comms 2025), Cerebras S-1, Taalas public statements, Groq published specs, Tenstorrent IP licensing data. Where data is unavailable or interpretive, marked "(est.)" or "target". Feedback welcome if any cell in the table or matrix is misplaced — open an issue.
+We have not yet measured the C1 ReRAM-CIM macro on our own silicon. The C1 gates are: density, `t_vmm`, write/verify overhead, drift health checks, package/thermal limits, and buyer task success on real 0.1B / 0.3B / 1B / bounded 3B models. Numbers in this section are principle coordinates anchored against public ReRAM-CIM / CIM / resident-weight systems and our cleanroom model. Where data is unavailable or interpretive, it should be treated as modeled or target, not measured. Feedback welcome if any cell in the table or matrix is misplaced — open an issue.
 
 ---
 
 ## What we've already verified — Stage 0+/0++ hard signals (5)
+
+These are historical substrate signals, not C1 product claims. They explain why the memory wall matters and why resident weights are worth testing. C1 must still prove the small-model edge loop on its own hardware path.
 
 All data: 2-bit DeepSeek V4-Flash (antirez Q2-K GGUF, 81 GB) on M4 Max 128 GB. Reproducible in `data/` + `scripts/`. **SRAM-side findings are quantization-agnostic** — KV/Indexer/Activation memory needs are weight-quantization-independent (<5% difference between 2-bit and 4-bit).
 
@@ -398,7 +398,7 @@ All data: 2-bit DeepSeek V4-Flash (antirez Q2-K GGUF, 81 GB) on M4 Max 128 GB. R
 
 **Exp 5**: cold prefill 636 s; warm (in-RAM KV) 8.16 s; **diskwarm (disk-backed KV via `--kv-disk-dir`) 5.65 s**. Diskwarm is *equal-or-faster* than in-RAM warm — OS page cache holds the hot pages, so mmap'd disk KV reads at RAM speed.
 
-**Implication**: 3FS-style spillover ("256K hot SRAM + 1M via cluster KV") goes from theoretical to **empirically validated** as a research direction. It is no longer a C1 product promise; >3B / rack / Pro Cloud style systems stay C2/C3 until C1 evidence exists.
+**Implication**: 3FS-style spillover ("256K hot SRAM + 1M via cluster KV") goes from theoretical to **empirically validated** as a research direction. It is not a C1 product promise; >3B / rack / Pro Cloud style systems stay C2/C3 until C1 evidence exists.
 
 ### Signal 3 — `ds4-server` is fully serial (no batch parallelism)
 
@@ -417,7 +417,7 @@ Wall time scales linearly with `n_users`; per-user `gen_tps` is invariant. **ds4
 
 **Exp 9**: summarize 12.4 / diff 11.5 / draft 11.9 / review 11.7 / code(~10K ctx) 15.76 t/s.
 
-**The chip's job**: target 3-12K t/s single-stream on the same model. That's a **200-1000× gap** — not incremental, a *category change*. Today's interactive cliff (~50K context UX death zone) gets pushed to 1M+ tokens.
+**What this means now**: this remains a C2/C3 frontier motivation. C1 does not promise to run this same 81 GB model. C1's job is narrower: prove that a small resident low-bit model can deliver a dramatic same-task latency jump at the edge.
 
 ---
 
@@ -489,7 +489,7 @@ The chip is the difference between *AI you talk to occasionally* and *AI as how 
 | t3 VC business summary (250K ctx) | **8.5** | full 6-section structure, ship-ready |
 | t4 critical review (250K ctx) | **9.0** ★ | substantive, non-sycophantic |
 | t5 short-ctx code (~5K ctx) | **9.5** ★★ | production-ready Python with type hints, exception handling, docstring |
-| weighted 4/5 | **8.75** | **¥6K entry SKU 2-bit quantization strategy LOCK ✅** |
+| weighted 4/5 | **8.75** | historical evidence that low-bit paths can remain useful on selected tasks; not a current price/SKU lock |
 
 (t2 code_review was `max_tokens=1500` underconfig — model reasoning consumed quota before content, harness fix queued.)
 
@@ -509,8 +509,8 @@ The chip is the difference between *AI you talk to occasionally* and *AI as how 
 | 8 | Path C 250K achievable (8-layer 28nm + idea 10) | ✅ | Exp 10: 6.67 GB need ≈ 6.7 GB asymmetric layer composition equivalent |
 | 9 | 4-bit ReRAM cell BER @ 28nm production | ⚠️ partial | Wiefels Mbit-scale endurance proven; production 4-bit BER deferred to vendor BD |
 | 10 | ReRAM retention 5-10 years @ 25-70°C | ⚠️ partial | proven for 5y @ 25-70°C; 85°C 10y extrapolated |
-| 11 | 昕原 28nm production yield | ✅ | >93% yield, 2K wpm partner fab now (ByteDance + Ant + Saudi Aramco invested) |
-| 12 | TOPS/W estimate P10=5 / P50=15 / P90=40 | 🟡 estimated | 5-paper cross-validate (HYDAR / 知存 / 苹芯 / 后摩 / d-Matrix), no in-house silicon yet |
+| 11 | 28nm ReRAM production ecosystem exists | ⚠️ partial | public and partner-verifiable ecosystem signal; exact vendor yield / capacity must be source-rated before being used as sales fact |
+| 12 | Energy / power envelope | 🟡 estimated | cross-checked against public CIM / ReRAM-CIM literature and vendor material; C1 buyer comparison should lead with same-task latency, not TOPS |
 | 13 | MoE expert Zipf activation distribution | ⚠️ assumed | Stage 0++ Exp 12 deferred |
 | 14 | 8-layer 3D yield | ⚠️ assumed | TSMC 2024 reference; 28nm 8-layer specific unverified |
 | 15 | Path A (12-layer 28nm) yield | ⚠️ unknown | No public precedent |
@@ -531,7 +531,7 @@ The chip is the difference between *AI you talk to occasionally* and *AI as how 
 | Stage 2 | 知存 (Zhicun) / 苹芯 (Pingxin) / 后摩 (Houmo) eval board cross-check | Michael | **borrowing** (asking, fallback secondhand $700-4,200) | $0-700 | ⏳ asking |
 | Stage 3 | EBAZ4205 mining-leftover FPGA for MoE Top-K routing | Michael soldering | secondhand Taobao | **$30-70** | self-fund |
 | Stage 4 | Multi-board 3D dataflow simulation | Michael | KiCad (free) + parts + **lab gear borrowed/rented** | $400-1,400 + gear | mixed |
-| Phase β | 昕原 (Xinyuan) / 知存 / 苹芯 / 后摩 BD outreach | Michael | email/X/intro | $0 | M3 trigger |
+| Phase β | ReRAM-CIM / CIM eval-board and testchip outreach | Michael | email/X/intro | $0 | after C0/C1 proof asks are specific |
 | Phase δ | MPW small test tile (5×5 mm² 28nm) | (TBD) | O1 borrow vendor testchip / O2 university CMP / O3 partner-funded / O4 alumni | $0-42K | M9-M24 |
 
 ### Funding (not the hard part)
@@ -564,7 +564,7 @@ If you have any of the following resources and *you also want this to exist*, pl
 - Direct partner funding for one 5×5 mm² 28nm test tile (**~$21K–42K / ¥150K–300K**, fully open-sourced design)
 
 **Knowledge**
-- V4-Flash real MoE expert activation distribution data (we assume Zipf, needs validation)
+- real MoE expert activation distribution data for C2/C3 frontier modeling
 - HYDAR ISSCC '26 full paper (we only have the abstract)
 - 8-layer 28nm 3D SoIC yield data / packaging expert intro
 
@@ -604,11 +604,11 @@ The first product is **not** a GPU replacement and not a broad AI-card platform.
 
 We're not positioning this as a national-champion-vs-someone-else story. We're **the missing hardware-layer piece of DeepSeek's full stack + the continuation of open-source spirit into silicon**.
 
-**Why China-fab capacity matters here**: 28nm ReRAM-CIM production capacity is *accessible* in Chinese fabs today (e.g., 昕原 confirmed at 2K wpm partner-fab, >93% yield, multi-billion-dollar investor stack). That accessibility means *this physical artifact can actually exist*, not as a five-year wait but as a near-term reality. **We use that accessibility to serve the open community** — not to compete *against* anyone, but to put the missing hardware layer where it belongs, in the open.
+**Why 28nm ReRAM-CIM capacity matters here**: the point is not to vertically own a CPU/GPU company. The point is to stand on partner foundry / OSAT / IP / eval-board ecosystems and test whether a narrow resident-weight C1 substrate can exist. Any vendor-specific yield, capacity, or investor claim must be source-rated before being used as sales fact.
 
 The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (知行合一 / *zhī xíng hé yī* — knowledge and action as one) + ~100 wholehearted partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
 
-*"Chip lifetime ≠ silicon lifetime"* — 28nm ReRAM is reprogrammable (10⁶ write cycles). Same silicon runs V4-Flash text-only today, V4.1-VL multimodal six months from now (just reflash, +1 GB vision encoder weights), V4.5 / V5-Flash for the next several years. 5-7 year chip useful life across 3-5 model generations. Western Mask-ROM chips (Etched/Taalas) are one-shot. Chinese ReRAM-CIM is *evolving*.
+*"Chip lifetime ≠ silicon lifetime"* — ReRAM is writable, so a resident model slot can be provisioned, verified, refreshed, and upgraded across service cycles if endurance / drift / write-time gates close. That is the useful contrast with one-shot model-as-silicon approaches. It is **not** a promise of per-request hot-swap or automatic support for every future frontier model.
 
 ---
 
@@ -616,6 +616,7 @@ The path forward — open thesis, public 18-row transparency, public invitations
 
 - **README.md** (this file) — English thesis + transparency
 - **chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md** — current public C1 boundary: 0.1B / 0.3B / 1B / bounded 3B, speed-first buyer metrics, rewritable resident slots, and the write/drift support tax ★ **NEW 2026-07-07**
+- **living-impact-map.json** + **scripts/public_c1_consistency_audit.py** — release gate for public updates: every live text surface must be updated or explicitly classified as unaffected/archive before GitHub push.
 - **chip/model-2026-06/** — archived public clean-room physics snapshot: single-source ledger + density / throughput / energy / counter studies + runnable parametric engine. Still useful, but product/outreach boundary is superseded by the C1 brief.
 - **article-3.md** — Scaling to big models: the wall we don't have (KV cache, throughput, tensor parallelism, ReRAM's real limits) ★ **NEW 2026-06-15**
 - **article-2.md** — Stage 1 validation report (15 hypotheses checked, one architecture locked) ★ **NEW 2026-05-18**

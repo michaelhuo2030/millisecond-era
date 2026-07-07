@@ -1,0 +1,297 @@
+{
+  "version": 1,
+  "purpose": "Whole-repository propagation manifest for public millisecond-era changes. Any push to GitHub must prove every live text surface is either updated or explicitly unaffected.",
+  "live_surface_globs": [
+    "living-impact-map.json",
+    "*.md",
+    "*.html",
+    "*.js",
+    "chip/**/*.md",
+    "data/**/*.md",
+    "docs/**/*.md",
+    "experiments/**/*.md",
+    "fpga/**/*.md",
+    "hdc/**/*.md",
+    "learn/**/*.html",
+    "rwkv-on-chip/**/*.md",
+    "scripts/*.py",
+    "specs/**/*.md"
+  ],
+  "exclude_globs": [
+    ".git/**",
+    "assets/**",
+    "**/__pycache__/**",
+    "node_modules/**"
+  ],
+  "findings": [
+    {
+      "id": "C1-PUBLIC-BOUNDARY-2026-07-07",
+      "canonical_doc": "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md",
+      "claim": "Public chip positioning starts with the narrow C1 ladder: 0.1B / 0.3B / 1B / bounded 3B resident low-bit inference, speed-first buyer metrics, provisionable model slots, and C2/C3 frontier work explicitly separated from first-SKU claims.",
+      "required_updates": [
+        {
+          "path": "living-impact-map.json",
+          "anchors": [
+            "C1-PUBLIC-BOUNDARY-2026-07-07",
+            "every live text surface is either updated or explicitly unaffected"
+          ]
+        },
+        {
+          "path": "README.md",
+          "anchors": [
+            "C1 cleanroom update",
+            "C1 is the bridgehead, not the ceiling",
+            "C1 does not promise to run this same 81 GB model"
+          ]
+        },
+        {
+          "path": "cheatsheet.md",
+          "anchors": [
+            "Public chip positioning update (2026-07-07)",
+            "Run `python3 scripts/public_c1_consistency_audit.py` before publishing public chip updates"
+          ]
+        },
+        {
+          "path": "OUTREACH-LOG.md",
+          "anchors": [
+            "repo-wide C1/C2/C3 consistency pass",
+            "same-task tok/s, latency, peak-reflex Hz"
+          ]
+        },
+        {
+          "path": "index.html",
+          "anchors": [
+            "C1 modeled target",
+            "100B frontier later"
+          ]
+        },
+        {
+          "path": "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md",
+          "anchors": [
+            "Whole picture: C1 bridgehead, 100B frontier",
+            "same-task speed first",
+            "0.1B / 0.3B / 1B / bounded 3B"
+          ]
+        },
+        {
+          "path": "chip/README.md",
+          "anchors": [
+            "C1 is the bridgehead, not the ceiling",
+            "Historical v1 decision now superseded"
+          ]
+        },
+        {
+          "path": "chip/ADR-v1-architecture.md",
+          "anchors": [
+            "2026-07 public update",
+            "0.1B / 0.3B / 1B / bounded 3B"
+          ]
+        },
+        {
+          "path": "article-1.md",
+          "anchors": [
+            "2026-07 public update / historical record"
+          ]
+        },
+        {
+          "path": "docs/article-1-zh.md",
+          "anchors": [
+            "2026-07 \u516c\u5f00\u66f4\u65b0 / \u5386\u53f2\u7a3f\u6807\u6ce8"
+          ]
+        },
+        {
+          "path": "article-2.md",
+          "anchors": [
+            "2026-07 public update / historical record"
+          ]
+        },
+        {
+          "path": "docs/article-2-zh.md",
+          "anchors": [
+            "2026-07 \u516c\u5f00\u66f4\u65b0 / \u5386\u53f2\u7a3f\u6807\u6ce8"
+          ]
+        },
+        {
+          "path": "article-3.md",
+          "anchors": [
+            "2026-07 public update / frontier label"
+          ]
+        },
+        {
+          "path": "fpga/README.md",
+          "anchors": [
+            "2026-07 C1 framing",
+            "Current public C1 starts at 0.1B / 0.3B / 1B / bounded 3B"
+          ]
+        },
+        {
+          "path": "fpga/SILICON-MEASURED-2026-06-13.md",
+          "anchors": [
+            "2026-07 public update"
+          ]
+        },
+        {
+          "path": "data/neurosim_sweep_data/README.md",
+          "anchors": [
+            "2026-07 archive label"
+          ]
+        },
+        {
+          "path": "docs/stage-1-validation/README.md",
+          "anchors": [
+            "2026-07 archive label"
+          ]
+        },
+        {
+          "path": "rwkv-on-chip/README.md",
+          "anchors": [
+            "2026-07 C1 framing",
+            "C1 current boundary"
+          ]
+        },
+        {
+          "path": "rwkv-on-chip/CAPABILITY-MAP.md",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/reram-cim-101.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/reram-cim-visual.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/reram-architecture.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/reram-cim-calculator.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/speed-trial.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/real-world-speed-proof.html",
+          "anchors": [
+            "2026-07 C1",
+            "0.1B / 0.3B / 1B / bounded 3B"
+          ]
+        },
+        {
+          "path": "learn/fpga-llm-explainer.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "learn/demos/index.html",
+          "anchors": [
+            "2026-07 C1 framing"
+          ]
+        },
+        {
+          "path": "scripts/public_c1_consistency_audit.py",
+          "anchors": [
+            "living_impact_audit",
+            "PUBLIC_C1_CONSISTENCY_AUDIT"
+          ]
+        },
+        {
+          "path": "scripts/living_impact_audit.py",
+          "anchors": [
+            "Portable living-impact manifest auditor"
+          ]
+        },
+        {
+          "path": "scripts/living_impact_selftest.py",
+          "anchors": [
+            "Self-tests for the portable living-impact auditor"
+          ]
+        }
+      ],
+      "unaffected_groups": [
+        {
+          "name": "root application and philosophy docs",
+          "globs": [
+            "CASE-STUDY-office-memory.md",
+            "HOW-I-WORK.md",
+            "PHILOSOPHY.md",
+            "civilization-thesis.html",
+            "site-nav.js"
+          ],
+          "reason": "Public project/application context; not current chip SKU or outreach surface."
+        },
+        {
+          "name": "append-only history and cleanroom archives",
+          "globs": [
+            "iteration-log-2026-05.md",
+            "chip/model-2026-06/**/*.md",
+            "data/neurosim_sweep_data/**/*.md",
+            "docs/stage-1-validation/**/*.md",
+            "experiments/**/*.md",
+            "specs/**/*.md"
+          ],
+          "reason": "Historical evidence or reproducibility archive; live product boundary is propagated through required current surfaces."
+        },
+        {
+          "name": "HDC library, applications, and theory docs",
+          "globs": [
+            "hdc/**/*.md",
+            "hdc/**/*.html",
+            "docs/HDC-*.md",
+            "docs/article-hdc-silicon-hippocampus.md",
+            "docs/hdc-*.md",
+            "docs/cross-domain-compounding-learning-society.md",
+            "docs/MAC-SPEED-CEILING-MEASURED.md",
+            "docs/NORTH-STAR.md",
+            "docs/visuals/*.md"
+          ],
+          "reason": "HDC method/application surfaces; they do not define the chip C1 SKU boundary."
+        },
+        {
+          "name": "learn pages that do not make chip SKU claims",
+          "globs": [
+            "learn/hdc-101.html",
+            "learn/civilization-ratchet.html",
+            "learn/reflexive-world.html",
+            "learn/voice-xray.html",
+            "learn/civilization/*.html",
+            "learn/demos/*.html"
+          ],
+          "reason": "Interactive demos and application pages; current chip SKU claims live in the required updated explainers and C1 brief."
+        },
+        {
+          "name": "RWKV model/repro archive below current folder index",
+          "globs": [
+            "rwkv-on-chip/models/*.md",
+            "rwkv-on-chip/reproduce/*.md"
+          ],
+          "reason": "Model cards and reproduction notes are evidence archives; folder-level README/CAPABILITY-MAP carry the current C1/C2/C3 framing."
+        },
+        {
+          "name": "prototype scripts and utilities",
+          "globs": [
+            "scripts/*.py",
+            "fpga/**/*.md"
+          ],
+          "reason": "Executable prototypes or FPGA evidence; the required README/SILICON pages carry current C1 interpretation."
+        }
+      ]
+    }
+  ]
+}

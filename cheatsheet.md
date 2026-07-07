@@ -62,3 +62,12 @@ Local preview: `python3 -m http.server 8792` from repo root → http://localhost
 - Run `python3 scripts/public_c1_consistency_audit.py` before publishing public chip updates. It checks README, chip docs,
   public articles, FPGA/data archives, RWKV notes, and key `learn/` explainers for C1 anchors and stale Mini/Pro/USB-C/9B
   language.
+
+## GitHub push release gate (living-impact guard)
+- When Michael says "push to GitHub", treat it as a whole-repository release gate, not a narrow Git operation.
+- Run `python3 scripts/living_impact_selftest.py` and `python3 scripts/public_c1_consistency_audit.py` before any public push.
+- `living-impact-map.json` is the manifest: every live text surface must be either a `required_update` with anchors or an
+  explicitly classified unaffected/archive surface with a reason.
+- The C1 audit now calls the living-impact audit too. A file cannot pass only because it has one C1 label at the top while
+  stale product claims remain elsewhere.
+- Do not use `git add .`; inspect `git status -sb` and stage allow-listed files only.

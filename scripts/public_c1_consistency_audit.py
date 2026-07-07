@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Audit public millisecond-era docs for the 2026-07 C1 boundary.
 
-This is intentionally lightweight: it catches the failure mode where README,
-public articles, or browser explainers keep old Mini/Pro/USB-C/9B claims without
-an explicit current-boundary or archive label.
+This combines two gates:
+
+1. required anchor checks on key public surfaces;
+2. living-impact manifest coverage, so every live text surface is either updated
+   or explicitly classified as unaffected/archive.
+
+It also checks stale phrases in local context. A single "2026-07 update" label
+near the top of a file is not enough to sanitize a stale claim 400 lines later.
 """
 
 from __future__ import annotations
@@ -12,6 +17,8 @@ import fnmatch
 import re
 import sys
 from pathlib import Path
+
+import living_impact_audit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,7 +71,13 @@ REQUIRED_ANCHORS: dict[str, list[str]] = {
 
 ARCHIVE_GLOBS = [
     "iteration-log-2026-05.md",
+    "article-1.md",
+    "article-2.md",
+    "docs/article-1-zh.md",
+    "docs/article-2-zh.md",
     "chip/model-2026-06/**",
+    "data/neurosim_sweep_data/**",
+    "docs/stage-1-validation/**",
     "specs/**",
     "rwkv-on-chip/models/**",
 ]
@@ -79,6 +92,10 @@ STALE_PATTERNS = [
     r"\$11,300",
     r"¥6K",
     r"Qwen3\.5-9B",
+    r"Mini SKU primary",
+    r"Mini SKU later",
+    r"HDC on Mini SKU",
+    r"The Mini SKU includes",
     r"27[–-]70B",
     r"3D stacked \(dropped\)",
     r"we abandoned it",
@@ -88,6 +105,7 @@ STALE_PATTERNS = [
     r"4B ternary \(our v1\)",
     r"4B 三元\(我们的 v1\)",
     r"2[–-]5k tok/s",
+    r"same silicon runs V4-Flash",
 ]
 
 
@@ -102,6 +120,11 @@ UPDATE_LABELS = [
     "Historical only",
     "superseded",
     "取代",
+    "archived v1 design record",
+    "historical now",
+    "C2/C3 frontier",
+    "not a current product claim",
+    "not a C1 product promise",
 ]
 
 
@@ -130,8 +153,18 @@ def line_no(text: str, idx: int) -> int:
     return text.count("\n", 0, idx) + 1
 
 
+def context_has_update_label(text: str, idx: int, radius: int = 700) -> bool:
+    start = max(0, idx - radius)
+    end = min(len(text), idx + radius)
+    context = text[start:end]
+    return any(label in context for label in UPDATE_LABELS)
+
+
 def main() -> int:
     errors: list[str] = []
+
+    for issue in living_impact_audit.audit_manifest(ROOT / "living-impact-map.json", base=ROOT):
+        errors.append(f"living-impact: {issue}")
 
     for path, anchors in REQUIRED_ANCHORS.items():
         p = ROOT / path
@@ -149,13 +182,12 @@ def main() -> int:
         if is_archive(path):
             continue
         text = p.read_text(encoding="utf-8", errors="replace")
-        has_update_label = any(label in text for label in UPDATE_LABELS)
         for pat in stale_res:
             for m in pat.finditer(text):
-                if has_update_label:
+                if context_has_update_label(text, m.start()):
                     continue
                 errors.append(
-                    f"{path}:{line_no(text, m.start())}: stale phrase without C1/archive label: {m.group(0)!r}"
+                    f"{path}:{line_no(text, m.start())}: stale phrase without nearby C1/archive label: {m.group(0)!r}"
                 )
 
     if errors:
@@ -165,7 +197,10 @@ def main() -> int:
         return 1
 
     print("PUBLIC_C1_CONSISTENCY_AUDIT PASS")
-    print(f"Checked {len(REQUIRED_ANCHORS)} required public surfaces and {len(iter_public_text_files())} text files.")
+    print(
+        f"Checked {len(REQUIRED_ANCHORS)} required public surfaces, "
+        f"{len(iter_public_text_files())} text files, and living-impact coverage."
+    )
     return 0
 
 

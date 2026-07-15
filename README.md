@@ -2,6 +2,7 @@
 
 > **Resident-weight ReRAM-CIM research for the millisecond age**
 > *From a tiny real-silicon ternary FPGA proof to a narrow C1 edge substrate: 0.1B / 0.3B / 1B / bounded 3B first; DeepSeek-class and 100B-class systems remain C2/C3 frontier research.*
+> *Born from antirez's `ds4` making DeepSeek V4-Flash runnable on a 128 GB Mac; narrowed by density evidence, not detached from that original intent.*
 
 ## 🔥 New — measured on real silicon: a ternary LLM generating text on a ¥205 RMB (~$29) FPGA at **~13,671 tok/s**
 
@@ -35,7 +36,7 @@
 
 The latest cleanroom pass narrowed the project from "build a giant AI chip" to a first product family: **C1**, a resident-weight, low-bit inference accelerator with a local controller. Full public brief: **[`chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md`](chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md)**.
 
-**What changed:** the sales comparison is no longer a TOPS contest. The native comparison is **same-task tok/s, p50/p99 latency, peak-reflex Hz, closed-loop success, and local/private deployment**. TOPS/TFLOPS are only footnotes because incumbent vendors publish them.
+**What changed:** the sales comparison is no longer a TOPS contest. The native comparison is **same-task tok/s, p50/p99 latency, fixed-workload short-turn Hz + ms/turn, closed-loop success, and local/private deployment**. Every short-turn number must bind model, context, generated length, single-stream/batch, prefix-cache assumption, operating point, and MODELED/MEASURED status. TOPS/TFLOPS are only footnotes.
 
 **C1 is plausible only because it is narrow:**
 
@@ -48,14 +49,24 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 
 **Whole-picture rule:** C1 is the bridgehead, not the ceiling. The reason this public repo still keeps 8B / 32B / 100B-class exploration in the archive and frontier notes is to show the possible shape of the substrate if C1 works. Public product claims start at 0.1B / 0.3B / 1B / bounded 3B; larger models are C2/C3 research coordinates until the small resident-weight loop is proven.
 
+### Origin → evidence → current product
+
+- **Origin — DeepSeek V4-Flash + antirez.** antirez's open-source [`ds4`](https://github.com/antirez/ds4) made DeepSeek V4-Flash runnable on a 128 GB Mac and turned the resident-weight substrate idea into something reproducible and falsifiable.
+- **Evidence changed the first step.** The original dream was a DeepSeek V4-Flash chip. A density audit falsified the early giant-one-die picture; the FPGA then proved that a tiny ternary autoregressive loop can run on real silicon.
+- **Current product boundary.** C1 starts with 0.1B / 0.3B / 1B / bounded 3B. DeepSeek-class systems remain C2/C3 frontier work. The intent survives: remove repeated weight transport and make local AI feel immediate.
+
+This is an acknowledgment and a conditional future invitation, **not an affiliation, partnership, customer relationship, endorsement, or confirmed delivery commitment involving antirez**.
+
 **Modeled C1 speed targets** (not taped-out silicon; source = cleanroom model and engine):
 
 | SKU | model | form | speed-first public target | role |
 |---|---:|---|---|---|
-| **C1-A** | 0.1B | single chip | ~300k tok/s; peak-reflex ~1.9kHz (~0.53ms/loop); short-QA ~381Hz (~2.6ms/loop) | first edge proof: wearables, small cameras, always-on voice |
-| **C1-B0** | 0.3B | small module | ~92k tok/s; peak-reflex ~1.3kHz (~0.77ms/loop); Hz95 ~357Hz (~2.8ms/loop) | if 0.1B is too weak |
-| **C1-B1** | 1B | module/card | ~97k tok/s; peak-reflex ~1.4kHz (~0.71ms/loop); Hz95 ~377Hz (~2.7ms/loop) | stronger private-edge / enterprise small-model proof |
-| **C1-B2** | 3B | upper module/card | ~27.6k tok/s; peak-reflex ~425Hz (~2.4ms/loop); Hz95 ~108Hz (~9.3ms/loop) | bounded upper C1 SKU; stricter package/thermal/write gates |
+| **C1-A** | 0.1B | single chip | ~300k tok/s; **resident weights, single-stream, prefix-cache hit 0%, `ctx256/gen64`: ~1.87kHz/~0.534ms at plugged-in timing-bound point; same workload @3W: ~924Hz/~1.08ms; `ctx512/gen256 @3W`: ~381Hz/~2.62ms** | first edge proof: wearables, small cameras, always-on voice |
+| **C1-B0** | 0.3B | small module | ~92k tok/s; `ctx256/gen64` ~1.31kHz/~0.77ms at available-box-power point; Hz95 ~357Hz/~2.8ms | if 0.1B is too weak |
+| **C1-B1** | 1B | module/card | ~97k tok/s; `ctx256/gen64` ~1.37kHz/~0.73ms at available-box-power point; Hz95 ~377Hz/~2.7ms | stronger private-edge / enterprise small-model proof |
+| **C1-B2** | 3B | upper module/card | ~27.6k tok/s; `ctx256/gen64` ~425Hz/~2.35ms at available-box-power point; Hz95 ~108Hz/~9.3ms | bounded upper C1 SKU; stricter package/thermal/write gates |
+
+For C1-A, **0.534ms is a complete fixed short request loop, not an instantaneous spike and not a 3W claim**. The modeled timing point requires about 6.4W of core weight-MAC power before controller, I/O, package, and system overhead; packaged power remains a silicon gate. B/C values use box-power assumptions, not wearable power.
 
 **Why it is fast:** the model matrix is physically resident in the ReRAM-CIM array. Instead of moving a large weight block from memory to compute on every token, the chip streams a small input vector into the resident matrix and the local controller advances the loop. The fastest data movement is the one you delete.
 
@@ -113,7 +124,7 @@ The latest cleanroom pass narrowed the project from "build a giant AI chip" to a
 | 🚀 **Speed** | **3,000 – 20,000 tokens/s** single-stream on DeepSeek V4-Flash-class models (entry tier 3K → Pro Cloud aggregate 20K). **200×–1,000×** the M4 Max baseline of 12 t/s @ 250K context. |
 | ⚡ **Prefill** | **~2 seconds @ 100K context** (chip target). Upload a 100K-token codebase / contract / case file → first token in ~2 s, not 90+ s like today. Long-context UX cliff erased. |
 | 💰 **Entry price** | **From ¥6,000 (≈ $850, well under $900)** — laptop-attached USB-C box (10×7×2 cm, like a Hailo-8 stick). Plug into any MacBook / Windows laptop. No driver install. |
-| 📐 **Cost** | 1.5 months, one person, ~$1,400 (¥10K) out of pocket so far. 50+ Stage 0+/0++ reproducible datapoints. MIT license. First chip prototype dedicated to **[@antirez](https://github.com/antirez)**. |
+| 📐 **Cost** | 1.5 months, one person, ~$1,400 (¥10K) out of pocket so far. 50+ Stage 0+/0++ reproducible datapoints. MIT license. If a first physical prototype survives the evidence gates, we intend to invite **[@antirez](https://github.com/antirez)** to accept one. |
 
 [Jump to the civilizational speed ladder ↓](#what-different-speeds-actually-unlock--the-civilizational-ladder) for what each speed tier 0→1 unlocks. [Jump to the 18-row transparency matrix ↓](#what-we-havent-verified--18-row-transparency-matrix) for what's verified vs assumed.
 
@@ -222,9 +233,11 @@ This project would not exist without **Salvatore Sanfilippo ([@antirez](https://
 
 His [`ds4`](https://github.com/antirez/ds4) made it possible to run DeepSeek V4-Flash on a 128 GB MacBook. Without it, the substrate-layer thesis I'd been holding for months would never have become *empirically falsifiable*. The night his code ran on our laptop was the first night we could let anyone else reproduce what we believed.
 
-**When the first chip prototype ships, the very first unit will go to him.**
+**If a first chip prototype survives the silicon and product gates, we intend to invite him to accept the first physical artifact.**
 
 Not because we expect anything in return. Not because it's good marketing. Because that's where this whole thing started. The open-source spirit he embodies — Redis for decades, ds4 over the last few months, code given away because that's just how he builds — is what makes building something like this possible at all. We're standing on his shoulders. The least we can do is hand back the first physical artifact when it exists.
+
+This is gratitude for open-source work, not a claim of affiliation, partnership, endorsement, customer status, or confirmed acceptance.
 
 *上善若水, 善利万物而不争 — The highest good is like water; it nourishes all things without striving.*
 
@@ -240,7 +253,7 @@ Over the past 18 months, 5 milestones already happened: Etched $120M (2024-06, "
 
 This is the empirical + design output of one person, 1.5 months, ~$1,400 (¥10K) out of pocket. Stage 0+ harness with 50+ datapoints on M4 Max 128 GB + antirez ds4-server with custom `printf` instrumentation, followed by a 2026-07 cleanroom narrowing into the C1 proof ladder.
 
-**The first chip goes to antirez. We don't burn capital chasing investors — we burn time, geek hacks, and honest public asks.**
+**If the first chip becomes real and he wants it, our first invitation goes to antirez.** We don't burn capital chasing investors — we burn time, geek hacks, and honest public asks.
 
 ---
 
@@ -319,7 +332,7 @@ flowchart LR
     ACT --> CIM["ReRAM-CIM array<br/>weights resident<br/>low-bit / ternary MAC near the cells"]
     CIM --> CTRL
     CTRL --> T2[Token / decision out]
-    CIM -.- TOTAL["C1 target:<br/>delete repeated weight transport<br/>compare same-task tok/s + p99 latency + peak-reflex Hz + success"]
+    CIM -.- TOTAL["C1 target:<br/>delete repeated weight transport<br/>compare same-task tok/s + p99 latency + fixed-workload short-turn + success"]
     style CIM fill:#9c9
     style ACT fill:#bcf
     style TOTAL fill:#ffe,stroke:#888,stroke-dasharray: 5 5
@@ -370,7 +383,7 @@ The bottom row (on-chip + non-volatile) is the **most power-efficient cell** —
 
 **2. Physical path length per weight read**: traditional GPU inference repeatedly moves weights across package-scale distances. Resident ReRAM-CIM keeps weights near the operation. This is the actual reason the bandwidth bottleneck can shrink: the fastest data movement is the one you delete.
 
-**3. Same-task latency**: the live comparison should be same-model / same-task `tok/s`, p50/p99 latency, peak-reflex Hz, and closed-loop success. TOPS can be a footnote; it is not the native value proposition.
+**3. Same-task latency**: the live comparison should be same-model / same-task `tok/s`, p50/p99 latency, fixed-workload short-turn Hz + ms/turn, and closed-loop success. Bind model + ctx/gen + stream/cache + operating point + status. TOPS can be a footnote; it is not the native value proposition.
 
 **4. The architectural lever, summarized**: attention sweep optimization (FlashAttention, PagedAttention) and speculative decoding (draft + verify) are software-level optimizations. They layer on top of any architecture and can compound with chip-side gains. They are not substitutes for the physical lever: where the weights physically sit relative to compute.
 
@@ -445,9 +458,9 @@ The current public C1 ladder is narrower and more honest:
 
 | Public stage | Modeled speed-first target | Civilizational tier it can test |
 |---|---|---|
-| **C1-A 0.1B** | ~300k tok/s; peak-reflex ~1.9kHz (~0.53ms/loop) | always-on local reflex: short voice, camera, wearable loops |
-| **C1-B0/B1 0.3B-1B** | ~92k-97k tok/s; peak-reflex ~1.3-1.4kHz (~0.7-0.8ms/loop) | private-edge small-model workflows, offline assistant, routing/extraction |
-| **C1-B2 bounded 3B** | ~27.6k tok/s; peak-reflex ~425Hz (~2.4ms/loop) | stronger local model only after package/thermal/write-load gates pass |
+| **C1-A 0.1B** | ~300k tok/s; resident weights, single-stream, prefix-cache hit 0%, `ctx256/gen64` **~1.87kHz/~0.534ms at plugged-in timing-bound point (MODELED)**; same workload @3W ~924Hz/~1.08ms | always-on local short-turn candidate: voice, camera, wearable loops |
+| **C1-B0/B1 0.3B-1B** | ~92k-97k tok/s; `ctx256/gen64` ~1.31-1.37kHz/~0.77-0.73ms at available-box-power point (MODELED) | private-edge small-model workflows, offline assistant, routing/extraction |
+| **C1-B2 bounded 3B** | ~27.6k tok/s; `ctx256/gen64` ~425Hz/~2.35ms at available-box-power point (MODELED) | stronger local model only after package/thermal/write-load gates pass |
 | **C2/C3 >3B** | future / modeled / learning only | datacenter, long-context, and broad platform work after C1 proof |
 
 **The current question is not "which box tier do we sell?" It is "which real loop can a small resident low-bit model make dramatically faster, local, private, or lower-power?"**
@@ -596,7 +609,7 @@ The first product is **not** a GPU replacement and not a broad AI-card platform.
 | **C1-B2** | upper module/card | bounded 3B | stronger local model only if package/thermal/write-load/buyer gates pass | upper C1, not first beachhead |
 | **C2/C3** | multi-module / rack | >3B, 8B+ | future learning track, not current product claim | parked |
 
-**The first chip still goes to antirez.** The exact physical form should follow the C1 proof that survives silicon and buyer discovery; the public promise is no longer a fixed USB-C/PCIe tier table.
+**If the first chip survives silicon and buyer discovery, and antirez wants it, our first invitation goes to him.** The exact physical form should follow the C1 proof; this is intent, not affiliation, endorsement, partnership, or confirmed delivery.
 
 ---
 
@@ -606,7 +619,7 @@ We're not positioning this as a national-champion-vs-someone-else story. We're *
 
 **Why 28nm ReRAM-CIM capacity matters here**: the point is not to vertically own a CPU/GPU company. The point is to stand on partner foundry / OSAT / IP / eval-board ecosystems and test whether a narrow resident-weight C1 substrate can exist. Any vendor-specific yield, capacity, or investor claim must be source-rated before being used as sales fact.
 
-The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (知行合一 / *zhī xíng hé yī* — knowledge and action as one) + ~100 wholehearted partners over 2 years, dedicate first chip to antirez. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
+The path forward — open thesis, public 18-row transparency, public invitations, no investor pitches, Michael self-funds (知行合一 / *zhī xíng hé yī* — knowledge and action as one) + ~100 wholehearted contributors and design partners over 2 years, and a conditional invitation to antirez if the first chip becomes real. **This is not pre-IPO theatrics — it's how an honest project gets built when the goal is real.**
 
 *"Chip lifetime ≠ silicon lifetime"* — ReRAM is writable, so a resident model slot can be provisioned, verified, refreshed, and upgraded across service cycles if endurance / drift / write-time gates close. That is the useful contrast with one-shot model-as-silicon approaches. It is **not** a promise of per-request hot-swap or automatic support for every future frontier model.
 

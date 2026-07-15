@@ -27,7 +27,44 @@
     {
       "id": "C1-PUBLIC-BOUNDARY-2026-07-07",
       "canonical_doc": "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md",
-      "claim": "Public chip positioning starts with the narrow C1 ladder: 0.1B / 0.3B / 1B / bounded 3B resident low-bit inference, speed-first buyer metrics, provisionable model slots, and C2/C3 frontier work explicitly separated from first-SKU claims.",
+      "claim": "Public chip positioning starts with the narrow C1 ladder and preserves the DeepSeek V4-Flash plus antirez origin. Speed claims use workload length times operating point: C1-A 0.1B resident weights, single-stream, prefix-cache hit 0%, ctx256/gen64 is about 0.534ms at the plugged-in timing-bound MODELED point, not at 3W; ctx512/gen256 at 3W is about 2.62ms. No origin wording may imply affiliation, partnership, endorsement, customer status, or confirmed delivery.",
+      "semantic_checks": [
+        {
+          "name": "current public surfaces reject the legacy label and false antirez commitments",
+          "paths": [
+            "README.md",
+            "index.html",
+            "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md",
+            "OUTREACH-LOG.md",
+            "cheatsheet.md"
+          ],
+          "forbidden_patterns": [
+            "peak[- ]?reflex",
+            "峰值反应",
+            "巅峰反应",
+            "The first chip goes to antirez",
+            "the very first unit will go to him",
+            "First chip prototype dedicated to"
+          ]
+        },
+        {
+          "name": "denominator and origin boundary stay visible",
+          "paths": [
+            "README.md",
+            "index.html",
+            "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md"
+          ],
+          "required_patterns": [
+            "ctx256/gen64",
+            "prefix-cache hit 0%",
+            "single-stream",
+            "timing-bound",
+            "MODELED|modeled",
+            "DeepSeek V4-Flash",
+            "not an affiliation|不代表合作"
+          ]
+        }
+      ],
       "required_updates": [
         {
           "path": "living-impact-map.json",
@@ -55,14 +92,16 @@
           "path": "OUTREACH-LOG.md",
           "anchors": [
             "repo-wide C1/C2/C3 consistency pass",
-            "same-task tok/s, latency, peak-reflex Hz"
+            "fixed-workload short-turn Hz + ms/turn"
           ]
         },
         {
           "path": "index.html",
           "anchors": [
             "C1 modeled target",
-            "100B frontier later"
+            "100B frontier later",
+            "Origin → iteration → current",
+            "not affiliation, partnership, endorsement, customer status, or confirmed delivery"
           ]
         },
         {
@@ -70,7 +109,9 @@
           "anchors": [
             "Whole picture: C1 bridgehead, 100B frontier",
             "same-task speed first",
-            "0.1B / 0.3B / 1B / bounded 3B"
+            "0.1B / 0.3B / 1B / bounded 3B",
+            "Origin → evidence → current product",
+            "not an affiliation, partnership, customer relationship, endorsement, or confirmed delivery"
           ]
         },
         {

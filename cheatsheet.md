@@ -55,7 +55,7 @@ Local preview: `python3 -m http.server 8792` from repo root → http://localhost
 - C1 ladder: `0.1B / 0.3B / 1B / bounded 3B`; `>3B` stays C2/C3 future learning.
 - Whole-picture framing: C1 is the bridgehead, not the ceiling. Keep 8B / 32B / 100B as C2/C3 frontier coordinates,
   not first-SKU promises.
-- Buyer-facing order: same-task `tok/s`, latency, peak-reflex `Hz` + `ms/loop`, task success, then local/private/power. TOPS/TFLOPS belong only in footnotes/reference coordinates.
+- Buyer-facing order: same-task `tok/s`, latency, fixed-workload short-turn `Hz` + `ms/turn`, task success, then local/private/power. Bind model + ctx/gen + single-stream/batch + prefix-cache + operating point + status. C1-A headline: 0.1B resident weights, single-stream, prefix-cache hit 0%, `ctx256/gen64` ~1.87kHz/~0.534ms at plugged-in timing-bound point; same workload @3W ~924Hz/~1.08ms. TOPS/TFLOPS belong in footnotes.
 - Rewritable wording: "provisionable resident model slots"; do not imply per-request hot-swap or online learning in ReRAM.
 - Public-safe red lines: no cell programming recipes, circuit/floorplan/package/process private detail, partner names, unsupported AI4S 100x claims, or "replace GPU/DRIVE/Jetson safety stack" claims.
 - `chip/model-2026-06/` is now an archived public physics snapshot. It is still useful, but current product/outreach copy starts from the C1 brief.

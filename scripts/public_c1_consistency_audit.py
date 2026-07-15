@@ -29,15 +29,23 @@ REQUIRED_ANCHORS: dict[str, list[str]] = {
         "C1 cleanroom update",
         "0.1B / 0.3B / 1B / bounded 3B",
         "C1 is the bridgehead, not the ceiling",
+        "resident weights, single-stream, prefix-cache hit 0%",
+        "not a 3W claim",
+        "not an affiliation, partnership, customer relationship, endorsement, or confirmed delivery commitment",
     ],
     "index.html": [
         "C1 modeled target",
         "100B frontier later",
+        "Origin → iteration → current",
+        "not affiliation, partnership, endorsement, customer status, or confirmed delivery",
     ],
     "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md": [
         "Whole picture: C1 bridgehead, 100B frontier",
         "0.1B / 0.3B / 1B / bounded 3B",
         "same-task speed first",
+        "resident weights, single-stream, prefix-cache hit 0%",
+        "not a 3W claim",
+        "not an affiliation, partnership, customer relationship, endorsement, or confirmed delivery",
     ],
     "chip/README.md": [
         "C1 is the bridgehead, not the ceiling",
@@ -106,6 +114,25 @@ STALE_PATTERNS = [
     r"4B 三元\(我们的 v1\)",
     r"2[–-]5k tok/s",
     r"same silicon runs V4-Flash",
+]
+
+
+CURRENT_PERFORMANCE_SURFACES = [
+    "README.md",
+    "index.html",
+    "chip/C1-FIRST-SKU-PUBLIC-BRIEF-2026-07.md",
+    "OUTREACH-LOG.md",
+    "cheatsheet.md",
+]
+
+
+FORBIDDEN_CURRENT_PATTERNS = [
+    r"peak[- ]?reflex",
+    r"峰值反应",
+    r"巅峰反应",
+    r"The first chip goes to antirez",
+    r"the very first unit will go to him",
+    r"First chip prototype dedicated to",
 ]
 
 
@@ -188,6 +215,16 @@ def main() -> int:
                     continue
                 errors.append(
                     f"{path}:{line_no(text, m.start())}: stale phrase without nearby C1/archive label: {m.group(0)!r}"
+                )
+
+    forbidden_current_res = [re.compile(p, re.IGNORECASE) for p in FORBIDDEN_CURRENT_PATTERNS]
+    for path in CURRENT_PERFORMANCE_SURFACES:
+        text = (ROOT / path).read_text(encoding="utf-8", errors="replace")
+        for pat in forbidden_current_res:
+            match = pat.search(text)
+            if match:
+                errors.append(
+                    f"{path}:{line_no(text, match.start())}: forbidden current performance/origin phrase: {match.group(0)!r}"
                 )
 
     if errors:

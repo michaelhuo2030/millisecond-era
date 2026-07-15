@@ -17,6 +17,14 @@ It is not a GPU, not a CPU, not a general PyTorch target, and not a broad accele
 
 Anything **>3B** is C2/C3 future work until C1 evidence exists.
 
+## Origin → evidence → current product
+
+- **Origin — DeepSeek V4-Flash + antirez.** antirez's open-source [`ds4`](https://github.com/antirez/ds4) made DeepSeek V4-Flash runnable on a 128 GB Mac and made the resident-weight thesis reproducible and falsifiable.
+- **Iteration — evidence narrowed the first step.** The initial ambition was a DeepSeek V4-Flash chip. A density audit falsified the giant-one-die picture; the FPGA then proved a tiny ternary autoregressive loop on real silicon.
+- **Current — C1 starts small without abandoning the intent.** The first product boundary is 0.1B / 0.3B / 1B / bounded 3B. DeepSeek-class systems remain C2/C3 frontier work. The through-line is unchanged: remove repeated weight transport so local AI can respond immediately.
+
+This origin story is an acknowledgment and a conditional future invitation, **not an affiliation, partnership, customer relationship, endorsement, or confirmed delivery involving antirez**.
+
 ## Whole picture: C1 bridgehead, 100B frontier
 
 Bounded 3B is a **C1 constraint**, not a technology ceiling.
@@ -51,7 +59,7 @@ The resident matrix is not permanent ROM. ReRAM makes the model **provisionable 
 Buyer-facing comparisons should use this order. The short rule is: **same-task speed first, deployment fit second,
 TOPS last**.
 
-1. **Same-task speed:** tok/s, p50/p95/p99 latency, peak-reflex Hz, ms/loop, closed-loop success.
+1. **Same-task speed:** tok/s, p50/p95/p99 latency, fixed-workload short-turn Hz + ms/turn, closed-loop success. Bind model + ctx/gen + single-stream/batch + prefix-cache assumption + operating point + MODELED/MEASURED status.
 2. **Deployment fit:** local/private, power, thermal, model-update cadence, form factor.
 3. **Reference coordinates only:** TOPS, TFLOPS, watts, and vendor platform names.
 
@@ -69,12 +77,14 @@ All numbers below are **modeled cleanroom design targets**, not taped-out ASIC s
 
 | SKU | target model | form | modeled speed-first target | early role |
 |---|---:|---|---|---|
-| **C1-A** | 0.1B | single packaged chip | ~300k tok/s; peak-reflex ~1.9kHz (~0.53ms/loop); short-QA ~381Hz (~2.6ms/loop) | first edge proof: AI glasses, earbuds, small cameras, always-on voice |
-| **C1-B0** | 0.3B | small module | ~92k tok/s; peak-reflex ~1.3kHz (~0.77ms/loop); Hz95 ~357Hz (~2.8ms/loop) | bridge if 0.1B is too weak |
-| **C1-B1** | 1B | module/card | ~97k tok/s; peak-reflex ~1.4kHz (~0.71ms/loop); Hz95 ~377Hz (~2.7ms/loop) | private-edge and enterprise small-model proof |
-| **C1-B2** | bounded 3B | upper module/card | ~27.6k tok/s; peak-reflex ~425Hz (~2.4ms/loop); Hz95 ~108Hz (~9.3ms/loop) | upper C1 only; needs stricter package, PDN, thermal, write-load, and buyer gates |
+| **C1-A** | 0.1B | single packaged chip | ~300k tok/s; **resident weights, single-stream, prefix-cache hit 0%, `ctx256/gen64`: ~1.87kHz/~0.534ms at plugged-in timing-bound point; same workload @3W: ~924Hz/~1.08ms; `ctx512/gen256 @3W`: ~381Hz/~2.62ms** | first edge proof: AI glasses, earbuds, small cameras, always-on voice |
+| **C1-B0** | 0.3B | small module | ~92k tok/s; `ctx256/gen64` ~1.31kHz/~0.77ms at available-box-power point; Hz95 ~357Hz/~2.8ms | bridge if 0.1B is too weak |
+| **C1-B1** | 1B | module/card | ~97k tok/s; `ctx256/gen64` ~1.37kHz/~0.73ms at available-box-power point; Hz95 ~377Hz/~2.7ms | private-edge and enterprise small-model proof |
+| **C1-B2** | bounded 3B | upper module/card | ~27.6k tok/s; `ctx256/gen64` ~425Hz/~2.35ms at available-box-power point; Hz95 ~108Hz/~9.3ms | upper C1 only; needs stricter package, PDN, thermal, write-load, and buyer gates |
 
 Read both units together: **1000Hz = 1ms/loop, 100Hz = 10ms/loop, 10Hz = 100ms/loop**.
+
+For C1-A, **0.534ms is a complete fixed short request loop, not an instantaneous spike and not a 3W claim**. The modeled timing point needs about 6.4W of core weight-MAC power before controller, I/O, package, and system overhead; packaged power remains a silicon gate. B/C short-turn rows use available-box-power assumptions, not wearable power.
 
 ## What to say to a buyer
 

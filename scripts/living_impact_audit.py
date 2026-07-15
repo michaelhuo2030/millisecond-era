@@ -9,6 +9,7 @@ import fnmatch
 import glob
 import json
 import pathlib
+import re
 import sys
 
 
@@ -75,6 +76,29 @@ def audit_manifest(manifest_path="living-impact-map.json", base=None):
                 if anchor not in txt:
                     issues.append(f"ANCHOR MISSING - [{fid}] {rel} lacks {anchor!r}")
 
+        for check in finding.get("semantic_checks", []):
+            name = check.get("name", "unnamed semantic check")
+            texts = []
+            for rel in check.get("paths", []):
+                p = _path(rel, base)
+                if not p.exists():
+                    issues.append(f"SEMANTIC FILE MISSING - [{fid}] [{name}] {rel}")
+                    continue
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+                texts.append(txt)
+                for pattern in check.get("forbidden_patterns", []):
+                    if re.search(pattern, txt, flags=re.IGNORECASE | re.MULTILINE):
+                        issues.append(
+                            f"SEMANTIC FORBIDDEN - [{fid}] [{name}] {rel} matches /{pattern}/"
+                        )
+
+            aggregate = "\n".join(texts)
+            for pattern in check.get("required_patterns", []):
+                if not re.search(pattern, aggregate, flags=re.IGNORECASE | re.MULTILINE):
+                    issues.append(
+                        f"SEMANTIC REQUIRED MISSING - [{fid}] [{name}] no checked file matches /{pattern}/"
+                    )
+
     return issues
 
 
@@ -91,7 +115,7 @@ def main():
             print(f"  - {issue}")
         print(f"  ({len(issues)} issue(s). Update the manifest or affected surfaces.)")
         return 1
-    print("[living_impact_audit] OK - every live surface is covered; required anchors present.")
+    print("[living_impact_audit] OK - every live surface is covered; required anchors and semantic checks pass.")
     return 0
 
 

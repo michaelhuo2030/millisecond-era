@@ -11,7 +11,7 @@ This is the public repo ledger for shareable artifacts. Archive does not automat
 ## Launch discipline
 
 - Lead with measured FPGA evidence and clearly labeled modeled ASIC targets.
-- For C1 outreach, compare on same-task tok/s, latency, peak-reflex Hz, and task success before TOPS.
+- For C1 outreach, compare on same-task tok/s, latency, fixed-workload short-turn Hz + ms/turn, and task success before TOPS. Bind model + ctx/gen + stream/cache + operating point + status; never present 0.534ms as a 3W result.
 - Rewritability means provisionable resident model slots, not hot-swap RAM.
 - Keep AI-for-science as research inspiration until trace-backed evidence proves a real end-to-end speedup.
 - Do not present C2/C3 rack or >3B scenarios as the first product.

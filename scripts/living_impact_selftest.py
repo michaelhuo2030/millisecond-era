@@ -78,6 +78,26 @@ def main():
     no_unaffected["findings"][0]["unaffected_groups"] = []
     expect("unaffected groups are enforced", audit_data(no_unaffected), "UNCOVERED")
 
+    semantic_forbidden = copy.deepcopy(base)
+    semantic_forbidden["findings"][0]["semantic_checks"] = [
+        {
+            "name": "selftest forbidden phrase",
+            "paths": ["README.md"],
+            "forbidden_patterns": ["C1 cleanroom update"],
+        }
+    ]
+    expect("forbidden live phrase", audit_data(semantic_forbidden), "SEMANTIC FORBIDDEN")
+
+    semantic_required = copy.deepcopy(base)
+    semantic_required["findings"][0]["semantic_checks"] = [
+        {
+            "name": "selftest required phrase",
+            "paths": ["README.md"],
+            "required_patterns": ["__SELFTEST_IMPOSSIBLE_SEMANTIC_REQUIREMENT__"],
+        }
+    ]
+    expect("required semantic phrase", audit_data(semantic_required), "SEMANTIC REQUIRED MISSING")
+
     print("[living_impact_selftest] OK - all negative and positive cases behaved as expected.")
 
 

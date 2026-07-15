@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Millisecond Era · 毫秒纪元 — click-and-play on-device AI chip</title>
-<meta name="description" content="Make AI insanely fast — fast enough to fit in a pair of glasses and think offline, and rewritable so it never locks in. Every card runs right in your browser.">
+<title>Millisecond Era · 毫秒纪元 — modeled resident-weight C1 chip research</title>
+<meta name="description" content="A measured tiny ternary FPGA proof and a modeled, not-yet-taped-out resident-weight ReRAM-CIM C1 target. Explore the evidence, assumptions, and interactive demos.">
 <style>
 :root{
   --bg:#06070d;--bg2:#0a0d16;--panel:#12141f;--panel2:#161a26;--line:#242838;
@@ -70,16 +70,20 @@ footer .one{color:#aab2c4;margin-bottom:8px}
   <div class="kicker"><span class="lang-en">The Millisecond Era · 毫秒纪元</span><span class="lang-zh">毫秒纪元 · The Millisecond Era</span></div>
   <h1><span class="lang-en">Make AI <span class="grad">insanely fast</span></span><span class="lang-zh">把 AI 做到<span class="grad">极致的快</span></span></h1>
   <p class="tagline">
-    <span class="lang-en">Fast enough to <b>fit in a pair of glasses</b> and <b>think with no connection</b> — and <b>rewritable, never locked in</b>.<br>Turn intelligence from a "rented cloud service" back into "something you actually own."</span>
-    <span class="lang-zh">快到能<b>装进一副眼镜</b>、<b>断网也能思考</b>，而且<b>可重刷、不锁死</b>。<br>让智能从"租来的云服务"，变回"你真正拥有的能力"。</span>
+    <span class="lang-en">A <b>measured tiny ternary FPGA proof</b>, and a <b>modeled resident-weight C1 target</b> for immediate local AI.<br>The ReRAM-CIM ASIC is <b>not taped out</b>; this site shows both the ambition and the evidence boundary.</span>
+    <span class="lang-zh">一个<b>真硅实测的微型三值 FPGA 证明</b>，加上一条让本地 AI 即时响应的<b>常驻权重 C1 推算路线</b>。<br>ReRAM-CIM ASIC <b>尚未流片</b>；这里同时展示梦想与证据边界。</span>
   </p>
   <div class="chips">
     <span class="chip"><span class="lang-en">C1 modeled target <b>0.1B→3B</b></span><span class="lang-zh">C1 推算目标 <b>0.1B→3B</b></span></span>
     <span class="chip"><span class="lang-en">C1 bridgehead · <b>100B frontier later</b></span><span class="lang-zh">C1 是桥头堡 · <b>100B 是后续前沿</b></span></span>
-    <span class="chip"><span class="lang-en">0.1B peak-reflex <b>~0.53 ms</b></span><span class="lang-zh">0.1B 峰值反应 <b>~0.53 ms</b></span></span>
-    <span class="chip"><span class="lang-en">Compute-in-memory · <b>weights don't move</b></span><span class="lang-zh">存算一体 · <b>不搬权重</b></span></span>
+    <span class="chip"><span class="lang-en">0.1B · single-stream · cache0 · ctx256/gen64 · modeled timing-bound <b>~0.534 ms</b></span><span class="lang-zh">0.1B · 单流 · 无前缀缓存 · ctx256/gen64 · 推算 timing-bound <b>~0.534 ms</b></span></span>
+    <span class="chip"><span class="lang-en">Compute-in-memory · <b>no repeated weight transport</b></span><span class="lang-zh">存算一体 · <b>减少反复搬权重</b></span></span>
     <span class="chip"><span class="lang-en">Ternary −1/0/+1 · <b>no multiplier</b></span><span class="lang-zh">三值 −1/0/+1 · <b>无乘法</b></span></span>
     <span class="chip"><span class="lang-en">ReRAM <b>provisionable</b></span><span class="lang-zh">ReRAM <b>可写入/可升级</b></span></span>
+  </div>
+  <div class="howto">
+    <span class="lang-en"><b>Origin → iteration → current:</b> antirez's open-source ds4 made DeepSeek V4-Flash runnable on a 128 GB Mac and made the thesis falsifiable. Density evidence narrowed the first product to C1: 0.1B / 0.3B / 1B / bounded 3B. This is acknowledgment, not affiliation, partnership, endorsement, customer status, or confirmed delivery.</span>
+    <span class="lang-zh"><b>缘起 → 迭代 → 当下：</b> antirez 的开源 ds4 让 DeepSeek V4-Flash 在 128GB Mac 上真正跑起来，也让假设可以被证伪。密度证据把第一产品收敛到 C1：0.1B / 0.3B / 1B / 有边界的 3B。这是致敬，不代表合作、背书、客户关系或已确认交付。</span>
   </div>
   <div class="cta">
     <a class="btn primary" href="learn/speed-trial.html"><span class="lang-en">▶ Speed Trial · don't trust me, click</span><span class="lang-zh">▶ 速度自证 · 别信我，自己点</span></a>
@@ -188,8 +192,8 @@ footer .one{color:#aab2c4;margin-bottom:8px}
   <div class="sehd">
     <h2><span class="lang-en">🧱 The chip & how it works</span><span class="lang-zh">🧱 芯片与原理</span></h2>
     <div class="lead">
-      <span class="lang-en">Where does the speed come from? <b>Compute-in-memory (ReRAM-CIM)</b> — the weights <i>are</i> the circuit, so <b>no data moves</b>, sidestepping the memory-bandwidth wall that throttles every AI device. Below: the chip <b>taken apart and made tweakable</b>.</span>
-      <span class="lang-zh">速度从哪来？<b>存算一体（ReRAM-CIM）</b>——权重就是电路，<b>不搬数据</b>，绕开拖死所有 AI 设备的内存带宽墙。下面把芯片<b>拆开给你看、给你算</b>。</span>
+      <span class="lang-en">Where could the speed come from? <b>Compute-in-memory (ReRAM-CIM)</b> keeps weights physically resident, deleting repeated weight transport while inputs, activations, and outputs still move. Below: the modeled chip <b>taken apart and made tweakable</b>.</span>
+      <span class="lang-zh">速度可能从哪来？<b>存算一体（ReRAM-CIM）</b>让权重物理常驻，减少每 token 反复搬权重；输入、激活和输出仍然要移动。下面把这条推算芯片路线<b>拆开给你看、给你算</b>。</span>
     </div>
   </div>
   <div class="grid">
@@ -249,8 +253,8 @@ footer .one{color:#aab2c4;margin-bottom:8px}
   <div class="sehd">
     <h2><span class="lang-en">🛡️ Three doors · apps & civilization</span><span class="lang-zh">🛡️ 三扇门 · 应用与文明</span></h2>
     <div class="lead">
-      <span class="lang-en">Fast enough, frugal enough, and private on-device — a whole class of previously-impossible apps becomes real for the first time: <b>glasses that think offline · 24/7 private guardianship · a lifetime recorded, searchable anytime</b>. The moat is physics, not being smarter.</span>
-      <span class="lang-zh">够快、够省、又在端上私有——一整类以前不可能的应用第一次成立：<b>断网也能思考的眼镜 · 7×24 私有守护 · 记录一生随时可查</b>。护城河是物理，不是更聪明。</span>
+      <span class="lang-en">If the C1 speed, power, and low-bit quality gates close, these are candidate local/private applications to test: <b>offline glasses · private guardianship · owned searchable memory</b>. They are exploration targets, not validated product claims.</span>
+      <span class="lang-zh">如果 C1 的速度、功耗和低比特质量门都能闭合，这些是值得验证的本地私密应用：<b>离线眼镜 · 私有守护 · 自有可查记忆</b>。它们是探索靶场，不是已验证产品承诺。</span>
     </div>
   </div>
   <div class="grid">
